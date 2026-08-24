@@ -1,22 +1,25 @@
 package canbusreg
 
-import "testing"
+import (
+	"github.com/Project-Helianthus/helianthus-canbus"
+	"testing"
+)
 
-func TestRegistryFailsClosedAndBoundsEvidence(t *testing.T) {
-	registry := NewRegistry(GreeVRFCandidate())
+type matchProfile struct{ name string }
 
-	result := registry.Classify(Observation{Extended: false, ID: 0x123, Data: []byte{1, 2, 3}})
-	if result.Profile != "" || result.Projection != nil {
-		t.Fatalf("unknown observation = %#v, want opaque without projection", result)
+func (p matchProfile) Classify(Evidence) Classification { return Classification{p.name, p.name} }
+
+func TestRegistryFailsClosed(t *testing.T) {
+	id, _ := canbus.NewExtendedID(0x10000001)
+	frame, _ := canbus.NewFrame(id, []byte{0, 1})
+	e := Evidence{Frame: frame}
+	if got := NewRegistry(GreeVRFCandidate()).Classify(e); got.Profile != "" {
+		t.Fatalf("Gree=%#v", got)
 	}
-
-	result = registry.Classify(Observation{Extended: true, ID: 0x10000001, Data: make([]byte, 9)})
-	if result.Profile != "" || result.Projection != nil {
-		t.Fatalf("oversized observation = %#v, want opaque without projection", result)
+	if got := NewRegistry(matchProfile{"a"}, matchProfile{"b"}).Classify(e); got.Profile != "" {
+		t.Fatalf("overlap=%#v", got)
 	}
-
-	result = registry.Classify(Observation{Extended: true, ID: 0x10000001, Data: []byte{0, 1}})
-	if result.Profile != "" || result.Projection != nil {
-		t.Fatalf("unqualified Gree candidate = %#v, want opaque without projection", result)
+	if got := NewRegistry(matchProfile{"a"}).Classify(e); got.Profile != "a" {
+		t.Fatalf("single=%#v", got)
 	}
 }

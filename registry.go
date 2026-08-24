@@ -1,78 +1,50 @@
 package canbusreg
 
-const maxObservationDataBytes = 8
+import (
+	"github.com/Project-Helianthus/helianthus-canbus"
+	"time"
+)
 
-// Observation is one received CAN frame represented without transport-specific state.
-type Observation struct {
-	Extended bool
-	ID       uint32
-	Data     []byte
+type Evidence struct {
+	Frame     canbus.Frame
+	Interface canbus.InterfaceIdentity
+	Sequence  uint64
+	Monotonic time.Duration
+	RawRecord [canbus.SocketCANRecordSize]byte
 }
 
-// Classification is the semantic result of matching an observation to a profile.
-// An empty value represents opaque, unclassified evidence.
+func NewEvidence(o canbus.Observation) Evidence {
+	return Evidence{o.Frame(), o.Interface(), o.Sequence(), o.MonotonicTimestamp(), o.RawRecord()}
+}
+
 type Classification struct {
 	Profile    string
 	Projection any
 }
+type Profile interface{ Classify(Evidence) Classification }
+type Registry struct{ profiles []Profile }
 
-// Profile can explicitly recognize an observation and supply its semantic projection.
-type Profile interface {
-	Classify(Observation) Classification
-}
+func NewRegistry(profiles ...Profile) Registry { return Registry{append([]Profile(nil), profiles...)} }
 
-// Registry evaluates explicitly registered vendor profiles. It does not infer profiles
-// from frame shape, identifier ranges, or payload contents.
-type Registry struct {
-	profiles []Profile
-}
-
-// NewRegistry creates a registry with the supplied explicit vendor profiles.
-func NewRegistry(profiles ...Profile) Registry {
-	return Registry{profiles: append([]Profile(nil), profiles...)}
-}
-
-// Classify returns an opaque result when the observation is malformed or no profile
-// explicitly provides a projection.
-func (r Registry) Classify(observation Observation) Classification {
-	if !observationWellFormed(observation) {
-		return Classification{}
-	}
-
-	for _, profile := range r.profiles {
-		if profile == nil {
+func (r Registry) Classify(e Evidence) Classification {
+	var match Classification
+	for _, p := range r.profiles {
+		if p == nil {
 			continue
 		}
-
-		result := profile.Classify(observation)
-		if result.Profile != "" && result.Projection != nil {
-			return result
+		candidate := p.Classify(e)
+		if candidate.Profile == "" || candidate.Projection == nil {
+			continue
 		}
+		if match.Profile != "" {
+			return Classification{}
+		}
+		match = candidate
 	}
-
-	return Classification{}
-}
-
-func observationWellFormed(observation Observation) bool {
-	if len(observation.Data) > maxObservationDataBytes {
-		return false
-	}
-
-	if observation.Extended {
-		return observation.ID <= 0x1fffffff
-	}
-
-	return observation.ID <= 0x7ff
+	return match
 }
 
 type greeVRFCandidate struct{}
 
-// GreeVRFCandidate registers the first Gree VRF flavor. It deliberately has no
-// frame classifier or projection until the flavor has explicit evidence.
-func GreeVRFCandidate() Profile {
-	return greeVRFCandidate{}
-}
-
-func (greeVRFCandidate) Classify(Observation) Classification {
-	return Classification{}
-}
+func GreeVRFCandidate() Profile                           { return greeVRFCandidate{} }
+func (greeVRFCandidate) Classify(Evidence) Classification { return Classification{} }

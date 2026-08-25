@@ -43,8 +43,3 @@ func (r Registry) Classify(e Evidence) Classification {
 	}
 	return match
 }
-
-type greeVRFCandidate struct{}
-
-func GreeVRFCandidate() Profile                           { return greeVRFCandidate{} }
-func (greeVRFCandidate) Classify(Evidence) Classification { return Classification{} }

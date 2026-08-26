@@ -2,16 +2,25 @@ package canbusreg
 
 import "testing"
 
+func TestGreeVRFMapTableInventory(t *testing.T) {
+	if got := len(greeVRFMapM94Entries); got != 94 {
+		t.Fatalf("M94 entries = %d, want 94", got)
+	}
+	if got := len(greeVRFMapM115Entries); got != 115 {
+		t.Fatalf("M115 entries = %d, want 115", got)
+	}
+}
+
 func TestGreeVRFMapDecoderReplaysCanonicalPipelines(t *testing.T) {
 	tests := []struct {
-		name       string
-		decoder    GreeVRFMapDecoder
-		initial    GreeVRFMapState
-		opcode     uint8
-		data       []byte
-		rows       []int
-		cells      map[uint8]uint8
-		latch      bool
+		name    string
+		decoder GreeVRFMapDecoder
+		initial GreeVRFMapState
+		opcode  uint8
+		data    []byte
+		rows    []int
+		cells   map[uint8]uint8
+		latch   bool
 	}{
 		{
 			name:    "M94 duplicate source applies both rows",
@@ -78,10 +87,10 @@ func TestGreeVRFMapDecoderReplaysCanonicalPipelines(t *testing.T) {
 	}
 }
 
-func TestGreeVRFMapDecoderFailsClosedForInvalidFrame(t *testing.T) {
+func TestGreeVRFMapDecoderFailsClosedForUnalignedU16Stream(t *testing.T) {
 	decoder := NewGreeVRFMapDecoder(GreeVRFMapM94, 0)
 	initial := GreeVRFMapState{Cells: map[uint8]uint8{0x34: 0x55}}
-	got, rows, ok := decoder.Apply(initial, 0x22, []byte{0x0d})
+	got, rows, ok := decoder.Apply(initial, 0x73, []byte{0x01, 0xaa})
 	if ok || len(rows) != 0 || got.Cells[0x34] != 0x55 {
 		t.Fatalf("invalid frame result = %#v, %v, %t", got, rows, ok)
 	}

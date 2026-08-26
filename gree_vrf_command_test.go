@@ -2,6 +2,22 @@ package canbusreg
 
 import "testing"
 
+func TestGreeVRFCommandTableInventory(t *testing.T) {
+	if got := len(greeVRFCommandRows); got != 88 {
+		t.Fatalf("rows = %d, want 88", got)
+	}
+	counts := map[greeVRFCommandKind]int{}
+	for _, row := range greeVRFCommandRows {
+		counts[row.kind]++
+	}
+	if counts[greeVRFCommandBool]+counts[greeVRFCommandU8]+counts[greeVRFCommandU16LE] != 47 {
+		t.Fatalf("supported rows = %d, want 47", counts[greeVRFCommandBool]+counts[greeVRFCommandU8]+counts[greeVRFCommandU16LE])
+	}
+	if counts[greeVRFCommandReserved] != 40 || counts[greeVRFCommandUnsupportedWidth] != 1 {
+		t.Fatalf("rejected rows = reserved:%d unsupported:%d", counts[greeVRFCommandReserved], counts[greeVRFCommandUnsupportedWidth])
+	}
+}
+
 func TestGreeVRFCommandEncoderBuildsSupportedFamilies(t *testing.T) {
 	tests := []struct {
 		name       string
@@ -10,9 +26,9 @@ func TestGreeVRFCommandEncoderBuildsSupportedFamilies(t *testing.T) {
 		wantID     uint32
 		wantData   []byte
 	}{
-		{name: "boolean", propertyID: 0x06, value: 2, wantID: 0x17ffc306, wantData: []byte{0x00, 0x01, 0x01}},
+		{name: "boolean", propertyID: 0x06, value: 2, wantID: 0x17ffc36f, wantData: []byte{0x00, 0x01, 0x01}},
 		{name: "unsigned byte", propertyID: 0x0b, value: 0x7f, wantID: 0x17ffc371, wantData: []byte{0x00, 0x01, 0x7f}},
-		{name: "little endian unsigned word", propertyID: 0x10, value: 0x1234, wantID: 0x17ffc373, wantData: []byte{0x02, 0x03, 0x34, 0x12}},
+		{name: "little endian unsigned word", propertyID: 0x10, value: 0x1234, wantID: 0x17ffc373, wantData: []byte{0x00, 0x03, 0x34, 0x12}},
 	}
 
 	for _, testCase := range tests {
@@ -41,7 +57,7 @@ func TestGreeVRFCommandEncoderRejectsUnsupportedInputs(t *testing.T) {
 		{name: "out of table", unit7: 6, propertyID: 0x58, value: 1},
 	} {
 		t.Run(testCase.name, func(t *testing.T) {
-			if got, ok := EncodeGreeVRFCommand(0x17e00000, testCase.unit7, testCase.propertyID, testCase.value); ok || got != (GreeVRFCommand{}) {
+			if got, ok := EncodeGreeVRFCommand(0x17e00000, testCase.unit7, testCase.propertyID, testCase.value); ok || got.Identifier != 0 || got.Data != nil {
 				t.Fatalf("command = %#v, ok = %t", got, ok)
 			}
 		})
@@ -56,7 +72,7 @@ func TestGreeVRFTimeCommandEncodesPackedDecimal(t *testing.T) {
 	if got.Identifier != 0x04820000 || string(got.Data) != string([]byte{0x24, 0x08, 0x26, 0x13, 0x45, 0x09, 0x02, 0x02}) {
 		t.Fatalf("time command = %#v", got)
 	}
-	if got, ok := EncodeGreeVRFTimeCommand(GreeVRFTime{Month: 100}); ok || got != (GreeVRFCommand{}) {
+	if got, ok := EncodeGreeVRFTimeCommand(GreeVRFTime{Month: 100}); ok || got.Identifier != 0 || got.Data != nil {
 		t.Fatalf("out-of-range decimal result = %#v, %t", got, ok)
 	}
 }

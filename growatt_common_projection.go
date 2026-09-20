@@ -35,13 +35,13 @@ type GrowattLowVoltageBMSCommonStatus struct {
 }
 
 // GrowattLowVoltageBMSCommonMeasurements contains only the shared 0x313 fields.
-// Bytes 4--5 remain available solely through RawEvidence.
+// Bytes 4--5 and byte 7's revision-local high bit remain available solely
+// through RawEvidence.
 type GrowattLowVoltageBMSCommonMeasurements struct {
 	VoltageCentivolts int16
 	CurrentDeciamps   int16
 	SOCPercent        uint8
 	SOHValue          uint8
-	SOHValid          bool
 }
 
 // GrowattLowVoltageBMSCommonProjector holds one explicitly selected source.
@@ -97,7 +97,6 @@ func (p *GrowattLowVoltageBMSCommonProjector) Apply(evidence Evidence) (GrowattL
 			CurrentDeciamps:   int16(binary.BigEndian.Uint16(data[2:4])),
 			SOCPercent:        data[6],
 			SOHValue:          data[7] & 0x7f,
-			SOHValid:          data[7]&0x80 != 0,
 		}
 	}
 	return projection, true

@@ -42,8 +42,27 @@ func TestGrowattCommonProjectionExposesOnlyDocumentedSharedFields(t *testing.T) 
 	if !accepted || measurements.Limits != nil || measurements.Status != nil || measurements.Measurements == nil {
 		t.Fatalf("measurement projection = %#v, accepted = %t", measurements, accepted)
 	}
-	if measurements.Measurements.VoltageCentivolts != 5120 || measurements.Measurements.CurrentDeciamps != -10 || measurements.Measurements.SOCPercent != 80 || measurements.Measurements.SOHValue != 127 || !measurements.Measurements.SOHValid {
+	if measurements.Measurements.VoltageCentivolts != 5120 || measurements.Measurements.CurrentDeciamps != -10 || measurements.Measurements.SOCPercent != 80 || measurements.Measurements.SOHValue != 127 {
 		t.Fatalf("measurements = %#v", measurements.Measurements)
+	}
+}
+
+func TestGrowattCommonProjectionWithholdsRevisionLocalSOHHighBit(t *testing.T) {
+	source := growattInterface(t, "can7", 7)
+	projector, ok := NewGrowattLowVoltageBMSCommonProjector(source)
+	if !ok {
+		t.Fatal("selected source was rejected")
+	}
+
+	for _, rawSOH := range []byte{0x7f, 0xff} {
+		evidence := growattCommonEvidence(t, source, uint64(rawSOH), 0x313, []byte{0x14, 0x00, 0xff, 0xf6, 0x7f, 0xff, 80, rawSOH})
+		got, accepted := projector.Apply(evidence)
+		if !accepted || got.Measurements == nil || got.Measurements.SOHValue != 0x7f {
+			t.Fatalf("raw SOH %#x projection = %#v, accepted = %t", rawSOH, got, accepted)
+		}
+		if got.RawEvidence != evidence {
+			t.Fatalf("raw SOH %#x evidence = %#v", rawSOH, got.RawEvidence)
+		}
 	}
 }
 

@@ -334,3 +334,18 @@ func TestCX01ConstantBytesIndependent(t *testing.T) {
 		}
 	}
 }
+
+func TestCX01CoordinatorHighWordsKeepGeometry(t *testing.T) {
+	spec := cx01Spec(t, "QAAA", "0006")
+	spec.Direction = "coordinator-to-module"
+	spec.Scope = "aggregate"
+	spec.Source = 0xf4
+	spec.Destination = 0xf5
+	s := cx01Select(t, spec)
+	for kind, name := range map[uint32]string{0x180e: "additional_limit", 0x180f: "quotient"} {
+		r := CXDecodeLINKTelemetry(s, cx01Input(t, spec, kind, [8]byte{0, 0, 0, 0, 0, 0, 1, 2}))
+		if f := r.Fields[name]; f.Numerator != 513 || f.Status != "raw" || f.Unit != "" {
+			t.Fatalf("%x %s %#v", kind, name, f)
+		}
+	}
+}

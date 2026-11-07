@@ -68,15 +68,13 @@ func CXDecodeLINKTelemetry(s CXSelection, i CX01LINKInput) CXNativeResult {
 			byteField("index_1", 1)
 			raw("extremum_2", le(2))
 			raw("extremum_4", le(4))
-			byteField("extra", 6)
-			byteField("b7", 7)
+			raw("additional_limit", le(6))
 		case 0x180f:
 			raw("limit", le(0))
 			raw("current", le(2))
 			byteField("count", 4)
 			byteField("soh_cache", 5)
-			byteField("quotient", 6)
-			byteField("b7", 7)
+			raw("quotient", le(6))
 		default:
 			return r
 		}

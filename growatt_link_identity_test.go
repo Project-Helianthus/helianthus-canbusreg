@@ -47,7 +47,7 @@ func TestCX01IdentityAssemblyAndConflict(t *testing.T) {
 	}
 }
 func TestCX01SerialNegativeVectors(t *testing.T) {
-	for _, gate := range []string{"orphan", "reorder", "interrupt", "length-low", "length-high", "padding", "duplicate", "conflicting-length", "l0", "unknown"} {
+	for _, gate := range []string{"orphan", "reorder", "interrupt", "length-low", "length-high", "padding", "duplicate", "conflicting-length", "l0", "unknown", "reserved-bit7"} {
 		t.Run(gate, func(t *testing.T) {
 			spec := cx01Spec(t, "QAAA", "0006")
 			if gate == "l0" {
@@ -91,6 +91,8 @@ func TestCX01SerialNegativeVectors(t *testing.T) {
 				p[0] = 15
 			case "conflicting-length":
 				p[0] = 48
+			case "reserved-bit7":
+				p[0] = 0xaf
 			}
 			r := feed(0x18fb, p)
 			if a.CX01Snapshot().HasSerial || r.Raw != p || r.Status == "accepted" {

@@ -112,7 +112,7 @@ func (a *CX01LINKIdentityAssembler) CX01Decode(i CX01LINKInput) CXNativeResult {
 		}
 		length := (p[0] & 31) + 1
 		fragment := (p[0] >> 5) & 3
-		if length != 16 || fragment > 2 || (!a.assembling && fragment != 0) || (a.assembling && fragment != a.next) {
+		if p[0]&0x80 != 0 || length != 16 || fragment > 2 || (!a.assembling && fragment != 0) || (a.assembling && fragment != a.next) {
 			a.assembling = false
 			r.Status = "invalid"
 			return r

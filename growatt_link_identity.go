@@ -72,7 +72,7 @@ func (a *CX01LINKIdentityAssembler) CX01Decode(i CX01LINKInput) CXNativeResult {
 		return r
 	}
 	if !cx01LINKAdmission(a.selection, i) {
-		a.assembling = false
+		// Unrelated traffic must not disturb an in-progress serial assembly.
 		return r
 	}
 	if i.Evidence.Sequence <= a.lastSequence || i.Evidence.Monotonic < a.lastMonotonic {
@@ -137,6 +137,11 @@ func (a *CX01LINKIdentityAssembler) CX01Decode(i CX01LINKInput) CXNativeResult {
 		a.evidence[fragment] = i.Evidence
 		a.next = fragment + 1
 		if fragment == 2 {
+			if a.snapshot.HasSerial && a.snapshot.Serial != a.fragments {
+				a.cx01Invalidate()
+				r.Status = "conflict"
+				return r
+			}
 			a.snapshot.Serial = a.fragments
 			a.snapshot.SerialEvidence = a.evidence
 			a.snapshot.HasSerial = true

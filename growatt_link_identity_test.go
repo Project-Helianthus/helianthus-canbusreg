@@ -279,3 +279,71 @@ func TestCX01DecoderConflictIsSticky(t *testing.T) {
 		t.Fatal("not sticky")
 	}
 }
+
+func TestCX01UnrelatedTrafficKeepsSerialAssembly(t *testing.T) {
+	spec := cx01Spec(t, "QAAA", "0006")
+	a := CX01NewLINKIdentityAssembler(cx01Select(t, spec))
+	seq := uint64(0)
+	feed := func(kind uint32, p [8]byte) CXNativeResult {
+		seq++
+		i := cx01Input(t, spec, kind, p)
+		i.Evidence.Sequence = seq
+		return a.CX01Decode(i)
+	}
+	feed(0x1802, [8]byte{'Q', 'A', 'A', 'A', '0', '0', '0', '6'})
+	frags := [][8]byte{{15, 1, 2, 3, 4, 5, 6, 7}, {47, 8, 9, 10, 11, 12, 13, 14}, {79, 15, 16, 0, 0, 0, 0, 0}}
+	for j, p := range frags {
+		if j == 1 {
+			id, err := canbus.NewStandardID(uint32(spec.Source))
+			if err != nil {
+				t.Fatal(err)
+			}
+			f, err := canbus.NewFrame(id, make([]byte, 8))
+			if err != nil {
+				t.Fatal(err)
+			}
+			u := cx01Input(t, spec, 0x18fb, frags[0])
+			u.Evidence.Frame = f
+			u.Evidence.Sequence = seq + 1
+			seq++
+			a.CX01Decode(u)
+		}
+		if feed(0x18fb, p).Status != "accepted" {
+			t.Fatalf("fragment %d", j)
+		}
+	}
+	if !a.CX01Snapshot().HasSerial {
+		t.Fatal("serial lost to unrelated traffic")
+	}
+}
+
+func TestCX01SerialChangeConflicts(t *testing.T) {
+	spec := cx01Spec(t, "QAAA", "0006")
+	a := CX01NewLINKIdentityAssembler(cx01Select(t, spec))
+	seq := uint64(0)
+	feed := func(kind uint32, p [8]byte) CXNativeResult {
+		seq++
+		i := cx01Input(t, spec, kind, p)
+		i.Evidence.Sequence = seq
+		return a.CX01Decode(i)
+	}
+	feed(0x1802, [8]byte{'Q', 'A', 'A', 'A', '0', '0', '0', '6'})
+	for _, p := range [][8]byte{{15, 1, 2, 3, 4, 5, 6, 7}, {47, 8, 9, 10, 11, 12, 13, 14}, {79, 15, 16, 0, 0, 0, 0, 0}} {
+		feed(0x18fb, p)
+	}
+	feed(0x1805, [8]byte{1})
+	if len(a.CX01Snapshot().Fields) == 0 {
+		t.Fatal("setup")
+	}
+	var last CXNativeResult
+	for _, p := range [][8]byte{{15, 9, 2, 3, 4, 5, 6, 7}, {47, 8, 9, 10, 11, 12, 13, 14}, {79, 15, 16, 0, 0, 0, 0, 0}} {
+		last = feed(0x18fb, p)
+	}
+	if last.Status != "conflict" {
+		t.Fatal(last.Status)
+	}
+	s := a.CX01Snapshot()
+	if s.HasSerial || s.HasIdentity || len(s.Fields) != 0 || s.Status != "conflict" {
+		t.Fatal("stale state survived serial change")
+	}
+}

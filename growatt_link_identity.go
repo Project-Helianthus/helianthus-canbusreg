@@ -61,7 +61,10 @@ func (a *CX01LINKIdentityAssembler) CX01Decode(i CX01LINKInput) CXNativeResult {
 	defer a.mu.Unlock()
 	r := cx01Result(a.selection, i, "invalid")
 	c := a.selection.spec
-	if i.Evidence.Interface == c.Interface && uint8(i.Evidence.Frame.ID().Value()) == c.Source && (i.Epoch != c.Epoch || i.Direction != c.Direction || i.Endpoint != c.Endpoint || i.Bank != c.Bank || i.Group != c.Group || i.Slot != c.Slot || i.Scope != c.Scope) {
+	f := i.Evidence.Frame
+	id := f.ID().Value()
+	routed := c.Flavor == "link" && c.RouteSet && f.ID().Extended() && f.DLC() == 8 && f.RawDLC() == 8 && id>>24 == 0x18 && uint8(id>>8) == c.Destination && uint8(id) == c.Source
+	if routed && i.Evidence.Interface == c.Interface && (i.Epoch != c.Epoch || i.Direction != c.Direction || i.Endpoint != c.Endpoint || i.Bank != c.Bank || i.Group != c.Group || i.Slot != c.Slot || i.Scope != c.Scope) {
 		a.cx01Invalidate()
 	}
 	if a.snapshot.Status == "conflict" {
@@ -150,6 +153,10 @@ func (a *CX01LINKIdentityAssembler) CX01Decode(i CX01LINKInput) CXNativeResult {
 		}
 	}
 	r = CXDecodeLINKTelemetry(a.selection, i)
+	if r.Status == "conflict" {
+		a.cx01Invalidate()
+		return r
+	}
 	if !a.snapshot.HasIdentity && kind != 0x1802 {
 		for name, f := range r.Fields {
 			if f.Status == "accepted" {

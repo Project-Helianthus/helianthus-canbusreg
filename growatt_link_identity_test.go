@@ -1,6 +1,9 @@
 package canbusreg
 
-import "testing"
+import (
+	"github.com/Project-Helianthus/helianthus-canbus"
+	"testing"
+)
 
 func TestCX01IdentityAssemblyAndConflict(t *testing.T) {
 	spec := cx01Spec(t, "QAAA", "0006")
@@ -215,5 +218,62 @@ func TestCX01IdentityReleaseReuse(t *testing.T) {
 	r := a.CX01Decode(i)
 	if r.Status != "conflict" || r.Raw != p || a.CX01Snapshot().HasIdentity || before.Release != "0006" {
 		t.Fatal("release reassigned history")
+	}
+}
+
+func TestCX01UnroutedFrameDoesNotInvalidate(t *testing.T) {
+	spec := cx01Spec(t, "QAAA", "0006")
+	a := CX01NewLINKIdentityAssembler(cx01Select(t, spec))
+	i := cx01Input(t, spec, 0x1802, [8]byte{'Q', 'A', 'A', 'A', '0', '0', '0', '6'})
+	a.CX01Decode(i)
+	i = cx01Input(t, spec, 0x1805, [8]byte{1})
+	i.Evidence.Sequence = 2
+	a.CX01Decode(i)
+	if len(a.CX01Snapshot().Fields) == 0 {
+		t.Fatal("setup")
+	}
+	id, err := canbus.NewStandardID(uint32(spec.Source))
+	if err != nil {
+		t.Fatal(err)
+	}
+	f, err := canbus.NewFrame(id, make([]byte, 8))
+	if err != nil {
+		t.Fatal(err)
+	}
+	u := i
+	u.Evidence.Frame = f
+	u.Evidence.Sequence = 3
+	u.Scope = "aggregate"
+	u.Direction = "other"
+	if r := a.CX01Decode(u); r.Status == "accepted" {
+		t.Fatal("unrelated frame admitted")
+	}
+	snap := a.CX01Snapshot()
+	if snap.Status != "accepted" || !snap.HasIdentity || len(snap.Fields) == 0 {
+		t.Fatal("unrelated frame erased state", snap.Status)
+	}
+}
+func TestCX01DecoderConflictIsSticky(t *testing.T) {
+	spec := cx01Spec(t, "QAAa", "9011")
+	spec.Choice = "legacy19"
+	a := CX01NewLINKIdentityAssembler(cx01Select(t, spec))
+	i := cx01Input(t, spec, 0x1802, [8]byte{'Q', 'A', 'A', 'a', '9', '0', '1', '1'})
+	a.CX01Decode(i)
+	if a.CX01Snapshot().Status != "accepted" {
+		t.Fatal("setup")
+	}
+	i = cx01Input(t, spec, 0x1853, [8]byte{})
+	i.Evidence.Sequence = 2
+	if r := a.CX01Decode(i); r.Status != "conflict" {
+		t.Fatal(r.Status)
+	}
+	snap := a.CX01Snapshot()
+	if snap.Status != "conflict" || snap.HasIdentity || len(snap.Fields) != 0 {
+		t.Fatal("not invalidated", snap.Status)
+	}
+	i = cx01Input(t, spec, 0x1802, [8]byte{'Q', 'A', 'A', 'a', '9', '0', '1', '1'})
+	i.Evidence.Sequence = 3
+	if r := a.CX01Decode(i); r.Status != "conflict" || a.CX01Snapshot().Status != "conflict" {
+		t.Fatal("not sticky")
 	}
 }

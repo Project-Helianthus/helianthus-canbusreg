@@ -169,21 +169,29 @@ func CX01ConfirmNativeSelection(s CXSelection, indication CX01NativeIndication) 
 	}
 	contract := ""
 	id := f.ID().Value()
-	if f.ID().Extended() && cx01LINKAdmission(s, i) {
-		switch uint16(id >> 16) {
-		case 0x1853, 0x1861, 0x1869:
-			contract = "release11"
+	family := uint16(id >> 16)
+	if f.ID().Extended() {
+		switch family {
+		case 0x1853, 0x1861:
+			if cx01LINKAdmission(s, i) {
+				contract = "release11"
+			}
+		case 0x1869:
+			if cx01LINKReportAdmission(s, i) {
+				contract = "release11"
+			}
 		}
 	}
 	if indication.TopologyAssociated && i.Direction == "bms-to-pcs" {
-		if !f.ID().Extended() {
+		if f.ID().Extended() {
+			if family >= 0x1900 && family <= 0x1909 {
+				contract = "legacy19"
+			}
+		} else {
 			switch id {
 			case 0x326, 0x327, 0x333, 0x334:
 				contract = "release11"
 			}
-		}
-		if id >= 0x1900 && id <= 0x1909 {
-			contract = "legacy19"
 		}
 	}
 	if contract == "" {

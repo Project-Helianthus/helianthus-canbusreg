@@ -116,7 +116,7 @@ func TestCX01NativeIndicationNeverChooses(t *testing.T) {
 		spec := cx01Spec(t, "QAAa", "9011")
 		spec.Choice = choice
 		s := cx01Select(t, spec)
-		for _, id := range []uint32{0x18ff, 0x1900, 0x1909, 0x190a, 0x326, 0x327, 0x333, 0x334} {
+		for _, id := range []uint32{0x18ffF202, 0x1900F202, 0x1909F202, 0x190aF202, 0x326, 0x327, 0x333, 0x334} {
 			for _, associated := range []bool{false, true} {
 				i := cx01Input(t, spec, 0x1805, [8]byte{})
 				if id <= 0x7ff {
@@ -129,9 +129,9 @@ func TestCX01NativeIndicationNeverChooses(t *testing.T) {
 				i.Direction = "bms-to-pcs"
 				r := CX01ConfirmNativeSelection(s, CX01NativeIndication{i, associated})
 				want := "unsupported"
-				if choice != "" && associated && id != 0x18ff && id != 0x190a {
+				if choice != "" && associated && id != 0x18ffF202 && id != 0x190aF202 {
 					contract := "release11"
-					if id >= 0x1900 {
+					if id > 0x7ff {
 						contract = "legacy19"
 					}
 					if choice == contract {
@@ -149,7 +149,7 @@ func TestCX01NativeIndicationNeverChooses(t *testing.T) {
 			i := cx01Input(t, spec, kind, [8]byte{})
 			r := CX01ConfirmNativeSelection(s, CX01NativeIndication{Input: i})
 			want := "unsupported"
-			if kind != 0x1805 && choice != "" {
+			if kind != 0x1805 && kind != 0x1869 && choice != "" {
 				want = "confirmed"
 				if choice == "legacy19" {
 					want = "conflict"
@@ -158,6 +158,28 @@ func TestCX01NativeIndicationNeverChooses(t *testing.T) {
 			if r.Status != want {
 				t.Fatal("LINK evidence")
 			}
+		}
+	}
+}
+func TestCX01Release11ReportRoute(t *testing.T) {
+	for _, choice := range []string{"legacy19", "release11"} {
+		spec := cx01Spec(t, "QAAa", "9011")
+		spec.Choice = choice
+		spec.Destination = 0xf5
+		s := cx01Select(t, spec)
+		i := cx01Input(t, spec, 0x1869, [8]byte{})
+		want := "confirmed"
+		if choice == "legacy19" {
+			want = "conflict"
+		}
+		if r := CX01ConfirmNativeSelection(s, CX01NativeIndication{Input: i}); r.Status != want {
+			t.Fatalf("1869 F5 %s: %s", choice, r.Status)
+		}
+		spec.Destination = 0xf3
+		s = cx01Select(t, spec)
+		i = cx01Input(t, spec, 0x1869, [8]byte{})
+		if r := CX01ConfirmNativeSelection(s, CX01NativeIndication{Input: i}); r.Status != "unsupported" {
+			t.Fatalf("1869 other route: %s", r.Status)
 		}
 	}
 }

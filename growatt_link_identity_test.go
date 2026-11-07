@@ -347,3 +347,20 @@ func TestCX01SerialChangeConflicts(t *testing.T) {
 		t.Fatal("stale state survived serial change")
 	}
 }
+
+func TestCX01DecoderIgnoresF4ReportFrameForLegacySelection(t *testing.T) {
+	spec := cx01Spec(t, "QAAa", "9011")
+	spec.Choice = "legacy19"
+	a := CX01NewLINKIdentityAssembler(cx01Select(t, spec))
+	i := cx01Input(t, spec, 0x1802, [8]byte{'Q', 'A', 'A', 'a', '9', '0', '1', '1'})
+	a.CX01Decode(i)
+	i = cx01Input(t, spec, 0x1869, [8]byte{})
+	i.Evidence.Sequence = 2
+	if r := a.CX01Decode(i); r.Status == "conflict" {
+		t.Fatal("F4 report frame raised conflict")
+	}
+	snap := a.CX01Snapshot()
+	if snap.Status != "accepted" || !snap.HasIdentity {
+		t.Fatal("identity erased", snap.Status)
+	}
+}

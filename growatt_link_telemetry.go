@@ -207,7 +207,9 @@ func CXDecodeLINKTelemetry(s CXSelection, i CX01LINKInput) CXNativeResult {
 			r.Fields[name] = f
 		}
 	case 0x1853, 0x1861, 0x1869:
-		if s.group == "L4" {
+		// The confirmer admits 0x1869 only on the F5 report route; this path
+		// admits F4 frames only, so a 0x1869 frame here is not release evidence.
+		if s.group == "L4" && uint16(i.Evidence.Frame.ID().Value()>>16) != 0x1869 {
 			r.Status = "conflict"
 			return r
 		}

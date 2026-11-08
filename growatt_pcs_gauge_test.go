@@ -1,6 +1,7 @@
 package canbusreg
 
 import (
+	"fmt"
 	"github.com/Project-Helianthus/helianthus-canbus"
 	"testing"
 	"time"
@@ -173,6 +174,16 @@ func TestCX06RetainedFaultVariants(t *testing.T) {
 	r := CX06DecodePCSGauge(s, i)
 	cx06Want(t, r, "retained_7", "accepted", 8, 1, "")
 	if _, ok := r.Fields["current_fault"]; ok {
+		t.Fatal(r)
+	}
+}
+func TestCX06EarlyL1RetainedFaultBytes(t *testing.T) {
+	s, i := cx06Fixture(t, "QAAA0005", 0x318, [8]byte{1, 2, 3, 4, 5, 6, 7, 8})
+	r := CX06DecodePCSGauge(s, i)
+	for at := 0; at < 8; at++ {
+		cx06Want(t, r, fmt.Sprintf("retained_%d", at), "accepted", int64(at+1), 1, "")
+	}
+	if _, ok := r.Fields["word_0"]; ok {
 		t.Fatal(r)
 	}
 }

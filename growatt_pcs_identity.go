@@ -67,14 +67,8 @@ func CX06DecodePCSIdentity(s CXSelection, i CX06PCSInput) CXNativeResult {
 		for at := 4; at < 8; at++ {
 			add(fmt.Sprintf("synthesized_%d", at), int64(p[at]), "", "synthesized byte", "Proven", selected)
 		}
-		threshold := n - 50
-		if n < 51 {
-			threshold = 3600
-		}
+		threshold := n
 		gate := selected && local && g == "L8" && i.MeasurementValid && i.ThresholdStateKnown && !i.AlternativeEligible
-		if !gate {
-			threshold = n
-		}
 		add("threshold", threshold, "mV", "context-selected threshold", "Hypothesis", gate)
 	case 0x324, 0x325:
 		for at, b := range p {
@@ -148,6 +142,10 @@ func (a *CX06SerialAssembler) Consume(s CXSelection, i CX06PCSInput) CX06SerialR
 	case 1:
 		copy(a.serial[6:13], p[1:8])
 	case 2:
+		if p[4] != 0 || p[5] != 0 || p[6] != 0 || p[7] != 0 {
+			a.clear()
+			return out
+		}
 		copy(a.serial[13:16], p[1:4])
 	default:
 		a.clear()

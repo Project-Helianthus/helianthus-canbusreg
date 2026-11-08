@@ -33,10 +33,7 @@ func TestCX06Auxiliary(t *testing.T) {
 		t.Run("threshold_boundary_"+string(rune('a'+threshold)), func(t *testing.T) {
 			s, i := cx06Fixture(t, "QAAA0011", 0x323, [8]byte{7, byte(threshold >> 8), byte(threshold), 2, 9, 8, 7, 6})
 			r := CX06DecodePCSIdentity(s, i)
-			want := int64(threshold) - 50
-			if threshold < 51 {
-				want = 3600
-			}
+			want := int64(threshold)
 			cx06Want(t, r, "threshold", "accepted", want, 1, "mV")
 			cx06Want(t, r, "count", "accepted", 7, 1, "")
 			for _, negative := range []string{"state_missing", "alternative", "scope", "selector", "validity"} {
@@ -107,6 +104,9 @@ func cx06Fragment(t *testing.T, s CXSelection, i CX06PCSInput, part byte) CX06PC
 	if part == 0 {
 		p[1] = i.SerialSlot
 	}
+	if part == 2 {
+		p[4], p[5], p[6], p[7] = 0, 0, 0, 0
+	}
 	id, _ := canbus.NewStandardID(0x324)
 	i.Evidence.Frame, _ = canbus.NewFrame(id, p[:])
 	i.Evidence.Sequence = uint64(part) + 10
@@ -136,6 +136,22 @@ func TestCX06SerialAssembly(t *testing.T) {
 			if r.Serial != detached.Serial || r.Fragments[0].Raw != detached.Fragments[0].Raw {
 				t.Fatal("attached snapshot")
 			}
+		}
+	}
+}
+func TestCX06SerialFinalPadding(t *testing.T) {
+	for at := 4; at < 8; at++ {
+		s, i := cx06Fixture(t, "QAAA0011", 0x324, [8]byte{})
+		var a CX06SerialAssembler
+		a.Consume(s, cx06Fragment(t, s, i, 0))
+		a.Consume(s, cx06Fragment(t, s, i, 1))
+		in := cx06Fragment(t, s, i, 2)
+		p := in.Evidence.Frame.Bytes()
+		p[at] = 1
+		id, _ := canbus.NewStandardID(0x324)
+		in.Evidence.Frame, _ = canbus.NewFrame(id, p[:])
+		if r := a.Consume(s, in); r.Status == "complete" {
+			t.Fatal(at, r)
 		}
 	}
 }

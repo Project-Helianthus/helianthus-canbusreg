@@ -206,7 +206,7 @@ func CX06DecodePCSGauge(s CXSelection, i CX06PCSInput) CXNativeResult {
 			add("slot", int64(p[7]), 1, "", "local slot zero or aggregate rotation", "Proven", selected && (!local || p[7] == 0))
 		}
 	case 0x318:
-		if early {
+		if g == "L0" {
 			words(valid)
 			break
 		}

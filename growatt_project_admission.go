@@ -207,7 +207,7 @@ func (p *cx16SelectedProfile) Classify(e Evidence) Classification {
 				}
 				projection.Native[prefix] = native
 				if len(part.Fields) > 0 {
-					key := cx16RetentionKey(prefix, e)
+					key := cx16RetentionKey(prefix, e, part)
 					p.retained[key] = CX05RetainAccepted(p.retained[key], part)
 				}
 			}
@@ -247,8 +247,15 @@ func (p *cx16SelectedProfile) Classify(e Evidence) Classification {
 }
 
 // cx16RetentionKey keys retained extended and gauge PCS values by native family
-// so that families sharing field names never overwrite one another.
-func cx16RetentionKey(prefix string, e Evidence) string {
+// so that families sharing field names never overwrite one another. Slot
+// records without an associated member are kept apart from member-associated ones.
+func cx16RetentionKey(prefix string, e Evidence, part CXNativeResult) string {
+	if prefix == "slots" && !part.HasMember {
+		return prefix + "/unassociated"
+	}
+	if prefix == "parallel" || prefix == "release11" {
+		return fmt.Sprintf("%s/%03x", prefix, e.Frame.ID().Value())
+	}
 	if prefix == "gauge" {
 		return fmt.Sprintf("%s/%03x", prefix, e.Frame.ID().Value())
 	}

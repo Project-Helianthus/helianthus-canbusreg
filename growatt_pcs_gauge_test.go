@@ -366,3 +366,30 @@ func TestCX06SOHTruncationAndIndependentRounding(t *testing.T) {
 		t.Fatal("independent rounding rejected", r, core)
 	}
 }
+
+func TestCX06L8WithheldKeepsFieldNames(t *testing.T) {
+	s, i := cx06Fixture(t, "QAAA0011", 0x316, [8]byte{1, 2, 0, 3, 0, 4, 0, 5})
+	i.MeasurementValid = false
+	r := CX06DecodePCSGauge(s, i)
+	for _, name := range []string{"capacity", "cycles"} {
+		if _, ok := r.Fields[name]; !ok {
+			t.Fatalf("withheld L8 lost %s: %v", name, r)
+		}
+		if f := r.Fields[name]; f.Status == "accepted" || f.Denominator != 1 || f.Unit != "" {
+			t.Fatal(f)
+		}
+	}
+	if _, ok := r.Fields["word_4"]; ok {
+		t.Fatal(r)
+	}
+	i.MeasurementValid = true
+	i.FieldStates = map[string]string{"capacity": "stale", "cycles": "invalid"}
+	r = CX06DecodePCSGauge(s, i)
+	cx06Want(t, r, "capacity", "stale", 4, 10, "")
+	cx06Want(t, r, "cycles", "invalid", 5, 10, "")
+	i.MeasurementValid = false
+	r = CX06DecodePCSGauge(s, i)
+	if r.Fields["capacity"].Status != "stale" || r.Fields["cycles"].Status != "invalid" {
+		t.Fatal(r)
+	}
+}

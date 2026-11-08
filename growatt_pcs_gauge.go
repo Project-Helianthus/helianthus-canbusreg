@@ -163,14 +163,15 @@ func CX06DecodePCSGauge(s CXSelection, i CX06PCSInput) CXNativeResult {
 				d := int64(1)
 				unit := ""
 				gate := valid && g == "L8"
-				if gate && at >= 4 {
-					d = 10
+				if g == "L8" && at >= 4 {
 					if at == 4 {
 						name = "capacity"
-						unit = "Ah"
 					} else {
 						name = "cycles"
-						unit = "cycles"
+					}
+					if gate {
+						d = 10
+						unit = []string{"Ah", "cycles"}[(at-4)/2]
 					}
 				}
 				meaning := "opaque biased code"

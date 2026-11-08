@@ -69,6 +69,9 @@ type CX17Provider struct {
 	// assembler is the single LINK identity assembly of the active generation; it retains the completed serial so
 	// that a later different serial under the same project, release and route raises a sticky conflict.
 	assembler *CX01LINKIdentityAssembler
+	// linkSerial assembles 0x18fb serial announcements of the configured LINK selection whether or not a 0x1802
+	// record was received, so two different complete serials under one selection always raise a sticky conflict.
+	linkSerial cx17LINKSerial
 	// serial is the single PCS-standard 0x324 serial assembly of the active generation; serialSlot and
 	// serialValue retain the completed serial and its native slot so a later different one raises a sticky conflict.
 	serial      *CX06SerialAssembler
@@ -83,8 +86,56 @@ type CX17Provider struct {
 // cx17Association is the native slot and group association supplied with a PCS record. It is part of the
 // identity fence like the member: the same wire bytes decode into another slot's or group's fields when it changes.
 type cx17Association struct {
-	slotValid, groupValid bool
-	slot, group           uint8
+	slotValid, groupValid, serialSlotValid bool
+	slot, group, serialSlot                uint8
+}
+
+// cx17LINKSerial is the provider's bounded 0x18fb serial assembly: one pending in-order fragment sequence and the
+// completed serial retained for the generation.
+type cx17LINKSerial struct {
+	assembling, has bool
+	next            uint8
+	fragments       [16]byte
+	serial          [16]byte
+}
+
+// cx17Consume feeds one admitted descriptive LINK record. Another admitted record kind, or a malformed or reordered
+// fragment, only discards the pending assembly. A completed serial that differs from the retained one is a conflict.
+func (a *cx17LINKSerial) cx17Consume(s CXSelection, i CX01LINKInput) bool {
+	if !cx01LINKAdmission(s, i) {
+		return false
+	}
+	if i.Evidence.Frame.ID().Value()>>16 != 0x18fb {
+		a.assembling = false
+		return false
+	}
+	p := i.Evidence.Frame.Bytes()
+	length, fragment := (p[0]&31)+1, (p[0]>>5)&3
+	if p[0]&0x80 != 0 || length != 16 || fragment > 2 || (!a.assembling && fragment != 0) || (a.assembling && fragment != a.next) {
+		a.assembling = false
+		return false
+	}
+	if fragment == 0 {
+		a.fragments, a.assembling = [16]byte{}, true
+	}
+	if fragment == 2 {
+		for _, b := range p[3:] {
+			if b != 0 {
+				a.assembling = false
+				return false
+			}
+		}
+		copy(a.fragments[14:], p[1:3])
+		a.assembling = false
+		if a.has && a.serial != a.fragments {
+			return true
+		}
+		a.serial, a.has = a.fragments, true
+		return false
+	}
+	copy(a.fragments[int(fragment)*7:], p[1:])
+	a.next = fragment + 1
+	return false
 }
 
 func CX17NewPCSProvider(s CXSelection) (*CX17Provider, error) {
@@ -124,7 +175,7 @@ func (p *CX17Provider) Start(source CX17ReceiveSource, generation uint64) error 
 	p.conflict = false
 	p.identity = make(map[string]int64)
 	p.member, p.hasMember, p.seen = CXSelection{}, false, false
-	p.assembler = nil
+	p.assembler, p.linkSerial = nil, cx17LINKSerial{}
 	if p.selection.CX01Spec().Flavor == "link" {
 		p.assembler = CX01NewLINKIdentityAssembler(p.selection)
 	}
@@ -256,8 +307,9 @@ func (p *CX17Provider) cx17Apply(o CX17Observation) {
 	if (c.Flavor == "pcs-standard" || c.Flavor == "pcs-parallel") && !in.PCS.PublisherResolved {
 		identityChanged = true
 	}
-	// The reporting-member association is part of the identity fence: a change
-	// within a generation would reinterpret member-derived fields.
+	// The reporting-member, native slot/group and serial slot associations are part of the identity fence: a change
+	// within a generation would reinterpret member-, slot- or serial-derived fields. The baseline is taken from the
+	// first admitted observation only, so a malformed observation cannot fix the generation's associations.
 	hasMember := in.PCS.Member != nil
 	var member CXSelection
 	if hasMember {
@@ -266,7 +318,7 @@ func (p *CX17Provider) cx17Apply(o CX17Observation) {
 	if p.seen && (hasMember != p.hasMember || member != p.member) {
 		identityChanged = true
 	}
-	association := cx17Association{in.PCS.SlotValid, in.PCS.GroupValid, in.PCS.NativeSlot, in.PCS.NativeGroup}
+	association := cx17Association{in.PCS.SlotValid, in.PCS.GroupValid, in.PCS.SerialSlotValid, in.PCS.NativeSlot, in.PCS.NativeGroup, in.PCS.SerialSlot}
 	if p.seen && association != p.association {
 		identityChanged = true
 	}
@@ -277,9 +329,6 @@ func (p *CX17Provider) cx17Apply(o CX17Observation) {
 		p.cx17Withhold("conflict")
 		p.cx17Raw(o, "conflict")
 		return
-	}
-	if !p.seen {
-		p.seen, p.hasMember, p.member, p.association = true, hasMember, member, association
 	}
 	profile, err := NewCX16SelectedProfile(p.selection, []CX16ReplayInput{in})
 	if err != nil {
@@ -300,9 +349,15 @@ func (p *CX17Provider) cx17Apply(o CX17Observation) {
 		p.cx17Raw(o, "conflict")
 		return
 	}
+	if !p.seen && projection.Current.Status == "descriptive" {
+		p.seen, p.hasMember, p.member, p.association = true, hasMember, member, association
+	}
 	// The serial is assembled across observations; a completed serial that differs from the retained one is a
 	// sticky conflict of this generation.
 	if p.assembler != nil && projection.Current.Status == "descriptive" && p.assembler.CX01Decode(i).Status == "conflict" {
+		p.conflict = true
+	}
+	if c.Flavor == "link" && projection.Current.Status == "descriptive" && p.linkSerial.cx17Consume(p.selection, i) {
 		p.conflict = true
 	}
 	if projection.Current.Status == "descriptive" && p.cx17SerialConflict(in) {

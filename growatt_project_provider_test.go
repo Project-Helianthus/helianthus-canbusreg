@@ -1314,3 +1314,134 @@ func TestCX17CellCountChangeDemotesBalanceEnables(t *testing.T) {
 		})
 	}
 }
+
+// Catches: a changed serial slot, or a serial slot validity changed in either direction, after the generation's
+// baseline leaving the predecessor's telemetry current and promotable until (or forever, once the assembler rejects
+// every serial) another complete serial arrives. An unchanged serial slot association keeps receiving.
+func TestCX17SerialSlotAssociationChangeConflicts(t *testing.T) {
+	serial := [][8]byte{{0, 1, 1, 2, 3, 4, 5, 6}, {1, 7, 8, 9, 10, 11, 12, 13}, {2, 14, 15, 16, 0, 0, 0, 0}}
+	telemetry := [8]byte{0x14, 0xbe, 0xff, 0xf6, 0, 10, 50, 0xe4}
+	for _, name := range []string{"slot-after-serial", "validity-cleared", "validity-set", "unchanged"} {
+		t.Run(name, func(t *testing.T) {
+			s, i := cx16Fixture(t)
+			i.PCS.SerialSlotValid, i.PCS.SerialSlot = name != "validity-set", 1
+			p, _ := CX17NewPCSProvider(s)
+			a := cx17Source()
+			if err := p.Start(a, 1); err != nil {
+				t.Fatal(err)
+			}
+			defer p.Stop()
+			send := func(id uint32, payload [8]byte) {
+				i.PCS.Evidence.Sequence++
+				i.PCS.Evidence.Monotonic += time.Millisecond
+				cx16Frame(t, &i, id, false, payload)
+				cx17Send(t, a, p, 1, i)
+			}
+			send(0x313, telemetry)
+			if name != "validity-set" {
+				for _, payload := range serial {
+					send(0x324, payload)
+				}
+			}
+			if got := p.CX17Snapshot(i.PCS.Evidence.Monotonic, time.Hour); got.State != "receiving" || !got.Promotable {
+				t.Fatal("baseline", got.State, got.Promotable)
+			}
+			switch name {
+			case "slot-after-serial":
+				i.PCS.SerialSlot = 2
+			case "validity-cleared":
+				i.PCS.SerialSlotValid = false
+			case "validity-set":
+				i.PCS.SerialSlotValid = true
+			}
+			send(0x313, telemetry)
+			got := p.CX17Snapshot(i.PCS.Evidence.Monotonic, time.Hour)
+			conflict := name != "unchanged"
+			if (got.State == "conflict") != conflict || got.Promotable == conflict || (conflict && len(got.Current) != 0) {
+				t.Fatal(name, got.State, got.Promotable, len(got.Current))
+			}
+			if last := got.Raw[len(got.Raw)-1]; conflict && last.Status != "conflict" {
+				t.Fatal("raw", last.Status)
+			}
+		})
+	}
+}
+
+// Catches: complete 0x18fb serial announcements being ignored by the LINK identity assembly when no 0x1802 record
+// was received, so a replacement peer announcing a different complete serial under the same configured selection
+// never raised the sticky conflict. The same serial repeated does not conflict.
+func TestCX17LINKSerialWithoutIdentityRecordConflicts(t *testing.T) {
+	serial := func(first byte) [][8]byte {
+		return [][8]byte{{15, first, 2, 3, 4, 5, 6, 7}, {47, 8, 9, 10, 11, 12, 13, 14}, {79, 15, 16, 0, 0, 0, 0, 0}}
+	}
+	for _, name := range []string{"same", "different"} {
+		t.Run(name, func(t *testing.T) {
+			s, i := cx16LINK(t, 0x18fb, serial(1)[0])
+			p, _ := CX17NewLINKProvider(s)
+			a := cx17Source()
+			if err := p.Start(a, 1); err != nil {
+				t.Fatal(err)
+			}
+			defer p.Stop()
+			i.PCS.Evidence.Sequence = 0
+			feed := func(frames [][8]byte) {
+				for _, payload := range frames {
+					i.PCS.Evidence.Sequence++
+					cx16Frame(t, &i, 0x18fb<<16|0xf401, true, payload)
+					cx17Send(t, a, p, 1, i)
+				}
+			}
+			feed(serial(1))
+			if got := p.CX17Snapshot(time.Second, time.Second); got.State != "receiving" {
+				t.Fatal("first serial", got.State)
+			}
+			next := serial(1)
+			if name == "different" {
+				next = serial(9)
+			}
+			feed(next)
+			got := p.CX17Snapshot(time.Second, time.Second)
+			if (got.State == "conflict") != (name == "different") || (name == "different" && (got.Promotable || len(got.Current) != 0)) {
+				t.Fatal(name, got.State, got.Promotable, len(got.Current))
+			}
+		})
+	}
+}
+
+// Catches: a malformed first observation (negative field age, so admission withholds it) establishing the member,
+// native association and serial slot baselines, so the following valid observation carrying its correct
+// associations permanently conflicted the generation. The malformed raw record is still retained.
+func TestCX17MalformedFirstObservationDoesNotSetBaseline(t *testing.T) {
+	cases := map[string]func(s *CXSelection, pcs *CX08PCSInput){
+		"member": func(s *CXSelection, pcs *CX08PCSInput) { pcs.Member = s },
+		"association": func(_ *CXSelection, pcs *CX08PCSInput) {
+			pcs.SlotValid, pcs.NativeSlot, pcs.GroupValid, pcs.NativeGroup = true, 3, true, 2
+		},
+		"serial-slot": func(_ *CXSelection, pcs *CX08PCSInput) { pcs.SerialSlotValid, pcs.SerialSlot = true, 5 },
+	}
+	for name, poison := range cases {
+		t.Run(name, func(t *testing.T) {
+			s, i := cx16Fixture(t)
+			p, _ := CX17NewPCSProvider(s)
+			a := cx17Source()
+			if err := p.Start(a, 1); err != nil {
+				t.Fatal(err)
+			}
+			defer p.Stop()
+			bad := i
+			bad.PCS.FieldAge = -time.Second
+			poison(&s, &bad.PCS)
+			cx17Send(t, a, p, 1, bad)
+			if got := p.CX17Snapshot(time.Second, time.Second); got.State == "conflict" || len(got.Raw) != 1 || got.Raw[0].Status != "invalid" || len(got.Current) != 0 {
+				t.Fatal("malformed first", got.State, got.Raw, len(got.Current))
+			}
+			for sequence := uint64(2); sequence <= 3; sequence++ {
+				i.PCS.Evidence.Sequence = sequence
+				cx17Send(t, a, p, 1, i)
+				if got := p.CX17Snapshot(time.Second, time.Second); got.State != "receiving" || !got.Promotable || got.Current["core/voltage"].Evidence.Sequence != sequence {
+					t.Fatal("valid after malformed", sequence, got.State, got.Promotable)
+				}
+			}
+		})
+	}
+}

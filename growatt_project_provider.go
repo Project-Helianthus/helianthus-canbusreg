@@ -277,10 +277,13 @@ func (p *CX17Provider) cx17Apply(o CX17Observation) {
 			p.snapshot.LastGoodGeneration[name] = o.Generation
 		}
 	}
-	// A replacement DTC record that omits a derived index must not leave the
+	// A replacement standard or release-11 parallel DTC record that omits a derived index must not leave the
 	// previous index current; LastGood stays untouched.
-	if part, ok := projection.Native["slots"]; ok && e.Frame.ID().Value() == 0x333 {
-		key := cx16RetentionKey("slots", e, part)
+	for prefix, part := range projection.Native {
+		if !(prefix == "slots" && e.Frame.ID().Value() == 0x333) && prefix != "release11" {
+			continue
+		}
+		key := cx16RetentionKey(prefix, e, part)
 		for _, name := range []string{"dtc_a_index", "dtc_b_index"} {
 			full := key + "/" + name
 			if _, ok := fields[full]; ok {

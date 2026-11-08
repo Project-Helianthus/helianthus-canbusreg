@@ -767,6 +767,35 @@ func TestCX17ReplacementDTCDemotesOmittedIndex(t *testing.T) {
 	}
 }
 
+func TestCX17ParallelReplacementDTCDemotesOmittedIndex(t *testing.T) {
+	c := cx11Spec(t)
+	c.ProjectCode, c.Release, c.Choice = "QAAa", "9011", "release11"
+	s := cx10Selection(t, c)
+	p, err := CX17NewPCSProvider(s)
+	if err != nil {
+		t.Fatal(err)
+	}
+	a := cx17Source()
+	p.Start(a, 1)
+	defer p.Stop()
+	send := func(seq uint64, payload [8]byte) CX17Snapshot {
+		in := cx10Input(t, c, 0x523, payload)
+		in.Evidence.Sequence = seq
+		pcs := CX08PCSInput{CX06PCSInput: CX06PCSInput{CX05PCSInput: CX05PCSInput{CX01LINKInput: in, PublisherResolved: true}}}
+		cx17Send(t, a, p, 1, CX16ReplayInput{Selection: s, PCS: pcs})
+		return p.CX17Snapshot(time.Second, time.Hour)
+	}
+	got := send(1, [8]byte{2, 4, 0xa1, 0, 0, 0, 0, 0})
+	const name = "release11/523/dtc_a_index"
+	if got.Current[name].Status != "accepted" {
+		t.Fatal(got.State, got.Current)
+	}
+	got = send(2, [8]byte{2, 4, 0xff, 0xfe, 0, 0, 0, 0})
+	if got.Current[name].Status == "accepted" || got.LastGood[name].Status != "accepted" {
+		t.Fatal(got.Current[name], got.LastGood[name])
+	}
+}
+
 func TestCX17NonzeroReservedByteDoesNotConflict(t *testing.T) {
 	s, i := cx16Fixture(t)
 	p, _ := CX17NewPCSProvider(s)

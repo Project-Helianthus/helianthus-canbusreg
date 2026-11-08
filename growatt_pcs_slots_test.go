@@ -357,3 +357,23 @@ func TestCX08RetentionIdentityIncludesMember(t *testing.T) {
 		t.Fatal("index retained across a member change", m.Fields["dtc_a_index"])
 	}
 }
+
+func TestCX05RetainsEmptyAcrossPartialUpdate(t *testing.T) {
+	s, i := cx08Fixture(t, 0x333, [8]byte{3, 2, 0, 0, 0x10, 1})
+	i.NativeSlot = 2
+	i.Member = &s
+	zero := CX08DecodePCSSlots(s, i)
+	if zero.Fields["dtc_a_index"].Status != "empty" {
+		t.Fatal(zero.Fields["dtc_a_index"])
+	}
+	i.FieldStates = map[string]string{"dtc_a_index": "stale"}
+	partial := CX08DecodePCSSlots(s, i)
+	merged := CX05RetainAccepted(zero, partial)
+	if merged.Fields["dtc_a_index"].Status != "empty" {
+		t.Fatal("empty state dropped by partial update", merged.Fields["dtc_a_index"])
+	}
+	again := CX05RetainAccepted(merged, partial)
+	if again.Fields["dtc_a_index"].Status != "empty" {
+		t.Fatal("empty state dropped on replay", again.Fields["dtc_a_index"])
+	}
+}

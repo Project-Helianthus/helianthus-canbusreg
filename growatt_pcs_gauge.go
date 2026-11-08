@@ -101,7 +101,7 @@ func CX06DecodePCSGauge(s CXSelection, i CX06PCSInput) CXNativeResult {
 	}
 	pid := i.Evidence.Frame.ID().Value()
 	gateway := id == "QCAA0001" && c.Scope == "aggregate"
-	placeholder := gateway && (pid == 0x315 || pid == 0x316 || pid == 0x317 || pid == 0x318 || pid == 0x321 || pid == 0x324 || pid == 0x325) || c.Flavor == "pcs-parallel" && c.ProjectCode == "QAAB" && g != "" && pid == 0x315
+	placeholder := gateway && (pid == 0x315 || pid == 0x316 || pid == 0x317 || pid == 0x318 || pid == 0x321 || pid == 0x324 || pid == 0x325) || c.Flavor == "pcs-parallel" && (c.ProjectCode == "QAAB" || c.ProjectCode == "QAAb") && g != "" && pid == 0x315
 	if placeholder {
 		for at, b := range p {
 			raw(fmt.Sprintf("byte_%d", at), int64(b))
@@ -203,7 +203,8 @@ func CX06DecodePCSGauge(s CXSelection, i CX06PCSInput) CXNativeResult {
 			add(fmt.Sprintf("retained_%d", 8+at), int64(p[at]), 1, "", "retained fault byte", grade, valid)
 		}
 		if !full {
-			add("soh_truncated", int64(p[6]), 1, "percent", "truncated estimate; independent rounding", "Proven", valid && p[7] == 0 && p[6] <= 100)
+			sohContract := id == "QAAA0006" || c.Release == "0011"
+			add("soh_truncated", int64(p[6]), 1, "percent", "truncated estimate; independent rounding", "Proven", valid && sohContract && p[7] == 0 && p[6] <= 100)
 			add("slot", int64(p[7]), 1, "", "local slot zero or aggregate rotation", "Proven", selected && (!local || p[7] == 0))
 		}
 	case 0x318:

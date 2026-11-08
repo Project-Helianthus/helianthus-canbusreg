@@ -161,7 +161,11 @@ func TestCX06RetainedFaultVariants(t *testing.T) {
 				cx06Want(t, r, "retained_15", "accepted", 0, 1, "")
 			} else {
 				cx06Want(t, r, "retained_13", "accepted", 6, 1, "")
-				cx06Want(t, r, "soh_truncated", "accepted", 99, 1, "percent")
+				if identity == "QAAA0006" || identity == "QAAA0011" {
+					cx06Want(t, r, "soh_truncated", "accepted", 99, 1, "percent")
+				} else {
+					cx06Want(t, r, "soh_truncated", "raw", 99, 1, "")
+				}
 				p := i.Evidence.Frame.Bytes()
 				p[7] = 1
 				id, _ := canbus.NewStandardID(0x317)

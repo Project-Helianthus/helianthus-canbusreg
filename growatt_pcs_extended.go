@@ -39,7 +39,7 @@ func CX09DecodePCSExtended(s CXSelection, i CX01LINKInput) CXNativeResult {
 		if kind < 0x1900 || kind > 0x1909 {
 			return r
 		}
-		endpoint := c.Scope == "local" && c.Destination == 0xf2 && c.Source >= 1 && c.Source <= 8
+		endpoint := c.Scope == "local" && c.Destination == 0xf2 && (!gateway || (c.Source >= 1 && c.Source <= 8))
 		coordinator := c.Scope == "aggregate" && c.Destination == 0xdf && c.Source == 0xf2
 		if !endpoint && !coordinator {
 			return r

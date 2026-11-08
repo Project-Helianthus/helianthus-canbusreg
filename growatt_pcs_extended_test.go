@@ -583,8 +583,17 @@ func TestCX09EndpointSourceRangeAndCellVoltageUnits(t *testing.T) {
 	p := [8]byte{1, 0, 2, 0, 3, 0, 4, 0}
 	for _, src := range []uint8{0, 9, 0xf2} {
 		c := cx09Spec(t)
+		c.ProjectCode = "QCAA"
+		c.Release = "0001"
 		c.Source = src
 		cx09Withheld(t, CX09DecodePCSExtended(cx09Select(t, c), cx09Input(t, c, 0x1902, p)), p)
+	}
+	// The 1-8 receiver bound belongs to the gateway contract only; an explicitly
+	// selected non-gateway endpoint at source 9 is decoded.
+	nc := cx09Spec(t)
+	nc.Source = 9
+	if r := CX09DecodePCSExtended(cx09Select(t, nc), cx09Input(t, nc, 0x1902, p)); r.Status != "accepted" || r.Fields["pack_voltage"].Status != "accepted" {
+		t.Fatal(r)
 	}
 	c := cx09Spec(t)
 	c.Release = "0007"

@@ -16,6 +16,8 @@ import (
 // FD records are copied into Diagnostics without producing fields.
 // FieldStates may withhold individual fields as absent, invalid, unsupported,
 // stale, conflict or unassigned. FieldAges overrides only that field's age.
+// Indices are interpreted only for a supported native contract; the temperature
+// extrema of 322 use distinct field names so retention cannot mix quantities.
 // IndexMinimum/Maximum are inclusive caller-selected native bounds, not cell
 // geometry inferred from extrema. Count is used only for the fine-average gate.
 type CX05PCSInput struct {
@@ -66,6 +68,8 @@ func CX05DecodePCSStandard(s CXSelection, i CX05PCSInput) CX05PCSResult {
 	local := c.ProjectCode == "QAAA" && c.Release == "0006" && c.Scope == "local"
 	release11 := s.CX01Group() == "L8"
 	gateway := c.ProjectCode == "QCAA" && c.Release == "0001" && c.Scope == "aggregate"
+	fixedAggregate := c.ProjectCode == "QAAB" && c.Scope == "aggregate"
+	supported := local || release11 || gateway || fixedAggregate
 	measured := i.MeasurementValid && (local || release11)
 	add := func(name string, n, d int64, unit, meaning, grade string, interpreted bool) {
 		status := "raw"
@@ -111,7 +115,7 @@ func CX05DecodePCSStandard(s CXSelection, i CX05PCSInput) CX05PCSResult {
 	signed := func(at int) int64 { return int64(int16(binary.BigEndian.Uint16(p[at : at+2]))) }
 	index := func(name string, at int) {
 		n := uint16(p[at])
-		value(name, int64(n), 1, "index", "selected native index", i.IndexValid && i.IndexScope == c.Scope && i.IndexMinimum <= i.IndexMaximum && n >= i.IndexMinimum && n <= i.IndexMaximum)
+		value(name, int64(n), 1, "index", "selected native index", supported && i.IndexValid && i.IndexScope == c.Scope && i.IndexMinimum <= i.IndexMaximum && n >= i.IndexMinimum && n <= i.IndexMaximum)
 	}
 	switch f.ID().Value() {
 	case 0x311:
@@ -177,8 +181,8 @@ func CX05DecodePCSStandard(s CXSelection, i CX05PCSInput) CX05PCSResult {
 	case 0x322:
 		value("maximum_temperature", signed(0), 10, "C", "maximum temperature", measured && i.TemperatureValid)
 		value("minimum_temperature", signed(2), 10, "C", "minimum temperature", measured && i.TemperatureValid)
-		index("maximum_index", 4)
-		index("minimum_index", 5)
+		index("maximum_temperature_index", 4)
+		index("minimum_temperature_index", 5)
 		for at, name := range []string{"extra_6", "extra_7"} {
 			add(name, int64(p[at+6]), 1, "percent", "downstream SOC extremum", "Hypothesis", gateway && i.MeasurementValid && p[at+6] <= 100)
 			invalid(name, gateway && i.MeasurementValid && p[at+6] > 100)
@@ -189,7 +193,7 @@ func CX05DecodePCSStandard(s CXSelection, i CX05PCSInput) CX05PCSResult {
 				index(name, at)
 			} else {
 				raw(name, int64(p[at]))
-				add(name+"_fixed_aggregate", int64(p[at]), 1, "", "fixed aggregate location", "Hypothesis", c.ProjectCode == "QAAB" && s.CX01Group() != "" && c.Scope == "aggregate" && i.IndexValid && i.IndexScope == c.Scope && p[at] == 1)
+				add(name+"_fixed_aggregate", int64(p[at]), 1, "", "fixed aggregate location", "Hypothesis", fixedAggregate && s.CX01Group() != "" && i.IndexValid && i.IndexScope == c.Scope && p[at] == 1)
 			}
 		}
 		value("maximum_cell", be(4), 1, "mV", "maximum cell extremum", measured)

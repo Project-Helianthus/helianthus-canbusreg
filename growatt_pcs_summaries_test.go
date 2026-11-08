@@ -67,7 +67,7 @@ func TestCX14MappedBitsAndIndependentContributors(t *testing.T) {
 				zero, _ := canbus.NewFrame(i.Evidence.Frame.ID(), make([]byte, 8))
 				i.Evidence.Frame = zero
 				clear := CX14DecodePCSSummaries(s, i).Bits[key]
-				if len(clear.Alternatives) != 0 || clear.Field.Meaning != "" {
+				if len(clear.Alternatives) != 0 || len(clear.ConditionalAlternatives) != 0 || clear.Field.Numerator != 0 || clear.Field.Status != "accepted" || clear.Field.Meaning != "summary bit clear; independent diagnostics not inferred" {
 					t.Fatal("clear summary interpreted", clear)
 				}
 			})
@@ -414,5 +414,24 @@ func TestCX14IndependentStatusSources(t *testing.T) {
 				t.Fatal(b)
 			}
 		})
+	}
+}
+
+func TestCX14ClearedSummaryReplacesRetainedSetBit(t *testing.T) {
+	s, i := cx14Fixture(t, 0x312, cx14Payload("A", 4), false)
+	previous := CX14DecodePCSSummaries(s, i)
+	if previous.Fields["A/4"].Status != "accepted" || previous.Fields["A/4"].Numerator != 1 {
+		t.Fatal(previous.Fields["A/4"])
+	}
+	s, clear := cx14Fixture(t, 0x312, [8]byte{}, false)
+	clear.Evidence.Sequence = i.Evidence.Sequence + 1
+	r := CX14DecodePCSSummaries(s, clear)
+	b := r.Bits["A/4"]
+	if b.Field.Status != "accepted" || b.Field.Numerator != 0 || len(b.Alternatives) != 0 || b.Field.Meaning != "summary bit clear; independent diagnostics not inferred" {
+		t.Fatal(b)
+	}
+	retained := CX05RetainAccepted(previous.CXNativeResult, r.CXNativeResult)
+	if retained.Fields["A/4"].Numerator != 0 || retained.Fields["A/4"].Evidence != clear.Evidence {
+		t.Fatal(retained.Fields["A/4"])
 	}
 }

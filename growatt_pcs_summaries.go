@@ -137,6 +137,12 @@ func CX14DecodePCSSummaries(s CXSelection, i CX14PCSInput) CX14PCSResult {
 					b.Field.Grade = grade
 				}
 			}
+			if supported && field.Numerator == 0 && len(mappings[w.name][bit]) > 0 {
+				// A clear summary bit is a valid observation of that bit only; it
+				// does not show that the independent diagnostics are clear.
+				b.Field.Status, b.Field.Grade = "accepted", "Proven"
+				b.Field.Meaning = "summary bit clear; independent diagnostics not inferred"
+			}
 			if modern && w.name == "B" && (bit == 8 || bit == 10) && b.Field.Numerator == 1 {
 				b.Field.Status, b.Field.Grade = "accepted", "Proven"
 				b.Field.Meaning = "independent status source; no diagnostic index"

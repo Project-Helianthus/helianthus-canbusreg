@@ -157,7 +157,7 @@ func TestCX11DiagnosticBoundaries(t *testing.T) {
 					}
 					p := [8]byte{0, 0, byte(pack - 200), byte(state), 0, 0, 0, 0}
 					binary.LittleEndian.PutUint16(p[:2], word)
-					x := CX11ParallelContext{CategoryFirst: cx11Source(c, a), CategorySecond: cx11Source(c, b), PackCode: cx11Source(c, pack), State: cx11Source(c, state)}
+					x := CX11ParallelContext{CategoryFirst: cx11Source(c, a), CategorySecond: cx11Source(c, b), PackCode: cx11Source(c, pack), State: cx11Source(c, state), CellSumValid: cx11Source(c, 1)}
 					r := cx11Decode(t, c, 0x6d3, p, x)
 					cx11Want(t, r, "cell_sum", int64(word), 10, status, "Hypothesis")
 					cx11Want(t, r, "pack_over_200", pack-200, 1, "accepted", "Hypothesis")
@@ -201,6 +201,26 @@ func cx11DiagnosticNegative(t *testing.T, kind string) {
 		d = 1
 	}
 	cx11Want(t, r, key, n, d, "withheld", "Unknown")
+}
+func TestCX11CellSumRequiresValidityEvidence(t *testing.T) {
+	c := cx11Spec(t)
+	p := [8]byte{5, 2, 0, 0, 0, 0, 0, 0}
+	base := func() CX11ParallelContext {
+		return CX11ParallelContext{CategoryFirst: cx11Source(c, 0), CategorySecond: cx11Source(c, 0), PackCode: cx11Source(c, 200), State: cx11Source(c, 0)}
+	}
+	r := cx11Decode(t, c, 0x6d3, p, base())
+	cx11Want(t, r, "cell_sum", 517, 10, "withheld", "Unknown")
+	x := base()
+	x.CellSumValid = cx11Source(c, 0)
+	r = cx11Decode(t, c, 0x6d3, p, x)
+	cx11Want(t, r, "cell_sum", 517, 10, "withheld", "Unknown")
+	x.CellSumValid = cx11Source(c, 1)
+	x.CellSumValid.Scope = "aggregate"
+	r = cx11Decode(t, c, 0x6d3, p, x)
+	cx11Want(t, r, "cell_sum", 517, 10, "withheld", "Unknown")
+	x.CellSumValid = cx11Source(c, 1)
+	r = cx11Decode(t, c, 0x6d3, p, x)
+	cx11Want(t, r, "cell_sum", 517, 10, "accepted", "Hypothesis")
 }
 func TestCX11MissingCounters(t *testing.T) {
 	c := cx11Spec(t)

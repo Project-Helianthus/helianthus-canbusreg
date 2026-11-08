@@ -13,6 +13,9 @@ import (
 type CX11ParallelContext struct {
 	SOHTenths, SOCTenths, Permission, State *CXNativeField
 	CategoryFirst, CategorySecond, PackCode *CXNativeField
+	// CellSumValid is independent evidence that the cell-sum word is a valid
+	// measurement (value 1). Zero diagnostic counters alone do not establish it.
+	CellSumValid *CXNativeField
 }
 
 func cx11SourceValue(s CXSelection, f *CXNativeField, maximum int64) (int64, bool) {
@@ -195,6 +198,8 @@ func CX11DecodeParallel(s CXSelection, i CX01LINKInput, x CX11ParallelContext) C
 				r.Fields["cell_sum"] = f
 			} else if le(0) == 65535 {
 				mark("cell_sum", "invalid")
+			} else if valid, kv := cx11SourceValue(s, x.CellSumValid, 1); !kv || valid != 1 {
+				mark("cell_sum", "withheld")
 			}
 			pack, kp := cx11SourceValue(s, x.PackCode, 65535)
 			state, ks := cx11SourceValue(s, x.State, 255)

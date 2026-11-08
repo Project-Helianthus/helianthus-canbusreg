@@ -578,3 +578,20 @@ func TestCX09ConcurrentRetention(t *testing.T) {
 		t.Fatal(snap)
 	}
 }
+
+func TestCX09EndpointSourceRangeAndCellVoltageUnits(t *testing.T) {
+	p := [8]byte{1, 0, 2, 0, 3, 0, 4, 0}
+	for _, src := range []uint8{0, 9, 0xf2} {
+		c := cx09Spec(t)
+		c.Source = src
+		cx09Withheld(t, CX09DecodePCSExtended(cx09Select(t, c), cx09Input(t, c, 0x1902, p)), p)
+	}
+	c := cx09Spec(t)
+	c.Release = "0007"
+	r := CX09DecodePCSExtended(cx09Select(t, c), cx09Input(t, c, 0x1905, p))
+	for _, n := range []string{"maximum_voltage", "minimum_voltage"} {
+		if f := r.Fields[n]; f.Status != "raw" || f.Unit != "" || f.Meaning != "" {
+			t.Fatal(n, f)
+		}
+	}
+}

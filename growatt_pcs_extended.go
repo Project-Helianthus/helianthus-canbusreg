@@ -39,7 +39,7 @@ func CX09DecodePCSExtended(s CXSelection, i CX01LINKInput) CXNativeResult {
 		if kind < 0x1900 || kind > 0x1909 {
 			return r
 		}
-		endpoint := c.Scope == "local" && c.Destination == 0xf2
+		endpoint := c.Scope == "local" && c.Destination == 0xf2 && c.Source >= 1 && c.Source <= 8
 		coordinator := c.Scope == "aggregate" && c.Destination == 0xdf && c.Source == 0xf2
 		if !endpoint && !coordinator {
 			return r
@@ -138,9 +138,13 @@ func CX09DecodePCSExtended(s CXSelection, i CX01LINKInput) CXNativeResult {
 		}
 	case 0x1905:
 		known("maximum_index", le(0))
-		scaled("maximum_voltage", le(2), 1, "mV", "maximum cell voltage")
+		raw("maximum_voltage", le(2))
 		known("minimum_index", le(4))
-		scaled("minimum_voltage", le(6), 1, "mV", "minimum cell voltage")
+		raw("minimum_voltage", le(6))
+		if localUnits {
+			scaled("maximum_voltage", le(2), 1, "mV", "maximum cell voltage")
+			scaled("minimum_voltage", le(6), 1, "mV", "minimum cell voltage")
+		}
 	case 0x1906:
 		known("maximum_index", le(0))
 		raw("maximum_temperature_code", int64(p[2]))

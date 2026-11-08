@@ -307,3 +307,34 @@ func TestCX08NonzeroToZeroDTCRetention(t *testing.T) {
 		t.Fatal(merged.Fields["dtc_b_index"])
 	}
 }
+
+func TestCX08ZeroDTCIndexIndependentWithholding(t *testing.T) {
+	s, i := cx08Fixture(t, 0x333, [8]byte{3, 2, 0, 0, 0x10, 1})
+	i.NativeSlot = 2
+	i.Member = &s
+	previous := CX08DecodePCSSlots(s, i)
+	if previous.Fields["dtc_a_index"].Status != "empty" {
+		t.Fatal(previous.Fields["dtc_a_index"])
+	}
+	s0, i0 := cx08Fixture(t, 0x333, [8]byte{3, 2, 0x10, 0, 0x10, 1})
+	i0.NativeSlot = 2
+	i0.Member = &s0
+	retained := CX08DecodePCSSlots(s0, i0)
+	i.FieldStates = map[string]string{"dtc_a_index": "stale"}
+	r := CX08DecodePCSSlots(s, i)
+	if r.Fields["dtc_a_index"].Status != "stale" {
+		t.Fatal(r.Fields["dtc_a_index"])
+	}
+	if m := CX05RetainAccepted(retained, r); m.Fields["dtc_a_index"].Status != "accepted" {
+		t.Fatal(m.Fields["dtc_a_index"])
+	}
+	i.FieldStates = nil
+	i.FieldAges = map[string]time.Duration{"dtc_a_index": -time.Second}
+	r = CX08DecodePCSSlots(s, i)
+	if r.Fields["dtc_a_index"].Status != "invalid" {
+		t.Fatal(r.Fields["dtc_a_index"])
+	}
+	if m := CX05RetainAccepted(retained, r); m.Fields["dtc_a_index"].Status != "accepted" {
+		t.Fatal(m.Fields["dtc_a_index"])
+	}
+}

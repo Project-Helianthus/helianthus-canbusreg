@@ -87,11 +87,18 @@ func CX08DecodePCSSlots(s CXSelection, i CX08PCSInput) CXNativeResult {
 				if field.Status == "accepted" {
 					field.Status = "empty"
 					r.Fields[name] = field
-					// A valid zero word supersedes any previously accepted index.
-					idx := field
-					idx.Meaning = ""
-					r.Fields[name+"_index"] = idx
 				}
+				// A valid zero word supersedes a previously accepted index only
+				// when the index passes its own state and age checks.
+				add(name+"_index", 0, 1, "", "", true)
+				idx := r.Fields[name+"_index"]
+				if _, own := i.FieldAges[name+"_index"]; !own {
+					idx.Age = field.Age
+				}
+				if idx.Status == "accepted" {
+					idx.Status = field.Status
+				}
+				r.Fields[name+"_index"] = idx
 				continue
 			}
 			for index := 0; index < count; index++ {

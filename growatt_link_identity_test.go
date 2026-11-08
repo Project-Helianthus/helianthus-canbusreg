@@ -3,6 +3,7 @@ package canbusreg
 import (
 	"github.com/Project-Helianthus/helianthus-canbus"
 	"testing"
+	"time"
 )
 
 func TestCX01IdentityAssemblyAndConflict(t *testing.T) {
@@ -102,7 +103,7 @@ func TestCX01SerialNegativeVectors(t *testing.T) {
 	}
 }
 func TestCX01IdentityEpochRoleAndPartial(t *testing.T) {
-	for _, gate := range []string{"epoch", "role", "bad-ascii", "malformed", "source", "interface-name", "interface-index", "endpoint", "bank", "group", "slot", "scope", "direction"} {
+	for _, gate := range []string{"epoch", "bad-ascii", "malformed", "source", "interface-name", "interface-index", "endpoint", "bank", "group", "slot", "scope", "direction"} {
 		t.Run(gate, func(t *testing.T) {
 			spec := cx01Spec(t, "QAAA", "0006")
 			a := CX01NewLINKIdentityAssembler(cx01Select(t, spec))
@@ -119,9 +120,6 @@ func TestCX01IdentityEpochRoleAndPartial(t *testing.T) {
 			switch gate {
 			case "epoch":
 				i.Epoch++
-			case "role":
-				i = cx01Input(t, spec, 0x1800, [8]byte{0, 1})
-				i.Evidence.Sequence = 4
 			case "bad-ascii":
 				i = cx01Input(t, spec, 0x1802, [8]byte{})
 				i.Evidence.Sequence = 4
@@ -362,5 +360,108 @@ func TestCX01DecoderIgnoresF4ReportFrameForLegacySelection(t *testing.T) {
 	snap := a.CX01Snapshot()
 	if snap.Status != "accepted" || !snap.HasIdentity {
 		t.Fatal("identity erased", snap.Status)
+	}
+}
+
+func TestCX01FlagsByteChangeRetainsState(t *testing.T) {
+	spec := cx01Spec(t, "QAAA", "0006")
+	a := CX01NewLINKIdentityAssembler(cx01Select(t, spec))
+	seq := uint64(0)
+	feed := func(kind uint32, p [8]byte) CXNativeResult {
+		seq++
+		i := cx01Input(t, spec, kind, p)
+		i.Evidence.Sequence = seq
+		return a.CX01Decode(i)
+	}
+	feed(0x1802, [8]byte{'Q', 'A', 'A', 'A', '0', '0', '0', '6'})
+	for _, p := range [][8]byte{{15, 1, 2, 3, 4, 5, 6, 7}, {47, 8, 9, 10, 11, 12, 13, 14}, {79, 15, 16, 0, 0, 0, 0, 0}} {
+		feed(0x18fb, p)
+	}
+	feed(0x1800, [8]byte{})
+	feed(0x1805, [8]byte{1})
+	r := feed(0x1800, [8]byte{0, 0x81})
+	if r.Status != "accepted" {
+		t.Fatal(r.Status)
+	}
+	if f := r.Fields["role_flags"]; f.Status != "raw" || f.Numerator != 0x81 || f.Unit != "" || f.Meaning != "" {
+		t.Fatalf("flags not raw %#v", f)
+	}
+	s := a.CX01Snapshot()
+	if s.Status != "accepted" || !s.HasIdentity || !s.HasSerial || s.Serial[15] != 16 {
+		t.Fatal("flags change invalidated identity", s.Status)
+	}
+	if _, ok := s.Fields["1805/pack_voltage"]; !ok {
+		t.Fatal("flags change erased telemetry")
+	}
+	if f := s.Fields["1800/role_flags"]; f.Numerator != 0x81 || f.Status != "raw" {
+		t.Fatalf("raw flags not retained %#v", f)
+	}
+}
+
+func TestCX01ObsoleteEvidenceDoesNotInvalidate(t *testing.T) {
+	for _, gate := range []string{"older-epoch", "older-sequence", "reversed-time"} {
+		t.Run(gate, func(t *testing.T) {
+			spec := cx01Spec(t, "QAAA", "0006")
+			spec.Epoch = 5
+			a := CX01NewLINKIdentityAssembler(cx01Select(t, spec))
+			i := cx01Input(t, spec, 0x1802, [8]byte{'Q', 'A', 'A', 'A', '0', '0', '0', '6'})
+			i.Evidence.Sequence = 10
+			i.Evidence.Monotonic = 10 * time.Second
+			a.CX01Decode(i)
+			i = cx01Input(t, spec, 0x1805, [8]byte{1})
+			i.Evidence.Sequence = 11
+			i.Evidence.Monotonic = 11 * time.Second
+			a.CX01Decode(i)
+			if len(a.CX01Snapshot().Fields) == 0 {
+				t.Fatal("setup")
+			}
+			d := cx01Input(t, spec, 0x1805, [8]byte{1})
+			d.Evidence.Sequence = 12
+			d.Evidence.Monotonic = 12 * time.Second
+			switch gate {
+			case "older-epoch":
+				d.Epoch = 4
+			case "older-sequence":
+				d.Epoch = 4
+				d.Evidence.Sequence = 3
+			case "reversed-time":
+				d.Bank = "b"
+				d.Evidence.Monotonic = time.Second
+			}
+			if r := a.CX01Decode(d); r.Status != "stale" {
+				t.Fatal(r.Status)
+			}
+			s := a.CX01Snapshot()
+			if s.Status != "accepted" || !s.HasIdentity || len(s.Fields) == 0 {
+				t.Fatal("obsolete evidence invalidated state", s.Status)
+			}
+			n := cx01Input(t, spec, 0x1805, [8]byte{2})
+			n.Evidence.Sequence = 13
+			n.Evidence.Monotonic = 13 * time.Second
+			if r := a.CX01Decode(n); r.Status != "accepted" {
+				t.Fatal("current evidence rejected", r.Status)
+			}
+			n.Epoch = 6
+			n.Evidence.Sequence = 14
+			if r := a.CX01Decode(n); r.Status != "conflict" || len(a.CX01Snapshot().Fields) != 0 {
+				t.Fatal("newer epoch did not invalidate", r.Status)
+			}
+		})
+	}
+}
+
+func TestCX01IdentityAssemblerRejectsCoordinatorSource(t *testing.T) {
+	spec := cx01Spec(t, "QAAA", "0006")
+	spec.Source = 0xf4
+	a := CX01NewLINKIdentityAssembler(cx01Select(t, spec))
+	a.CX01Decode(cx01Input(t, spec, 0x1802, [8]byte{'Q', 'A', 'A', 'A', '0', '0', '0', '6'}))
+	i := cx01Input(t, spec, 0x1805, [8]byte{1})
+	i.Evidence.Sequence = 2
+	r := a.CX01Decode(i)
+	if r.Status == "accepted" || len(r.Fields) != 0 {
+		t.Fatal("coordinator source admitted as module telemetry")
+	}
+	if s := a.CX01Snapshot(); s.HasIdentity || len(s.Fields) != 0 {
+		t.Fatal("coordinator source established identity")
 	}
 }

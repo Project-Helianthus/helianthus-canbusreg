@@ -226,9 +226,9 @@ func TestCX01OpaqueHypothesesStayRaw(t *testing.T) {
 	for _, source := range []uint8{0, 1, 9, 10, 244, 254, 255} {
 		spec.Source = source
 		r := CXDecodeLINKTelemetry(cx01Select(t, spec), cx01Input(t, spec, 0x1805, [8]byte{}))
-		if source == 255 {
-			if len(r.Fields) != 0 {
-				t.Fatal("FF ordinary")
+		if source == 255 || source == 0xf4 {
+			if len(r.Fields) != 0 || r.Status != "invalid" {
+				t.Fatalf("reserved source %#x ordinary", source)
 			}
 		} else if r.Fields["pack_voltage"].Status != "accepted" {
 			t.Fatalf("universal module bound %d", source)

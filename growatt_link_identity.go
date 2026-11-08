@@ -55,7 +55,8 @@ func (a *CX01LINKIdentityAssembler) cx01Invalidate() {
 }
 
 // Decode validates identity continuity and retains independent last-known-good fields.
-// A conflict is sticky: a changed role, identity or epoch needs a new selection/assembler.
+// A conflict is sticky: a changed route role, identity, serial or newer epoch
+// needs a new selection/assembler. Obsolete evidence is reported stale instead.
 func (a *CX01LINKIdentityAssembler) CX01Decode(i CX01LINKInput) CXNativeResult {
 	a.mu.Lock()
 	defer a.mu.Unlock()
@@ -64,20 +65,27 @@ func (a *CX01LINKIdentityAssembler) CX01Decode(i CX01LINKInput) CXNativeResult {
 	f := i.Evidence.Frame
 	id := f.ID().Value()
 	routed := c.Flavor == "link" && c.RouteSet && f.ID().Extended() && f.DLC() == 8 && f.RawDLC() == 8 && id>>24 == 0x18 && uint8(id>>8) == c.Destination && uint8(id) == c.Source
-	if routed && i.Evidence.Interface == c.Interface && (i.Epoch != c.Epoch || i.Direction != c.Direction || i.Endpoint != c.Endpoint || i.Bank != c.Bank || i.Group != c.Group || i.Slot != c.Slot || i.Scope != c.Scope) {
-		a.cx01Invalidate()
-	}
+	related := routed && i.Evidence.Interface == c.Interface
 	if a.snapshot.Status == "conflict" {
+		r.Status = "conflict"
+		return r
+	}
+	// Obsolete evidence (an older epoch, a replayed sequence or reversed time)
+	// is rejected before it can drive a sticky conflict transition.
+	if related && (i.Epoch < c.Epoch || i.Evidence.Sequence <= a.lastSequence || i.Evidence.Monotonic < a.lastMonotonic) {
+		r.Status = "stale"
+		if cx01LINKAdmission(a.selection, i) {
+			a.assembling = false
+		}
+		return r
+	}
+	if related && (i.Epoch != c.Epoch || i.Direction != c.Direction || i.Endpoint != c.Endpoint || i.Bank != c.Bank || i.Group != c.Group || i.Slot != c.Slot || i.Scope != c.Scope) {
+		a.cx01Invalidate()
 		r.Status = "conflict"
 		return r
 	}
 	if !cx01LINKAdmission(a.selection, i) {
 		// Unrelated traffic must not disturb an in-progress serial assembly.
-		return r
-	}
-	if i.Evidence.Sequence <= a.lastSequence || i.Evidence.Monotonic < a.lastMonotonic {
-		r.Status = "stale"
-		a.assembling = false
 		return r
 	}
 	a.lastSequence = i.Evidence.Sequence
@@ -150,13 +158,8 @@ func (a *CX01LINKIdentityAssembler) CX01Decode(i CX01LINKInput) CXNativeResult {
 		r.Status = "accepted"
 		return r
 	}
-	if kind == 0x1800 && a.snapshot.HasIdentity {
-		if old, ok := a.snapshot.Fields["1800/role_flags"]; ok && old.Numerator != int64(p[1]) {
-			a.cx01Invalidate()
-			r.Status = "conflict"
-			return r
-		}
-	}
+	// The 1800 flags byte is opaque: its unspecified bits cannot establish a
+	// role change, so it is retained raw (latest value) and never invalidates.
 	r = CXDecodeLINKTelemetry(a.selection, i)
 	if r.Status == "conflict" {
 		a.cx01Invalidate()

@@ -27,7 +27,7 @@ func cx01LINKFrameAdmission(s CXSelection, i CX01LINKInput) bool {
 }
 func cx01LINKAdmission(s CXSelection, i CX01LINKInput) bool {
 	c := s.spec
-	return cx01LINKFrameAdmission(s, i) && c.Direction == "module-to-coordinator" && c.Destination == 0xf4 && c.Source != 0xff && c.Scope == "local"
+	return cx01LINKFrameAdmission(s, i) && c.Direction == "module-to-coordinator" && c.Destination == 0xf4 && c.Source != 0xff && c.Source != 0xf4 && c.Scope == "local"
 }
 
 // cx01LINKReportAdmission admits module reports addressed to the F5 route.

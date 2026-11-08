@@ -203,7 +203,7 @@ func CX06DecodePCSGauge(s CXSelection, i CX06PCSInput) CXNativeResult {
 			add(fmt.Sprintf("retained_%d", 8+at), int64(p[at]), 1, "", "retained fault byte", grade, valid)
 		}
 		if !full {
-			sohContract := id == "QAAA0006" || c.Release == "0011"
+			sohContract := id == "QAAA0006" || g == "L8"
 			add("soh_truncated", int64(p[6]), 1, "percent", "truncated estimate; independent rounding", "Proven", valid && sohContract && p[7] == 0 && p[6] <= 100)
 			add("slot", int64(p[7]), 1, "", "local slot zero or aggregate rotation", "Proven", selected && (!local || p[7] == 0))
 		}

@@ -153,7 +153,7 @@ func TestCX06NamedHypothesisNegatives(t *testing.T) {
 	}
 }
 func TestCX06RetainedFaultVariants(t *testing.T) {
-	for _, identity := range []string{"QAAA0005", "QAAa2005", "QAAA0006", "QAAA0011", "QAAb5004"} {
+	for _, identity := range []string{"QAAA0005", "QAAa2005", "QAAA0006", "QAAA0011", "QAAa9011", "QAAb5004"} {
 		t.Run(identity, func(t *testing.T) {
 			s, i := cx06Fixture(t, identity, 0x317, [8]byte{1, 2, 3, 4, 5, 6, 99, 0})
 			r := CX06DecodePCSGauge(s, i)
@@ -161,7 +161,7 @@ func TestCX06RetainedFaultVariants(t *testing.T) {
 				cx06Want(t, r, "retained_15", "accepted", 0, 1, "")
 			} else {
 				cx06Want(t, r, "retained_13", "accepted", 6, 1, "")
-				if identity == "QAAA0006" || identity == "QAAA0011" {
+				if identity == "QAAA0006" || identity == "QAAA0011" || identity == "QAAa9011" {
 					cx06Want(t, r, "soh_truncated", "accepted", 99, 1, "percent")
 				} else {
 					cx06Want(t, r, "soh_truncated", "raw", 99, 1, "")

@@ -2,6 +2,7 @@ package canbusreg
 
 import (
 	"encoding/binary"
+	"strings"
 	"testing"
 	"time"
 
@@ -475,6 +476,18 @@ func TestCX05ExtremaAndLocationHypothesis(t *testing.T) {
 		r := CX05DecodePCSStandard(s, i)
 		if (r.Fields["maximum_location_fixed_aggregate"].Status == "accepted") != (location == 1) {
 			t.Fatal(r)
+		}
+	}
+	for _, id := range []uint32{0x319, 0x322, 0x330} {
+		s, i := cx05Fixture(t, id, [8]byte{1, 2, 1, 4, 5, 6, 7, 8})
+		s, i = cx05Reselect(t, s, i, func(c *CX01SelectionSpec) { c.ProjectCode, c.Release, c.Scope = "QAAB", "0099", "aggregate" })
+		i.IndexScope = "aggregate"
+		i.IndexValid = true
+		r := CX05DecodePCSStandard(s, i)
+		for name, f := range r.Fields {
+			if f.Status == "accepted" && (strings.HasSuffix(name, "_index") || strings.HasSuffix(name, "_fixed_aggregate")) {
+				t.Fatalf("unknown QAAB release accepted %s: %v", name, r)
+			}
 		}
 	}
 	for _, n := range []byte{0, 1, 14, 15, 16, 255} {

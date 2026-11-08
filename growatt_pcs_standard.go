@@ -68,7 +68,7 @@ func CX05DecodePCSStandard(s CXSelection, i CX05PCSInput) CX05PCSResult {
 	local := c.ProjectCode == "QAAA" && c.Release == "0006" && c.Scope == "local"
 	release11 := s.CX01Group() == "L8"
 	gateway := c.ProjectCode == "QCAA" && c.Release == "0001" && c.Scope == "aggregate"
-	fixedAggregate := c.ProjectCode == "QAAB" && c.Scope == "aggregate"
+	fixedAggregate := c.ProjectCode == "QAAB" && c.Release == "0004" && c.Scope == "aggregate"
 	supported := local || release11 || gateway || fixedAggregate
 	measured := i.MeasurementValid && (local || release11)
 	add := func(name string, n, d int64, unit, meaning, grade string, interpreted bool) {

@@ -64,6 +64,9 @@ type CX17Provider struct {
 	member            CXSelection
 	hasMember, seen   bool
 	association       cx17Association
+	// assembler is the single LINK identity assembly of the active generation; it retains the completed serial so
+	// that a later different serial under the same project, release and route raises a sticky conflict.
+	assembler *CX01LINKIdentityAssembler
 }
 
 // cx17Association is the native slot and group association supplied with a PCS record. It is part of the
@@ -110,6 +113,10 @@ func (p *CX17Provider) Start(source CX17ReceiveSource, generation uint64) error 
 	p.conflict = false
 	p.identity = make(map[string]int64)
 	p.member, p.hasMember, p.seen = CXSelection{}, false, false
+	p.assembler = nil
+	if p.selection.CX01Spec().Flavor == "link" {
+		p.assembler = CX01NewLINKIdentityAssembler(p.selection)
+	}
 	p.sequence = 0
 	p.monotonic = 0
 	p.snapshot.Generation = generation
@@ -157,13 +164,50 @@ func (p *CX17Provider) cx17Receive(ctx context.Context, source CX17ReceiveSource
 	}
 }
 
-// cx17ExtendedIdentityRecord reports whether an extended19 record carries the identity fields: the wire kind
-// 0x1900, or the coordinator's aggregate 0x1910 that the decoder normalizes to the same fields.
-func cx17ExtendedIdentityRecord(c CX01SelectionSpec, kind uint32) bool {
-	if kind == 0x1900 {
-		return true
+// cx17ExtendedKind normalizes the coordinator's aggregate 0x1910..0x1919 records to the 0x1900..0x1909 kinds the
+// decoder interprets them as, so identity fields fence identically on both routes. Gateway-state 0x1910 keeps its kind.
+func cx17ExtendedKind(c CX01SelectionSpec, kind uint32) uint32 {
+	if kind >= 0x1910 && kind <= 0x1919 && c.Scope == "aggregate" && c.Destination == 0xdf && c.Source == 0xf2 {
+		return kind - 0x10
 	}
-	return kind == 0x1910 && c.Scope == "aggregate" && c.Destination == 0xdf && c.Source == 0xf2
+	return kind
+}
+
+// cx17IdentityKey names the fence entry of a decoded identity or role field. Opaque fields, such as the LINK 0x1800
+// flags byte whose unspecified bits cannot establish a role change, are never fenced; withheld fields carry no value.
+func cx17IdentityKey(c CX01SelectionSpec, prefix string, id uint32, name string, f CXNativeField) (string, bool) {
+	if cx17Withheld(f.Status) {
+		return "", false
+	}
+	switch prefix {
+	case "parallel":
+		if id&^15 == 0x600 && (name == "product" || name == "hardware" || name == "version_mux") {
+			return prefix + "/" + name, true
+		}
+	case "identity":
+		if id == 0x320 && (name == "product_0" || name == "product_1" || name == "hardware" || name == "version_3" || name == "version_5") {
+			return prefix + "/" + name, true
+		}
+		// Only an accepted family is identity; a raw family on an unlabelled selection stays uninterpreted.
+		if id == 0x321 && name == "family" && f.Status == "accepted" {
+			return "identity/0321/family", true
+		}
+	case "extended":
+		switch kind := cx17ExtendedKind(c, id>>16); {
+		case kind == 0x1900 && (name == "product" || name == "hardware" || name == "version"):
+			return prefix + "/" + name, true
+		case kind == 0x1903 && name == "role":
+			return "extended/1903/role", true
+		}
+	case "link":
+		switch kind := id >> 16; {
+		case kind == 0x1802 && (name == "project_code" || name == "release"):
+			return prefix + "/" + name, true
+		case kind == 0x1801 && name == "version":
+			return "link/1801/version", true
+		}
+	}
+	return "", false
 }
 func (p *CX17Provider) cx17Raw(o CX17Observation, status string) {
 	raw := o.Input.PCS.NativeRecord
@@ -240,14 +284,19 @@ func (p *CX17Provider) cx17Apply(o CX17Observation) {
 		p.cx17Raw(o, "conflict")
 		return
 	}
+	// The serial is assembled across observations; a completed serial that differs from the retained one is a
+	// sticky conflict of this generation.
+	if p.assembler != nil && projection.Current.Status == "descriptive" && p.assembler.CX01Decode(i).Status == "conflict" {
+		p.conflict = true
+	}
 	// Compare only identity/role fields supplied by the accepted native API.
+	id := e.Frame.ID().Value()
 	for prefix, part := range projection.Native {
 		for name, f := range part.Fields {
-			identityField := (prefix == "parallel" && e.Frame.ID().Value()&^15 == 0x600 && (name == "product" || name == "hardware" || name == "version_mux")) || (prefix == "extended" && cx17ExtendedIdentityRecord(c, e.Frame.ID().Value()>>16) && (name == "product" || name == "hardware" || name == "version")) || prefix == "identity" && e.Frame.ID().Value() == 0x320 && (name == "product_0" || name == "product_1" || name == "hardware" || name == "version_3" || name == "version_5") || prefix == "link" && (name == "role_flags" || name == "project_code" || name == "release")
-			if !identityField || cx17Withheld(f.Status) {
+			key, identityField := cx17IdentityKey(c, prefix, id, name, f)
+			if !identityField {
 				continue
 			}
-			key := prefix + "/" + name
 			if old, seen := p.identity[key]; seen && old != f.Numerator {
 				p.conflict = true
 			}
@@ -319,6 +368,11 @@ func (p *CX17Provider) cx17Apply(o CX17Observation) {
 	if c.Flavor == "link" {
 		p.cx17Reconcile("cells/cell_", 16, in.CellCount, in.CellCountValid, fields)
 		p.cx17Reconcile("sensors/sensor_", 4, in.SensorCount, in.SensorCountValid, fields)
+		// A later 0x1801 whose gate, hardware age or count withholds enables must not leave earlier enables current.
+		if part, ok := projection.Native["balance"]; ok && part.Status == "accepted" {
+			_, enabled := part.Fields["enable_1"]
+			p.cx17Reconcile("balance/enable_", 16, in.CellCount, enabled, fields)
+		}
 	}
 	p.snapshot.State = "receiving"
 }

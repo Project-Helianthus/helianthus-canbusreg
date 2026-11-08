@@ -374,10 +374,13 @@ func TestCX17FreshFrameDoesNotRenewSibling(t *testing.T) {
 		}
 	}
 }
+
+// Catches: a changed LINK project/release (0x1802) or peer version byte (0x1801/version) within one generation
+// updating the identity without a sticky conflict, so fields retained under the previous peer stayed promotable.
 func TestCX17WireIdentityReuseAndRoleChange(t *testing.T) {
-	for _, kind := range []uint32{0x1800, 0x1802} {
+	for _, kind := range []uint32{0x1801, 0x1802} {
 		t.Run(fmt.Sprintf("%x", kind), func(t *testing.T) {
-			payload := [8]byte{}
+			payload := [8]byte{5, 0, 1, 2, 3, 4, 6, 0}
 			if kind == 0x1802 {
 				payload = [8]byte{'Q', 'A', 'A', 'A', '0', '0', '0', '6'}
 			}
@@ -387,10 +390,13 @@ func TestCX17WireIdentityReuseAndRoleChange(t *testing.T) {
 			p.Start(a, 1)
 			defer p.Stop()
 			cx17Send(t, a, p, 1, i)
+			if got := p.CX17Snapshot(time.Second, time.Second); got.State != "receiving" {
+				t.Fatal("first observation", got.State)
+			}
 			if kind == 0x1802 {
 				payload[7] = '7'
 			} else {
-				payload[1] = 1
+				payload[6] = 7
 			}
 			cx16Frame(t, &i, kind<<16|0xf401, true, payload)
 			i.PCS.Evidence.Sequence = 2
@@ -908,6 +914,226 @@ func TestCX17AggregateExtendedIdentityChangeConflicts(t *testing.T) {
 			got := p.CX17Snapshot(time.Second, time.Second)
 			if got.State != "conflict" || got.Promotable || len(got.Current) != 0 {
 				t.Fatal(got.State, got.Promotable, len(got.Current))
+			}
+		})
+	}
+}
+
+// Catches: the opaque LINK 0x1800 flags byte fencing the generation. Its unspecified bits cannot establish a role
+// change, so a different role_flags value is retained raw (latest value) and the generation keeps receiving.
+func TestCX17OpaqueRoleFlagsDoNotConflict(t *testing.T) {
+	payload := [8]byte{0, 0x01, 16, 4, 0, 0, 0, 0}
+	s, i := cx16LINK(t, 0x1800, payload)
+	p, _ := CX17NewLINKProvider(s)
+	a := cx17Source()
+	if err := p.Start(a, 1); err != nil {
+		t.Fatal(err)
+	}
+	defer p.Stop()
+	cx17Send(t, a, p, 1, i)
+	payload[1] = 0x81
+	cx16Frame(t, &i, 0x1800<<16|0xf401, true, payload)
+	i.PCS.Evidence.Sequence = 2
+	cx17Send(t, a, p, 1, i)
+	got := p.CX17Snapshot(time.Second, time.Second)
+	f := got.Current["link/1800/role_flags"]
+	if got.State != "receiving" || f.Status != "raw" || f.Numerator != 0x81 || f.Unit != "" || f.Meaning != "" {
+		t.Fatal(got.State, f)
+	}
+	// A real identity change still fences after opaque flag changes.
+	cx16Frame(t, &i, 0x1802<<16|0xf401, true, [8]byte{'Q', 'A', 'A', 'A', '0', '0', '0', '6'})
+	i.PCS.Evidence.Sequence = 3
+	cx17Send(t, a, p, 1, i)
+	if got = p.CX17Snapshot(time.Second, time.Second); got.State != "receiving" {
+		t.Fatal("matching identity conflicted", got.State)
+	}
+}
+
+// Catches: an accepted PCS 0x321 family changing within one generation without a sticky conflict, so telemetry
+// retained under the previous family stayed promotable. A raw family on an unlabelled selection is not identity.
+func TestCX17PCSFamilyChangeConflicts(t *testing.T) {
+	for _, release := range []string{"0011", "0006"} {
+		t.Run(release, func(t *testing.T) {
+			s, i := cx16Fixture(t)
+			c := s.CX01Spec()
+			c.Release = release
+			s = cx16Reselect(t, &i, c)
+			p, err := CX17NewPCSProvider(s)
+			if err != nil {
+				t.Fatal(err)
+			}
+			a := cx17Source()
+			if err := p.Start(a, 1); err != nil {
+				t.Fatal(err)
+			}
+			defer p.Stop()
+			cx16Frame(t, &i, 0x321, false, [8]byte{0, 'A', 'B', 'C', 'D', 0, 1, 2})
+			cx17Send(t, a, p, 1, i)
+			want := map[string]string{"0011": "accepted", "0006": "raw"}[release]
+			if got := p.CX17Snapshot(time.Second, time.Second); got.State != "receiving" || got.Current["identity/family"].Status != want {
+				t.Fatal(got.State, got.Current["identity/family"])
+			}
+			i.PCS.Evidence.Sequence = 2
+			cx16Frame(t, &i, 0x321, false, [8]byte{0, 'A', 'B', 'C', 'E', 0, 1, 2})
+			cx17Send(t, a, p, 1, i)
+			got := p.CX17Snapshot(time.Second, time.Second)
+			if release == "0011" && (got.State != "conflict" || got.Promotable || len(got.Current) != 0 || got.LastGood["identity/family"].Numerator != 0x41424344) {
+				t.Fatal("accepted family change", got.State, got.Promotable, got.LastGood["identity/family"])
+			}
+			if release == "0006" && (got.State != "receiving" || got.Current["identity/family"].Numerator != 0x41424345) {
+				t.Fatal("raw family fenced", got.State, got.Current["identity/family"])
+			}
+		})
+	}
+}
+
+// Catches: the extended 0x1903 role (and the coordinator's aggregate 0x1913, normalized to the same role) changing
+// within one generation without a sticky conflict. A changed state byte on the same record is not identity.
+func TestCX17ExtendedRoleChangeConflicts(t *testing.T) {
+	for _, kind := range []uint32{0x1903, 0x1913} {
+		t.Run(fmt.Sprintf("%x", kind), func(t *testing.T) {
+			s, i := cx16Fixture(t)
+			c := s.CX01Spec()
+			c.Flavor, c.Bank, c.Endpoint, c.Group, c.Slot, c.RouteSet = "pcs-extended19", "bank-a", "endpoint-a", "group-a", "slot-a", true
+			c.Destination, c.Source = 0xf2, 2
+			if kind == 0x1913 {
+				c.Scope, c.Destination, c.Source = "aggregate", 0xdf, 0xf2
+			}
+			s = cx16Reselect(t, &i, c)
+			route := uint32(c.Destination)<<8 | uint32(c.Source)
+			payload := [8]byte{1, 0, 2, 0, 3, 4, 5, 1}
+			cx16Frame(t, &i, kind<<16|route, true, payload)
+			p, _ := CX17NewPCSProvider(s)
+			a := cx17Source()
+			if err := p.Start(a, 1); err != nil {
+				t.Fatal(err)
+			}
+			defer p.Stop()
+			cx17Send(t, a, p, 1, i)
+			key := fmt.Sprintf("extended/%04x/role", kind)
+			if got := p.CX17Snapshot(time.Second, time.Second); got.State != "receiving" || got.Current[key].Status != "accepted" || got.Current[key].Numerator != 1 {
+				t.Fatal(got.State, got.Current[key])
+			}
+			payload[6] = 6
+			cx16Frame(t, &i, kind<<16|route, true, payload)
+			i.PCS.Evidence.Sequence = 2
+			cx17Send(t, a, p, 1, i)
+			if got := p.CX17Snapshot(time.Second, time.Second); got.State != "receiving" {
+				t.Fatal("state change fenced", got.State)
+			}
+			payload[7] = 2
+			cx16Frame(t, &i, kind<<16|route, true, payload)
+			i.PCS.Evidence.Sequence = 3
+			cx17Send(t, a, p, 1, i)
+			got := p.CX17Snapshot(time.Second, time.Second)
+			if got.State != "conflict" || got.Promotable || len(got.Current) != 0 || got.LastGood[key].Numerator != 1 {
+				t.Fatal(got.State, got.Promotable, len(got.Current), got.LastGood[key])
+			}
+		})
+	}
+}
+
+// Catches: a replacement LINK peer announcing a different complete 0x18fb serial under the same project, release
+// and route without a conflict, because no serial was assembled and retained across observations. The same serial
+// repeated, or a fresh generation, does not conflict.
+func TestCX17LINKSerialReplacementConflicts(t *testing.T) {
+	serial := func(first byte) [][8]byte {
+		return [][8]byte{{15, first, 2, 3, 4, 5, 6, 7}, {47, 8, 9, 10, 11, 12, 13, 14}, {79, 15, 16, 0, 0, 0, 0, 0}}
+	}
+	for _, name := range []string{"same", "different", "new-generation"} {
+		t.Run(name, func(t *testing.T) {
+			s, i := cx16LINK(t, 0x1802, [8]byte{'Q', 'A', 'A', 'A', '0', '0', '0', '6'})
+			p, _ := CX17NewLINKProvider(s)
+			a := cx17Source()
+			if err := p.Start(a, 1); err != nil {
+				t.Fatal(err)
+			}
+			defer p.Stop()
+			generation := uint64(1)
+			cx17Send(t, a, p, generation, i)
+			feed := func(frames [][8]byte) {
+				for _, payload := range frames {
+					i.PCS.Evidence.Sequence++
+					cx16Frame(t, &i, 0x18fb<<16|0xf401, true, payload)
+					cx17Send(t, a, p, generation, i)
+				}
+			}
+			feed(serial(1))
+			if got := p.CX17Snapshot(time.Second, time.Second); got.State != "receiving" {
+				t.Fatal("first serial", got.State)
+			}
+			next := serial(1)
+			if name != "same" {
+				next = serial(9)
+			}
+			if name == "new-generation" {
+				b := cx17Source()
+				generation = 2
+				if err := p.Start(b, generation); err != nil {
+					t.Fatal(err)
+				}
+				a = b
+				// Sequences above the predecessor's keep a retained predecessor assembly from rejecting them as stale.
+				i.PCS.Evidence.Sequence = 10
+				cx16Frame(t, &i, 0x1802<<16|0xf401, true, [8]byte{'Q', 'A', 'A', 'A', '0', '0', '0', '6'})
+				cx17Send(t, a, p, generation, i)
+			}
+			feed(next)
+			got := p.CX17Snapshot(time.Second, time.Second)
+			if (got.State == "conflict") != (name == "different") || (name == "different" && (got.Promotable || len(got.Current) != 0)) {
+				t.Fatal(name, got.State, got.Promotable, len(got.Current))
+			}
+		})
+	}
+}
+
+// Catches: a later 0x1801 whose balance gate is invalid, whose hardware age is unknown, or whose cell count is
+// smaller or invalid omitting enable fields while the earlier accepted enables stayed current and promotable.
+// LastGood keeps the earlier enables.
+func TestCX17BalanceEnablesDemotedWhenWithheld(t *testing.T) {
+	for _, name := range []string{"gate-invalid", "hardware-age-unknown", "count-smaller", "count-invalid", "unchanged"} {
+		t.Run(name, func(t *testing.T) {
+			s, i := cx16LINK(t, 0x1801, [8]byte{0x0f, 0, 1, 2, 3, 4, 6, 0})
+			i.CellCount, i.CellCountValid = 4, true
+			i.BalanceGate = CX12MeasurementGate{Configured: true, Valid: true}
+			i.HardwareAgeKnown = true
+			p, _ := CX17NewLINKProvider(s)
+			a := cx17Source()
+			if err := p.Start(a, 1); err != nil {
+				t.Fatal(err)
+			}
+			defer p.Stop()
+			cx17Send(t, a, p, 1, i)
+			now := i.PCS.Evidence.Monotonic
+			if got := p.CX17Snapshot(now, time.Second); got.Current["balance/enable_3"].Status != "accepted" || !got.Promotable {
+				t.Fatal(got.State, got.Current["balance/enable_3"])
+			}
+			i.PCS.Evidence.Sequence = 2
+			switch name {
+			case "gate-invalid":
+				i.BalanceGate.Valid = false
+			case "hardware-age-unknown":
+				i.HardwareAgeKnown = false
+			case "count-smaller":
+				i.CellCount = 2
+			case "count-invalid":
+				i.CellCountValid = false
+			}
+			cx17Send(t, a, p, 1, i)
+			got := p.CX17Snapshot(now, time.Second)
+			want := map[string]string{"gate-invalid": "absent", "hardware-age-unknown": "absent", "count-smaller": "unconfigured", "count-invalid": "absent", "unchanged": "accepted"}[name]
+			for _, slot := range []int{3, 4} {
+				key := fmt.Sprintf("balance/enable_%d", slot)
+				f := got.Current[key]
+				if f.Status != want || (want != "accepted" && (f.Unit != "" || f.Meaning != "")) || got.LastGood[key].Status != "accepted" {
+					t.Fatal(key, f, got.LastGood[key])
+				}
+			}
+			if f := got.Current["balance/enable_1"]; (name == "count-smaller" || name == "unchanged") != (f.Status == "accepted" && f.Evidence.Sequence == 2) {
+				t.Fatal("enable_1", f)
+			}
+			if name != "unchanged" && name != "count-smaller" && got.Promotable {
+				t.Fatal("withheld enables promotable")
 			}
 		})
 	}

@@ -532,3 +532,35 @@ func TestCX15Release11HeartbeatAndState(t *testing.T) {
 		}
 	}
 }
+
+func TestCX15ExtendedRouteMustMatchSelection(t *testing.T) {
+	for _, v := range []struct {
+		direction, role string
+		pid             uint32
+	}{
+		{"coordinator-to-battery", "battery", 0x190a},
+		{"gateway-to-pcs", "pcs", 0x190d},
+		{"service-to-gateway", "gateway", 0x1919},
+	} {
+		for _, route := range [][2]uint8{{0xde, 0xf2}, {0xdf, 0xf3}, {0xf2, 0xf5}, {0xf3, 0xf5}, {0xf2, 0xf4}} {
+			t.Run(fmt.Sprintf("%s-%02X-%02X", v.direction, route[0], route[1]), func(t *testing.T) {
+				s, c, i := cx15Fixture(t, 4, "pcs-extended19", v.direction, v.role, v.pid)
+				if !CX15ClassifyReceiver(s, c, i).Admitted {
+					t.Fatal("matching selection not admitted")
+				}
+				if route[0] == s.spec.Destination && route[1] == s.spec.Source {
+					return
+				}
+				spec := s.CX01Spec()
+				spec.Destination, spec.Source = route[0], route[1]
+				other := cx01Select(t, spec)
+				if other.group == "" {
+					t.Skip("route not selectable")
+				}
+				if r := CX15ClassifyReceiver(other, c, i); r.Admitted {
+					t.Fatal("frame admitted for different selected route", r)
+				}
+			})
+		}
+	}
+}

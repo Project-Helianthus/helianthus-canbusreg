@@ -253,11 +253,11 @@ func CX15ClassifyReceiver(s CXSelection, c CX15ReceiverContext, i CX01LINKInput)
 				return r
 			}
 		case "extended-pcs":
-			if !spec.RouteSet || uint16(id) != 0xdff2 {
+			if !spec.RouteSet || uint16(id) != 0xdff2 || uint8(id>>8) != spec.Destination || uint8(id) != spec.Source {
 				return r
 			}
 		case "gateway-service":
-			if !spec.RouteSet || uint16(id) != 0xf2f5 {
+			if !spec.RouteSet || uint16(id) != 0xf2f5 || uint8(id>>8) != spec.Destination || uint8(id) != spec.Source {
 				return r
 			}
 		}

@@ -58,8 +58,8 @@ func CX10DecodeParallel(s CXSelection, i CX01LINKInput) CXNativeResult {
 	}
 	p := r.Raw
 	add := func(name string, n int64, unit, meaning, status string) {
-		grade := "Proven"
-		if status == "raw" {
+		grade := s.CX01Grade()
+		if grade != "Proven" && grade != "Hypothesis" || status == "raw" {
 			grade = "Unknown"
 		}
 		r.Fields[name] = CXNativeField{Numerator: n, Denominator: 1, Unit: unit, Meaning: meaning, Grade: grade, Status: status, Raw: p, Evidence: i.Evidence, Epoch: i.Epoch, Scope: i.Scope, Bank: i.Bank, Endpoint: i.Endpoint, Group: i.Group, Slot: i.Slot, Age: i.FieldAge}

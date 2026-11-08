@@ -315,3 +315,27 @@ func TestCX10UnitGateNegative(t *testing.T) {
 		}
 	}
 }
+
+func TestCX10FieldGradeFollowsSelection(t *testing.T) {
+	p := [8]byte{1, 2, 3, 4, 5, 6, 7, 8}
+	for _, tc := range []struct {
+		project, release, group, want string
+		id                            uint32
+	}{{"QAAB", "0004", "3", "Hypothesis", 0x603}, {"QAAA", "0011", "3", "Proven", 0x603}} {
+		c := cx10Spec(t)
+		c.ProjectCode, c.Release = tc.project, tc.release
+		s := cx10Selection(t, c)
+		if s.CX01Grade() != tc.want {
+			t.Fatalf("selection grade %s", s.CX01Grade())
+		}
+		r := CX10DecodeParallel(s, cx10Input(t, c, tc.id, p))
+		for _, n := range []string{"product", "hardware"} {
+			if f, ok := r.Fields[n]; !ok || f.Grade != tc.want {
+				t.Fatalf("%s %s: %#v", tc.project, n, f)
+			}
+		}
+		if r.Fields["version_mux"].Grade != "Unknown" {
+			t.Fatal("raw word promoted")
+		}
+	}
+}

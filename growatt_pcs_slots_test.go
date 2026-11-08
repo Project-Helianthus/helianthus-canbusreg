@@ -95,6 +95,28 @@ func TestCX08MemberDictionary(t *testing.T) {
 		t.Fatal("inferred member")
 	}
 }
+func TestCX08MemberIndexInheritsSourceStatus(t *testing.T) {
+	s, i := cx08Fixture(t, 0x333, [8]byte{3, 2, 0x10, 0, 0x10, 1})
+	i.NativeSlot = 2
+	i.Member = &s
+	for _, state := range []string{"absent", "invalid", "unsupported", "stale", "conflict", "unassigned"} {
+		i.FieldStates = map[string]string{"dtc_a": state}
+		r := CX08DecodePCSSlots(s, i)
+		if r.Fields["dtc_a_index"].Status != state || r.Fields["dtc_a_index"].Meaning != "" {
+			t.Fatal(state, r.Fields["dtc_a_index"])
+		}
+		cx08Want(t, r, "dtc_b_index", "accepted", 1, 1, "")
+	}
+	i.FieldStates = nil
+	i.FieldAges = map[string]time.Duration{"dtc_a": -time.Second}
+	if r := CX08DecodePCSSlots(s, i); r.Fields["dtc_a_index"].Status != "invalid" {
+		t.Fatal("negative age", r.Fields["dtc_a_index"])
+	}
+	i.FieldAges = map[string]time.Duration{"dtc_a": 2 * time.Second}
+	if r := CX08DecodePCSSlots(s, i); r.Fields["dtc_a_index"].Age != 2*time.Second {
+		t.Fatal("age", r.Fields["dtc_a_index"])
+	}
+}
 func TestCX08ReleaseAndPadding(t *testing.T) {
 	for _, pid := range []uint32{0x326, 0x327, 0x333, 0x334} {
 		s, i := cx08Fixture(t, pid, [8]byte{})

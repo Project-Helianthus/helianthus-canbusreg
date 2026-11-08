@@ -94,7 +94,18 @@ func CX08DecodePCSSlots(s CXSelection, i CX08PCSInput) CXNativeResult {
 				expected, _ := CX07EncodeDTC(*i.Member, index)
 				if word == expected {
 					add(name, int64(word), 1, "", "selected member numeric word", true)
-					add(name+"_index", int64(index), 1, "", "member numeric index; condition opaque", true)
+					src := r.Fields[name]
+					add(name+"_index", int64(index), 1, "", "member numeric index; condition opaque", src.Status == "accepted")
+					// The index derives from the source word, so it inherits the
+					// word's withheld status and age.
+					idx := r.Fields[name+"_index"]
+					if src.Status != "accepted" {
+						idx.Status, idx.Unit, idx.Meaning = src.Status, "", ""
+					}
+					if _, own := i.FieldAges[name+"_index"]; !own {
+						idx.Age = src.Age
+					}
+					r.Fields[name+"_index"] = idx
 					break
 				}
 			}

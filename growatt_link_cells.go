@@ -84,6 +84,21 @@ func cx12Gate(g CX12MeasurementGate) string {
 	}
 	return "accepted"
 }
+
+// cx12GateRejection keeps the independent gate verdict and age on a field the
+// gate refused, instead of reverting to the frame's own raw status and age.
+func cx12GateRejection(f CXNativeField, g CX12MeasurementGate) CXNativeField {
+	st := cx12Gate(g)
+	if st == "accepted" || st == "unconfigured" {
+		return f
+	}
+	f.Status = st
+	if g.Age >= 0 {
+		f.Age = g.Age
+	}
+	return f
+}
+
 func cx12Admit(s CXSelection, i CX01LINKInput) bool {
 	return cx01LINKAdmission(s, i) && s.CX01Group() != "" && i.Evidence.Sequence > 0 && i.Evidence.Monotonic >= 0
 }
@@ -285,6 +300,8 @@ func CX12DecodeLINKCellMean(s CXSelection, i CX01LINKInput, g CX12MeasurementGat
 		f.Unit = "mV"
 		f.Meaning = "native cell mean"
 		f.Age = g.Age
+	} else {
+		f = cx12GateRejection(f, g)
 	}
 	r.Fields["mean"] = f
 	r.Status = "accepted"

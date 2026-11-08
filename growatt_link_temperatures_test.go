@@ -285,3 +285,20 @@ func TestCX12SummaryRejectsReusedContributorEvidence(t *testing.T) {
 		})
 	}
 }
+
+func TestCX12SummaryGateRejectionKeepsGateStatusAndAge(t *testing.T) {
+	spec := cx01Spec(t, "QAAA", "0011")
+	s := cx01Select(t, spec)
+	v := cx12Sensors(t, spec, 2, cx12Words(400, 408, 0, 0), cx12Gates())
+	stale := CX12MeasurementGate{Configured: true, Valid: false, Status: "stale", Age: 7 * time.Second}
+	g := CX12SummaryGates{FineTemperatureValid: true, Maximum: stale, Minimum: cx12Gates()[0], Mean: stale, Contributors: v}
+	r := CX12DecodeLINKTemperatureSummary(s, cx12SummaryInput(t, spec, 0x1862, cx12Words(408, 400, 404, 0)), g)
+	for _, name := range []string{"maximum", "mean"} {
+		if f := r.Fields[name]; f.Status != "stale" || f.Age != 7*time.Second {
+			t.Fatal(name, f)
+		}
+	}
+	if f := r.Fields["minimum"]; f.Status != "accepted" {
+		t.Fatal(f)
+	}
+}

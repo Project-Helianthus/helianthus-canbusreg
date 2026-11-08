@@ -42,6 +42,8 @@ func CX12DecodeLINKTemperatureSummary(s CXSelection, i CX01LINKInput, g CX12Summ
 			f.Grade = "Proven"
 			f.Status = "accepted"
 			f.Age = gate.Age
+		} else {
+			f = cx12GateRejection(f, gate)
 		}
 		r.Fields[name] = f
 	}

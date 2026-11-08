@@ -243,13 +243,15 @@ func cx12Contributors(s CXSelection, i CX01LINKInput, v CX12VectorSnapshot, kind
 		if f.Age < 0 || f.Age > v.MaxAge || elapsed > v.MaxAge-f.Age {
 			return 0, false
 		}
+		// Each numerator must derive from the raw word its own index selects.
+		word := int64(binary.LittleEndian.Uint16(f.Raw[((j-1)%4)*2:]))
 		if kind == "temperatures" {
-			if f.Denominator != 8 {
+			if f.Denominator != 8 || word == 65535 || f.Numerator != word-320 {
 				return 0, false
 			}
 			sum += f.Numerator + 320
 		} else {
-			if f.Denominator != 1 {
+			if f.Denominator != 1 || f.Numerator != word {
 				return 0, false
 			}
 			sum += f.Numerator

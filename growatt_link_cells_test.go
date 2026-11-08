@@ -346,3 +346,28 @@ func TestCX12CellsNoExtremaSubstitution(t *testing.T) {
 		}
 	}
 }
+
+func TestCX12CellMeanRejectsSameFrameSlotReuse(t *testing.T) {
+	spec := cx01Spec(t, "QAAA", "0011")
+	s := cx01Select(t, spec)
+	a := CX12NewLINKCells(s, 2, true)
+	i0 := cx01Input(t, spec, 0x1810, cx12Words(400, 408, 0, 0))
+	i0.Evidence.Sequence = 1
+	a.CX12Decode(i0, cx12Gates())
+	raw := cx12Words(0, 0, 0, 404)
+	i := cx01Input(t, spec, 0x1806, raw)
+	i.Evidence.Sequence = 2
+	v := a.CX12Snapshot(time.Second, time.Second)
+	if r := CX12DecodeLINKCellMean(s, i, cx12Gates()[0], v, false); r.Fields["mean"].Status != "accepted" {
+		t.Fatal(r)
+	}
+	f := v.Fields[2]
+	f.Numerator = v.Fields[1].Numerator
+	v.Fields[2] = f
+	raw = cx12Words(0, 0, 0, 400)
+	i = cx01Input(t, spec, 0x1806, raw)
+	i.Evidence.Sequence = 2
+	if r := CX12DecodeLINKCellMean(s, i, cx12Gates()[0], v, false); r.Fields["mean"].Status == "accepted" {
+		t.Fatal(r)
+	}
+}

@@ -878,3 +878,37 @@ func TestCX17NativeAssociationChangeConflicts(t *testing.T) {
 		})
 	}
 }
+
+// Catches: aggregate extended identity records (kind 0x1910 from the coordinator) decoding as the normalized
+// 0x1900 identity fields while the fence looked only at wire kind 0x1900, so changed product, hardware or
+// version values on 0x1910 overwrote current and last-good fields without a sticky conflict.
+func TestCX17AggregateExtendedIdentityChangeConflicts(t *testing.T) {
+	for _, kind := range []uint32{0x1900, 0x1910} {
+		t.Run(fmt.Sprintf("%x", kind), func(t *testing.T) {
+			s, i := cx16Fixture(t)
+			c := s.CX01Spec()
+			c.Flavor, c.Scope, c.Destination, c.Source = "pcs-extended19", "aggregate", 0xdf, 0xf2
+			c.Bank, c.Endpoint, c.Group, c.Slot, c.RouteSet = "bank-a", "endpoint-a", "group-a", "slot-a", true
+			s = cx16Reselect(t, &i, c)
+			payload := [8]byte{0x34, 0x12, 2, 6, 0, 0, 0, 0}
+			cx16Frame(t, &i, kind<<16|0xdf<<8|0xf2, true, payload)
+			p, _ := CX17NewPCSProvider(s)
+			a := cx17Source()
+			p.Start(a, 1)
+			defer p.Stop()
+			cx17Send(t, a, p, 1, i)
+			key := fmt.Sprintf("extended/%04x/product", kind)
+			if got := p.CX17Snapshot(time.Second, time.Second); got.Current[key].Numerator != 0x1234 || got.Current[key].Status != "accepted" {
+				t.Fatalf("identity record not accepted: %#v", got.Current[key])
+			}
+			payload[0] = 0x35
+			cx16Frame(t, &i, kind<<16|0xdf<<8|0xf2, true, payload)
+			i.PCS.Evidence.Sequence = 2
+			cx17Send(t, a, p, 1, i)
+			got := p.CX17Snapshot(time.Second, time.Second)
+			if got.State != "conflict" || got.Promotable || len(got.Current) != 0 {
+				t.Fatal(got.State, got.Promotable, len(got.Current))
+			}
+		})
+	}
+}

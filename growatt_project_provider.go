@@ -156,6 +156,15 @@ func (p *CX17Provider) cx17Receive(ctx context.Context, source CX17ReceiveSource
 		p.mu.Unlock()
 	}
 }
+
+// cx17ExtendedIdentityRecord reports whether an extended19 record carries the identity fields: the wire kind
+// 0x1900, or the coordinator's aggregate 0x1910 that the decoder normalizes to the same fields.
+func cx17ExtendedIdentityRecord(c CX01SelectionSpec, kind uint32) bool {
+	if kind == 0x1900 {
+		return true
+	}
+	return kind == 0x1910 && c.Scope == "aggregate" && c.Destination == 0xdf && c.Source == 0xf2
+}
 func (p *CX17Provider) cx17Raw(o CX17Observation, status string) {
 	raw := o.Input.PCS.NativeRecord
 	if len(raw) > 72 {
@@ -234,7 +243,7 @@ func (p *CX17Provider) cx17Apply(o CX17Observation) {
 	// Compare only identity/role fields supplied by the accepted native API.
 	for prefix, part := range projection.Native {
 		for name, f := range part.Fields {
-			identityField := (prefix == "parallel" && e.Frame.ID().Value()&^15 == 0x600 && (name == "product" || name == "hardware" || name == "version_mux")) || (prefix == "extended" && e.Frame.ID().Value()>>16 == 0x1900 && (name == "product" || name == "hardware" || name == "version")) || prefix == "identity" && e.Frame.ID().Value() == 0x320 && (name == "product_0" || name == "product_1" || name == "hardware" || name == "version_3" || name == "version_5") || prefix == "link" && (name == "role_flags" || name == "project_code" || name == "release")
+			identityField := (prefix == "parallel" && e.Frame.ID().Value()&^15 == 0x600 && (name == "product" || name == "hardware" || name == "version_mux")) || (prefix == "extended" && cx17ExtendedIdentityRecord(c, e.Frame.ID().Value()>>16) && (name == "product" || name == "hardware" || name == "version")) || prefix == "identity" && e.Frame.ID().Value() == 0x320 && (name == "product_0" || name == "product_1" || name == "hardware" || name == "version_3" || name == "version_5") || prefix == "link" && (name == "role_flags" || name == "project_code" || name == "release")
 			if !identityField || cx17Withheld(f.Status) {
 				continue
 			}

@@ -1,0 +1,338 @@
+[
+  {
+    "identity": "QAaT8252",
+    "choice": "",
+    "group": "L0",
+    "flavors": [
+      "pcs-standard",
+      "link"
+    ]
+  },
+  {
+    "identity": "QAAA0002",
+    "choice": "",
+    "group": "L0",
+    "flavors": [
+      "pcs-standard",
+      "link"
+    ]
+  },
+  {
+    "identity": "QAAA0005",
+    "choice": "",
+    "group": "L1",
+    "flavors": [
+      "pcs-standard",
+      "link",
+      "pcs-extended19"
+    ]
+  },
+  {
+    "identity": "QAAa2005",
+    "choice": "",
+    "group": "L1",
+    "flavors": [
+      "pcs-standard",
+      "link",
+      "pcs-extended19"
+    ]
+  },
+  {
+    "identity": "QAAa3005",
+    "choice": "",
+    "group": "L1",
+    "flavors": [
+      "pcs-standard",
+      "link",
+      "pcs-extended19"
+    ]
+  },
+  {
+    "identity": "QAAa5005",
+    "choice": "",
+    "group": "L1",
+    "flavors": [
+      "pcs-standard",
+      "link",
+      "pcs-extended19"
+    ]
+  },
+  {
+    "identity": "QAAa6005",
+    "choice": "",
+    "group": "L1",
+    "flavors": [
+      "pcs-standard",
+      "link",
+      "pcs-extended19"
+    ]
+  },
+  {
+    "identity": "QAAa9005",
+    "choice": "",
+    "group": "L1",
+    "flavors": [
+      "pcs-standard",
+      "link",
+      "pcs-extended19"
+    ]
+  },
+  {
+    "identity": "QAAa9006",
+    "choice": "",
+    "group": "L1",
+    "flavors": [
+      "pcs-standard",
+      "link",
+      "pcs-extended19"
+    ]
+  },
+  {
+    "identity": "QAAA0006",
+    "choice": "",
+    "group": "L2",
+    "flavors": [
+      "pcs-standard",
+      "link",
+      "pcs-extended19"
+    ]
+  },
+  {
+    "identity": "QAAA0007",
+    "choice": "",
+    "group": "L3",
+    "flavors": [
+      "pcs-standard",
+      "link",
+      "pcs-extended19"
+    ]
+  },
+  {
+    "identity": "QAAA0008",
+    "choice": "",
+    "group": "L3",
+    "flavors": [
+      "pcs-standard",
+      "link",
+      "pcs-extended19"
+    ]
+  },
+  {
+    "identity": "QAAa2007",
+    "choice": "",
+    "group": "L3",
+    "flavors": [
+      "pcs-standard",
+      "link",
+      "pcs-extended19"
+    ]
+  },
+  {
+    "identity": "QAAa6008",
+    "choice": "",
+    "group": "L3",
+    "flavors": [
+      "pcs-standard",
+      "link",
+      "pcs-extended19"
+    ]
+  },
+  {
+    "identity": "QAAa6009",
+    "choice": "",
+    "group": "L3",
+    "flavors": [
+      "pcs-standard",
+      "link",
+      "pcs-extended19"
+    ]
+  },
+  {
+    "identity": "QAAa7004",
+    "choice": "",
+    "group": "L3",
+    "flavors": [
+      "pcs-standard",
+      "link",
+      "pcs-extended19"
+    ]
+  },
+  {
+    "identity": "QAAa8008",
+    "choice": "",
+    "group": "L3",
+    "flavors": [
+      "pcs-standard",
+      "link",
+      "pcs-extended19"
+    ]
+  },
+  {
+    "identity": "QAAA0009",
+    "choice": "",
+    "group": "L4",
+    "flavors": [
+      "pcs-standard",
+      "link",
+      "pcs-extended19"
+    ]
+  },
+  {
+    "identity": "QAAA0010",
+    "choice": "",
+    "group": "L4",
+    "flavors": [
+      "pcs-standard",
+      "link",
+      "pcs-extended19"
+    ]
+  },
+  {
+    "identity": "QAAa1011",
+    "choice": "",
+    "group": "L4",
+    "flavors": [
+      "pcs-standard",
+      "link",
+      "pcs-extended19"
+    ]
+  },
+  {
+    "identity": "QAAa4010",
+    "choice": "",
+    "group": "L4",
+    "flavors": [
+      "pcs-standard",
+      "link",
+      "pcs-extended19"
+    ]
+  },
+  {
+    "identity": "QAAa4011",
+    "choice": "",
+    "group": "L4",
+    "flavors": [
+      "pcs-standard",
+      "link",
+      "pcs-extended19"
+    ]
+  },
+  {
+    "identity": "QAAa9010",
+    "choice": "",
+    "group": "L4",
+    "flavors": [
+      "pcs-standard",
+      "link",
+      "pcs-extended19"
+    ]
+  },
+  {
+    "identity": "QAAb5004",
+    "choice": "",
+    "group": "L5",
+    "flavors": [
+      "pcs-standard",
+      "link",
+      "pcs-extended19",
+      "pcs-parallel"
+    ]
+  },
+  {
+    "identity": "QAAB0004",
+    "choice": "",
+    "group": "L5",
+    "flavors": [
+      "pcs-standard",
+      "link",
+      "pcs-extended19",
+      "pcs-parallel"
+    ]
+  },
+  {
+    "identity": "QAAB0002",
+    "choice": "",
+    "group": "L6",
+    "flavors": [
+      "pcs-standard",
+      "link",
+      "pcs-extended19",
+      "pcs-parallel"
+    ]
+  },
+  {
+    "identity": "QAAB0003",
+    "choice": "",
+    "group": "L6",
+    "flavors": [
+      "pcs-standard",
+      "link",
+      "pcs-extended19",
+      "pcs-parallel"
+    ]
+  },
+  {
+    "identity": "QAAB0006",
+    "choice": "",
+    "group": "L7",
+    "flavors": [
+      "pcs-standard",
+      "link",
+      "pcs-parallel"
+    ]
+  },
+  {
+    "identity": "QAAA0011",
+    "choice": "",
+    "group": "L8",
+    "flavors": [
+      "pcs-standard",
+      "link",
+      "pcs-parallel"
+    ]
+  },
+  {
+    "identity": "QAAa9011",
+    "choice": "legacy19",
+    "group": "L4",
+    "flavors": [
+      "pcs-standard",
+      "pcs-extended19",
+      "link"
+    ]
+  },
+  {
+    "identity": "QAAa9011",
+    "choice": "release11",
+    "group": "L8",
+    "flavors": [
+      "pcs-standard",
+      "pcs-parallel",
+      "link"
+    ]
+  },
+  {
+    "identity": "QAAa9011",
+    "choice": "",
+    "group": "",
+    "flavors": []
+  },
+  {
+    "identity": "qAAA0006",
+    "choice": "",
+    "group": "",
+    "flavors": []
+  },
+  {
+    "identity": "QAAA9999",
+    "choice": "",
+    "group": "",
+    "flavors": []
+  },
+  {
+    "identity": "QAAA0000",
+    "choice": "",
+    "group": "",
+    "flavors": []
+  }
+]

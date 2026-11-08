@@ -44,6 +44,9 @@ func CX12DecodeLINKTemperatureSummary(s CXSelection, i CX01LINKInput, g CX12Summ
 			f.Age = gate.Age
 		} else {
 			f = cx12GateRejection(f, gate)
+			if n == 65535 {
+				f.Status = "invalid"
+			}
 		}
 		r.Fields[name] = f
 	}

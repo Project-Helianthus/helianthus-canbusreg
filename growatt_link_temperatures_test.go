@@ -302,3 +302,16 @@ func TestCX12SummaryGateRejectionKeepsGateStatusAndAge(t *testing.T) {
 		t.Fatal(f)
 	}
 }
+
+func TestCX12SummarySentinelStaysInvalidWithValidGates(t *testing.T) {
+	spec := cx01Spec(t, "QAAA", "0011")
+	s := cx01Select(t, spec)
+	v := cx12Sensors(t, spec, 2, cx12Words(400, 408, 0, 0), cx12Gates())
+	g := CX12SummaryGates{FineTemperatureValid: true, Maximum: cx12Gates()[0], Minimum: cx12Gates()[0], Mean: cx12Gates()[0], Contributors: v}
+	r := CX12DecodeLINKTemperatureSummary(s, cx12SummaryInput(t, spec, 0x1862, cx12Words(65535, 65535, 65535, 0)), g)
+	for _, name := range []string{"maximum", "minimum", "mean"} {
+		if f := r.Fields[name]; f.Status != "invalid" || f.Unit != "" || f.Grade == "Proven" {
+			t.Fatal(name, f)
+		}
+	}
+}

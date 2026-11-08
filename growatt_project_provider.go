@@ -63,6 +63,14 @@ type CX17Provider struct {
 	identity          map[string]int64
 	member            CXSelection
 	hasMember, seen   bool
+	association       cx17Association
+}
+
+// cx17Association is the native slot and group association supplied with a PCS record. It is part of the
+// identity fence like the member: the same wire bytes decode into another slot's or group's fields when it changes.
+type cx17Association struct {
+	slotValid, groupValid bool
+	slot, group           uint8
 }
 
 func CX17NewPCSProvider(s CXSelection) (*CX17Provider, error) {
@@ -189,6 +197,10 @@ func (p *CX17Provider) cx17Apply(o CX17Observation) {
 	if p.seen && (hasMember != p.hasMember || member != p.member) {
 		identityChanged = true
 	}
+	association := cx17Association{in.PCS.SlotValid, in.PCS.GroupValid, in.PCS.NativeSlot, in.PCS.NativeGroup}
+	if p.seen && association != p.association {
+		identityChanged = true
+	}
 	if identityChanged {
 		p.conflict = true
 	}
@@ -198,7 +210,7 @@ func (p *CX17Provider) cx17Apply(o CX17Observation) {
 		return
 	}
 	if !p.seen {
-		p.seen, p.hasMember, p.member = true, hasMember, member
+		p.seen, p.hasMember, p.member, p.association = true, hasMember, member, association
 	}
 	profile, err := NewCX16SelectedProfile(p.selection, []CX16ReplayInput{in})
 	if err != nil {

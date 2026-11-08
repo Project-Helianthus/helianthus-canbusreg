@@ -845,3 +845,36 @@ func TestCX17InterleavedLINKKindsKeepIndependentIndexes(t *testing.T) {
 		t.Fatal("kind-less LINK retention key still present")
 	}
 }
+
+// Catches: the native slot or group association changing under identical wire bytes within one generation,
+// which would decode the same record into another slot's or group's current and last-good fields.
+func TestCX17NativeAssociationChangeConflicts(t *testing.T) {
+	cases := map[string]func(pcs *CX08PCSInput){
+		"slot":           func(pcs *CX08PCSInput) { pcs.NativeSlot = 3 },
+		"group":          func(pcs *CX08PCSInput) { pcs.NativeGroup = 2 },
+		"slot validity":  func(pcs *CX08PCSInput) { pcs.SlotValid = false },
+		"group validity": func(pcs *CX08PCSInput) { pcs.GroupValid = false },
+	}
+	for name, change := range cases {
+		t.Run(name, func(t *testing.T) {
+			s, i := cx16Fixture(t)
+			i.PCS.SlotValid, i.PCS.NativeSlot, i.PCS.GroupValid, i.PCS.NativeGroup = true, 2, true, 1
+			p, _ := CX17NewPCSProvider(s)
+			a := cx17Source()
+			p.Start(a, 1)
+			defer p.Stop()
+			cx17Send(t, a, p, 1, i)
+			if got := p.CX17Snapshot(time.Second, time.Second); got.State == "conflict" {
+				t.Fatalf("first observation conflicted: %#v", got)
+			}
+			next := i
+			next.PCS.Evidence.Sequence = 2
+			change(&next.PCS)
+			cx17Send(t, a, p, 1, next)
+			got := p.CX17Snapshot(time.Second, time.Second)
+			if got.State != "conflict" || got.Promotable || len(got.Current) != 0 {
+				t.Fatal(got.State, got.Promotable, len(got.Current))
+			}
+		})
+	}
+}

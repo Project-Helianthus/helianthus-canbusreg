@@ -154,6 +154,12 @@ func CX14DecodePCSSummaries(s CXSelection, i CX14PCSInput) CX14PCSResult {
 				b.Field.Status, b.Field.Grade = "accepted", "Proven"
 				b.Field.Meaning = "summary bit clear; independent diagnostics not inferred"
 			}
+			if legacy && w.name == "A" && bit == 0 && b.Field.Numerator == 0 {
+				// A clear A/0 is a valid observation of that bit and must be able to
+				// replace a previously retained set bit.
+				b.Field.Status, b.Field.Grade = "accepted", "Proven"
+				b.Field.Meaning = "summary bit clear; independent diagnostics not inferred"
+			}
 			if modern && w.name == "B" && (bit == 8 || bit == 10) && b.Field.Numerator == 1 {
 				b.Field.Status, b.Field.Grade = "accepted", "Proven"
 				b.Field.Meaning = "independent status source; no diagnostic index"

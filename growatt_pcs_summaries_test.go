@@ -436,6 +436,26 @@ func TestCX14ClearedSummaryReplacesRetainedSetBit(t *testing.T) {
 	}
 }
 
+func TestCX14LegacyA0ClearReplacesRetainedState5(t *testing.T) {
+	s, i := cx14Fixture(t, 0x312, cx14Payload("A", 0), true)
+	five := uint8(5)
+	i.StateCode = &five
+	previous := CX14DecodePCSSummaries(s, i)
+	if f := previous.Fields["A/0"]; f.Status != "accepted" || f.Numerator != 1 {
+		t.Fatal(f)
+	}
+	s, clear := cx14Fixture(t, 0x312, [8]byte{}, true)
+	clear.Evidence.Sequence = i.Evidence.Sequence + 1
+	r := CX14DecodePCSSummaries(s, clear)
+	if f := r.Fields["A/0"]; f.Status != "accepted" || f.Numerator != 0 || f.Grade != "Proven" {
+		t.Fatal(f)
+	}
+	retained := CX05RetainAccepted(previous.CXNativeResult, r.CXNativeResult)
+	if f := retained.Fields["A/0"]; f.Numerator != 0 || f.Evidence != clear.Evidence {
+		t.Fatal(f)
+	}
+}
+
 func TestCX14ClearedIndependentStatusReplacesRetainedSetBit(t *testing.T) {
 	for _, bit := range []int{8, 10} {
 		t.Run(fmt.Sprint(bit), func(t *testing.T) {

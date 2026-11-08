@@ -145,6 +145,10 @@ type CXNativeResult struct {
 	Status            string
 	Fields            map[string]CXNativeField
 	PhysicalQualified bool
+	// Member records the reporting-member dictionary selection used to decode
+	// member-dependent fields; HasMember is false when none was supplied.
+	Member    CXSelection
+	HasMember bool
 }
 
 // CX01NativeIndication requires a caller-supplied topology association for PCS

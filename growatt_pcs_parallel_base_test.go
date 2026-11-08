@@ -181,7 +181,7 @@ func TestCX10BaseFamiliesAndEvidence(t *testing.T) {
 		name string
 		want int64
 		unit string
-	}{{0x503, "fault_16", 1, ""}, {0x663, "fault_0", 1, ""}, {0x673, "fault_8", 1, ""}, {0x603, "hardware", 3, ""}, {0x613, "current", 1027, ""}, {0x623, "state", 7, ""}, {0x633, "quantity_6", 2055, ""}, {0x643, "maximum_mv", 1027, "mV"}, {0x653, "soh", 8, ""}} {
+	}{{0x503, "fault_16", 1, ""}, {0x663, "fault_0", 1, ""}, {0x673, "fault_8", 1, ""}, {0x603, "hardware", 3, ""}, {0x613, "current", 1027, ""}, {0x623, "state", 7, ""}, {0x633, "quantity_6", 2055, ""}, {0x643, "maximum_word", 1027, ""}, {0x653, "soh", 8, ""}} {
 		t.Run(v.name, func(t *testing.T) {
 			i := cx10Input(t, c, v.id, p)
 			r := CX10DecodeParallel(cx10Selection(t, c), i)
@@ -190,6 +190,19 @@ func TestCX10BaseFamiliesAndEvidence(t *testing.T) {
 				t.Fatalf("field: %#v", f)
 			}
 		})
+	}
+}
+func TestCX10SummaryAliasesRejected(t *testing.T) {
+	p := [8]byte{1, 2, 3, 4, 5, 6, 7, 8}
+	for _, scope := range []string{"local", "aggregate"} {
+		c := cx10Spec(t)
+		c.Scope = scope
+		for _, id := range []uint32{0x593, 0x693, 0x6a3, 0x6b3, 0x6e3} {
+			r := CX10DecodeParallel(cx10Selection(t, c), cx10Input(t, c, id, p))
+			if len(r.Fields) != 0 || r.Status == "accepted" {
+				t.Fatalf("%x %s: %#v", id, scope, r)
+			}
+		}
 	}
 }
 func TestCX10CoordinatorLayoutsAndScopeNegative(t *testing.T) {

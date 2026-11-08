@@ -24,11 +24,10 @@ func cx10Family(s CXSelection, id uint32) (uint32, bool) {
 		return id, s.CX01Group() == "L8"
 	}
 	family := id &^ 15
-	if id == 0x590 || id == 0x690 || id == 0x6a0 || id == 0x6b0 || id == 0x6e0 {
-		if c.Scope != "aggregate" {
+	if family == 0x590 || family == 0x690 || family == 0x6a0 || family == 0x6b0 || family == 0x6e0 {
+		if c.Scope != "aggregate" || id != family {
 			return 0, false
 		}
-		family = id
 	} else if id&15 != uint32(g) {
 		return 0, false
 	}
@@ -125,24 +124,19 @@ func CX10DecodeParallel(s CXSelection, i CX01LINKInput) CXNativeResult {
 	case 0x640:
 		b("maximum_index", 0)
 		b("zero_1", 1)
-		w("maximum_mv", 2)
+		rawWord("maximum_word", 2)
 		b("minimum_index", 4)
 		b("zero_5", 5)
-		w("minimum_mv", 6)
-		for _, name := range []string{"maximum_mv", "minimum_mv"} {
-			f := r.Fields[name]
-			f.Unit = "mV"
-			r.Fields[name] = f
-		}
+		rawWord("minimum_word", 6)
 		if p[1] != 0 {
 			invalid("zero_1")
 			invalid("maximum_index")
-			invalid("maximum_mv")
+			invalid("maximum_word")
 		}
 		if p[5] != 0 {
 			invalid("zero_5")
 			invalid("minimum_index")
-			invalid("minimum_mv")
+			invalid("minimum_word")
 		}
 	case 0x650:
 		for at, name := range []string{"maximum_index", "zero_1", "maximum_code", "minimum_index", "zero_4", "minimum_code", "extra", "soh"} {

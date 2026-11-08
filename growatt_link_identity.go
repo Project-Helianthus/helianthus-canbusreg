@@ -70,9 +70,12 @@ func (a *CX01LINKIdentityAssembler) CX01Decode(i CX01LINKInput) CXNativeResult {
 		r.Status = "conflict"
 		return r
 	}
-	// Obsolete evidence (an older epoch, a replayed sequence or reversed time)
-	// is rejected before it can drive a sticky conflict transition.
-	if related && (i.Epoch < c.Epoch || i.Evidence.Sequence <= a.lastSequence || i.Evidence.Monotonic < a.lastMonotonic) {
+	// Obsolete evidence (an older epoch, or a replayed sequence or reversed
+	// time within the current epoch) is rejected before it can drive a sticky
+	// conflict transition. Sequence counters and monotonic clocks belong to one
+	// session, so a newer epoch is never stale: it reaches the conflict check.
+	sameEpoch := i.Epoch == c.Epoch
+	if related && (i.Epoch < c.Epoch || (sameEpoch && (i.Evidence.Sequence <= a.lastSequence || i.Evidence.Monotonic < a.lastMonotonic))) {
 		r.Status = "stale"
 		if cx01LINKAdmission(a.selection, i) {
 			a.assembling = false

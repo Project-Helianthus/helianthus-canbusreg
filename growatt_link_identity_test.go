@@ -465,3 +465,44 @@ func TestCX01IdentityAssemblerRejectsCoordinatorSource(t *testing.T) {
 		t.Fatal("coordinator source established identity")
 	}
 }
+
+func TestCX01NewerEpochWithResetCountersInvalidates(t *testing.T) {
+	for _, reset := range []string{"sequence", "monotonic", "both"} {
+		t.Run(reset, func(t *testing.T) {
+			spec := cx01Spec(t, "QAAA", "0006")
+			spec.Epoch = 5
+			a := CX01NewLINKIdentityAssembler(cx01Select(t, spec))
+			i := cx01Input(t, spec, 0x1802, [8]byte{'Q', 'A', 'A', 'A', '0', '0', '0', '6'})
+			i.Evidence.Sequence = 10
+			i.Evidence.Monotonic = 10 * time.Second
+			a.CX01Decode(i)
+			i = cx01Input(t, spec, 0x1805, [8]byte{1})
+			i.Evidence.Sequence = 11
+			i.Evidence.Monotonic = 11 * time.Second
+			a.CX01Decode(i)
+			if len(a.CX01Snapshot().Fields) == 0 {
+				t.Fatal("setup")
+			}
+			// A new session restarts its counters: the newer epoch must not be
+			// mistaken for a replayed sequence or reversed time.
+			n := cx01Input(t, spec, 0x1805, [8]byte{2})
+			n.Epoch = 6
+			n.Evidence.Sequence = 12
+			n.Evidence.Monotonic = 12 * time.Second
+			switch reset {
+			case "sequence":
+				n.Evidence.Sequence = 1
+			case "monotonic":
+				n.Evidence.Monotonic = time.Second
+			case "both":
+				n.Evidence.Sequence = 1
+				n.Evidence.Monotonic = time.Second
+			}
+			r := a.CX01Decode(n)
+			s := a.CX01Snapshot()
+			if r.Status != "conflict" || s.Status != "conflict" || s.HasIdentity || len(s.Fields) != 0 {
+				t.Fatalf("newer epoch with reset counters retained state: result %s, snapshot %s", r.Status, s.Status)
+			}
+		})
+	}
+}

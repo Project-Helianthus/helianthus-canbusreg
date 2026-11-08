@@ -595,6 +595,10 @@ func TestCX09EndpointSourceRangeAndCellVoltageUnits(t *testing.T) {
 	if r := CX09DecodePCSExtended(cx09Select(t, nc), cx09Input(t, nc, 0x1902, p)); r.Status != "accepted" || r.Fields["pack_voltage"].Status != "accepted" {
 		t.Fatal(r)
 	}
+	// An unassigned source of zero is rejected for every selected family.
+	zc := cx09Spec(t)
+	zc.Source = 0
+	cx09Withheld(t, CX09DecodePCSExtended(cx09Select(t, zc), cx09Input(t, zc, 0x1902, p)), p)
 	c := cx09Spec(t)
 	c.Release = "0007"
 	r := CX09DecodePCSExtended(cx09Select(t, c), cx09Input(t, c, 0x1905, p))

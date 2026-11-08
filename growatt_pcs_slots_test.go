@@ -284,3 +284,26 @@ func TestCX08MemberAssociationKeys(t *testing.T) {
 		t.Fatal(r)
 	}
 }
+
+func TestCX08NonzeroToZeroDTCRetention(t *testing.T) {
+	s, i := cx08Fixture(t, 0x333, [8]byte{3, 2, 0x10, 0, 0x10, 1})
+	i.NativeSlot = 2
+	i.Member = &s
+	previous := CX08DecodePCSSlots(s, i)
+	if previous.Fields["dtc_a"].Status != "accepted" || previous.Fields["dtc_a_index"].Status != "accepted" {
+		t.Fatal(previous)
+	}
+	s, i = cx08Fixture(t, 0x333, [8]byte{3, 2, 0, 0, 0x10, 1})
+	i.NativeSlot = 2
+	i.Member = &s
+	update := CX08DecodePCSSlots(s, i)
+	merged := CX05RetainAccepted(previous, update)
+	for _, name := range []string{"dtc_a", "dtc_a_index"} {
+		if merged.Fields[name].Status != "empty" {
+			t.Fatal(name, merged.Fields[name])
+		}
+	}
+	if merged.Fields["dtc_b_index"].Status != "accepted" {
+		t.Fatal(merged.Fields["dtc_b_index"])
+	}
+}

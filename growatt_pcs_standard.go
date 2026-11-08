@@ -215,7 +215,7 @@ func CX05RetainAccepted(previous, update CXNativeResult) CXNativeResult {
 	out.Fields = make(map[string]CXNativeField)
 	if previous.Selection == update.Selection && previous.HasMember == update.HasMember && previous.Member == update.Member {
 		for name, f := range previous.Fields {
-			if f.Status == "accepted" {
+			if f.Status == "accepted" || f.Status == "empty" {
 				out.Fields[name] = f
 			}
 		}

@@ -688,3 +688,81 @@ func TestCX17LINKCountDropDemotesRetainedCells(t *testing.T) {
 		t.Fatal(got.Current["cells/cell_5"], got.LastGood["cells/cell_5"])
 	}
 }
+
+func TestCX17EqualMemberValueDoesNotConflict(t *testing.T) {
+	s, i := cx16Fixture(t)
+	p, _ := CX17NewPCSProvider(s)
+	a := cx17Source()
+	p.Start(a, 1)
+	defer p.Stop()
+	i.PCS.Member = &s
+	cx17Send(t, a, p, 1, i)
+	if got := p.CX17Snapshot(time.Second, time.Second); got.State != "receiving" || len(got.Current) == 0 {
+		t.Fatal(got)
+	}
+	other := s
+	changed := i
+	changed.PCS.Member = &other
+	changed.PCS.Evidence.Sequence = 2
+	cx17Send(t, a, p, 1, changed)
+	if got := p.CX17Snapshot(time.Second, time.Second); got.State != "receiving" || len(got.Current) == 0 {
+		t.Fatal("same member value must not conflict", got.State)
+	}
+}
+
+func TestCX17MemberAssociationChangeConflicts(t *testing.T) {
+	for _, first := range []bool{false, true} {
+		s, i := cx16Fixture(t)
+		p, _ := CX17NewPCSProvider(s)
+		a := cx17Source()
+		p.Start(a, 1)
+		if first {
+			i.PCS.Member = &s
+		}
+		cx17Send(t, a, p, 1, i)
+		next := i
+		next.PCS.Evidence.Sequence = 2
+		if first {
+			next.PCS.Member = nil
+		} else {
+			next.PCS.Member = &s
+		}
+		cx17Send(t, a, p, 1, next)
+		got := p.CX17Snapshot(time.Second, time.Second)
+		if got.State != "conflict" || got.Promotable || len(got.Current) != 0 {
+			t.Fatal(first, got)
+		}
+		p.Stop()
+	}
+}
+
+func TestCX17ReplacementDTCDemotesOmittedIndex(t *testing.T) {
+	s, pcs := cx08Fixture(t, 0x333, [8]byte{3, 2})
+	word, ok := CX07EncodeDTC(s, 0)
+	if !ok {
+		t.Fatal("no member dictionary entry")
+	}
+	pcs.NativeSlot, pcs.PublisherResolved, pcs.Member = 2, true, &s
+	p, err := CX17NewPCSProvider(s)
+	if err != nil {
+		t.Fatal(err)
+	}
+	a := cx17Source()
+	p.Start(a, 1)
+	defer p.Stop()
+	i := CX16ReplayInput{Selection: s, PCS: pcs}
+	cx16Frame(t, &i, 0x333, false, [8]byte{3, 2, byte(word >> 8), byte(word), 0x10, 1})
+	cx17Send(t, a, p, 1, i)
+	const name = "slots/dtc_a_index"
+	got := p.CX17Snapshot(i.PCS.Evidence.Monotonic, time.Hour)
+	if got.Current[name].Status != "accepted" {
+		t.Fatal(got.State, got.Current)
+	}
+	cx16Frame(t, &i, 0x333, false, [8]byte{3, 2, 0xff, 0xfe, 0x10, 1})
+	i.PCS.Evidence.Sequence++
+	cx17Send(t, a, p, 1, i)
+	got = p.CX17Snapshot(i.PCS.Evidence.Monotonic, time.Hour)
+	if got.Current[name].Status == "accepted" || got.LastGood[name].Status != "accepted" {
+		t.Fatal(got.Current[name], got.LastGood[name])
+	}
+}

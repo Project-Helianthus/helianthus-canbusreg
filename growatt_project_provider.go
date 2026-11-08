@@ -61,6 +61,8 @@ type CX17Provider struct {
 	done              chan struct{}
 	order             []string
 	identity          map[string]int64
+	member            CXSelection
+	hasMember, seen   bool
 }
 
 func CX17NewPCSProvider(s CXSelection) (*CX17Provider, error) {
@@ -99,6 +101,7 @@ func (p *CX17Provider) Start(source CX17ReceiveSource, generation uint64) error 
 	p.running = true
 	p.conflict = false
 	p.identity = make(map[string]int64)
+	p.member, p.hasMember, p.seen = CXSelection{}, false, false
 	p.sequence = 0
 	p.monotonic = 0
 	p.snapshot.Generation = generation
@@ -176,6 +179,16 @@ func (p *CX17Provider) cx17Apply(o CX17Observation) {
 	if (c.Flavor == "pcs-standard" || c.Flavor == "pcs-parallel") && !in.PCS.PublisherResolved {
 		identityChanged = true
 	}
+	// The reporting-member association is part of the identity fence: a change
+	// within a generation would reinterpret member-derived fields.
+	hasMember := in.PCS.Member != nil
+	var member CXSelection
+	if hasMember {
+		member = *in.PCS.Member
+	}
+	if p.seen && (hasMember != p.hasMember || member != p.member) {
+		identityChanged = true
+	}
 	if identityChanged {
 		p.conflict = true
 	}
@@ -183,6 +196,9 @@ func (p *CX17Provider) cx17Apply(o CX17Observation) {
 		p.cx17Withhold("conflict")
 		p.cx17Raw(o, "conflict")
 		return
+	}
+	if !p.seen {
+		p.seen, p.hasMember, p.member = true, hasMember, member
 	}
 	profile, err := NewCX16SelectedProfile(p.selection, []CX16ReplayInput{in})
 	if err != nil {
@@ -259,6 +275,21 @@ func (p *CX17Provider) cx17Apply(o CX17Observation) {
 		if f.Status == "accepted" || f.Status == "empty" {
 			p.snapshot.LastGood[name] = f
 			p.snapshot.LastGoodGeneration[name] = o.Generation
+		}
+	}
+	// A replacement DTC record that omits a derived index must not leave the
+	// previous index current; LastGood stays untouched.
+	if part, ok := projection.Native["slots"]; ok && e.Frame.ID().Value() == 0x333 {
+		key := cx16RetentionKey("slots", e, part)
+		for _, name := range []string{"dtc_a_index", "dtc_b_index"} {
+			full := key + "/" + name
+			if _, ok := fields[full]; ok {
+				continue
+			}
+			if f, ok := p.snapshot.Current[full]; ok {
+				f.Status, f.Unit, f.Meaning = "absent", "", ""
+				p.snapshot.Current[full] = f
+			}
 		}
 	}
 	if c.Flavor == "link" {

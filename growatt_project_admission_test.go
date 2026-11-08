@@ -405,3 +405,28 @@ func TestCX16EveryProjectAndReleaseCharacterNegative(t *testing.T) {
 		}
 	}
 }
+
+func TestCX16ExtendedFamiliesRetainedSeparately(t *testing.T) {
+	s, base := cx16Fixture(t)
+	c := s.CX01Spec()
+	c.Flavor, c.PCSFlavor, c.Direction = "pcs-extended19", "", "bms-to-pcs"
+	c.RouteSet, c.Destination, c.Source = true, 0xf2, 1
+	s = cx16Reselect(t, &base, c)
+	a, b := base, base
+	cx16Frame(t, &a, 0x1905<<16|0xf201, true, [8]byte{3, 0, 0x10, 0x0e, 5, 0, 0x20, 0x0d})
+	b.PCS.Evidence.Sequence, b.PCS.Evidence.Monotonic = 2, 2*time.Second
+	cx16Frame(t, &b, 0x1906<<16|0xf201, true, [8]byte{9, 0, 0, 11, 0, 0, 0, 0})
+	p := cx16Profile(t, s, a, b)
+	cx16Classify(t, p, a.PCS.Evidence)
+	r := cx16Classify(t, p, b.PCS.Evidence)
+	va, vb := r.LastGood["extended/1905/maximum_index"], r.LastGood["extended/1906/maximum_index"]
+	if va.Status != "accepted" || vb.Status != "accepted" || va.Numerator != 3 || vb.Numerator != 9 {
+		t.Fatalf("cross-family overwrite: %#v %#v", va, vb)
+	}
+	if _, ok := r.LastGood["extended/maximum_index"]; ok {
+		t.Fatal("family-less retention key")
+	}
+	if r.RetainedNative["extended/1905"].Fields["maximum_index"].Numerator != 3 || r.RetainedNative["extended/1906"].Fields["maximum_index"].Numerator != 9 {
+		t.Fatal(r.RetainedNative)
+	}
+}

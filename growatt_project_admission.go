@@ -207,7 +207,8 @@ func (p *cx16SelectedProfile) Classify(e Evidence) Classification {
 				}
 				projection.Native[prefix] = native
 				if len(part.Fields) > 0 {
-					p.retained[prefix] = CX05RetainAccepted(p.retained[prefix], part)
+					key := cx16RetentionKey(prefix, e)
+					p.retained[key] = CX05RetainAccepted(p.retained[key], part)
 				}
 			}
 			for name, bit := range entry.bits {
@@ -243,6 +244,15 @@ func (p *cx16SelectedProfile) Classify(e Evidence) Classification {
 		return Classification{}
 	}
 	return Classification{Profile: "growatt.project.selected", Projection: projection}
+}
+
+// cx16RetentionKey keys retained extended PCS values by native family so that
+// families sharing field names never overwrite one another.
+func cx16RetentionKey(prefix string, e Evidence) string {
+	if prefix != "extended" {
+		return prefix
+	}
+	return fmt.Sprintf("%s/%04x", prefix, e.Frame.ID().Value()>>16)
 }
 
 // This is a collision shield, not recognition or a native meaning dictionary.

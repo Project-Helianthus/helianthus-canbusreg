@@ -819,3 +819,29 @@ func TestCX17NonzeroReservedByteDoesNotConflict(t *testing.T) {
 		t.Fatal("identity change must still conflict", got)
 	}
 }
+
+// Catches: LINK record kinds that share a field name (0x1806 cell indexes, 0x1808 temperature indexes)
+// collapsing into one retention key, so the later record overwrote the earlier record's evidence.
+func TestCX17InterleavedLINKKindsKeepIndependentIndexes(t *testing.T) {
+	s, i := cx16LINK(t, 0x1806, [8]byte{1, 0, 2, 7, 0, 3, 0, 4})
+	p, _ := CX17NewLINKProvider(s)
+	a := cx17Source()
+	p.Start(a, 1)
+	defer p.Stop()
+	cx17Send(t, a, p, 1, i)
+	cells := p.CX17Snapshot(time.Second, time.Second)
+	if cells.Current["link/1806/minimum_index"].Numerator != 7 {
+		t.Fatalf("cell minimum index: %#v", cells.Current["link/1806/minimum_index"])
+	}
+	i.PCS.Evidence.Sequence++
+	i.PCS.Evidence.Monotonic += time.Millisecond
+	cx16Frame(t, &i, 0x1808<<16|0xf401, true, [8]byte{9, 1, 3, 2, 0, 0, 0, 0})
+	cx17Send(t, a, p, 1, i)
+	got := p.CX17Snapshot(time.Second, time.Second)
+	if got.Current["link/1808/minimum_index"].Numerator != 3 || got.Current["link/1806/minimum_index"].Numerator != 7 {
+		t.Fatalf("indexes collided: cells %#v temperatures %#v", got.Current["link/1806/minimum_index"], got.Current["link/1808/minimum_index"])
+	}
+	if _, collided := got.Current["link/minimum_index"]; collided {
+		t.Fatal("kind-less LINK retention key still present")
+	}
+}

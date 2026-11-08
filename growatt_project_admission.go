@@ -259,6 +259,11 @@ func cx16RetentionKey(prefix string, e Evidence, part CXNativeResult) string {
 	if prefix == "gauge" {
 		return fmt.Sprintf("%s/%03x", prefix, e.Frame.ID().Value())
 	}
+	if prefix == "link" {
+		// LINK record kinds share field names (cell and temperature indexes, spreads), so each kind keeps
+		// its own retention key and a later kind never overwrites another kind's evidence.
+		return fmt.Sprintf("%s/%04x", prefix, e.Frame.ID().Value()>>16)
+	}
 	if prefix != "extended" {
 		return prefix
 	}

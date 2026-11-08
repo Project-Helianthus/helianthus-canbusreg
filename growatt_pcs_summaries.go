@@ -150,6 +150,10 @@ func CX14DecodePCSSummaries(s CXSelection, i CX14PCSInput) CX14PCSResult {
 					b.Field.Meaning = "parallel status selector 4; no local diagnostic index"
 				}
 			}
+			if modern && w.name == "B" && (bit == 8 || bit == 10) && b.Field.Numerator == 0 {
+				b.Field.Status, b.Field.Grade = "accepted", "Proven"
+				b.Field.Meaning = "independent status source clear; no diagnostic index"
+			}
 			// Expected-clear bits are not fault indices; a set bit is a conflict.
 			clear := modern && ((w.name == "A" && (bit == 0 || bit == 9)) || (w.name == "B" && bit == 9) || (w.name == "B4" && bit < 2) || (w.name == "B5" && bit == 7) || (w.name == "B7" && bit < 2))
 			if clear && b.Field.Numerator != 0 {

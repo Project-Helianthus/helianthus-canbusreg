@@ -3,6 +3,7 @@ package canbusreg
 import (
 	"context"
 	"errors"
+	"fmt"
 	"sort"
 	"sync"
 	"time"
@@ -206,7 +207,7 @@ func (p *CX17Provider) cx17Apply(o CX17Observation) {
 	for prefix, part := range projection.Native {
 		for name, f := range part.Fields {
 			identityField := (prefix == "parallel" && e.Frame.ID().Value()&^15 == 0x600 && (name == "product" || name == "hardware" || name == "version_mux")) || (prefix == "extended" && e.Frame.ID().Value()>>16 == 0x1900 && (name == "product" || name == "hardware" || name == "version")) || prefix == "identity" && e.Frame.ID().Value() == 0x320 || prefix == "link" && (name == "role_flags" || name == "project_code" || name == "release")
-			if !identityField {
+			if !identityField || cx17Withheld(f.Status) {
 				continue
 			}
 			key := prefix + "/" + name
@@ -260,7 +261,44 @@ func (p *CX17Provider) cx17Apply(o CX17Observation) {
 			p.snapshot.LastGoodGeneration[name] = o.Generation
 		}
 	}
+	if c.Flavor == "link" {
+		p.cx17Reconcile("cells/cell_", 16, in.CellCount, in.CellCountValid, fields)
+		p.cx17Reconcile("sensors/sensor_", 4, in.SensorCount, in.SensorCountValid, fields)
+	}
 	p.snapshot.State = "receiving"
+}
+
+// cx17Withheld reports field states that carry no value for identity comparison.
+func cx17Withheld(status string) bool {
+	switch status {
+	case "absent", "invalid", "unsupported", "stale", "conflict", "unassigned":
+		return true
+	}
+	return false
+}
+
+// cx17Reconcile demotes retained current vector fields that the latest count
+// no longer configures. Historical last-good values are left untouched.
+func (p *CX17Provider) cx17Reconcile(prefix string, max, count int, valid bool, fresh map[string]CXNativeField) {
+	valid = valid && count >= 1 && count <= max
+	for index := 1; index <= max; index++ {
+		name := fmt.Sprintf("%s%d", prefix, index)
+		if _, ok := fresh[name]; ok {
+			continue
+		}
+		f, ok := p.snapshot.Current[name]
+		if !ok || (valid && index <= count) {
+			continue
+		}
+		if valid {
+			f.Status = "unconfigured"
+		} else {
+			f.Status = "absent"
+		}
+		f.Unit = ""
+		f.Meaning = ""
+		p.snapshot.Current[name] = f
+	}
 }
 
 // CX17Snapshot uses caller logical time and an inclusive maximum age. Each

@@ -628,3 +628,63 @@ func TestCX17FieldEvictionAcrossGenerations(t *testing.T) {
 		t.Fatal("generation retention", got)
 	}
 }
+
+func TestCX17InvalidIdentityFieldDoesNotConflict(t *testing.T) {
+	s, i := cx16Fixture(t)
+	p, _ := CX17NewPCSProvider(s)
+	a := cx17Source()
+	p.Start(a, 1)
+	defer p.Stop()
+	cx16Frame(t, &i, 0x320, false, [8]byte{1, 2, 3, 4, 5, 6, 7, 0})
+	i.PCS.Evidence.Sequence = 1
+	cx17Send(t, a, p, 1, i)
+	if got := p.CX17Snapshot(time.Second, time.Second); got.Current["identity/product_0"].Status != "accepted" {
+		t.Fatal(got)
+	}
+	i.PCS.Evidence.Sequence = 2
+	cx16Frame(t, &i, 0x320, false, [8]byte{9, 2, 3, 4, 5, 6, 7, 0})
+	i.PCS.FieldStates = map[string]string{"product_0": "invalid"}
+	cx17Send(t, a, p, 1, i)
+	got := p.CX17Snapshot(time.Second, time.Second)
+	if got.State == "conflict" || len(got.Current) == 0 || got.Current["identity/product_0"].Status != "invalid" {
+		t.Fatal("withheld field caused conflict", got)
+	}
+	i.PCS.Evidence.Sequence = 3
+	cx16Frame(t, &i, 0x320, false, [8]byte{1, 2, 3, 4, 5, 6, 7, 0})
+	i.PCS.FieldStates = nil
+	cx17Send(t, a, p, 1, i)
+	if got = p.CX17Snapshot(time.Second, time.Second); got.State == "conflict" || got.Current["identity/product_0"].Status != "accepted" {
+		t.Fatal("baseline was overwritten by withheld field", got)
+	}
+	i.PCS.Evidence.Sequence = 4
+	cx16Frame(t, &i, 0x320, false, [8]byte{9, 2, 3, 4, 5, 6, 7, 0})
+	cx17Send(t, a, p, 1, i)
+	if got = p.CX17Snapshot(time.Second, time.Second); got.State != "conflict" || len(got.Current) != 0 {
+		t.Fatal("accepted identity change must still conflict", got)
+	}
+}
+
+func TestCX17LINKCountDropDemotesRetainedCells(t *testing.T) {
+	s, i := cx16LINK(t, 0x1811, [8]byte{5, 0, 6, 0, 7, 0, 8, 0})
+	p, _ := CX17NewLINKProvider(s)
+	a := cx17Source()
+	p.Start(a, 1)
+	defer p.Stop()
+	i.CellCount, i.CellCountValid = 16, true
+	for n := range i.CellGates {
+		i.CellGates[n] = CX12MeasurementGate{Configured: true, Valid: true}
+	}
+	cx17Send(t, a, p, 1, i)
+	if got := p.CX17Snapshot(time.Second, time.Second); got.Current["cells/cell_5"].Status != "accepted" {
+		t.Fatal(got.Current)
+	}
+	i.PCS.Evidence.Sequence++
+	i.PCS.Evidence.Monotonic += time.Millisecond
+	cx16Frame(t, &i, 0x1810<<16|0xf401, true, [8]byte{1, 0, 2, 0, 3, 0, 4, 0})
+	i.CellCount = 4
+	cx17Send(t, a, p, 1, i)
+	got := p.CX17Snapshot(time.Second, time.Second)
+	if got.Current["cells/cell_5"].Status != "unconfigured" || got.Current["cells/cell_5"].Unit != "" || got.LastGood["cells/cell_5"].Status != "accepted" {
+		t.Fatal(got.Current["cells/cell_5"], got.LastGood["cells/cell_5"])
+	}
+}

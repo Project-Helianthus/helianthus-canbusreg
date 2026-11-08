@@ -222,7 +222,7 @@ func (p *CX17Provider) cx17Apply(o CX17Observation) {
 	// Compare only identity/role fields supplied by the accepted native API.
 	for prefix, part := range projection.Native {
 		for name, f := range part.Fields {
-			identityField := (prefix == "parallel" && e.Frame.ID().Value()&^15 == 0x600 && (name == "product" || name == "hardware" || name == "version_mux")) || (prefix == "extended" && e.Frame.ID().Value()>>16 == 0x1900 && (name == "product" || name == "hardware" || name == "version")) || prefix == "identity" && e.Frame.ID().Value() == 0x320 || prefix == "link" && (name == "role_flags" || name == "project_code" || name == "release")
+			identityField := (prefix == "parallel" && e.Frame.ID().Value()&^15 == 0x600 && (name == "product" || name == "hardware" || name == "version_mux")) || (prefix == "extended" && e.Frame.ID().Value()>>16 == 0x1900 && (name == "product" || name == "hardware" || name == "version")) || prefix == "identity" && e.Frame.ID().Value() == 0x320 && (name == "product_0" || name == "product_1" || name == "hardware" || name == "version_3" || name == "version_5") || prefix == "link" && (name == "role_flags" || name == "project_code" || name == "release")
 			if !identityField || cx17Withheld(f.Status) {
 				continue
 			}

@@ -766,3 +766,27 @@ func TestCX17ReplacementDTCDemotesOmittedIndex(t *testing.T) {
 		t.Fatal(got.Current[name], got.LastGood[name])
 	}
 }
+
+func TestCX17NonzeroReservedByteDoesNotConflict(t *testing.T) {
+	s, i := cx16Fixture(t)
+	p, _ := CX17NewPCSProvider(s)
+	a := cx17Source()
+	p.Start(a, 1)
+	defer p.Stop()
+	cx16Frame(t, &i, 0x320, false, [8]byte{1, 2, 3, 4, 5, 6, 7, 0})
+	i.PCS.Evidence.Sequence = 1
+	cx17Send(t, a, p, 1, i)
+	i.PCS.Evidence.Sequence = 2
+	cx16Frame(t, &i, 0x320, false, [8]byte{1, 2, 3, 4, 5, 6, 7, 9})
+	cx17Send(t, a, p, 1, i)
+	got := p.CX17Snapshot(time.Second, time.Second)
+	if got.State == "conflict" || len(got.Current) == 0 || got.Current["identity/product_0"].Status != "accepted" {
+		t.Fatal("reserved byte must not fence identity", got)
+	}
+	i.PCS.Evidence.Sequence = 3
+	cx16Frame(t, &i, 0x320, false, [8]byte{9, 2, 3, 4, 5, 6, 7, 9})
+	cx17Send(t, a, p, 1, i)
+	if got = p.CX17Snapshot(time.Second, time.Second); got.State != "conflict" {
+		t.Fatal("identity change must still conflict", got)
+	}
+}

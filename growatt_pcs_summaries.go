@@ -78,6 +78,14 @@ func CX14DecodePCSSummaries(s CXSelection, i CX14PCSInput) CX14PCSResult {
 		"B6": {0: {53}, 1: {39, 54}, 2: {55}, 3: {56}, 4: {84}, 5: {88, 97}},
 		"B7": {2: {57}, 3: {58}, 4: {85}, 5: {89}},
 	}
+	if legacy {
+		// The legacy local frame carries diagnostic index 4 on B/10; release-11
+		// keeps the same bit as an independent status selector instead.
+		mappings["B"] = map[int][]int{}
+		for k, v := range map[int][]int{1: {8}, 2: {6}, 3: {2}, 4: {0, 98}, 6: {22, 89}, 7: {20}, 10: {4}, 12: {40}, 13: {14}, 14: {33}, 15: {12}} {
+			mappings["B"][k] = v
+		}
+	}
 	words := []struct {
 		name  string
 		value uint16
@@ -102,6 +110,9 @@ func CX14DecodePCSSummaries(s CXSelection, i CX14PCSInput) CX14PCSResult {
 				b.Alternatives = append([]int(nil), mappings[w.name][bit]...)
 				grade := "Proven"
 				meaning := "bounded numeric OR alternatives; no unique attribution"
+				if legacy && w.name == "B" && bit == 10 {
+					grade = "Hypothesis"
+				}
 				if legacy && w.name == "A" {
 					switch bit {
 					case 4:

@@ -458,3 +458,21 @@ func TestCX14ClearedIndependentStatusReplacesRetainedSetBit(t *testing.T) {
 		})
 	}
 }
+
+func TestCX14LegacyB10DiagnosticIndexAndReleaseElevenStatus(t *testing.T) {
+	s, i := cx14Fixture(t, 0x312, cx14Payload("B", 10), true)
+	b := CX14DecodePCSSummaries(s, i).Bits["B/10"]
+	if !reflect.DeepEqual(b.Alternatives, []int{4}) || b.Field.Status != "accepted" || b.Field.Grade != "Hypothesis" {
+		t.Fatal(b)
+	}
+	s, i = cx14Fixture(t, 0x312, [8]byte{}, true)
+	b = CX14DecodePCSSummaries(s, i).Bits["B/10"]
+	if b.Field.Status != "accepted" || len(b.Alternatives) != 0 || b.Field.Numerator != 0 {
+		t.Fatal(b)
+	}
+	s, i = cx14Fixture(t, 0x312, cx14Payload("B", 10), false)
+	b = CX14DecodePCSSummaries(s, i).Bits["B/10"]
+	if len(b.Alternatives) != 0 || b.Field.Meaning != "parallel status selector 4; no local diagnostic index" {
+		t.Fatal(b)
+	}
+}

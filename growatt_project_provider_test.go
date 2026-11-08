@@ -1445,3 +1445,124 @@ func TestCX17MalformedFirstObservationDoesNotSetBaseline(t *testing.T) {
 		})
 	}
 }
+
+// Catches: a local 0x321 announcement switching between an accepted family and a valid all-zero family_omitted
+// announcement (either direction) within one generation without a sticky conflict, leaving telemetry promotable
+// under contradictory identity states. A repeated omitted announcement keeps receiving, and on a selection whose
+// family is raw an omitted-then-labelled change stays unfenced.
+func TestCX17PCSFamilyOmittedTransitionConflicts(t *testing.T) {
+	labelled := [8]byte{0, 'A', 'B', 'C', 'D', 0, 1, 2}
+	omitted := [8]byte{0, 0, 0, 0, 0, 0, 1, 2}
+	cases := []struct {
+		name, release   string
+		first, second   [8]byte
+		firstStatusName string
+		conflict        bool
+	}{
+		{"labelled-to-omitted", "0011", labelled, omitted, "identity/family", true},
+		{"omitted-to-labelled", "0011", omitted, labelled, "identity/family_omitted", true},
+		{"omitted-repeat", "0011", omitted, omitted, "identity/family_omitted", false},
+		{"raw-family-unfenced", "0006", omitted, labelled, "identity/family_omitted", false},
+	}
+	for _, tc := range cases {
+		t.Run(tc.name, func(t *testing.T) {
+			s, i := cx16Fixture(t)
+			c := s.CX01Spec()
+			c.Release = tc.release
+			s = cx16Reselect(t, &i, c)
+			p, err := CX17NewPCSProvider(s)
+			if err != nil {
+				t.Fatal(err)
+			}
+			a := cx17Source()
+			if err := p.Start(a, 1); err != nil {
+				t.Fatal(err)
+			}
+			defer p.Stop()
+			cx16Frame(t, &i, 0x321, false, tc.first)
+			cx17Send(t, a, p, 1, i)
+			if got := p.CX17Snapshot(time.Second, time.Second); got.State != "receiving" || got.Current[tc.firstStatusName].Status != "accepted" {
+				t.Fatal("first", got.State, got.Current[tc.firstStatusName])
+			}
+			i.PCS.Evidence.Sequence = 2
+			cx16Frame(t, &i, 0x321, false, tc.second)
+			cx17Send(t, a, p, 1, i)
+			got := p.CX17Snapshot(time.Second, time.Second)
+			if (got.State == "conflict") != tc.conflict || (tc.conflict && (got.Promotable || len(got.Current) != 0 || got.LastGood[tc.firstStatusName].Status != "accepted")) {
+				t.Fatal(tc.name, got.State, got.Promotable, len(got.Current), got.LastGood[tc.firstStatusName])
+			}
+			if !tc.conflict && (got.State != "receiving" || !got.Promotable) {
+				t.Fatal("unfenced", got.State, got.Promotable)
+			}
+		})
+	}
+}
+
+// Catches: a wrong-route or malformed LINK observation carrying smaller or invalid cell and sensor counts demoting
+// the retained cells, sensors and balance enables of an accepted cycle with rejected evidence. Only an admitted
+// observation reconciles; the admitted control still demotes.
+func TestCX17RejectedLINKObservationDoesNotReconcile(t *testing.T) {
+	for _, name := range []string{"wrong-route-smaller", "wrong-route-invalid", "malformed-smaller", "malformed-invalid", "admitted-smaller"} {
+		t.Run(name, func(t *testing.T) {
+			s, i := cx16LINK(t, 0x1801, [8]byte{0xff, 0xff, 1, 2, 3, 4, 6, 0})
+			i.CellCount, i.CellCountValid = 16, true
+			i.SensorCount, i.SensorCountValid = 4, true
+			i.BalanceGate = CX12MeasurementGate{Configured: true, Valid: true}
+			i.HardwareAgeKnown = true
+			for n := range i.CellGates {
+				i.CellGates[n] = CX12MeasurementGate{Configured: true, Valid: true}
+			}
+			for n := range i.SensorGates {
+				i.SensorGates[n] = CX12MeasurementGate{Configured: true, Valid: true}
+			}
+			p, _ := CX17NewLINKProvider(s)
+			a := cx17Source()
+			if err := p.Start(a, 1); err != nil {
+				t.Fatal(err)
+			}
+			defer p.Stop()
+			send := func(id uint32, payload [8]byte) {
+				i.PCS.Evidence.Sequence++
+				i.PCS.Evidence.Monotonic += time.Millisecond
+				cx16Frame(t, &i, id, true, payload)
+				cx17Send(t, a, p, 1, i)
+			}
+			i.PCS.Evidence.Sequence = 0
+			send(0x1801<<16|0xf401, [8]byte{0xff, 0xff, 1, 2, 3, 4, 6, 0})
+			send(0x1811<<16|0xf401, [8]byte{5, 0, 6, 0, 7, 0, 8, 0})
+			send(0x1830<<16|0xf401, [8]byte{0x40, 1, 0x41, 1, 0x42, 1, 0x43, 1})
+			keys := []string{"cells/cell_5", "cells/cell_8", "sensors/sensor_2", "sensors/sensor_4", "balance/enable_3", "balance/enable_16"}
+			got := p.CX17Snapshot(i.PCS.Evidence.Monotonic, time.Hour)
+			for _, key := range keys {
+				if got.State != "receiving" || got.Current[key].Status != "accepted" {
+					t.Fatal("accepted cycle", key, got.State, got.Current[key])
+				}
+			}
+			id := uint32(0x1810<<16 | 0xf401)
+			switch name {
+			case "wrong-route-smaller", "wrong-route-invalid":
+				id = 0x1810<<16 | 0xf402
+			case "malformed-smaller", "malformed-invalid":
+				i.PCS.FieldAge = -time.Second
+			}
+			switch name {
+			case "wrong-route-invalid", "malformed-invalid":
+				i.CellCountValid, i.SensorCountValid = false, false
+			default:
+				i.CellCount, i.SensorCount = 2, 1
+			}
+			send(id, [8]byte{1, 0, 2, 0, 3, 0, 4, 0})
+			got = p.CX17Snapshot(i.PCS.Evidence.Monotonic, time.Hour)
+			admitted := name == "admitted-smaller"
+			if last := got.Raw[len(got.Raw)-1]; got.State != "receiving" || (last.Status == "invalid") == admitted {
+				t.Fatal("raw", got.State, last.Status)
+			}
+			for _, key := range keys {
+				f := got.Current[key]
+				if want := map[bool]string{false: "accepted", true: "unconfigured"}[admitted]; f.Status != want || got.LastGood[key].Status != "accepted" {
+					t.Fatal(name, key, f, got.LastGood[key])
+				}
+			}
+		})
+	}
+}

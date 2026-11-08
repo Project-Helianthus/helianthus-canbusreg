@@ -255,8 +255,10 @@ func cx17IdentityKey(c CX01SelectionSpec, prefix string, id uint32, name string,
 		if id == 0x320 && (name == "product_0" || name == "product_1" || name == "hardware" || name == "version_3" || name == "version_5") {
 			return prefix + "/" + name, true
 		}
-		// Only an accepted family is identity; a raw family on an unlabelled selection stays uninterpreted.
-		if id == 0x321 && name == "family" && f.Status == "accepted" {
+		// Only an accepted family, or an accepted all-zero family_omitted announcement, is identity: both share one
+		// fence entry, so switching between a labelled and an omitted family conflicts in either direction. A raw
+		// family on an unlabelled selection stays uninterpreted.
+		if id == 0x321 && (name == "family" || name == "family_omitted") && f.Status == "accepted" {
 			return "identity/0321/family", true
 		}
 	case "extended":
@@ -371,10 +373,15 @@ func (p *CX17Provider) cx17Apply(o CX17Observation) {
 			if !identityField {
 				continue
 			}
-			if old, seen := p.identity[key]; seen && old != f.Numerator {
+			value := f.Numerator
+			if name == "family_omitted" {
+				// An accepted family is four printable bytes; the omitted state gets a value no family can carry.
+				value = -1
+			}
+			if old, seen := p.identity[key]; seen && old != value {
 				p.conflict = true
 			}
-			p.identity[key] = f.Numerator
+			p.identity[key] = value
 		}
 	}
 	if p.conflict {
@@ -439,7 +446,9 @@ func (p *CX17Provider) cx17Apply(o CX17Observation) {
 			}
 		}
 	}
-	if c.Flavor == "link" {
+	// Only an admitted observation reconciles: a wrong-route or malformed record carries rejected counts that must
+	// not demote fields retained from accepted evidence.
+	if c.Flavor == "link" && projection.Current.Status == "descriptive" {
 		p.cx17Reconcile("cells/cell_", 16, in.CellCount, in.CellCountValid, fields)
 		p.cx17Reconcile("sensors/sensor_", 4, in.SensorCount, in.SensorCountValid, fields)
 		// A later 0x1801 whose gate, hardware age or count withholds enables must not leave earlier enables current.

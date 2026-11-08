@@ -1138,3 +1138,179 @@ func TestCX17BalanceEnablesDemotedWhenWithheld(t *testing.T) {
 		})
 	}
 }
+
+// Catches: a PCS-standard peer announcing a second, different complete 0x324 serial (or the same serial under a
+// changed native serial slot) within one generation without a conflict, because the serial was never assembled and
+// retained. The same serial repeated, an interrupted sequence, or a fresh generation does not conflict.
+func TestCX17PCSStandardSerialReplacementConflicts(t *testing.T) {
+	serial := func(slot, first byte) [][8]byte {
+		return [][8]byte{{0, slot, first, 2, 3, 4, 5, 6}, {1, 7, 8, 9, 10, 11, 12, 13}, {2, 14, 15, 16, 0, 0, 0, 0}}
+	}
+	for _, name := range []string{"same", "different", "slot-change", "interrupted", "new-generation"} {
+		t.Run(name, func(t *testing.T) {
+			s, i := cx16Fixture(t)
+			i.PCS.SerialSlotValid, i.PCS.SerialSlot = true, 1
+			p, _ := CX17NewPCSProvider(s)
+			a := cx17Source()
+			if err := p.Start(a, 1); err != nil {
+				t.Fatal(err)
+			}
+			defer p.Stop()
+			generation := uint64(1)
+			cx17Send(t, a, p, generation, i)
+			feed := func(frames [][8]byte) {
+				for _, payload := range frames {
+					i.PCS.Evidence.Sequence++
+					i.PCS.Evidence.Monotonic += time.Millisecond
+					cx16Frame(t, &i, 0x324, false, payload)
+					cx17Send(t, a, p, generation, i)
+				}
+			}
+			feed(serial(1, 1))
+			if got := p.CX17Snapshot(i.PCS.Evidence.Monotonic, time.Hour); got.State != "receiving" || !got.Promotable {
+				t.Fatal("first serial", got.State, got.Promotable)
+			}
+			next := serial(1, 1)
+			switch name {
+			case "different", "new-generation":
+				next = serial(1, 9)
+			case "slot-change":
+				i.PCS.SerialSlot = 2
+				next = serial(2, 1)
+			case "interrupted":
+				next = serial(1, 9)
+				next = [][8]byte{next[0], next[2]}
+			}
+			if name == "new-generation" {
+				b := cx17Source()
+				generation = 2
+				if err := p.Start(b, generation); err != nil {
+					t.Fatal(err)
+				}
+				a = b
+				i.PCS.Evidence.Sequence = 10
+				cx16Frame(t, &i, 0x313, false, [8]byte{0x14, 0xbe, 0xff, 0xf6, 0, 10, 50, 0xe4})
+				cx17Send(t, a, p, generation, i)
+			}
+			feed(next)
+			got := p.CX17Snapshot(i.PCS.Evidence.Monotonic, time.Hour)
+			conflict := name == "different" || name == "slot-change"
+			if (got.State == "conflict") != conflict || (conflict && (got.Promotable || len(got.Current) != 0)) {
+				t.Fatal(name, got.State, got.Promotable, len(got.Current))
+			}
+		})
+	}
+}
+
+// Catches: a PCS-parallel peer announcing a replacement 0x6C0 serial for the same module under unchanged product,
+// hardware and version without a conflict. Another module's serial is a separate identity and never merges; a
+// reordered fragment sequence, the same serial, or a fresh generation does not conflict.
+func TestCX17ParallelSerialReplacementConflicts(t *testing.T) {
+	serial := func(module, first byte) [][8]byte {
+		m := module << 4
+		return [][8]byte{{m, first, 2, 3, 4, 5, 6, 7}, {m | 1, 8, 9, 10, 11, 12, 13, 14}, {m | 2, 15, 16, 0, 0, 0, 0, 0}}
+	}
+	for _, name := range []string{"same", "different", "other-module", "reordered", "new-generation"} {
+		t.Run(name, func(t *testing.T) {
+			c := cx10Spec(t)
+			s := cx10Selection(t, c)
+			p, err := CX17NewPCSProvider(s)
+			if err != nil {
+				t.Fatal(err)
+			}
+			a := cx17Source()
+			if err := p.Start(a, 1); err != nil {
+				t.Fatal(err)
+			}
+			defer p.Stop()
+			generation, sequence := uint64(1), uint64(0)
+			feed := func(frames [][8]byte) {
+				for _, payload := range frames {
+					sequence++
+					in := cx10Input(t, c, 0x6c3, payload)
+					in.Evidence.Sequence, in.Evidence.Monotonic = sequence, time.Duration(sequence)*time.Millisecond
+					pcs := CX08PCSInput{CX06PCSInput: CX06PCSInput{CX05PCSInput: CX05PCSInput{CX01LINKInput: in, PublisherResolved: true}}}
+					cx17Send(t, a, p, generation, CX16ReplayInput{Selection: s, PCS: pcs})
+				}
+			}
+			feed([][8]byte{{1, 2, 3, 4, 5, 6, 7, 8}})
+			feed(serial(2, 1))
+			if got := p.CX17Snapshot(time.Second, time.Hour); got.State != "receiving" {
+				t.Fatal("first serial", got.State)
+			}
+			next := serial(2, 1)
+			switch name {
+			case "different", "new-generation":
+				next = serial(2, 9)
+			case "other-module":
+				next = serial(5, 9)
+			case "reordered":
+				next = serial(2, 9)
+				next = [][8]byte{next[0], next[2], next[1]}
+			}
+			if name == "new-generation" {
+				b := cx17Source()
+				generation = 2
+				if err := p.Start(b, generation); err != nil {
+					t.Fatal(err)
+				}
+				a = b
+			}
+			feed(next)
+			got := p.CX17Snapshot(time.Second, time.Hour)
+			if (got.State == "conflict") != (name == "different") || (name == "different" && (got.Promotable || len(got.Current) != 0)) {
+				t.Fatal(name, got.State, got.Promotable, len(got.Current))
+			}
+		})
+	}
+}
+
+// Catches: a later accepted non-balance LINK record carrying a smaller or invalid configured cell count while the
+// enables accepted from an earlier 0x1801 beyond that count stayed current. LastGood keeps the earlier enables.
+func TestCX17CellCountChangeDemotesBalanceEnables(t *testing.T) {
+	for _, name := range []string{"count-smaller", "count-invalid", "unchanged"} {
+		t.Run(name, func(t *testing.T) {
+			s, i := cx16LINK(t, 0x1801, [8]byte{0xff, 0xff, 1, 2, 3, 4, 6, 0})
+			i.CellCount, i.CellCountValid = 16, true
+			i.BalanceGate = CX12MeasurementGate{Configured: true, Valid: true}
+			i.HardwareAgeKnown = true
+			p, _ := CX17NewLINKProvider(s)
+			a := cx17Source()
+			if err := p.Start(a, 1); err != nil {
+				t.Fatal(err)
+			}
+			defer p.Stop()
+			cx17Send(t, a, p, 1, i)
+			now := i.PCS.Evidence.Monotonic
+			if got := p.CX17Snapshot(now, time.Second); got.Current["balance/enable_16"].Status != "accepted" {
+				t.Fatal(got.State, got.Current["balance/enable_16"])
+			}
+			i.PCS.Evidence.Sequence = 2
+			cx16Frame(t, &i, 0x1806<<16|0xf401, true, [8]byte{1, 0, 2, 7, 0, 3, 0, 4})
+			switch name {
+			case "count-smaller":
+				i.CellCount = 4
+			case "count-invalid":
+				i.CellCountValid = false
+			}
+			cx17Send(t, a, p, 1, i)
+			got := p.CX17Snapshot(now, time.Second)
+			if got.State != "receiving" {
+				t.Fatal(got.State)
+			}
+			for slot := 1; slot <= 16; slot++ {
+				key := fmt.Sprintf("balance/enable_%d", slot)
+				want := "accepted"
+				if name == "count-invalid" {
+					want = "absent"
+				} else if name == "count-smaller" && slot > 4 {
+					want = "unconfigured"
+				}
+				f := got.Current[key]
+				if f.Status != want || (want != "accepted" && (f.Unit != "" || f.Meaning != "")) || got.LastGood[key].Status != "accepted" {
+					t.Fatal(key, f, got.LastGood[key])
+				}
+			}
+		})
+	}
+}

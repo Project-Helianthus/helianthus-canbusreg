@@ -45,7 +45,9 @@ type CX17Snapshot struct {
 }
 
 // CX17Provider has exactly one configured source/selection, one identity
-// assembly and one candidate group; no fragments or input queue are retained.
+// assembly per identity kind (per native module for PCS-parallel serials, at
+// most 16) and one candidate group; only the pending serial fragments of those
+// assemblies are retained and there is no input queue.
 // Both field dictionaries and raw history are bounded to 256 entries. Field
 // eviction uses insertion order with lexicographically ordered batch insertion.
 // Start and Stop join the canceled predecessor; sources must honor cancellation.
@@ -67,6 +69,15 @@ type CX17Provider struct {
 	// assembler is the single LINK identity assembly of the active generation; it retains the completed serial so
 	// that a later different serial under the same project, release and route raises a sticky conflict.
 	assembler *CX01LINKIdentityAssembler
+	// serial is the single PCS-standard 0x324 serial assembly of the active generation; serialSlot and
+	// serialValue retain the completed serial and its native slot so a later different one raises a sticky conflict.
+	serial      *CX06SerialAssembler
+	serialSlot  uint8
+	serialValue [16]byte
+	hasSerial   bool
+	// modules holds the PCS-parallel 0x6C0 serial assembly of each module identity named by the native module
+	// nibble (at most 16, allocated on first use); each retains only its own module's completed serial.
+	modules [16]*CX10ParallelIdentityAssembler
 }
 
 // cx17Association is the native slot and group association supplied with a PCS record. It is part of the
@@ -117,6 +128,11 @@ func (p *CX17Provider) Start(source CX17ReceiveSource, generation uint64) error 
 	if p.selection.CX01Spec().Flavor == "link" {
 		p.assembler = CX01NewLINKIdentityAssembler(p.selection)
 	}
+	p.serial, p.serialSlot, p.serialValue, p.hasSerial = nil, 0, [16]byte{}, false
+	if p.selection.CX01Spec().Flavor == "pcs-standard" {
+		p.serial = &CX06SerialAssembler{}
+	}
+	p.modules = [16]*CX10ParallelIdentityAssembler{}
 	p.sequence = 0
 	p.monotonic = 0
 	p.snapshot.Generation = generation
@@ -289,6 +305,9 @@ func (p *CX17Provider) cx17Apply(o CX17Observation) {
 	if p.assembler != nil && projection.Current.Status == "descriptive" && p.assembler.CX01Decode(i).Status == "conflict" {
 		p.conflict = true
 	}
+	if projection.Current.Status == "descriptive" && p.cx17SerialConflict(in) {
+		p.conflict = true
+	}
 	// Compare only identity/role fields supplied by the accepted native API.
 	id := e.Frame.ID().Value()
 	for prefix, part := range projection.Native {
@@ -369,12 +388,51 @@ func (p *CX17Provider) cx17Apply(o CX17Observation) {
 		p.cx17Reconcile("cells/cell_", 16, in.CellCount, in.CellCountValid, fields)
 		p.cx17Reconcile("sensors/sensor_", 4, in.SensorCount, in.SensorCountValid, fields)
 		// A later 0x1801 whose gate, hardware age or count withholds enables must not leave earlier enables current.
+		// Every other accepted record carries the configured cell count too, so a smaller or invalid count there
+		// demotes the retained enables it no longer configures.
 		if part, ok := projection.Native["balance"]; ok && part.Status == "accepted" {
 			_, enabled := part.Fields["enable_1"]
 			p.cx17Reconcile("balance/enable_", 16, in.CellCount, enabled, fields)
+		} else {
+			p.cx17Reconcile("balance/enable_", 16, in.CellCount, in.CellCountValid, fields)
 		}
 	}
 	p.snapshot.State = "receiving"
+}
+
+// cx17SerialConflict feeds a descriptive PCS record to the generation's serial assemblies. A completed PCS-standard
+// 0x324 serial, or a completed PCS-parallel 0x6C0 serial of one module, that differs from the one retained earlier
+// in this generation (including a changed native serial slot) is a conflict. Interrupted or reordered fragment
+// sequences only discard the pending assembly.
+func (p *CX17Provider) cx17SerialConflict(in CX16ReplayInput) bool {
+	i := in.PCS.CX01LINKInput
+	id := i.Evidence.Frame.ID().Value()
+	if p.serial != nil && id == 0x324 {
+		r := p.serial.Consume(p.selection, in.PCS.CX06PCSInput)
+		if r.Status != "complete" {
+			return false
+		}
+		slot := in.PCS.SerialSlot
+		if p.hasSerial && (slot != p.serialSlot || r.Serial != p.serialValue) {
+			return true
+		}
+		p.serialSlot, p.serialValue, p.hasSerial = slot, r.Serial, true
+		return false
+	}
+	if p.selection.CX01Spec().Flavor != "pcs-parallel" || i.Evidence.Frame.ID().Extended() || id&^15 != 0x6c0 || i.Evidence.Frame.DLC() != 8 {
+		return false
+	}
+	module := i.Evidence.Frame.Bytes()[0] >> 4
+	a := p.modules[module]
+	if a == nil {
+		a = CX10NewParallelIdentityAssembler(p.selection, module)
+		p.modules[module] = a
+	}
+	// Only the final fragment of an in-order assembly can complete a serial; an out-of-order fragment also
+	// reports conflict from the assembler but merely discards the pending assembly.
+	completing := a.active && a.next == 2 && i.Evidence.Frame.Bytes()[0]&15 == 2
+	before := a.CX10Snapshot()
+	return a.CX10Decode(i).Status == "conflict" && completing && before.HasSerial
 }
 
 // cx17Withheld reports field states that carry no value for identity comparison.

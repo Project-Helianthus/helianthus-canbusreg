@@ -522,6 +522,16 @@ func TestCX17ConstructorFailClosed(t *testing.T) {
 	if _, err := CX17NewPCSProvider(ambiguous); err == nil {
 		t.Fatal("ambiguous selection")
 	}
+	// The gateway-state selection has no native group, so its 0x1910 downstream address never reaches the fence.
+	c = s.CX01Spec()
+	c.Flavor, c.ProjectCode, c.Release, c.Scope, c.Destination, c.Source = "pcs-extended19", "QCAA", "0001", "aggregate", 0xdf, 0xf2
+	gateway, err := NewCXSelection(c)
+	if err != nil || gateway.CX01Group() != "" {
+		t.Fatal(err, gateway.CX01Group())
+	}
+	if _, err := CX17NewPCSProvider(gateway); err == nil {
+		t.Fatal("gateway-state selection admitted")
+	}
 	p, _ := CX17NewPCSProvider(s)
 	a := cx17Source()
 	p.Start(a, 1)
@@ -1599,5 +1609,183 @@ func TestCX17MalformedObservationWithChangedAssociationDoesNotConflict(t *testin
 	after := p.CX17Snapshot(time.Second, time.Second)
 	if after.State == "conflict" || len(after.Current) == 0 {
 		t.Fatalf("valid observation after a rejected one did not keep receiving: %s %d", after.State, len(after.Current))
+	}
+}
+
+// Catches: a changed index scope, a raised minimum or a lowered maximum after the generation's baseline leaving
+// extrema indexes accepted under bounds or a scope the current input no longer supports. Unchanged bounds keep
+// receiving.
+func TestCX17IndexBoundsAssociationChangeConflicts(t *testing.T) {
+	for _, name := range []string{"scope", "minimum-raised", "maximum-lowered", "unchanged"} {
+		t.Run(name, func(t *testing.T) {
+			s, i := cx16Fixture(t)
+			i.PCS.IndexValid, i.PCS.IndexScope, i.PCS.IndexMinimum, i.PCS.IndexMaximum = true, "local", 0, 15
+			cx16Frame(t, &i, 0x319, false, [8]byte{0, 0x0c, 0, 0x0b, 0, 12, 3, 0})
+			p, _ := CX17NewPCSProvider(s)
+			a := cx17Source()
+			if err := p.Start(a, 1); err != nil {
+				t.Fatal(err)
+			}
+			defer p.Stop()
+			cx17Send(t, a, p, 1, i)
+			now := i.PCS.Evidence.Monotonic
+			if got := p.CX17Snapshot(now, time.Second); got.Current["core/maximum_index"].Status != "accepted" || got.Current["core/maximum_index"].Numerator != 12 {
+				t.Fatal(got.State, got.Current["core/maximum_index"])
+			}
+			next := i
+			next.PCS.Evidence.Sequence = 2
+			cx16Frame(t, &next, 0x314, false, [8]byte{0x27, 0x10, 0, 0, 0, 0, 0, 0})
+			switch name {
+			case "scope":
+				next.PCS.IndexScope = "aggregate"
+			case "minimum-raised":
+				next.PCS.IndexMinimum = 13
+			case "maximum-lowered":
+				next.PCS.IndexMaximum = 8
+			}
+			cx17Send(t, a, p, 1, next)
+			got := p.CX17Snapshot(now, time.Second)
+			if name == "unchanged" {
+				if got.State != "receiving" || !got.Promotable || got.Current["core/maximum_index"].Status != "accepted" {
+					t.Fatal(got.State, got.Promotable, got.Current["core/maximum_index"])
+				}
+				return
+			}
+			if got.State != "conflict" || got.Promotable || len(got.Current) != 0 || got.LastGood["core/maximum_index"].Status != "accepted" {
+				t.Fatal(got.State, got.Promotable, len(got.Current), got.LastGood["core/maximum_index"])
+			}
+		})
+	}
+}
+
+// cx17GroupFixture is the default PCS-standard fixture moved to another project release.
+func cx17GroupFixture(t *testing.T, release, group string) (CXSelection, CX16ReplayInput) {
+	t.Helper()
+	s, i := cx16Fixture(t)
+	c := s.CX01Spec()
+	c.Release = release
+	s, err := NewCXSelection(c)
+	if err != nil || s.CX01Group() != group {
+		t.Fatal(err, s.CX01Group())
+	}
+	i.Selection = s
+	return s, i
+}
+
+// Catches: early-layout 0x316 cells 5..8 accepted under a count of eight staying current after an admitted record
+// whose count no longer configures them (smaller count) or is invalid. Fields freshly decoded keep their own status,
+// LastGood is untouched and an unchanged count keeps the cells accepted.
+func TestCX17PCSGaugeCountChangeDemotesEarlyCells(t *testing.T) {
+	for _, name := range []string{"count-smaller", "count-invalid", "count-zero", "unchanged"} {
+		t.Run(name, func(t *testing.T) {
+			s, i := cx17GroupFixture(t, "0005", "L1")
+			i.PCS.CountValid, i.PCS.Count = true, 8
+			cx16Frame(t, &i, 0x316, false, [8]byte{0x0c, 0x80, 0x0c, 0x81, 0x0c, 0x82, 0x0c, 0x83})
+			p, _ := CX17NewPCSProvider(s)
+			a := cx17Source()
+			if err := p.Start(a, 1); err != nil {
+				t.Fatal(err)
+			}
+			defer p.Stop()
+			cx17Send(t, a, p, 1, i)
+			now := i.PCS.Evidence.Monotonic
+			before := p.CX17Snapshot(now, time.Second)
+			for pos := 5; pos <= 8; pos++ {
+				if f := before.Current[fmt.Sprintf("gauge/316/cell_%d", pos)]; f.Status != "accepted" {
+					t.Fatal(pos, before.State, f)
+				}
+			}
+			next := i
+			next.PCS.Evidence.Sequence = 2
+			cx16Frame(t, &next, 0x314, false, [8]byte{0x27, 0x10, 0, 0, 0, 0, 0, 0})
+			switch name {
+			case "count-smaller":
+				next.PCS.Count = 6
+			case "count-invalid":
+				next.PCS.CountValid = false
+			case "count-zero":
+				next.PCS.Count = 0
+			}
+			cx17Send(t, a, p, 1, next)
+			got := p.CX17Snapshot(now, time.Second)
+			if got.State != "receiving" {
+				t.Fatal(got.State)
+			}
+			for pos := 5; pos <= 8; pos++ {
+				key := fmt.Sprintf("gauge/316/cell_%d", pos)
+				want := "accepted"
+				switch {
+				case name == "count-invalid":
+					want = "absent"
+				case name == "count-zero", name == "count-smaller" && pos > 6:
+					want = "unconfigured"
+				}
+				f := got.Current[key]
+				if f.Status != want || (want != "accepted" && (f.Unit != "" || f.Meaning != "")) || got.LastGood[key].Status != "accepted" {
+					t.Fatal(key, f, got.LastGood[key])
+				}
+			}
+		})
+	}
+}
+
+// Catches: the release-11 count-aware fine average temperature staying current after an admitted record whose count
+// is invalid or zero. LastGood is untouched and a still-valid nonzero count keeps the temperature accepted.
+func TestCX17Release11TemperatureCountChangeDemotes(t *testing.T) {
+	for _, name := range []string{"count-invalid", "count-zero", "count-smaller"} {
+		t.Run(name, func(t *testing.T) {
+			s, i := cx17GroupFixture(t, "0011", "L8")
+			i.PCS.CountValid, i.PCS.Count = true, 8
+			p, _ := CX17NewPCSProvider(s)
+			a := cx17Source()
+			if err := p.Start(a, 1); err != nil {
+				t.Fatal(err)
+			}
+			defer p.Stop()
+			cx17Send(t, a, p, 1, i)
+			now := i.PCS.Evidence.Monotonic
+			if got := p.CX17Snapshot(now, time.Second); got.Current["core/temperature"].Status != "accepted" {
+				t.Fatal(got.State, got.Current["core/temperature"])
+			}
+			next := i
+			next.PCS.Evidence.Sequence = 2
+			cx16Frame(t, &next, 0x314, false, [8]byte{0x27, 0x10, 0, 0, 0, 0, 0, 0})
+			want := "accepted"
+			switch name {
+			case "count-invalid":
+				next.PCS.CountValid, want = false, "absent"
+			case "count-zero":
+				next.PCS.Count, want = 0, "unconfigured"
+			case "count-smaller":
+				next.PCS.Count = 1
+			}
+			cx17Send(t, a, p, 1, next)
+			got := p.CX17Snapshot(now, time.Second)
+			f := got.Current["core/temperature"]
+			if got.State != "receiving" || f.Status != want || (want != "accepted" && (f.Unit != "" || f.Meaning != "")) || got.LastGood["core/temperature"].Status != "accepted" {
+				t.Fatal(got.State, f, got.LastGood["core/temperature"])
+			}
+		})
+	}
+}
+
+// Catches: a gauge or temperature count reconciliation on a group whose decoder has no count gate. The default
+// layout keeps its accepted core temperature when an admitted record carries an invalid count.
+func TestCX17CountReconciliationOnlyForCountGatedGroups(t *testing.T) {
+	s, i := cx16Fixture(t)
+	p, _ := CX17NewPCSProvider(s)
+	a := cx17Source()
+	if err := p.Start(a, 1); err != nil {
+		t.Fatal(err)
+	}
+	defer p.Stop()
+	cx17Send(t, a, p, 1, i)
+	next := i
+	next.PCS.Evidence.Sequence = 2
+	cx16Frame(t, &next, 0x314, false, [8]byte{0x27, 0x10, 0, 0, 0, 0, 0, 0})
+	cx17Send(t, a, p, 1, next)
+	got := p.CX17Snapshot(i.PCS.Evidence.Monotonic, time.Second)
+	if got.State != "receiving" || got.Current["core/temperature"].Status != "accepted" {
+		t.Fatal(got.State, got.Current["core/temperature"])
 	}
 }

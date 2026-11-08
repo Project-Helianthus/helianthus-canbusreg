@@ -83,11 +83,14 @@ type CX17Provider struct {
 	modules [16]*CX10ParallelIdentityAssembler
 }
 
-// cx17Association is the native slot and group association supplied with a PCS record. It is part of the
-// identity fence like the member: the same wire bytes decode into another slot's or group's fields when it changes.
+// cx17Association is the native slot, group and extrema index association supplied with a PCS record. It is part of
+// the identity fence like the member: the same wire bytes decode into another slot's or group's fields, or into
+// indexes accepted under another scope or other inclusive bounds, when it changes.
 type cx17Association struct {
 	slotValid, groupValid, serialSlotValid bool
 	slot, group, serialSlot                uint8
+	indexScope                             string
+	indexMinimum, indexMaximum             uint16
 }
 
 // cx17LINKSerial is the provider's bounded 0x18fb serial assembly: one pending in-order fragment sequence and the
@@ -262,6 +265,8 @@ func cx17IdentityKey(c CX01SelectionSpec, prefix string, id uint32, name string,
 			return "identity/0321/family", true
 		}
 	case "extended":
+		// The gateway-state 0x1910 downstream address is not fenced: the gateway-state selection has no native group,
+		// so the constructors refuse it, and every other selection decodes that field only as raw, never accepted.
 		switch kind := cx17ExtendedKind(c, id>>16); {
 		case kind == 0x1900 && (name == "product" || name == "hardware" || name == "version"):
 			return prefix + "/" + name, true
@@ -317,7 +322,7 @@ func (p *CX17Provider) cx17Apply(o CX17Observation) {
 	if hasMember {
 		member = *in.PCS.Member
 	}
-	association := cx17Association{in.PCS.SlotValid, in.PCS.GroupValid, in.PCS.SerialSlotValid, in.PCS.NativeSlot, in.PCS.NativeGroup, in.PCS.SerialSlot}
+	association := cx17Association{in.PCS.SlotValid, in.PCS.GroupValid, in.PCS.SerialSlotValid, in.PCS.NativeSlot, in.PCS.NativeGroup, in.PCS.SerialSlot, in.PCS.IndexScope, in.PCS.IndexMinimum, in.PCS.IndexMaximum}
 	if identityChanged {
 		p.conflict = true
 	}
@@ -460,6 +465,19 @@ func (p *CX17Provider) cx17Apply(o CX17Observation) {
 			p.cx17Reconcile("balance/enable_", 16, in.CellCount, in.CellCountValid, fields)
 		}
 	}
+	// The PCS count gates early-layout cells 5..8 and the release-11 fine average temperature; a later admitted
+	// record whose count no longer qualifies them demotes the retained current values. LastGood stays untouched.
+	if c.Flavor == "pcs-standard" && projection.Current.Status == "descriptive" {
+		count, valid := int(in.PCS.Count), in.PCS.CountValid
+		switch p.selection.CX01Group() {
+		case "L0", "L1":
+			for position := 5; position <= 8; position++ {
+				p.cx17Demote(fmt.Sprintf("gauge/316/cell_%d", position), valid && count >= position, valid, fields)
+			}
+		case "L8":
+			p.cx17Demote("core/temperature", valid && count > 0, valid, fields)
+		}
+	}
 	p.snapshot.State = "receiving"
 }
 
@@ -512,23 +530,28 @@ func cx17Withheld(status string) bool {
 func (p *CX17Provider) cx17Reconcile(prefix string, max, count int, valid bool, fresh map[string]CXNativeField) {
 	valid = valid && count >= 1 && count <= max
 	for index := 1; index <= max; index++ {
-		name := fmt.Sprintf("%s%d", prefix, index)
-		if _, ok := fresh[name]; ok {
-			continue
-		}
-		f, ok := p.snapshot.Current[name]
-		if !ok || (valid && index <= count) {
-			continue
-		}
-		if valid {
-			f.Status = "unconfigured"
-		} else {
-			f.Status = "absent"
-		}
-		f.Unit = ""
-		f.Meaning = ""
-		p.snapshot.Current[name] = f
+		p.cx17Demote(fmt.Sprintf("%s%d", prefix, index), valid && index <= count, valid, fresh)
 	}
+}
+
+// cx17Demote marks one retained current field that the latest admitted count no longer configures: unconfigured for
+// a valid count, absent for an invalid one. A field decoded fresh in this observation keeps its own status.
+func (p *CX17Provider) cx17Demote(name string, configured, valid bool, fresh map[string]CXNativeField) {
+	if _, ok := fresh[name]; ok {
+		return
+	}
+	f, ok := p.snapshot.Current[name]
+	if !ok || configured {
+		return
+	}
+	if valid {
+		f.Status = "unconfigured"
+	} else {
+		f.Status = "absent"
+	}
+	f.Unit = ""
+	f.Meaning = ""
+	p.snapshot.Current[name] = f
 }
 
 // CX17Snapshot uses caller logical time and an inclusive maximum age. Each

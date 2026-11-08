@@ -1566,3 +1566,38 @@ func TestCX17RejectedLINKObservationDoesNotReconcile(t *testing.T) {
 		})
 	}
 }
+
+// Catches: a malformed observation (negative field age, rejected by admission) that also carries a changed
+// member or native association conflicting the generation before admission rejects it, so rejected evidence
+// cleared the current fields and a later valid observation could never recover.
+func TestCX17MalformedObservationWithChangedAssociationDoesNotConflict(t *testing.T) {
+	s, i := cx16Fixture(t)
+	p, _ := CX17NewPCSProvider(s)
+	a := cx17Source()
+	if err := p.Start(a, 1); err != nil {
+		t.Fatal(err)
+	}
+	defer p.Stop()
+	cx17Send(t, a, p, 1, i)
+	baseline := p.CX17Snapshot(time.Second, time.Second)
+	if baseline.State == "conflict" || len(baseline.Current) == 0 {
+		t.Fatalf("baseline not established: %s %d", baseline.State, len(baseline.Current))
+	}
+	bad := i
+	bad.PCS.Evidence.Sequence = 2
+	bad.PCS.FieldAge = -time.Second
+	bad.PCS.Member = &s
+	bad.PCS.SlotValid, bad.PCS.NativeSlot = true, 9
+	cx17Send(t, a, p, 1, bad)
+	got := p.CX17Snapshot(time.Second, time.Second)
+	if got.State == "conflict" || len(got.Current) != len(baseline.Current) || got.Raw[len(got.Raw)-1].Status != "invalid" {
+		t.Fatalf("rejected evidence changed the generation: state %s current %d raw %s", got.State, len(got.Current), got.Raw[len(got.Raw)-1].Status)
+	}
+	good := i
+	good.PCS.Evidence.Sequence = 3
+	cx17Send(t, a, p, 1, good)
+	after := p.CX17Snapshot(time.Second, time.Second)
+	if after.State == "conflict" || len(after.Current) == 0 {
+		t.Fatalf("valid observation after a rejected one did not keep receiving: %s %d", after.State, len(after.Current))
+	}
+}

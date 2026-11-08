@@ -317,13 +317,7 @@ func (p *CX17Provider) cx17Apply(o CX17Observation) {
 	if hasMember {
 		member = *in.PCS.Member
 	}
-	if p.seen && (hasMember != p.hasMember || member != p.member) {
-		identityChanged = true
-	}
 	association := cx17Association{in.PCS.SlotValid, in.PCS.GroupValid, in.PCS.SerialSlotValid, in.PCS.NativeSlot, in.PCS.NativeGroup, in.PCS.SerialSlot}
-	if p.seen && association != p.association {
-		identityChanged = true
-	}
 	if identityChanged {
 		p.conflict = true
 	}
@@ -353,6 +347,11 @@ func (p *CX17Provider) cx17Apply(o CX17Observation) {
 	}
 	if !p.seen && projection.Current.Status == "descriptive" {
 		p.seen, p.hasMember, p.member, p.association = true, hasMember, member, association
+	}
+	// Associations are compared only for admitted observations: rejected evidence (a malformed record) must
+	// neither fix nor break the generation's associations.
+	if p.seen && projection.Current.Status == "descriptive" && (hasMember != p.hasMember || member != p.member || association != p.association) {
+		p.conflict = true
 	}
 	// The serial is assembled across observations; a completed serial that differs from the retained one is a
 	// sticky conflict of this generation.

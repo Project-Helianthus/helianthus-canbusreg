@@ -25,6 +25,9 @@ func cx08Release11(s CXSelection) bool {
 // Bank="parallel" respectively; neither is inferred from current plausibility.
 func CX08DecodePCSSlots(s CXSelection, i CX08PCSInput) CXNativeResult {
 	r := cx01Result(s, i.CX01LINKInput, cx06Admit(s, i.CX06PCSInput))
+	if i.Member != nil {
+		r.Member, r.HasMember = *i.Member, true
+	}
 	if r.Status != "decoded" {
 		return r
 	}

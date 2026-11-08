@@ -338,3 +338,22 @@ func TestCX08ZeroDTCIndexIndependentWithholding(t *testing.T) {
 		t.Fatal(m.Fields["dtc_a_index"])
 	}
 }
+
+func TestCX08RetentionIdentityIncludesMember(t *testing.T) {
+	s, i := cx08Fixture(t, 0x333, [8]byte{3, 2, 0x10, 0, 0x10, 1})
+	i.NativeSlot = 2
+	i.Member = &s
+	previous := CX08DecodePCSSlots(s, i)
+	if !previous.HasMember || previous.Member != s {
+		t.Fatal("member selection not recorded", previous.Member)
+	}
+	if previous.Fields["dtc_a_index"].Status != "accepted" {
+		t.Fatal(previous.Fields["dtc_a_index"])
+	}
+	i.Member = nil
+	i.FieldStates = map[string]string{"dtc_a": "stale"}
+	update := CX08DecodePCSSlots(s, i)
+	if m := CX05RetainAccepted(previous, update); m.Fields["dtc_a_index"].Status == "accepted" {
+		t.Fatal("index retained across a member change", m.Fields["dtc_a_index"])
+	}
+}

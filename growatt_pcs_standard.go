@@ -207,12 +207,13 @@ func CX05DecodePCSStandard(s CXSelection, i CX05PCSInput) CX05PCSResult {
 }
 
 // CX05RetainAccepted preserves independent last-known-good fields and their
-// original ages. Rejected updates and identity changes cannot refresh them;
+// original ages. Rejected updates and identity changes (including a change of
+// reporting-member dictionary) cannot refresh them;
 // a valid empty observation supersedes the retained value.
 func CX05RetainAccepted(previous, update CXNativeResult) CXNativeResult {
 	out := update
 	out.Fields = make(map[string]CXNativeField)
-	if previous.Selection == update.Selection {
+	if previous.Selection == update.Selection && previous.HasMember == update.HasMember && previous.Member == update.Member {
 		for name, f := range previous.Fields {
 			if f.Status == "accepted" {
 				out.Fields[name] = f

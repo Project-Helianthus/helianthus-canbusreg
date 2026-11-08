@@ -430,3 +430,24 @@ func TestCX16ExtendedFamiliesRetainedSeparately(t *testing.T) {
 		t.Fatal(r.RetainedNative)
 	}
 }
+
+func TestCX16GaugeFamiliesRetainedSeparately(t *testing.T) {
+	s, base := cx16Fixture(t)
+	c := s.CX01Spec()
+	c.ProjectCode, c.Release, c.Group = "QAAA", "0002", "L0"
+	s = cx16Reselect(t, &base, c)
+	a, b := base, base
+	cx16Frame(t, &a, 0x315, false, [8]byte{0, 1, 0, 2, 0, 3, 0, 4})
+	b.PCS.Evidence.Sequence, b.PCS.Evidence.Monotonic = 2, 2*time.Second
+	cx16Frame(t, &b, 0x317, false, [8]byte{0, 9, 0, 8, 0, 7, 0, 6})
+	p := cx16Profile(t, s, a, b)
+	cx16Classify(t, p, a.PCS.Evidence)
+	r := cx16Classify(t, p, b.PCS.Evidence)
+	va, vb := r.LastGood["gauge/315/word_0"], r.LastGood["gauge/317/word_0"]
+	if va.Status != "accepted" || vb.Status != "accepted" || va.Numerator != 1 || vb.Numerator != 9 {
+		t.Fatalf("cross-PID overwrite: %#v %#v", va, vb)
+	}
+	if _, ok := r.LastGood["gauge/word_0"]; ok {
+		t.Fatal("family-less retention key")
+	}
+}

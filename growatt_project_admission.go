@@ -246,9 +246,12 @@ func (p *cx16SelectedProfile) Classify(e Evidence) Classification {
 	return Classification{Profile: "growatt.project.selected", Projection: projection}
 }
 
-// cx16RetentionKey keys retained extended PCS values by native family so that
-// families sharing field names never overwrite one another.
+// cx16RetentionKey keys retained extended and gauge PCS values by native family
+// so that families sharing field names never overwrite one another.
 func cx16RetentionKey(prefix string, e Evidence) string {
+	if prefix == "gauge" {
+		return fmt.Sprintf("%s/%03x", prefix, e.Frame.ID().Value())
+	}
 	if prefix != "extended" {
 		return prefix
 	}

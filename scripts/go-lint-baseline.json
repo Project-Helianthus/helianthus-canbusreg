@@ -1,0 +1,480 @@
+{
+  "version": 1,
+  "golangci_lint": "2.11.4",
+  "entries": [
+    {
+      "path": "gree_vrf_candidate.go",
+      "symbol": "<package>",
+      "rule": "revive/package-comments",
+      "count": 1
+    },
+    {
+      "path": "gree_vrf_candidate.go",
+      "symbol": "GreeVRFCandidateProfile",
+      "rule": "revive/exported",
+      "count": 1
+    },
+    {
+      "path": "gree_vrf_map.go",
+      "symbol": "GreeVRFMapM94",
+      "rule": "revive/exported",
+      "count": 1
+    },
+    {
+      "path": "gree_vrf_map.go",
+      "symbol": "NewGreeVRFMapDecoder",
+      "rule": "revive/exported",
+      "count": 1
+    },
+    {
+      "path": "growatt_link_balance.go",
+      "symbol": "CX12DecodeLINKBalance",
+      "rule": "revive/exported",
+      "count": 1
+    },
+    {
+      "path": "growatt_link_cells.go",
+      "symbol": "CX12DecodeLINKCellMean",
+      "rule": "revive/exported",
+      "count": 1
+    },
+    {
+      "path": "growatt_link_cells.go",
+      "symbol": "CX12LINKVector.CX12Decode",
+      "rule": "revive/exported",
+      "count": 1
+    },
+    {
+      "path": "growatt_link_cells.go",
+      "symbol": "CX12LINKVector.CX12Snapshot",
+      "rule": "revive/exported",
+      "count": 1
+    },
+    {
+      "path": "growatt_link_cells.go",
+      "symbol": "CX12MeasurementGate",
+      "rule": "revive/exported",
+      "count": 1
+    },
+    {
+      "path": "growatt_link_cells.go",
+      "symbol": "CX12NewLINKCells",
+      "rule": "revive/exported",
+      "count": 1
+    },
+    {
+      "path": "growatt_link_cells.go",
+      "symbol": "CX12VectorSnapshot",
+      "rule": "revive/exported",
+      "count": 1
+    },
+    {
+      "path": "growatt_link_diagnostics.go",
+      "symbol": "CX13DecodeLINKDiagnostics",
+      "rule": "revive/exported",
+      "count": 1
+    },
+    {
+      "path": "growatt_link_identity.go",
+      "symbol": "CX01LINKIdentityAssembler",
+      "rule": "revive/exported",
+      "count": 1
+    },
+    {
+      "path": "growatt_link_identity.go",
+      "symbol": "CX01LINKIdentityAssembler.CX01Decode",
+      "rule": "revive/exported",
+      "count": 1
+    },
+    {
+      "path": "growatt_link_identity.go",
+      "symbol": "CX01LINKIdentityAssembler.CX01Snapshot",
+      "rule": "revive/exported",
+      "count": 1
+    },
+    {
+      "path": "growatt_link_identity.go",
+      "symbol": "CX01NewLINKIdentityAssembler",
+      "rule": "revive/exported",
+      "count": 1
+    },
+    {
+      "path": "growatt_link_telemetry.go",
+      "symbol": "CX01LINKInput",
+      "rule": "revive/exported",
+      "count": 1
+    },
+    {
+      "path": "growatt_link_telemetry.go",
+      "symbol": "CXDecodeLINKTelemetry",
+      "rule": "revive/exported",
+      "count": 1
+    },
+    {
+      "path": "growatt_link_temperatures.go",
+      "symbol": "CX12DecodeLINKTemperatureSummary",
+      "rule": "revive/exported",
+      "count": 1
+    },
+    {
+      "path": "growatt_link_temperatures.go",
+      "symbol": "CX12NewLINKTemperatures",
+      "rule": "revive/exported",
+      "count": 1
+    },
+    {
+      "path": "growatt_link_temperatures.go",
+      "symbol": "CX12SummaryGates",
+      "rule": "revive/exported",
+      "count": 1
+    },
+    {
+      "path": "growatt_pcs_extended.go",
+      "symbol": "CX09DecodePCSExtended",
+      "rule": "revive/exported",
+      "count": 1
+    },
+    {
+      "path": "growatt_pcs_extended.go",
+      "symbol": "CX09NewPCSExtendedDecoder",
+      "rule": "revive/exported",
+      "count": 1
+    },
+    {
+      "path": "growatt_pcs_extended.go",
+      "symbol": "CX09PCSExtendedDecoder.CX09Decode",
+      "rule": "revive/exported",
+      "count": 1
+    },
+    {
+      "path": "growatt_pcs_extended.go",
+      "symbol": "CX09PCSExtendedDecoder.CX09Snapshot",
+      "rule": "revive/exported",
+      "count": 1
+    },
+    {
+      "path": "growatt_pcs_gauge.go",
+      "symbol": "CX06PCSInput",
+      "rule": "revive/exported",
+      "count": 1
+    },
+    {
+      "path": "growatt_pcs_identity.go",
+      "symbol": "CX06DecodePCSIdentity",
+      "rule": "revive/exported",
+      "count": 1
+    },
+    {
+      "path": "growatt_pcs_identity.go",
+      "symbol": "CX06SerialAssembler.Consume",
+      "rule": "revive/exported",
+      "count": 1
+    },
+    {
+      "path": "growatt_pcs_parallel_base.go",
+      "symbol": "CX10DecodeParallel",
+      "rule": "revive/exported",
+      "count": 1
+    },
+    {
+      "path": "growatt_pcs_parallel_identity.go",
+      "symbol": "CX10ParallelIdentityAssembler",
+      "rule": "revive/exported",
+      "count": 1
+    },
+    {
+      "path": "growatt_pcs_parallel_identity.go",
+      "symbol": "CX10ParallelIdentityAssembler.CX10Decode",
+      "rule": "revive/exported",
+      "count": 1
+    },
+    {
+      "path": "growatt_pcs_parallel_identity.go",
+      "symbol": "CX10ParallelIdentityAssembler.CX10Snapshot",
+      "rule": "revive/exported",
+      "count": 1
+    },
+    {
+      "path": "growatt_pcs_parallel_release11.go",
+      "symbol": "CX11ParallelContext",
+      "rule": "revive/exported",
+      "count": 1
+    },
+    {
+      "path": "growatt_pcs_slots.go",
+      "symbol": "CX08PCSInput",
+      "rule": "revive/exported",
+      "count": 1
+    },
+    {
+      "path": "growatt_pcs_standard.go",
+      "symbol": "CX05PCSInput",
+      "rule": "revive/exported",
+      "count": 1
+    },
+    {
+      "path": "growatt_pcs_standard.go",
+      "symbol": "CX05PCSResult",
+      "rule": "revive/exported",
+      "count": 1
+    },
+    {
+      "path": "growatt_pcs_summaries.go",
+      "symbol": "CX14PCSInput",
+      "rule": "revive/exported",
+      "count": 1
+    },
+    {
+      "path": "growatt_pcs_summaries.go",
+      "symbol": "CX14PCSResult",
+      "rule": "revive/exported",
+      "count": 1
+    },
+    {
+      "path": "growatt_project_admission.go",
+      "symbol": "CX16Diagnostic",
+      "rule": "revive/exported",
+      "count": 1
+    },
+    {
+      "path": "growatt_project_admission.go",
+      "symbol": "CX16Projection",
+      "rule": "revive/exported",
+      "count": 1
+    },
+    {
+      "path": "growatt_project_admission.go",
+      "symbol": "CX16ReplayInput",
+      "rule": "revive/exported",
+      "count": 1
+    },
+    {
+      "path": "growatt_project_capabilities.go",
+      "symbol": "CX15ReceiverContext",
+      "rule": "revive/exported",
+      "count": 1
+    },
+    {
+      "path": "growatt_project_capabilities.go",
+      "symbol": "CX15ReceiverResult",
+      "rule": "revive/exported",
+      "count": 1
+    },
+    {
+      "path": "growatt_project_conditions.go",
+      "symbol": "CX13LabelCondition",
+      "rule": "revive/exported",
+      "count": 1
+    },
+    {
+      "path": "growatt_project_counter.go",
+      "symbol": "CX08CounterInput",
+      "rule": "revive/exported",
+      "count": 1
+    },
+    {
+      "path": "growatt_project_dtc.go",
+      "symbol": "CX07ExplainLocalSelection",
+      "rule": "revive/exported",
+      "count": 1
+    },
+    {
+      "path": "growatt_project_opaque.go",
+      "symbol": "CX15CapabilityKey",
+      "rule": "revive/exported",
+      "count": 1
+    },
+    {
+      "path": "growatt_project_opaque.go",
+      "symbol": "CX15CapabilityState",
+      "rule": "revive/exported",
+      "count": 1
+    },
+    {
+      "path": "growatt_project_opaque.go",
+      "symbol": "CX15OpaqueStore.Capability",
+      "rule": "revive/exported",
+      "count": 1
+    },
+    {
+      "path": "growatt_project_opaque.go",
+      "symbol": "CX15OpaqueStore.LastKnownGood",
+      "rule": "revive/exported",
+      "count": 1
+    },
+    {
+      "path": "growatt_project_opaque.go",
+      "symbol": "CX15OpaqueStore.Observe",
+      "rule": "revive/exported",
+      "count": 1
+    },
+    {
+      "path": "growatt_project_opaque.go",
+      "symbol": "CX15OpaqueStore.RawSnapshot",
+      "rule": "revive/exported",
+      "count": 1
+    },
+    {
+      "path": "growatt_project_opaque.go",
+      "symbol": "CX15Unknown",
+      "rule": "revive/exported",
+      "count": 1
+    },
+    {
+      "path": "growatt_project_opaque.go",
+      "symbol": "NewCX15OpaqueStore",
+      "rule": "revive/exported",
+      "count": 1
+    },
+    {
+      "path": "growatt_project_provider.go",
+      "symbol": "CX17NewLINKProvider",
+      "rule": "revive/exported",
+      "count": 1
+    },
+    {
+      "path": "growatt_project_provider.go",
+      "symbol": "CX17NewPCSProvider",
+      "rule": "revive/exported",
+      "count": 1
+    },
+    {
+      "path": "growatt_project_provider.go",
+      "symbol": "CX17Observation",
+      "rule": "revive/exported",
+      "count": 1
+    },
+    {
+      "path": "growatt_project_provider.go",
+      "symbol": "CX17Provider.Start",
+      "rule": "revive/exported",
+      "count": 1
+    },
+    {
+      "path": "growatt_project_provider.go",
+      "symbol": "CX17Provider.Stop",
+      "rule": "revive/exported",
+      "count": 1
+    },
+    {
+      "path": "growatt_project_provider.go",
+      "symbol": "CX17Raw",
+      "rule": "revive/exported",
+      "count": 1
+    },
+    {
+      "path": "growatt_project_provider.go",
+      "symbol": "CX17Snapshot",
+      "rule": "revive/exported",
+      "count": 1
+    },
+    {
+      "path": "growatt_project_selection.go",
+      "symbol": "CX01ConfirmNativeSelection",
+      "rule": "revive/exported",
+      "count": 1
+    },
+    {
+      "path": "growatt_project_selection.go",
+      "symbol": "CXNativeResult",
+      "rule": "revive/exported",
+      "count": 1
+    },
+    {
+      "path": "growatt_project_selection.go",
+      "symbol": "CXSelection",
+      "rule": "revive/exported",
+      "count": 1
+    },
+    {
+      "path": "growatt_project_selection.go",
+      "symbol": "CXSelection.CX01Grade",
+      "rule": "revive/exported",
+      "count": 1
+    },
+    {
+      "path": "growatt_project_selection.go",
+      "symbol": "CXSelection.CX01Group",
+      "rule": "revive/exported",
+      "count": 1
+    },
+    {
+      "path": "growatt_project_selection.go",
+      "symbol": "CXSelection.CX01Layout",
+      "rule": "revive/exported",
+      "count": 1
+    },
+    {
+      "path": "growatt_project_selection.go",
+      "symbol": "CXSelection.CX01Spec",
+      "rule": "revive/exported",
+      "count": 1
+    },
+    {
+      "path": "growatt_project_selection.go",
+      "symbol": "NewCXSelection",
+      "rule": "revive/exported",
+      "count": 1
+    },
+    {
+      "path": "o08_growatt_provider.go",
+      "symbol": "O08GrowattProvider.O08Snapshot",
+      "rule": "revive/exported",
+      "count": 1
+    },
+    {
+      "path": "o08_growatt_provider.go",
+      "symbol": "O08NewGrowattProvider",
+      "rule": "revive/exported",
+      "count": 1
+    },
+    {
+      "path": "o08_growatt_provider.go",
+      "symbol": "O08RevisionV104",
+      "rule": "revive/exported",
+      "count": 1
+    },
+    {
+      "path": "registry.go",
+      "symbol": "Classification",
+      "rule": "revive/exported",
+      "count": 1
+    },
+    {
+      "path": "registry.go",
+      "symbol": "Evidence",
+      "rule": "revive/exported",
+      "count": 1
+    },
+    {
+      "path": "registry.go",
+      "symbol": "NewEvidence",
+      "rule": "revive/exported",
+      "count": 1
+    },
+    {
+      "path": "registry.go",
+      "symbol": "NewRegistry",
+      "rule": "revive/exported",
+      "count": 1
+    },
+    {
+      "path": "registry.go",
+      "symbol": "Profile",
+      "rule": "revive/exported",
+      "count": 1
+    },
+    {
+      "path": "registry.go",
+      "symbol": "Registry",
+      "rule": "revive/exported",
+      "count": 1
+    },
+    {
+      "path": "registry.go",
+      "symbol": "Registry.Classify",
+      "rule": "revive/exported",
+      "count": 1
+    }
+  ]
+}

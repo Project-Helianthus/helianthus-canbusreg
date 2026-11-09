@@ -29,8 +29,11 @@ EXCLUDED = {'.git': 'version-control metadata', '.tmp': 'tool scratch',
 
 
 def discover(root):
+    def scan_error(error):
+        raise error
+
     paths, exclusions = [], []
-    for directory, dirs, files in os.walk(root, followlinks=False):
+    for directory, dirs, files in os.walk(root, followlinks=False, onerror=scan_error):
         parent = Path(directory)
         for name in sorted(dirs[:]):
             path = parent / name

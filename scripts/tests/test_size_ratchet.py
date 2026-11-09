@@ -1,16 +1,50 @@
 """Synthetic contract tests for measurement, thresholds and exact debt identities."""
+from contextlib import redirect_stderr
 import importlib.util
+import io
 import json
 import os
 from pathlib import Path
 import subprocess
 import tempfile
 import unittest
+from unittest import mock
 
 ROOT = Path(__file__).resolve().parents[2]
 SPEC = importlib.util.spec_from_file_location('size_ratchet', ROOT / 'scripts/check_size_ratchet.py')
 GUARD = importlib.util.module_from_spec(SPEC)
 SPEC.loader.exec_module(GUARD)
+
+
+class DiscoveryTests(unittest.TestCase):
+    def test_scan_errors_are_fatal(self):
+        with tempfile.TemporaryDirectory(dir=ROOT / '.tmp') as directory:
+            root = Path(directory)
+            nested = root / 'nested'
+            nested.mkdir()
+            (root / 'normal.go').write_text('package sample\n')
+            (nested / 'hidden.go').write_text('invalid Go source')
+            scandir = os.scandir
+            for blocked in (root, nested):
+                with self.subTest(blocked=blocked.name):
+                    error = PermissionError('scan denied')
+
+                    def scan(path):
+                        if Path(path) == blocked:
+                            raise error
+                        return scandir(path)
+
+                    with mock.patch.object(GUARD.os, 'scandir', side_effect=scan):
+                        with self.assertRaises(PermissionError) as raised:
+                            GUARD.discover(root)
+                        self.assertIs(raised.exception, error)
+                        stderr = io.StringIO()
+                        with mock.patch('sys.argv', ['check_size_ratchet.py', '--root', str(root)]), \
+                                mock.patch.object(GUARD, 'measure') as measure, \
+                                redirect_stderr(stderr):
+                            self.assertEqual(GUARD.main(), 1)
+                        self.assertIn('ERROR scan denied', stderr.getvalue())
+                        measure.assert_not_called()
 
 
 class RatchetTests(unittest.TestCase):

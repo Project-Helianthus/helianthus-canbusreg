@@ -80,9 +80,42 @@ class BaselineTests(unittest.TestCase):
         with self.assertRaises(ValueError):
             json.loads('{"version":1,"version":1}', object_pairs_hook=guard.unique_object)
 
+    def test_standard_linter_identities(self):
+        cases = (
+            ('errcheck', 'Error return value of `p.Start` is not checked', 'p.Start', 'errcheck'),
+            ('errcheck', 'Error return value is not checked', '<unnamed>', 'errcheck'),
+            ('ineffassign', 'ineffectual assignment to ss', 'ss', 'ineffassign'),
+            ('unused', 'func readValue is unused', 'readValue', 'unused'),
+            ('staticcheck', 'SA1019: ReadValue is deprecated', 'ReadValue', 'staticcheck/SA1019'),
+            ('staticcheck', 'QF1003: `ReadValue` could use a switch', 'ReadValue', 'staticcheck/QF1003'),
+            ('staticcheck', 'ST1005: error strings should not be capitalized', 'error', 'staticcheck/ST1005'),
+            ('staticcheck', 'S1000: !!!', '<check>', 'staticcheck/S1000'),
+            ('govet', 'printf: ReadValue format mismatch', 'ReadValue', 'govet/printf'),
+            ('govet', 'printf: !!!', '<check>', 'govet/printf'),
+        )
+        for linter, message, symbol, rule in cases:
+            with self.subTest(linter=linter, message=message):
+                issue = dict(Pos=dict(Filename='sample.go'), FromLinter=linter, Text=message)
+                key = ('sample.go', symbol, rule)
+                self.assertEqual(key, guard.diagnostic_key(issue))
+                self.assertEqual({key: 2}, self.load([self.row(symbol=symbol, rule=rule)]))
+                self.assertTrue(guard.compare({key: 1}, {key: 2}))
+                self.assertTrue(guard.compare({key: 1}, {}))
+
     def test_unbaselined_linter(self):
-        with self.assertRaises(ValueError):
-            guard.diagnostic_key(dict(Pos=dict(Filename='sample.go'), FromLinter='govet', Text='synthetic'))
+        for linter, message in (
+            ('unknown', 'synthetic'), ('govet', 'synthetic'),
+            ('staticcheck', 'unknown: message'), ('errcheck', 'synthetic'),
+            ('ineffassign', 'synthetic'), ('unused', 'synthetic'),
+        ):
+            with self.subTest(linter=linter), self.assertRaises(ValueError):
+                guard.diagnostic_key(dict(Pos=dict(Filename='sample.go'), FromLinter=linter, Text=message))
+
+    def test_malformed_standard_rules(self):
+        for rule in ('staticcheck', 'staticcheck/unknown', 'staticcheck/SA1019/extra',
+                     'govet/', 'govet/printf/extra', 'unknown', 'errcheck/extra'):
+            with self.subTest(rule=rule), self.assertRaises(ValueError):
+                self.load([self.row(rule=rule)])
 
     def test_exported_identity(self):
         issue = dict(Pos=dict(Filename='sample.go'), FromLinter='revive', Text='exported: exported method Reader.ReadValue should have comment or be unexported')

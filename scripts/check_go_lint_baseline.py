@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Check finite readability debt while keeping ordinary lint failures fatal."""
+"""Check finite lint debt while keeping new or increased findings fatal."""
 import argparse
 from collections import Counter
 import json
@@ -37,7 +37,7 @@ def load_baseline(path):
         path = PurePosixPath(row['path'])
         if path.is_absolute() or '..' in path.parts or str(path) != row['path'] or not row['path'].endswith('.go') or any(c in row['path'] for c in '*?[]\\'):
             raise ValueError('noncanonical baseline path')
-        if row['rule'] not in {'revive/exported', 'revive/package-comments', 'revive/var-naming'}:
+        if not re.fullmatch(r'(?:revive/(?:exported|package-comments|var-naming)|errcheck|ineffassign|unused|govet/[A-Za-z_][A-Za-z_0-9]*|staticcheck/[A-Z]+[0-9]{4})', row['rule']):
             raise ValueError('rule cannot be exempted')
         if any(c in row['symbol'] for c in '*?[]/\\'):
             raise ValueError('invalid baseline symbol')
@@ -56,8 +56,31 @@ def diagnostic_key(issue):
     if '..' in PurePosixPath(path).parts or str(PurePosixPath(path)) != path or not path.endswith('.go') or any(c in path for c in '*?[]\\'):
         raise ValueError('invalid diagnostic path')
     text = issue['Text']
-    if issue['FromLinter'] != 'revive':
-        raise ValueError('unbaselined lint diagnostic: ' + text)
+    linter = issue['FromLinter']
+    if linter != 'revive':
+        if linter == 'errcheck':
+            match = re.fullmatch(r'Error return value(?: of `([^`]+)`)? is not checked', text)
+            symbol = (match[1] or '<unnamed>') if match else None
+            rule = linter
+        elif linter in {'ineffassign', 'unused'}:
+            pattern = (r'ineffectual assignment to ([A-Za-z_][A-Za-z_0-9]*)' if linter == 'ineffassign'
+                       else r'(?:.*? )?([A-Za-z_][A-Za-z_0-9.]*) is unused')
+            match = re.fullmatch(pattern, text)
+            symbol = match[1] if match else None
+            rule = linter
+        elif linter in {'staticcheck', 'govet'}:
+            prefix = r'[A-Z]+[0-9]{4}' if linter == 'staticcheck' else r'[A-Za-z_][A-Za-z_0-9]*'
+            match = re.fullmatch(r'(' + prefix + r'): (.+)', text)
+            if not match:
+                raise ValueError('unrecognized lint diagnostic: ' + text)
+            rule = linter + '/' + match[1]
+            token = re.search(r'`([^`]+)`|([A-Za-z_][A-Za-z_0-9.]*)', match[2])
+            symbol = (token[1] or token[2]) if token else '<check>'
+        else:
+            raise ValueError('unbaselined lint diagnostic: ' + text)
+        if not symbol or any(c in symbol for c in '*?[]/\\'):
+            raise ValueError('unrecognized lint diagnostic: ' + text)
+        return path, symbol, rule
     rule, _, message = text.partition(': ')
     if rule == 'exported':
         match = re.match(r'(?:comment on )?exported (?:const|var|type|function|method) ([\w.]+)\b', message)

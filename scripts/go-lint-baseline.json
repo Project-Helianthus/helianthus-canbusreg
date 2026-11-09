@@ -27,6 +27,12 @@
       "count": 1
     },
     {
+      "path": "gree_vrf_map.go",
+      "symbol": "could",
+      "rule": "staticcheck/QF1003",
+      "count": 2
+    },
+    {
       "path": "growatt_link_balance.go",
       "symbol": "CX12DecodeLINKBalance",
       "rule": "revive/exported",
@@ -159,6 +165,24 @@
       "count": 1
     },
     {
+      "path": "growatt_pcs_gauge.go",
+      "symbol": "could",
+      "rule": "staticcheck/QF1003",
+      "count": 1
+    },
+    {
+      "path": "growatt_pcs_gauge_test.go",
+      "symbol": "ss",
+      "rule": "ineffassign",
+      "count": 1
+    },
+    {
+      "path": "growatt_pcs_gauge_test.go",
+      "symbol": "this",
+      "rule": "staticcheck/SA4006",
+      "count": 1
+    },
+    {
       "path": "growatt_pcs_identity.go",
       "symbol": "CX06DecodePCSIdentity",
       "rule": "revive/exported",
@@ -205,6 +229,12 @@
       "symbol": "CX08PCSInput",
       "rule": "revive/exported",
       "count": 1
+    },
+    {
+      "path": "growatt_pcs_slots_test.go",
+      "symbol": "s2",
+      "rule": "ineffassign",
+      "count": 2
     },
     {
       "path": "growatt_pcs_standard.go",
@@ -267,9 +297,21 @@
       "count": 1
     },
     {
+      "path": "growatt_project_conditions.go",
+      "symbol": "could",
+      "rule": "staticcheck/QF1003",
+      "count": 1
+    },
+    {
       "path": "growatt_project_counter.go",
       "symbol": "CX08CounterInput",
       "rule": "revive/exported",
+      "count": 1
+    },
+    {
+      "path": "growatt_project_counter_test.go",
+      "symbol": "could",
+      "rule": "staticcheck/QF1003",
       "count": 1
     },
     {
@@ -367,6 +409,18 @@
       "symbol": "CX17Snapshot",
       "rule": "revive/exported",
       "count": 1
+    },
+    {
+      "path": "growatt_project_provider.go",
+      "symbol": "could",
+      "rule": "staticcheck/QF1001",
+      "count": 1
+    },
+    {
+      "path": "growatt_project_provider_test.go",
+      "symbol": "p.Start",
+      "rule": "errcheck",
+      "count": 27
     },
     {
       "path": "growatt_project_selection.go",

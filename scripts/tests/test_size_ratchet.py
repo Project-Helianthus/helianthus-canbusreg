@@ -16,7 +16,9 @@ SPEC.loader.exec_module(GUARD)
 class RatchetTests(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
-        cls.temp = tempfile.TemporaryDirectory(dir=ROOT / '.tmp')
+        scratch = ROOT / '.tmp'
+        scratch.mkdir(parents=True, exist_ok=True)
+        cls.temp = tempfile.TemporaryDirectory(dir=scratch)
         cls.root = Path(cls.temp.name)
         (cls.root / 'scripts/sizeratchet').mkdir(parents=True)
         (cls.root / 'scripts/sizeratchet/parser.go.txt').write_bytes(

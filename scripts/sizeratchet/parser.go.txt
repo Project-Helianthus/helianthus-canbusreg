@@ -36,9 +36,10 @@ func main() {
   if len(source) > 0 && source[len(source)-1] != '\n' { lines++ }
   add("<file>", "file_lines", lines)
   count := 0
-  var walk func(ast.Node, string)
-  walk = func(node ast.Node, enclosing string) {
+  var walk func(string, ...ast.Node)
+  walk = func(enclosing string, nodes ...ast.Node) {
    ordinal := 0
+   for _, node := range nodes {
    ast.Inspect(node, func(n ast.Node) bool {
     if n == nil { return false }
     if lit, ok := n.(*ast.FuncLit); ok {
@@ -46,11 +47,12 @@ func main() {
      symbol := fmt.Sprintf("%s/literal%d", enclosing, ordinal)
      count++
      add(symbol, "function_lines", fs.PositionFor(lit.End(), false).Line-fs.PositionFor(lit.Pos(), false).Line+1)
-     walk(lit.Body, symbol)
+     walk(symbol, lit.Type, lit.Body) // signature literals share the ordinal sequence
      return false
     }
     return true
    })
+   }
   }
   anonymousNames := map[string]int{}
   for _, decl := range file.Decls {
@@ -67,11 +69,11 @@ func main() {
     }
     count++
     add(symbol, "function_lines", fs.PositionFor(fn.End(), false).Line-fs.PositionFor(fn.Pos(), false).Line+1)
-    walk(fn, symbol) // receiver, signature types and body share one ordinal sequence
+    walk(symbol, fn) // receiver, signature types and body share one ordinal sequence
    } else if gen, ok := decl.(*ast.GenDecl); ok {
     for _, spec := range gen.Specs {
      if typeSpec, ok := spec.(*ast.TypeSpec); ok {
-      walk(typeSpec, "type:"+typeSpec.Name.Name)
+      walk("type:"+typeSpec.Name.Name, typeSpec)
      }
      if value, ok := spec.(*ast.ValueSpec); ok {
       names := ""
@@ -84,7 +86,7 @@ func main() {
        anonymousNames["var:"+names]++
        names = fmt.Sprintf("%s#%d", names, anonymousNames["var:"+names])
       }
-      walk(value, "var:"+names)
+      walk("var:"+names, value)
      }
     }
    }

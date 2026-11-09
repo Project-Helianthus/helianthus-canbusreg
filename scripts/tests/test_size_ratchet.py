@@ -148,6 +148,16 @@ class RatchetTests(unittest.TestCase):
         rows = self.parse('package sample\nfunc Work() (r [len([1]func(){func() {}})]int) {}\n')
         self.assertIn('Work/literal1', {r['symbol'] for r in rows})
 
+    def test_literals_in_literal_signatures_are_counted(self):
+        literals = ', '.join(['func() {}'] * 60)
+        source = ('package sample\nfunc Work() {\n _ = func(a [len([60]func(){%s})]int) {}\n}\n' % literals)
+        rows = self.parse(source)
+        self.assertEqual(next(r['value'] for r in rows if r['metric'] == 'functions_per_file'), 62)
+        symbols = {r['symbol'] for r in rows if r['metric'] == 'function_lines'}
+        self.assertIn('Work/literal1/literal60', symbols)
+        rows = self.parse('package sample\nfunc Work() {\n _ = func() (r [len([1]func(){func() {}})]int) { return }\n}\n')
+        self.assertIn('Work/literal1/literal1', {r['symbol'] for r in rows})
+
     def test_physical_lines_and_bodyless_declarations(self):
         for source in ('package sample\nfunc External()\n', 'package sample\nfunc External()'):
             rows = self.parse(source)

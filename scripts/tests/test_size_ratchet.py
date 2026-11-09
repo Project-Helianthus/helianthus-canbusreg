@@ -16,6 +16,10 @@ GUARD = importlib.util.module_from_spec(SPEC)
 SPEC.loader.exec_module(GUARD)
 
 
+def setUpModule():
+    (ROOT / '.tmp').mkdir(parents=True, exist_ok=True)
+
+
 class DiscoveryTests(unittest.TestCase):
     def test_scan_errors_are_fatal(self):
         with tempfile.TemporaryDirectory(dir=ROOT / '.tmp') as directory:
@@ -51,7 +55,6 @@ class RatchetTests(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
         scratch = ROOT / '.tmp'
-        scratch.mkdir(parents=True, exist_ok=True)
         cls.temp = tempfile.TemporaryDirectory(dir=scratch)
         cls.root = Path(cls.temp.name)
         (cls.root / 'scripts/sizeratchet').mkdir(parents=True)

@@ -67,7 +67,7 @@ func main() {
     }
     count++
     add(symbol, "function_lines", fs.PositionFor(fn.End(), false).Line-fs.PositionFor(fn.Pos(), false).Line+1)
-    if fn.Body != nil { walk(fn.Body, symbol) }
+    walk(fn, symbol) // receiver, signature types and body share one ordinal sequence
    } else if gen, ok := decl.(*ast.GenDecl); ok {
     for _, spec := range gen.Specs {
      if typeSpec, ok := spec.(*ast.TypeSpec); ok {

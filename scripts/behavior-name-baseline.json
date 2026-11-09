@@ -1,0 +1,3231 @@
+{
+  "version": 1,
+  "exceptions": [],
+  "baseline": [
+    {
+      "path": "gree_vrf_command.go",
+      "symbol": "greeVRFCommandU16LE",
+      "category": "identifier"
+    },
+    {
+      "path": "gree_vrf_command.go",
+      "symbol": "greeVRFCommandU8",
+      "category": "identifier"
+    },
+    {
+      "path": "gree_vrf_map.go",
+      "symbol": "GreeVRFMapM115",
+      "category": "identifier"
+    },
+    {
+      "path": "gree_vrf_map.go",
+      "symbol": "GreeVRFMapM94",
+      "category": "identifier"
+    },
+    {
+      "path": "gree_vrf_map.go",
+      "symbol": "greeVRFSourceU16LEByteStream",
+      "category": "identifier"
+    },
+    {
+      "path": "gree_vrf_map.go",
+      "symbol": "greeVRFSourceU8",
+      "category": "identifier"
+    },
+    {
+      "path": "gree_vrf_map.go",
+      "symbol": "greeVRFTransformBooleanToMagicAa55",
+      "category": "identifier"
+    },
+    {
+      "path": "gree_vrf_map.go",
+      "symbol": "greeVRFTransformModeUpdatesAll100SlotFlags",
+      "category": "identifier"
+    },
+    {
+      "path": "gree_vrf_map_data.go",
+      "symbol": "greeVRFMapM115Entries",
+      "category": "identifier"
+    },
+    {
+      "path": "gree_vrf_map_data.go",
+      "symbol": "greeVRFMapM94Entries",
+      "category": "identifier"
+    },
+    {
+      "path": "gree_vrf_map_test.go",
+      "symbol": "TestGreeVRFMapDecoderFailsClosedForUnalignedU16Stream",
+      "category": "test"
+    },
+    {
+      "path": "growatt_link_balance.go",
+      "symbol": "CX12DecodeLINKBalance",
+      "category": "identifier"
+    },
+    {
+      "path": "growatt_link_balance_test.go",
+      "symbol": "TestCX12BalanceCountValidityAndEveryMaskBit",
+      "category": "test"
+    },
+    {
+      "path": "growatt_link_balance_test.go",
+      "symbol": "TestCX12BalanceSelectorAndHardwareAge",
+      "category": "test"
+    },
+    {
+      "path": "growatt_link_cells.go",
+      "symbol": "CX12Decode",
+      "category": "identifier"
+    },
+    {
+      "path": "growatt_link_cells.go",
+      "symbol": "CX12DecodeLINKCellMean",
+      "category": "identifier"
+    },
+    {
+      "path": "growatt_link_cells.go",
+      "symbol": "CX12LINKVector",
+      "category": "identifier"
+    },
+    {
+      "path": "growatt_link_cells.go",
+      "symbol": "CX12MeasurementGate",
+      "category": "identifier"
+    },
+    {
+      "path": "growatt_link_cells.go",
+      "symbol": "CX12NewLINKCells",
+      "category": "identifier"
+    },
+    {
+      "path": "growatt_link_cells.go",
+      "symbol": "CX12NewLINKFixed16Cells",
+      "category": "identifier"
+    },
+    {
+      "path": "growatt_link_cells.go",
+      "symbol": "CX12Snapshot",
+      "category": "identifier"
+    },
+    {
+      "path": "growatt_link_cells.go",
+      "symbol": "CX12VectorSnapshot",
+      "category": "identifier"
+    },
+    {
+      "path": "growatt_link_cells.go",
+      "symbol": "cx12Admit",
+      "category": "identifier"
+    },
+    {
+      "path": "growatt_link_cells.go",
+      "symbol": "cx12Age",
+      "category": "identifier"
+    },
+    {
+      "path": "growatt_link_cells.go",
+      "symbol": "cx12Contributors",
+      "category": "identifier"
+    },
+    {
+      "path": "growatt_link_cells.go",
+      "symbol": "cx12Field",
+      "category": "identifier"
+    },
+    {
+      "path": "growatt_link_cells.go",
+      "symbol": "cx12Gate",
+      "category": "identifier"
+    },
+    {
+      "path": "growatt_link_cells.go",
+      "symbol": "cx12GateRejection",
+      "category": "identifier"
+    },
+    {
+      "path": "growatt_link_cells.go",
+      "symbol": "cx12NewVector",
+      "category": "identifier"
+    },
+    {
+      "path": "growatt_link_cells_test.go",
+      "symbol": "TestCX12AdmissionEveryAssociationField",
+      "category": "test"
+    },
+    {
+      "path": "growatt_link_cells_test.go",
+      "symbol": "TestCX12CellBlockMappingAndEvidence",
+      "category": "test"
+    },
+    {
+      "path": "growatt_link_cells_test.go",
+      "symbol": "TestCX12CellHistoryReplayDetachAndConcurrentReads",
+      "category": "test"
+    },
+    {
+      "path": "growatt_link_cells_test.go",
+      "symbol": "TestCX12CellMeanCountAwareAndFixed16",
+      "category": "test"
+    },
+    {
+      "path": "growatt_link_cells_test.go",
+      "symbol": "TestCX12CellMeanRejectsSameFrameSlotReuse",
+      "category": "test"
+    },
+    {
+      "path": "growatt_link_cells_test.go",
+      "symbol": "TestCX12CellMeanStaleEachContributorAndLegacyNegative",
+      "category": "test"
+    },
+    {
+      "path": "growatt_link_cells_test.go",
+      "symbol": "TestCX12CellsCountBoundaries",
+      "category": "test"
+    },
+    {
+      "path": "growatt_link_cells_test.go",
+      "symbol": "TestCX12CellsNoExtremaSubstitution",
+      "category": "test"
+    },
+    {
+      "path": "growatt_link_cells_test.go",
+      "symbol": "TestCX12CellsOmittedAndIndependentRefresh",
+      "category": "test"
+    },
+    {
+      "path": "growatt_link_cells_test.go",
+      "symbol": "TestCX12VectorSpanUsesMeasurementAge",
+      "category": "test"
+    },
+    {
+      "path": "growatt_link_cells_test.go",
+      "symbol": "cx12Gates",
+      "category": "identifier"
+    },
+    {
+      "path": "growatt_link_cells_test.go",
+      "symbol": "cx12OtherInterface",
+      "category": "identifier"
+    },
+    {
+      "path": "growatt_link_cells_test.go",
+      "symbol": "cx12Words",
+      "category": "identifier"
+    },
+    {
+      "path": "growatt_link_cells_test.go",
+      "symbol": "i0",
+      "category": "identifier"
+    },
+    {
+      "path": "growatt_link_diagnostics.go",
+      "symbol": "CX13DecodeLINKDiagnostics",
+      "category": "identifier"
+    },
+    {
+      "path": "growatt_link_diagnostics_test.go",
+      "symbol": "TestCX13AdmissionEveryKey",
+      "category": "test"
+    },
+    {
+      "path": "growatt_link_diagnostics_test.go",
+      "symbol": "TestCX13CountsHypothesisNegativesAndBoundaries",
+      "category": "test"
+    },
+    {
+      "path": "growatt_link_diagnostics_test.go",
+      "symbol": "TestCX13CountsModuloAndUnknownContributors",
+      "category": "test"
+    },
+    {
+      "path": "growatt_link_diagnostics_test.go",
+      "symbol": "TestCX13DiagnosticMetadataAndByteOrder",
+      "category": "test"
+    },
+    {
+      "path": "growatt_link_diagnostics_test.go",
+      "symbol": "TestCX13FaultBlocks",
+      "category": "test"
+    },
+    {
+      "path": "growatt_link_diagnostics_test.go",
+      "symbol": "TestCX13MonitorCoordinatorAndByteSeven",
+      "category": "test"
+    },
+    {
+      "path": "growatt_link_diagnostics_test.go",
+      "symbol": "TestCX13SelectedWordsStateAndReservedSiblings",
+      "category": "test"
+    },
+    {
+      "path": "growatt_link_diagnostics_test.go",
+      "symbol": "TestCX13StateAndDTCFeatureGates",
+      "category": "test"
+    },
+    {
+      "path": "growatt_link_diagnostics_test.go",
+      "symbol": "TestCX13ThirdBlockHypothesisNegatives",
+      "category": "test"
+    },
+    {
+      "path": "growatt_link_diagnostics_test.go",
+      "symbol": "cx13Standard",
+      "category": "identifier"
+    },
+    {
+      "path": "growatt_link_identity.go",
+      "symbol": "CX01Decode",
+      "category": "identifier"
+    },
+    {
+      "path": "growatt_link_identity.go",
+      "symbol": "CX01LINKIdentityAssembler",
+      "category": "identifier"
+    },
+    {
+      "path": "growatt_link_identity.go",
+      "symbol": "CX01LINKIdentitySnapshot",
+      "category": "identifier"
+    },
+    {
+      "path": "growatt_link_identity.go",
+      "symbol": "CX01NewLINKIdentityAssembler",
+      "category": "identifier"
+    },
+    {
+      "path": "growatt_link_identity.go",
+      "symbol": "CX01Snapshot",
+      "category": "identifier"
+    },
+    {
+      "path": "growatt_link_identity.go",
+      "symbol": "cx01Invalidate",
+      "category": "identifier"
+    },
+    {
+      "path": "growatt_link_identity.go",
+      "symbol": "cx01Snapshot",
+      "category": "identifier"
+    },
+    {
+      "path": "growatt_link_identity_test.go",
+      "symbol": "TestCX01AssemblerBeforeIdentityAndStale",
+      "category": "test"
+    },
+    {
+      "path": "growatt_link_identity_test.go",
+      "symbol": "TestCX01ConcurrentSnapshots",
+      "category": "test"
+    },
+    {
+      "path": "growatt_link_identity_test.go",
+      "symbol": "TestCX01DecoderConflictIsSticky",
+      "category": "test"
+    },
+    {
+      "path": "growatt_link_identity_test.go",
+      "symbol": "TestCX01DecoderIgnoresF4ReportFrameForLegacySelection",
+      "category": "test"
+    },
+    {
+      "path": "growatt_link_identity_test.go",
+      "symbol": "TestCX01FlagsByteChangeRetainsState",
+      "category": "test"
+    },
+    {
+      "path": "growatt_link_identity_test.go",
+      "symbol": "TestCX01IdentityAssemblerRejectsCoordinatorSource",
+      "category": "test"
+    },
+    {
+      "path": "growatt_link_identity_test.go",
+      "symbol": "TestCX01IdentityAssemblyAndConflict",
+      "category": "test"
+    },
+    {
+      "path": "growatt_link_identity_test.go",
+      "symbol": "TestCX01IdentityEpochRoleAndPartial",
+      "category": "test"
+    },
+    {
+      "path": "growatt_link_identity_test.go",
+      "symbol": "TestCX01IdentityReleaseReuse",
+      "category": "test"
+    },
+    {
+      "path": "growatt_link_identity_test.go",
+      "symbol": "TestCX01NewerEpochWithResetCountersInvalidates",
+      "category": "test"
+    },
+    {
+      "path": "growatt_link_identity_test.go",
+      "symbol": "TestCX01ObsoleteEvidenceDoesNotInvalidate",
+      "category": "test"
+    },
+    {
+      "path": "growatt_link_identity_test.go",
+      "symbol": "TestCX01SerialChangeConflicts",
+      "category": "test"
+    },
+    {
+      "path": "growatt_link_identity_test.go",
+      "symbol": "TestCX01SerialNegativeVectors",
+      "category": "test"
+    },
+    {
+      "path": "growatt_link_identity_test.go",
+      "symbol": "TestCX01UnrelatedTrafficKeepsSerialAssembly",
+      "category": "test"
+    },
+    {
+      "path": "growatt_link_identity_test.go",
+      "symbol": "TestCX01UnroutedFrameDoesNotInvalidate",
+      "category": "test"
+    },
+    {
+      "path": "growatt_link_telemetry.go",
+      "symbol": "CX01LINKInput",
+      "category": "identifier"
+    },
+    {
+      "path": "growatt_link_telemetry.go",
+      "symbol": "cx01LINKAdmission",
+      "category": "identifier"
+    },
+    {
+      "path": "growatt_link_telemetry.go",
+      "symbol": "cx01LINKCoordinatorAdmission",
+      "category": "identifier"
+    },
+    {
+      "path": "growatt_link_telemetry.go",
+      "symbol": "cx01LINKDateAdmission",
+      "category": "identifier"
+    },
+    {
+      "path": "growatt_link_telemetry.go",
+      "symbol": "cx01LINKFrameAdmission",
+      "category": "identifier"
+    },
+    {
+      "path": "growatt_link_telemetry.go",
+      "symbol": "cx01LINKReportAdmission",
+      "category": "identifier"
+    },
+    {
+      "path": "growatt_link_telemetry.go",
+      "symbol": "cx01Result",
+      "category": "identifier"
+    },
+    {
+      "path": "growatt_link_telemetry_test.go",
+      "symbol": "TestCX01AdmissionKeys",
+      "category": "test"
+    },
+    {
+      "path": "growatt_link_telemetry_test.go",
+      "symbol": "TestCX01ConstantBytesIndependent",
+      "category": "test"
+    },
+    {
+      "path": "growatt_link_telemetry_test.go",
+      "symbol": "TestCX01CoordinatorHighWordsKeepGeometry",
+      "category": "test"
+    },
+    {
+      "path": "growatt_link_telemetry_test.go",
+      "symbol": "TestCX01CoordinatorSeparateRole",
+      "category": "test"
+    },
+    {
+      "path": "growatt_link_telemetry_test.go",
+      "symbol": "TestCX01DateHypothesisBoundaryPairs",
+      "category": "test"
+    },
+    {
+      "path": "growatt_link_telemetry_test.go",
+      "symbol": "TestCX01LayoutsAndRawSiblings",
+      "category": "test"
+    },
+    {
+      "path": "growatt_link_telemetry_test.go",
+      "symbol": "TestCX01NativeWordsAndIndependentValidity",
+      "category": "test"
+    },
+    {
+      "path": "growatt_link_telemetry_test.go",
+      "symbol": "TestCX01OpaqueHypothesesStayRaw",
+      "category": "test"
+    },
+    {
+      "path": "growatt_link_telemetry_test.go",
+      "symbol": "TestCX01PackedTelemetry",
+      "category": "test"
+    },
+    {
+      "path": "growatt_link_telemetry_test.go",
+      "symbol": "TestCX01RawDLCGeometry",
+      "category": "test"
+    },
+    {
+      "path": "growatt_link_telemetry_test.go",
+      "symbol": "TestCX01SnapshotEvidenceAndRelease11",
+      "category": "test"
+    },
+    {
+      "path": "growatt_link_telemetry_test.go",
+      "symbol": "cx01Input",
+      "category": "identifier"
+    },
+    {
+      "path": "growatt_link_telemetry_test.go",
+      "symbol": "cx01ShortFrame",
+      "category": "identifier"
+    },
+    {
+      "path": "growatt_link_temperatures.go",
+      "symbol": "CX12DecodeLINKTemperatureSummary",
+      "category": "identifier"
+    },
+    {
+      "path": "growatt_link_temperatures.go",
+      "symbol": "CX12NewLINKTemperatures",
+      "category": "identifier"
+    },
+    {
+      "path": "growatt_link_temperatures.go",
+      "symbol": "CX12SummaryGates",
+      "category": "identifier"
+    },
+    {
+      "path": "growatt_link_temperatures_test.go",
+      "symbol": "TestCX12FineMeanEachStaleContributorAndAgeBoundary",
+      "category": "test"
+    },
+    {
+      "path": "growatt_link_temperatures_test.go",
+      "symbol": "TestCX12FineTemperaturesAndMean",
+      "category": "test"
+    },
+    {
+      "path": "growatt_link_temperatures_test.go",
+      "symbol": "TestCX12FineZeroFFFFAndUnconfigured",
+      "category": "test"
+    },
+    {
+      "path": "growatt_link_temperatures_test.go",
+      "symbol": "TestCX12MeanCountAndInvalidContributorNegatives",
+      "category": "test"
+    },
+    {
+      "path": "growatt_link_temperatures_test.go",
+      "symbol": "TestCX12MeanFloorAndInvalidCodesNeverFiltered",
+      "category": "test"
+    },
+    {
+      "path": "growatt_link_temperatures_test.go",
+      "symbol": "TestCX12NoPhysicalSensorAssociation",
+      "category": "test"
+    },
+    {
+      "path": "growatt_link_temperatures_test.go",
+      "symbol": "TestCX12SummaryAssociationAndEvidenceRetention",
+      "category": "test"
+    },
+    {
+      "path": "growatt_link_temperatures_test.go",
+      "symbol": "TestCX12SummaryGateRejectionKeepsGateStatusAndAge",
+      "category": "test"
+    },
+    {
+      "path": "growatt_link_temperatures_test.go",
+      "symbol": "TestCX12SummaryRejectsReusedContributorEvidence",
+      "category": "test"
+    },
+    {
+      "path": "growatt_link_temperatures_test.go",
+      "symbol": "TestCX12SummarySentinelStaysInvalidWithValidGates",
+      "category": "test"
+    },
+    {
+      "path": "growatt_link_temperatures_test.go",
+      "symbol": "TestCX12TemperatureSelectorAndIndependentWords",
+      "category": "test"
+    },
+    {
+      "path": "growatt_link_temperatures_test.go",
+      "symbol": "cx12Sensors",
+      "category": "identifier"
+    },
+    {
+      "path": "growatt_link_temperatures_test.go",
+      "symbol": "cx12SummaryInput",
+      "category": "identifier"
+    },
+    {
+      "path": "growatt_pcs_extended.go",
+      "symbol": "CX09Decode",
+      "category": "identifier"
+    },
+    {
+      "path": "growatt_pcs_extended.go",
+      "symbol": "CX09DecodePCSExtended",
+      "category": "identifier"
+    },
+    {
+      "path": "growatt_pcs_extended.go",
+      "symbol": "CX09NewPCSExtendedDecoder",
+      "category": "identifier"
+    },
+    {
+      "path": "growatt_pcs_extended.go",
+      "symbol": "CX09PCSExtendedDecoder",
+      "category": "identifier"
+    },
+    {
+      "path": "growatt_pcs_extended.go",
+      "symbol": "CX09Snapshot",
+      "category": "identifier"
+    },
+    {
+      "path": "growatt_pcs_extended_test.go",
+      "symbol": "TestCX09AggregateRoutesAndIdentitySentinel",
+      "category": "test"
+    },
+    {
+      "path": "growatt_pcs_extended_test.go",
+      "symbol": "TestCX09ConcurrentRetention",
+      "category": "test"
+    },
+    {
+      "path": "growatt_pcs_extended_test.go",
+      "symbol": "TestCX09CurrentAndEvidence",
+      "category": "test"
+    },
+    {
+      "path": "growatt_pcs_extended_test.go",
+      "symbol": "TestCX09EachFamilyRouteNegative",
+      "category": "test"
+    },
+    {
+      "path": "growatt_pcs_extended_test.go",
+      "symbol": "TestCX09EndpointSourceRangeAndCellVoltageUnits",
+      "category": "test"
+    },
+    {
+      "path": "growatt_pcs_extended_test.go",
+      "symbol": "TestCX09EveryAdmissionKeyNegative",
+      "category": "test"
+    },
+    {
+      "path": "growatt_pcs_extended_test.go",
+      "symbol": "TestCX09GatewayBoundAndNoIdentity",
+      "category": "test"
+    },
+    {
+      "path": "growatt_pcs_extended_test.go",
+      "symbol": "TestCX09GatewayBoundIsNotUniversalAndUpstreamStaysRaw",
+      "category": "test"
+    },
+    {
+      "path": "growatt_pcs_extended_test.go",
+      "symbol": "TestCX09LayoutsAndNumericBoundaries",
+      "category": "test"
+    },
+    {
+      "path": "growatt_pcs_extended_test.go",
+      "symbol": "TestCX09LegacyFeatureExclusions",
+      "category": "test"
+    },
+    {
+      "path": "growatt_pcs_extended_test.go",
+      "symbol": "TestCX09NativeRouteGatesWithMatchingSelection",
+      "category": "test"
+    },
+    {
+      "path": "growatt_pcs_extended_test.go",
+      "symbol": "TestCX09RawIndependentValidityAndFaultBlocks",
+      "category": "test"
+    },
+    {
+      "path": "growatt_pcs_extended_test.go",
+      "symbol": "TestCX09RetainedPartialAndStale",
+      "category": "test"
+    },
+    {
+      "path": "growatt_pcs_extended_test.go",
+      "symbol": "TestCX09UnitsScopeAndProjectNegative",
+      "category": "test"
+    },
+    {
+      "path": "growatt_pcs_extended_test.go",
+      "symbol": "cx09Input",
+      "category": "identifier"
+    },
+    {
+      "path": "growatt_pcs_extended_test.go",
+      "symbol": "cx09Select",
+      "category": "identifier"
+    },
+    {
+      "path": "growatt_pcs_extended_test.go",
+      "symbol": "cx09Spec",
+      "category": "identifier"
+    },
+    {
+      "path": "growatt_pcs_extended_test.go",
+      "symbol": "cx09Withheld",
+      "category": "identifier"
+    },
+    {
+      "path": "growatt_pcs_gauge.go",
+      "symbol": "CX06DecodePCSGauge",
+      "category": "identifier"
+    },
+    {
+      "path": "growatt_pcs_gauge.go",
+      "symbol": "CX06PCSInput",
+      "category": "identifier"
+    },
+    {
+      "path": "growatt_pcs_gauge.go",
+      "symbol": "cx06Add",
+      "category": "identifier"
+    },
+    {
+      "path": "growatt_pcs_gauge.go",
+      "symbol": "cx06Admit",
+      "category": "identifier"
+    },
+    {
+      "path": "growatt_pcs_gauge_test.go",
+      "symbol": "TestCX06AdmissionAndRetention",
+      "category": "test"
+    },
+    {
+      "path": "growatt_pcs_gauge_test.go",
+      "symbol": "TestCX06ByteGaugeIndependentNegative",
+      "category": "test"
+    },
+    {
+      "path": "growatt_pcs_gauge_test.go",
+      "symbol": "TestCX06EarlyL1RetainedFaultBytes",
+      "category": "test"
+    },
+    {
+      "path": "growatt_pcs_gauge_test.go",
+      "symbol": "TestCX06EarlyWordsNegativeSelectors",
+      "category": "test"
+    },
+    {
+      "path": "growatt_pcs_gauge_test.go",
+      "symbol": "TestCX06FieldStatusesAndAges",
+      "category": "test"
+    },
+    {
+      "path": "growatt_pcs_gauge_test.go",
+      "symbol": "TestCX06GaugeVariants",
+      "category": "test"
+    },
+    {
+      "path": "growatt_pcs_gauge_test.go",
+      "symbol": "TestCX06L8WithheldKeepsFieldNames",
+      "category": "test"
+    },
+    {
+      "path": "growatt_pcs_gauge_test.go",
+      "symbol": "TestCX06NamedHypothesisNegatives",
+      "category": "test"
+    },
+    {
+      "path": "growatt_pcs_gauge_test.go",
+      "symbol": "TestCX06RawDLCAndNativeRecords",
+      "category": "test"
+    },
+    {
+      "path": "growatt_pcs_gauge_test.go",
+      "symbol": "TestCX06RetainedFaultVariants",
+      "category": "test"
+    },
+    {
+      "path": "growatt_pcs_gauge_test.go",
+      "symbol": "TestCX06SOHTruncationAndIndependentRounding",
+      "category": "test"
+    },
+    {
+      "path": "growatt_pcs_gauge_test.go",
+      "symbol": "TestCX06UnassignedTypedRaw",
+      "category": "test"
+    },
+    {
+      "path": "growatt_pcs_gauge_test.go",
+      "symbol": "cx06Fixture",
+      "category": "identifier"
+    },
+    {
+      "path": "growatt_pcs_gauge_test.go",
+      "symbol": "cx06Want",
+      "category": "identifier"
+    },
+    {
+      "path": "growatt_pcs_identity.go",
+      "symbol": "CX06DecodePCSIdentity",
+      "category": "identifier"
+    },
+    {
+      "path": "growatt_pcs_identity.go",
+      "symbol": "CX06SerialAssembler",
+      "category": "identifier"
+    },
+    {
+      "path": "growatt_pcs_identity.go",
+      "symbol": "CX06SerialResult",
+      "category": "identifier"
+    },
+    {
+      "path": "growatt_pcs_identity_test.go",
+      "symbol": "TestCX06Auxiliary",
+      "category": "test"
+    },
+    {
+      "path": "growatt_pcs_identity_test.go",
+      "symbol": "TestCX06FamilyValidityAndOmissionAmbiguity",
+      "category": "test"
+    },
+    {
+      "path": "growatt_pcs_identity_test.go",
+      "symbol": "TestCX06GatewayCountSelectorNegativeAndBoundaries",
+      "category": "test"
+    },
+    {
+      "path": "growatt_pcs_identity_test.go",
+      "symbol": "TestCX06NonzeroPlaceholderAndNoHistory",
+      "category": "test"
+    },
+    {
+      "path": "growatt_pcs_identity_test.go",
+      "symbol": "TestCX06PlaceholderNegativeVectors",
+      "category": "test"
+    },
+    {
+      "path": "growatt_pcs_identity_test.go",
+      "symbol": "TestCX06SerialAssembly",
+      "category": "test"
+    },
+    {
+      "path": "growatt_pcs_identity_test.go",
+      "symbol": "TestCX06SerialFinalPadding",
+      "category": "test"
+    },
+    {
+      "path": "growatt_pcs_identity_test.go",
+      "symbol": "TestCX06SerialIdentityKey",
+      "category": "test"
+    },
+    {
+      "path": "growatt_pcs_identity_test.go",
+      "symbol": "TestCX06SerialOrdering",
+      "category": "test"
+    },
+    {
+      "path": "growatt_pcs_identity_test.go",
+      "symbol": "TestCX06SerialRejectedFieldAndInterleavedPID",
+      "category": "test"
+    },
+    {
+      "path": "growatt_pcs_identity_test.go",
+      "symbol": "TestCX06SerialSlotAndDetachedEvidence",
+      "category": "test"
+    },
+    {
+      "path": "growatt_pcs_identity_test.go",
+      "symbol": "cx06Fragment",
+      "category": "identifier"
+    },
+    {
+      "path": "growatt_pcs_parallel_base.go",
+      "symbol": "CX10DecodeParallel",
+      "category": "identifier"
+    },
+    {
+      "path": "growatt_pcs_parallel_base.go",
+      "symbol": "cx10Admission",
+      "category": "identifier"
+    },
+    {
+      "path": "growatt_pcs_parallel_base.go",
+      "symbol": "cx10Family",
+      "category": "identifier"
+    },
+    {
+      "path": "growatt_pcs_parallel_base_test.go",
+      "symbol": "TestCX10AdmissionKeyNegatives",
+      "category": "test"
+    },
+    {
+      "path": "growatt_pcs_parallel_base_test.go",
+      "symbol": "TestCX10BaseFamiliesAndEvidence",
+      "category": "test"
+    },
+    {
+      "path": "growatt_pcs_parallel_base_test.go",
+      "symbol": "TestCX10BaseLayout",
+      "category": "test"
+    },
+    {
+      "path": "growatt_pcs_parallel_base_test.go",
+      "symbol": "TestCX10CoordinatorLayoutsAndScopeNegative",
+      "category": "test"
+    },
+    {
+      "path": "growatt_pcs_parallel_base_test.go",
+      "symbol": "TestCX10FamilyAvailability",
+      "category": "test"
+    },
+    {
+      "path": "growatt_pcs_parallel_base_test.go",
+      "symbol": "TestCX10FieldGradeFollowsSelection",
+      "category": "test"
+    },
+    {
+      "path": "growatt_pcs_parallel_base_test.go",
+      "symbol": "TestCX10HypothesisContextNegatives",
+      "category": "test"
+    },
+    {
+      "path": "growatt_pcs_parallel_base_test.go",
+      "symbol": "TestCX10InvalidSiblingAndAggregateZero",
+      "category": "test"
+    },
+    {
+      "path": "growatt_pcs_parallel_base_test.go",
+      "symbol": "TestCX10MuxAndUnitGateWithheld",
+      "category": "test"
+    },
+    {
+      "path": "growatt_pcs_parallel_base_test.go",
+      "symbol": "TestCX10RawDLCNegative",
+      "category": "test"
+    },
+    {
+      "path": "growatt_pcs_parallel_base_test.go",
+      "symbol": "TestCX10SummaryAliasesRejected",
+      "category": "test"
+    },
+    {
+      "path": "growatt_pcs_parallel_base_test.go",
+      "symbol": "TestCX10UnitGateNegative",
+      "category": "test"
+    },
+    {
+      "path": "growatt_pcs_parallel_base_test.go",
+      "symbol": "cx10Input",
+      "category": "identifier"
+    },
+    {
+      "path": "growatt_pcs_parallel_base_test.go",
+      "symbol": "cx10Selection",
+      "category": "identifier"
+    },
+    {
+      "path": "growatt_pcs_parallel_base_test.go",
+      "symbol": "cx10Spec",
+      "category": "identifier"
+    },
+    {
+      "path": "growatt_pcs_parallel_identity.go",
+      "symbol": "CX10Decode",
+      "category": "identifier"
+    },
+    {
+      "path": "growatt_pcs_parallel_identity.go",
+      "symbol": "CX10NewParallelIdentityAssembler",
+      "category": "identifier"
+    },
+    {
+      "path": "growatt_pcs_parallel_identity.go",
+      "symbol": "CX10ParallelIdentityAssembler",
+      "category": "identifier"
+    },
+    {
+      "path": "growatt_pcs_parallel_identity.go",
+      "symbol": "CX10ParallelIdentitySnapshot",
+      "category": "identifier"
+    },
+    {
+      "path": "growatt_pcs_parallel_identity.go",
+      "symbol": "CX10Snapshot",
+      "category": "identifier"
+    },
+    {
+      "path": "growatt_pcs_parallel_identity_test.go",
+      "symbol": "TestCX10IdentityConcurrentSnapshot",
+      "category": "test"
+    },
+    {
+      "path": "growatt_pcs_parallel_identity_test.go",
+      "symbol": "TestCX10IdentityDuplicateConflict",
+      "category": "test"
+    },
+    {
+      "path": "growatt_pcs_parallel_identity_test.go",
+      "symbol": "TestCX10IdentityKeyIsolationNegatives",
+      "category": "test"
+    },
+    {
+      "path": "growatt_pcs_parallel_identity_test.go",
+      "symbol": "TestCX10IdentityModuleAndFragmentBoundaries",
+      "category": "test"
+    },
+    {
+      "path": "growatt_pcs_parallel_identity_test.go",
+      "symbol": "TestCX10IdentityNativeGroupAndSlotConfusion",
+      "category": "test"
+    },
+    {
+      "path": "growatt_pcs_parallel_identity_test.go",
+      "symbol": "TestCX10IdentityOrderedUnspecifiedTail",
+      "category": "test"
+    },
+    {
+      "path": "growatt_pcs_parallel_identity_test.go",
+      "symbol": "TestCX10IdentityOrderingConflictsAndLastKnownGood",
+      "category": "test"
+    },
+    {
+      "path": "growatt_pcs_parallel_identity_test.go",
+      "symbol": "TestCX10IdentitySequenceAndTimeNegative",
+      "category": "test"
+    },
+    {
+      "path": "growatt_pcs_parallel_identity_test.go",
+      "symbol": "cx10Fragment",
+      "category": "identifier"
+    },
+    {
+      "path": "growatt_pcs_parallel_release11.go",
+      "symbol": "CX11DecodeParallel",
+      "category": "identifier"
+    },
+    {
+      "path": "growatt_pcs_parallel_release11.go",
+      "symbol": "CX11ParallelContext",
+      "category": "identifier"
+    },
+    {
+      "path": "growatt_pcs_parallel_release11.go",
+      "symbol": "cx11SourceValue",
+      "category": "identifier"
+    },
+    {
+      "path": "growatt_pcs_parallel_release11_test.go",
+      "symbol": "TestCX11AdmissionIdentityAndGeometry",
+      "category": "test"
+    },
+    {
+      "path": "growatt_pcs_parallel_release11_test.go",
+      "symbol": "TestCX11AggregateScopeWithholdsLocalRules",
+      "category": "test"
+    },
+    {
+      "path": "growatt_pcs_parallel_release11_test.go",
+      "symbol": "TestCX11CellSumRequiresValidityEvidence",
+      "category": "test"
+    },
+    {
+      "path": "growatt_pcs_parallel_release11_test.go",
+      "symbol": "TestCX11ConflictsAndIndependentSiblings",
+      "category": "test"
+    },
+    {
+      "path": "growatt_pcs_parallel_release11_test.go",
+      "symbol": "TestCX11CurrentAndMux",
+      "category": "test"
+    },
+    {
+      "path": "growatt_pcs_parallel_release11_test.go",
+      "symbol": "TestCX11DiagnosticBoundaries",
+      "category": "test"
+    },
+    {
+      "path": "growatt_pcs_parallel_release11_test.go",
+      "symbol": "TestCX11DiagnosticFirstScopeNegative",
+      "category": "test"
+    },
+    {
+      "path": "growatt_pcs_parallel_release11_test.go",
+      "symbol": "TestCX11DiagnosticSecondScopeNegative",
+      "category": "test"
+    },
+    {
+      "path": "growatt_pcs_parallel_release11_test.go",
+      "symbol": "TestCX11MissingCounters",
+      "category": "test"
+    },
+    {
+      "path": "growatt_pcs_parallel_release11_test.go",
+      "symbol": "TestCX11MissingMemberDictionary",
+      "category": "test"
+    },
+    {
+      "path": "growatt_pcs_parallel_release11_test.go",
+      "symbol": "TestCX11NativeEvidenceAndIndependentResults",
+      "category": "test"
+    },
+    {
+      "path": "growatt_pcs_parallel_release11_test.go",
+      "symbol": "TestCX11PackSelectorNegative",
+      "category": "test"
+    },
+    {
+      "path": "growatt_pcs_parallel_release11_test.go",
+      "symbol": "TestCX11SOCSubstitutionAndState",
+      "category": "test"
+    },
+    {
+      "path": "growatt_pcs_parallel_release11_test.go",
+      "symbol": "TestCX11SOHSourceNegative",
+      "category": "test"
+    },
+    {
+      "path": "growatt_pcs_parallel_release11_test.go",
+      "symbol": "TestCX11SelectorNegatives",
+      "category": "test"
+    },
+    {
+      "path": "growatt_pcs_parallel_release11_test.go",
+      "symbol": "TestCX11SlotsAndMemberDictionary",
+      "category": "test"
+    },
+    {
+      "path": "growatt_pcs_parallel_release11_test.go",
+      "symbol": "TestCX11SourceIdentityAndValidity",
+      "category": "test"
+    },
+    {
+      "path": "growatt_pcs_parallel_release11_test.go",
+      "symbol": "TestCX11StateEndpointNegative",
+      "category": "test"
+    },
+    {
+      "path": "growatt_pcs_parallel_release11_test.go",
+      "symbol": "TestCX11SummaryAndReceiverOnly",
+      "category": "test"
+    },
+    {
+      "path": "growatt_pcs_parallel_release11_test.go",
+      "symbol": "TestCX11SummaryVariantsAndLocalRejection",
+      "category": "test"
+    },
+    {
+      "path": "growatt_pcs_parallel_release11_test.go",
+      "symbol": "TestCX11TemperatureAndSOHBoundaries",
+      "category": "test"
+    },
+    {
+      "path": "growatt_pcs_parallel_release11_test.go",
+      "symbol": "TestCX11TemperatureReservedNegative",
+      "category": "test"
+    },
+    {
+      "path": "growatt_pcs_parallel_release11_test.go",
+      "symbol": "TestCX11TemperatureScopeNegative",
+      "category": "test"
+    },
+    {
+      "path": "growatt_pcs_parallel_release11_test.go",
+      "symbol": "b7",
+      "category": "identifier"
+    },
+    {
+      "path": "growatt_pcs_parallel_release11_test.go",
+      "symbol": "cx11Decode",
+      "category": "identifier"
+    },
+    {
+      "path": "growatt_pcs_parallel_release11_test.go",
+      "symbol": "cx11DiagnosticNegative",
+      "category": "identifier"
+    },
+    {
+      "path": "growatt_pcs_parallel_release11_test.go",
+      "symbol": "cx11Source",
+      "category": "identifier"
+    },
+    {
+      "path": "growatt_pcs_parallel_release11_test.go",
+      "symbol": "cx11Spec",
+      "category": "identifier"
+    },
+    {
+      "path": "growatt_pcs_parallel_release11_test.go",
+      "symbol": "cx11Want",
+      "category": "identifier"
+    },
+    {
+      "path": "growatt_pcs_slots.go",
+      "symbol": "CX08DecodePCSSlots",
+      "category": "identifier"
+    },
+    {
+      "path": "growatt_pcs_slots.go",
+      "symbol": "CX08PCSInput",
+      "category": "identifier"
+    },
+    {
+      "path": "growatt_pcs_slots.go",
+      "symbol": "cx08Release11",
+      "category": "identifier"
+    },
+    {
+      "path": "growatt_pcs_slots_test.go",
+      "symbol": "TestCX05RetainsEmptyAcrossPartialUpdate",
+      "category": "test"
+    },
+    {
+      "path": "growatt_pcs_slots_test.go",
+      "symbol": "TestCX08AdmissionIdentity",
+      "category": "test"
+    },
+    {
+      "path": "growatt_pcs_slots_test.go",
+      "symbol": "TestCX08ExplicitSlotAssociations",
+      "category": "test"
+    },
+    {
+      "path": "growatt_pcs_slots_test.go",
+      "symbol": "TestCX08MemberAssociationKeys",
+      "category": "test"
+    },
+    {
+      "path": "growatt_pcs_slots_test.go",
+      "symbol": "TestCX08MemberDictionary",
+      "category": "test"
+    },
+    {
+      "path": "growatt_pcs_slots_test.go",
+      "symbol": "TestCX08MemberIndexInheritsSourceStatus",
+      "category": "test"
+    },
+    {
+      "path": "growatt_pcs_slots_test.go",
+      "symbol": "TestCX08NonzeroToZeroDTCRetention",
+      "category": "test"
+    },
+    {
+      "path": "growatt_pcs_slots_test.go",
+      "symbol": "TestCX08ReleaseAndPadding",
+      "category": "test"
+    },
+    {
+      "path": "growatt_pcs_slots_test.go",
+      "symbol": "TestCX08RetentionIdentityIncludesMember",
+      "category": "test"
+    },
+    {
+      "path": "growatt_pcs_slots_test.go",
+      "symbol": "TestCX08SlotArithmetic",
+      "category": "test"
+    },
+    {
+      "path": "growatt_pcs_slots_test.go",
+      "symbol": "TestCX08SlotsAndIndependentFields",
+      "category": "test"
+    },
+    {
+      "path": "growatt_pcs_slots_test.go",
+      "symbol": "TestCX08ZeroDTCIndexIndependentWithholding",
+      "category": "test"
+    },
+    {
+      "path": "growatt_pcs_slots_test.go",
+      "symbol": "cx08Fixture",
+      "category": "identifier"
+    },
+    {
+      "path": "growatt_pcs_slots_test.go",
+      "symbol": "cx08Want",
+      "category": "identifier"
+    },
+    {
+      "path": "growatt_pcs_slots_test.go",
+      "symbol": "i0",
+      "category": "identifier"
+    },
+    {
+      "path": "growatt_pcs_slots_test.go",
+      "symbol": "s0",
+      "category": "identifier"
+    },
+    {
+      "path": "growatt_pcs_slots_test.go",
+      "symbol": "s2",
+      "category": "identifier"
+    },
+    {
+      "path": "growatt_pcs_standard.go",
+      "symbol": "CX05DecodePCSStandard",
+      "category": "identifier"
+    },
+    {
+      "path": "growatt_pcs_standard.go",
+      "symbol": "CX05PCSInput",
+      "category": "identifier"
+    },
+    {
+      "path": "growatt_pcs_standard.go",
+      "symbol": "CX05PCSResult",
+      "category": "identifier"
+    },
+    {
+      "path": "growatt_pcs_standard.go",
+      "symbol": "CX05RetainAccepted",
+      "category": "identifier"
+    },
+    {
+      "path": "growatt_pcs_standard_test.go",
+      "symbol": "TestCX05AdmissionKeys",
+      "category": "test"
+    },
+    {
+      "path": "growatt_pcs_standard_test.go",
+      "symbol": "TestCX05CoreArithmetic",
+      "category": "test"
+    },
+    {
+      "path": "growatt_pcs_standard_test.go",
+      "symbol": "TestCX05ExtremaAndLocationHypothesis",
+      "category": "test"
+    },
+    {
+      "path": "growatt_pcs_standard_test.go",
+      "symbol": "TestCX05ExtremaIndependentTemperatureGate",
+      "category": "test"
+    },
+    {
+      "path": "growatt_pcs_standard_test.go",
+      "symbol": "TestCX05GatewaySOCHypothesis",
+      "category": "test"
+    },
+    {
+      "path": "growatt_pcs_standard_test.go",
+      "symbol": "TestCX05IndexRequiresSupportedContract",
+      "category": "test"
+    },
+    {
+      "path": "growatt_pcs_standard_test.go",
+      "symbol": "TestCX05InvalidCodesAndConflictingRecords",
+      "category": "test"
+    },
+    {
+      "path": "growatt_pcs_standard_test.go",
+      "symbol": "TestCX05NativeDiagnostics",
+      "category": "test"
+    },
+    {
+      "path": "growatt_pcs_standard_test.go",
+      "symbol": "TestCX05PartialStatesAndLastKnownGood",
+      "category": "test"
+    },
+    {
+      "path": "growatt_pcs_standard_test.go",
+      "symbol": "TestCX05Release11SOHHypothesis",
+      "category": "test"
+    },
+    {
+      "path": "growatt_pcs_standard_test.go",
+      "symbol": "TestCX05RetentionKeepsCellAndTemperatureIndicesApart",
+      "category": "test"
+    },
+    {
+      "path": "growatt_pcs_standard_test.go",
+      "symbol": "TestCX05SelectorAndScopeGates",
+      "category": "test"
+    },
+    {
+      "path": "growatt_pcs_standard_test.go",
+      "symbol": "TestCX05StatusHypothesisNegatives",
+      "category": "test"
+    },
+    {
+      "path": "growatt_pcs_standard_test.go",
+      "symbol": "TestCX05SummaryLimitsAndRanges",
+      "category": "test"
+    },
+    {
+      "path": "growatt_pcs_standard_test.go",
+      "symbol": "TestCX05TemperatureHypothesisNegatives",
+      "category": "test"
+    },
+    {
+      "path": "growatt_pcs_standard_test.go",
+      "symbol": "cx05Fixture",
+      "category": "identifier"
+    },
+    {
+      "path": "growatt_pcs_standard_test.go",
+      "symbol": "cx05Reselect",
+      "category": "identifier"
+    },
+    {
+      "path": "growatt_pcs_standard_test.go",
+      "symbol": "i2",
+      "category": "identifier"
+    },
+    {
+      "path": "growatt_pcs_summaries.go",
+      "symbol": "CX14DecodePCSSummaries",
+      "category": "identifier"
+    },
+    {
+      "path": "growatt_pcs_summaries.go",
+      "symbol": "CX14PCSInput",
+      "category": "identifier"
+    },
+    {
+      "path": "growatt_pcs_summaries.go",
+      "symbol": "CX14PCSResult",
+      "category": "identifier"
+    },
+    {
+      "path": "growatt_pcs_summaries.go",
+      "symbol": "CX14SummaryBit",
+      "category": "identifier"
+    },
+    {
+      "path": "growatt_pcs_summaries_test.go",
+      "symbol": "TestCX14AdmissionEveryKey",
+      "category": "test"
+    },
+    {
+      "path": "growatt_pcs_summaries_test.go",
+      "symbol": "TestCX14ClearedIndependentStatusReplacesRetainedSetBit",
+      "category": "test"
+    },
+    {
+      "path": "growatt_pcs_summaries_test.go",
+      "symbol": "TestCX14ClearedSummaryReplacesRetainedSetBit",
+      "category": "test"
+    },
+    {
+      "path": "growatt_pcs_summaries_test.go",
+      "symbol": "TestCX14Condition40Gate",
+      "category": "test"
+    },
+    {
+      "path": "growatt_pcs_summaries_test.go",
+      "symbol": "TestCX14IndependentStatusSources",
+      "category": "test"
+    },
+    {
+      "path": "growatt_pcs_summaries_test.go",
+      "symbol": "TestCX14LegacyA0ClearReplacesRetainedState5",
+      "category": "test"
+    },
+    {
+      "path": "growatt_pcs_summaries_test.go",
+      "symbol": "TestCX14LegacyB10DiagnosticIndexAndReleaseElevenStatus",
+      "category": "test"
+    },
+    {
+      "path": "growatt_pcs_summaries_test.go",
+      "symbol": "TestCX14Local323IndependentQualification",
+      "category": "test"
+    },
+    {
+      "path": "growatt_pcs_summaries_test.go",
+      "symbol": "TestCX14MappedBitsAndIndependentContributors",
+      "category": "test"
+    },
+    {
+      "path": "growatt_pcs_summaries_test.go",
+      "symbol": "TestCX14ParallelLocalAndExplicitAmbiguity",
+      "category": "test"
+    },
+    {
+      "path": "growatt_pcs_summaries_test.go",
+      "symbol": "TestCX14PartialRetentionAndClearIndependentFault",
+      "category": "test"
+    },
+    {
+      "path": "growatt_pcs_summaries_test.go",
+      "symbol": "TestCX14SummaryA0State5NegativeBoundaries",
+      "category": "test"
+    },
+    {
+      "path": "growatt_pcs_summaries_test.go",
+      "symbol": "TestCX14SummaryA11OnlyNegative",
+      "category": "test"
+    },
+    {
+      "path": "growatt_pcs_summaries_test.go",
+      "symbol": "TestCX14SummaryA12Only41Negative",
+      "category": "test"
+    },
+    {
+      "path": "growatt_pcs_summaries_test.go",
+      "symbol": "TestCX14SummaryA4Extra99Negative",
+      "category": "test"
+    },
+    {
+      "path": "growatt_pcs_summaries_test.go",
+      "symbol": "TestCX14UnassignedStatusAndExpectedClear",
+      "category": "test"
+    },
+    {
+      "path": "growatt_pcs_summaries_test.go",
+      "symbol": "TestCX14WrongProfilesAndHypothesisScopeNegatives",
+      "category": "test"
+    },
+    {
+      "path": "growatt_pcs_summaries_test.go",
+      "symbol": "c131",
+      "category": "identifier"
+    },
+    {
+      "path": "growatt_pcs_summaries_test.go",
+      "symbol": "c132",
+      "category": "identifier"
+    },
+    {
+      "path": "growatt_pcs_summaries_test.go",
+      "symbol": "cx14Expected",
+      "category": "identifier"
+    },
+    {
+      "path": "growatt_pcs_summaries_test.go",
+      "symbol": "cx14Fixture",
+      "category": "identifier"
+    },
+    {
+      "path": "growatt_pcs_summaries_test.go",
+      "symbol": "cx14Payload",
+      "category": "identifier"
+    },
+    {
+      "path": "growatt_project_admission.go",
+      "symbol": "CX16Diagnostic",
+      "category": "identifier"
+    },
+    {
+      "path": "growatt_project_admission.go",
+      "symbol": "CX16Projection",
+      "category": "identifier"
+    },
+    {
+      "path": "growatt_project_admission.go",
+      "symbol": "CX16ReplayInput",
+      "category": "identifier"
+    },
+    {
+      "path": "growatt_project_admission.go",
+      "symbol": "NewCX16SelectedProfile",
+      "category": "identifier"
+    },
+    {
+      "path": "growatt_project_admission.go",
+      "symbol": "cx16Context",
+      "category": "identifier"
+    },
+    {
+      "path": "growatt_project_admission.go",
+      "symbol": "cx16Decode",
+      "category": "identifier"
+    },
+    {
+      "path": "growatt_project_admission.go",
+      "symbol": "cx16Entry",
+      "category": "identifier"
+    },
+    {
+      "path": "growatt_project_admission.go",
+      "symbol": "cx16OverlappingGeometry",
+      "category": "identifier"
+    },
+    {
+      "path": "growatt_project_admission.go",
+      "symbol": "cx16RetentionKey",
+      "category": "identifier"
+    },
+    {
+      "path": "growatt_project_admission.go",
+      "symbol": "cx16SelectedProfile",
+      "category": "identifier"
+    },
+    {
+      "path": "growatt_project_admission_test.go",
+      "symbol": "TestCX16BoundedDetachedDiagnosticsAndConcurrency",
+      "category": "test"
+    },
+    {
+      "path": "growatt_project_admission_test.go",
+      "symbol": "TestCX16BoundsAndAmbiguousSelection",
+      "category": "test"
+    },
+    {
+      "path": "growatt_project_admission_test.go",
+      "symbol": "TestCX16EveryContextFieldNegative",
+      "category": "test"
+    },
+    {
+      "path": "growatt_project_admission_test.go",
+      "symbol": "TestCX16EveryProjectAndReleaseCharacterNegative",
+      "category": "test"
+    },
+    {
+      "path": "growatt_project_admission_test.go",
+      "symbol": "TestCX16EverySelectionFieldNegative",
+      "category": "test"
+    },
+    {
+      "path": "growatt_project_admission_test.go",
+      "symbol": "TestCX16ExtendedFamiliesRetainedSeparately",
+      "category": "test"
+    },
+    {
+      "path": "growatt_project_admission_test.go",
+      "symbol": "TestCX16GaugeFamiliesRetainedSeparately",
+      "category": "test"
+    },
+    {
+      "path": "growatt_project_admission_test.go",
+      "symbol": "TestCX16GeometryAndRawRecords",
+      "category": "test"
+    },
+    {
+      "path": "growatt_project_admission_test.go",
+      "symbol": "TestCX16IndependentStatusesZeroAndRetention",
+      "category": "test"
+    },
+    {
+      "path": "growatt_project_admission_test.go",
+      "symbol": "TestCX16LINKRouteEpochIdentityAndNoFallback",
+      "category": "test"
+    },
+    {
+      "path": "growatt_project_admission_test.go",
+      "symbol": "TestCX16SelectedCore",
+      "category": "test"
+    },
+    {
+      "path": "growatt_project_admission_test.go",
+      "symbol": "TestCX16SequenceConflictAndLastGood",
+      "category": "test"
+    },
+    {
+      "path": "growatt_project_admission_test.go",
+      "symbol": "TestCX16WireIdentityConflictStickyAndRaw",
+      "category": "test"
+    },
+    {
+      "path": "growatt_project_admission_test.go",
+      "symbol": "cx16Classify",
+      "category": "identifier"
+    },
+    {
+      "path": "growatt_project_admission_test.go",
+      "symbol": "cx16Fixture",
+      "category": "identifier"
+    },
+    {
+      "path": "growatt_project_admission_test.go",
+      "symbol": "cx16Frame",
+      "category": "identifier"
+    },
+    {
+      "path": "growatt_project_admission_test.go",
+      "symbol": "cx16LINK",
+      "category": "identifier"
+    },
+    {
+      "path": "growatt_project_admission_test.go",
+      "symbol": "cx16Profile",
+      "category": "identifier"
+    },
+    {
+      "path": "growatt_project_admission_test.go",
+      "symbol": "cx16Reselect",
+      "category": "identifier"
+    },
+    {
+      "path": "growatt_project_admission_test.go",
+      "symbol": "cx16Withheld",
+      "category": "identifier"
+    },
+    {
+      "path": "growatt_project_capabilities.go",
+      "symbol": "CX15ClassifyReceiver",
+      "category": "identifier"
+    },
+    {
+      "path": "growatt_project_capabilities.go",
+      "symbol": "CX15ReceiverContext",
+      "category": "identifier"
+    },
+    {
+      "path": "growatt_project_capabilities.go",
+      "symbol": "CX15ReceiverResult",
+      "category": "identifier"
+    },
+    {
+      "path": "growatt_project_capabilities.go",
+      "symbol": "cx15Describe",
+      "category": "identifier"
+    },
+    {
+      "path": "growatt_project_capabilities.go",
+      "symbol": "cx15PIDName",
+      "category": "identifier"
+    },
+    {
+      "path": "growatt_project_capabilities.go",
+      "symbol": "cx15ReceiverRules",
+      "category": "identifier"
+    },
+    {
+      "path": "growatt_project_capabilities.go",
+      "symbol": "cx15Rule",
+      "category": "identifier"
+    },
+    {
+      "path": "growatt_project_capabilities.go",
+      "symbol": "cx15Rules",
+      "category": "identifier"
+    },
+    {
+      "path": "growatt_project_capabilities_test.go",
+      "symbol": "TestCX15AddressingNoAllocation",
+      "category": "test"
+    },
+    {
+      "path": "growatt_project_capabilities_test.go",
+      "symbol": "TestCX15CoordinatorAndSessionNegatives",
+      "category": "test"
+    },
+    {
+      "path": "growatt_project_capabilities_test.go",
+      "symbol": "TestCX15ExtendedRouteMustMatchSelection",
+      "category": "test"
+    },
+    {
+      "path": "growatt_project_capabilities_test.go",
+      "symbol": "TestCX15FiniteTelemetryGroups",
+      "category": "test"
+    },
+    {
+      "path": "growatt_project_capabilities_test.go",
+      "symbol": "TestCX15Legacy18FCAndOutputOnly",
+      "category": "test"
+    },
+    {
+      "path": "growatt_project_capabilities_test.go",
+      "symbol": "TestCX15LegacyFreshnessIsNotSeconds",
+      "category": "test"
+    },
+    {
+      "path": "growatt_project_capabilities_test.go",
+      "symbol": "TestCX15LegacySynchronizationBoundaries",
+      "category": "test"
+    },
+    {
+      "path": "growatt_project_capabilities_test.go",
+      "symbol": "TestCX15MaintenanceResponseAmbiguity",
+      "category": "test"
+    },
+    {
+      "path": "growatt_project_capabilities_test.go",
+      "symbol": "TestCX15PCSAndMaintenanceNegativeVectors",
+      "category": "test"
+    },
+    {
+      "path": "growatt_project_capabilities_test.go",
+      "symbol": "TestCX15ReceiverMatrix",
+      "category": "test"
+    },
+    {
+      "path": "growatt_project_capabilities_test.go",
+      "symbol": "TestCX15Release11HeartbeatAndState",
+      "category": "test"
+    },
+    {
+      "path": "growatt_project_capabilities_test.go",
+      "symbol": "TestCX15ServiceGroupNegatives",
+      "category": "test"
+    },
+    {
+      "path": "growatt_project_capabilities_test.go",
+      "symbol": "b7",
+      "category": "identifier"
+    },
+    {
+      "path": "growatt_project_capabilities_test.go",
+      "symbol": "cx15Fixture",
+      "category": "identifier"
+    },
+    {
+      "path": "growatt_project_capabilities_test.go",
+      "symbol": "cx15Input",
+      "category": "identifier"
+    },
+    {
+      "path": "growatt_project_conditions.go",
+      "symbol": "CX13LabelCondition",
+      "category": "identifier"
+    },
+    {
+      "path": "growatt_project_conditions_test.go",
+      "symbol": "TestCX13AllConditionNamesAndOpaqueIndices",
+      "category": "test"
+    },
+    {
+      "path": "growatt_project_conditions_test.go",
+      "symbol": "TestCX13ConditionPCSParity",
+      "category": "test"
+    },
+    {
+      "path": "growatt_project_conditions_test.go",
+      "symbol": "TestCX13EachLabelHypothesisNegatives",
+      "category": "test"
+    },
+    {
+      "path": "growatt_project_conditions_test.go",
+      "symbol": "cx13Index",
+      "category": "identifier"
+    },
+    {
+      "path": "growatt_project_conditions_test.go",
+      "symbol": "cx13ModernOnly",
+      "category": "identifier"
+    },
+    {
+      "path": "growatt_project_conditions_test.go",
+      "symbol": "cx13Names",
+      "category": "identifier"
+    },
+    {
+      "path": "growatt_project_conformance_test.go",
+      "symbol": "TestCX16CurrentCollisionSuppression",
+      "category": "test"
+    },
+    {
+      "path": "growatt_project_conformance_test.go",
+      "symbol": "TestCX16FiniteSelectorConformance",
+      "category": "test"
+    },
+    {
+      "path": "growatt_project_conformance_test.go",
+      "symbol": "TestCX16ImmutableSelectionAndNativeRecordBound",
+      "category": "test"
+    },
+    {
+      "path": "growatt_project_conformance_test.go",
+      "symbol": "TestCX16InvalidContributorsWithholdMeanOnly",
+      "category": "test"
+    },
+    {
+      "path": "growatt_project_conformance_test.go",
+      "symbol": "TestCX16LINKCountBoundariesAndIndependentValidity",
+      "category": "test"
+    },
+    {
+      "path": "growatt_project_conformance_test.go",
+      "symbol": "TestCX16LINKSourceBoundaryPairs",
+      "category": "test"
+    },
+    {
+      "path": "growatt_project_conformance_test.go",
+      "symbol": "TestCX16LINKVectorCountBoundaryPairs",
+      "category": "test"
+    },
+    {
+      "path": "growatt_project_conformance_test.go",
+      "symbol": "TestCX16LegacyAndCommonCompatibility",
+      "category": "test"
+    },
+    {
+      "path": "growatt_project_conformance_test.go",
+      "symbol": "TestCX16NativeContractConfirmationNeedsExplicitChoiceAndAssociation",
+      "category": "test"
+    },
+    {
+      "path": "growatt_project_conformance_test.go",
+      "symbol": "TestCX16NoSelectionFromOfflineClassificationOrPartialIdentity",
+      "category": "test"
+    },
+    {
+      "path": "growatt_project_conformance_test.go",
+      "symbol": "TestCX16ReplayEvidenceKeyEveryField",
+      "category": "test"
+    },
+    {
+      "path": "growatt_project_conformance_test.go",
+      "symbol": "TestCX16SlotBankAndMemberDictionary",
+      "category": "test"
+    },
+    {
+      "path": "growatt_project_conformance_test.go",
+      "symbol": "TestCX16UnrelatedFrameDoesNotEraseMemberHistory",
+      "category": "test"
+    },
+    {
+      "path": "growatt_project_conformance_test.go",
+      "symbol": "p1",
+      "category": "identifier"
+    },
+    {
+      "path": "growatt_project_conformance_test.go",
+      "symbol": "p2",
+      "category": "identifier"
+    },
+    {
+      "path": "growatt_project_conformance_test.go",
+      "symbol": "v104",
+      "category": "identifier"
+    },
+    {
+      "path": "growatt_project_counter.go",
+      "symbol": "CX08CounterInput",
+      "category": "identifier"
+    },
+    {
+      "path": "growatt_project_counter.go",
+      "symbol": "CX08ExplainCounter",
+      "category": "identifier"
+    },
+    {
+      "path": "growatt_project_counter.go",
+      "symbol": "CX08ExplainTail",
+      "category": "identifier"
+    },
+    {
+      "path": "growatt_project_counter.go",
+      "symbol": "CX08RefineCounter",
+      "category": "identifier"
+    },
+    {
+      "path": "growatt_project_counter_test.go",
+      "symbol": "TestCX08CounterArithmetic",
+      "category": "test"
+    },
+    {
+      "path": "growatt_project_counter_test.go",
+      "symbol": "TestCX08CounterLINKAdmissionKeys",
+      "category": "test"
+    },
+    {
+      "path": "growatt_project_counter_test.go",
+      "symbol": "TestCX08CounterPaddingAndFieldIsolation",
+      "category": "test"
+    },
+    {
+      "path": "growatt_project_counter_test.go",
+      "symbol": "TestCX08CounterPreservesCachedCode",
+      "category": "test"
+    },
+    {
+      "path": "growatt_project_counter_test.go",
+      "symbol": "TestCX08CounterWireBoundaries",
+      "category": "test"
+    },
+    {
+      "path": "growatt_project_counter_test.go",
+      "symbol": "TestCX08TailHypothesisNegativeFeature",
+      "category": "test"
+    },
+    {
+      "path": "growatt_project_counter_test.go",
+      "symbol": "TestCX08TailHypothesisNegativeScopeAndValidity",
+      "category": "test"
+    },
+    {
+      "path": "growatt_project_dtc.go",
+      "symbol": "CX07DecodeDTC",
+      "category": "identifier"
+    },
+    {
+      "path": "growatt_project_dtc.go",
+      "symbol": "CX07EncodeDTC",
+      "category": "identifier"
+    },
+    {
+      "path": "growatt_project_dtc.go",
+      "symbol": "CX07ExplainLocalSelection",
+      "category": "identifier"
+    },
+    {
+      "path": "growatt_project_dtc.go",
+      "symbol": "CX07LocalSelection",
+      "category": "identifier"
+    },
+    {
+      "path": "growatt_project_dtc.go",
+      "symbol": "cx07Categories",
+      "category": "identifier"
+    },
+    {
+      "path": "growatt_project_dtc.go",
+      "symbol": "cx07Dictionary",
+      "category": "identifier"
+    },
+    {
+      "path": "growatt_project_dtc_test.go",
+      "symbol": "TestCX07AdmissionIdentityFields",
+      "category": "test"
+    },
+    {
+      "path": "growatt_project_dtc_test.go",
+      "symbol": "TestCX07ByteOrderAndIndependentSiblings",
+      "category": "test"
+    },
+    {
+      "path": "growatt_project_dtc_test.go",
+      "symbol": "TestCX07ExhaustiveCategoriesAndDisabledReception",
+      "category": "test"
+    },
+    {
+      "path": "growatt_project_dtc_test.go",
+      "symbol": "TestCX07ExhaustiveRoundtrip",
+      "category": "test"
+    },
+    {
+      "path": "growatt_project_dtc_test.go",
+      "symbol": "TestCX07MultiActivePriorityAndBounds",
+      "category": "test"
+    },
+    {
+      "path": "growatt_project_dtc_test.go",
+      "symbol": "TestCX07PCSAdmissionBoundaries",
+      "category": "test"
+    },
+    {
+      "path": "growatt_project_dtc_test.go",
+      "symbol": "TestCX07UnknownWordHypothesisNegatives",
+      "category": "test"
+    },
+    {
+      "path": "growatt_project_dtc_test.go",
+      "symbol": "TestCX07WordLocationsAndValidSiblingRetention",
+      "category": "test"
+    },
+    {
+      "path": "growatt_project_dtc_test.go",
+      "symbol": "TestCX07ZeroAndMemberDictionary",
+      "category": "test"
+    },
+    {
+      "path": "growatt_project_dtc_test.go",
+      "symbol": "cx07Expected",
+      "category": "identifier"
+    },
+    {
+      "path": "growatt_project_dtc_test.go",
+      "symbol": "cx07Member",
+      "category": "identifier"
+    },
+    {
+      "path": "growatt_project_opaque.go",
+      "symbol": "CX15CapabilityKey",
+      "category": "identifier"
+    },
+    {
+      "path": "growatt_project_opaque.go",
+      "symbol": "CX15CapabilityState",
+      "category": "identifier"
+    },
+    {
+      "path": "growatt_project_opaque.go",
+      "symbol": "CX15Observed",
+      "category": "identifier"
+    },
+    {
+      "path": "growatt_project_opaque.go",
+      "symbol": "CX15OpaqueStore",
+      "category": "identifier"
+    },
+    {
+      "path": "growatt_project_opaque.go",
+      "symbol": "CX15Qualified",
+      "category": "identifier"
+    },
+    {
+      "path": "growatt_project_opaque.go",
+      "symbol": "CX15Unknown",
+      "category": "identifier"
+    },
+    {
+      "path": "growatt_project_opaque.go",
+      "symbol": "CX15Unsupported",
+      "category": "identifier"
+    },
+    {
+      "path": "growatt_project_opaque.go",
+      "symbol": "NewCX15OpaqueStore",
+      "category": "identifier"
+    },
+    {
+      "path": "growatt_project_opaque.go",
+      "symbol": "cx15Capability",
+      "category": "identifier"
+    },
+    {
+      "path": "growatt_project_opaque.go",
+      "symbol": "cx15Retained",
+      "category": "identifier"
+    },
+    {
+      "path": "growatt_project_opaque.go",
+      "symbol": "cx15SameStream",
+      "category": "identifier"
+    },
+    {
+      "path": "growatt_project_opaque_test.go",
+      "symbol": "TestCX15AdmissionEveryEvidenceField",
+      "category": "test"
+    },
+    {
+      "path": "growatt_project_opaque_test.go",
+      "symbol": "TestCX15CapabilityEveryKeyFieldIndependent",
+      "category": "test"
+    },
+    {
+      "path": "growatt_project_opaque_test.go",
+      "symbol": "TestCX15DirectStatusPreservesPeriodicAlarmEvidence",
+      "category": "test"
+    },
+    {
+      "path": "growatt_project_opaque_test.go",
+      "symbol": "TestCX15ExplicitUnsupportedCannotOverrideRawRetention",
+      "category": "test"
+    },
+    {
+      "path": "growatt_project_opaque_test.go",
+      "symbol": "TestCX15MONRequiresIndependentAssociationAndNoDecoder",
+      "category": "test"
+    },
+    {
+      "path": "growatt_project_opaque_test.go",
+      "symbol": "TestCX15ParallelZeroTailAndOpaqueCountBoundaries",
+      "category": "test"
+    },
+    {
+      "path": "growatt_project_opaque_test.go",
+      "symbol": "TestCX15RawRetentionAndLastKnownGood",
+      "category": "test"
+    },
+    {
+      "path": "growatt_project_opaque_test.go",
+      "symbol": "TestCX15ReceiveOnlySurface",
+      "category": "test"
+    },
+    {
+      "path": "growatt_project_opaque_test.go",
+      "symbol": "TestCX15RetentionBoundsAndConcurrency",
+      "category": "test"
+    },
+    {
+      "path": "growatt_project_opaque_test.go",
+      "symbol": "cx15MutateField",
+      "category": "identifier"
+    },
+    {
+      "path": "growatt_project_provider.go",
+      "symbol": "CX17NewLINKProvider",
+      "category": "identifier"
+    },
+    {
+      "path": "growatt_project_provider.go",
+      "symbol": "CX17NewPCSProvider",
+      "category": "identifier"
+    },
+    {
+      "path": "growatt_project_provider.go",
+      "symbol": "CX17Observation",
+      "category": "identifier"
+    },
+    {
+      "path": "growatt_project_provider.go",
+      "symbol": "CX17Provider",
+      "category": "identifier"
+    },
+    {
+      "path": "growatt_project_provider.go",
+      "symbol": "CX17Raw",
+      "category": "identifier"
+    },
+    {
+      "path": "growatt_project_provider.go",
+      "symbol": "CX17Receive",
+      "category": "identifier"
+    },
+    {
+      "path": "growatt_project_provider.go",
+      "symbol": "CX17ReceiveSource",
+      "category": "identifier"
+    },
+    {
+      "path": "growatt_project_provider.go",
+      "symbol": "CX17Snapshot",
+      "category": "identifier"
+    },
+    {
+      "path": "growatt_project_provider.go",
+      "symbol": "cx17Apply",
+      "category": "identifier"
+    },
+    {
+      "path": "growatt_project_provider.go",
+      "symbol": "cx17Association",
+      "category": "identifier"
+    },
+    {
+      "path": "growatt_project_provider.go",
+      "symbol": "cx17Consume",
+      "category": "identifier"
+    },
+    {
+      "path": "growatt_project_provider.go",
+      "symbol": "cx17Demote",
+      "category": "identifier"
+    },
+    {
+      "path": "growatt_project_provider.go",
+      "symbol": "cx17ExtendedKind",
+      "category": "identifier"
+    },
+    {
+      "path": "growatt_project_provider.go",
+      "symbol": "cx17IdentityKey",
+      "category": "identifier"
+    },
+    {
+      "path": "growatt_project_provider.go",
+      "symbol": "cx17LINKSerial",
+      "category": "identifier"
+    },
+    {
+      "path": "growatt_project_provider.go",
+      "symbol": "cx17New",
+      "category": "identifier"
+    },
+    {
+      "path": "growatt_project_provider.go",
+      "symbol": "cx17Raw",
+      "category": "identifier"
+    },
+    {
+      "path": "growatt_project_provider.go",
+      "symbol": "cx17Receive",
+      "category": "identifier"
+    },
+    {
+      "path": "growatt_project_provider.go",
+      "symbol": "cx17Reconcile",
+      "category": "identifier"
+    },
+    {
+      "path": "growatt_project_provider.go",
+      "symbol": "cx17SerialConflict",
+      "category": "identifier"
+    },
+    {
+      "path": "growatt_project_provider.go",
+      "symbol": "cx17Stop",
+      "category": "identifier"
+    },
+    {
+      "path": "growatt_project_provider.go",
+      "symbol": "cx17Withheld",
+      "category": "identifier"
+    },
+    {
+      "path": "growatt_project_provider.go",
+      "symbol": "cx17Withhold",
+      "category": "identifier"
+    },
+    {
+      "path": "growatt_project_provider_test.go",
+      "symbol": "CX17Receive",
+      "category": "identifier"
+    },
+    {
+      "path": "growatt_project_provider_test.go",
+      "symbol": "TestCX17AggregateExtendedIdentityChangeConflicts",
+      "category": "test"
+    },
+    {
+      "path": "growatt_project_provider_test.go",
+      "symbol": "TestCX17BalanceEnablesDemotedWhenWithheld",
+      "category": "test"
+    },
+    {
+      "path": "growatt_project_provider_test.go",
+      "symbol": "TestCX17BoundsAndConcurrentSnapshots",
+      "category": "test"
+    },
+    {
+      "path": "growatt_project_provider_test.go",
+      "symbol": "TestCX17CancelJoinAndLateCallback",
+      "category": "test"
+    },
+    {
+      "path": "growatt_project_provider_test.go",
+      "symbol": "TestCX17CellCountChangeDemotesBalanceEnables",
+      "category": "test"
+    },
+    {
+      "path": "growatt_project_provider_test.go",
+      "symbol": "TestCX17ConstructorFailClosed",
+      "category": "test"
+    },
+    {
+      "path": "growatt_project_provider_test.go",
+      "symbol": "TestCX17CountReconciliationOnlyForCountGatedGroups",
+      "category": "test"
+    },
+    {
+      "path": "growatt_project_provider_test.go",
+      "symbol": "TestCX17EqualMemberValueDoesNotConflict",
+      "category": "test"
+    },
+    {
+      "path": "growatt_project_provider_test.go",
+      "symbol": "TestCX17EverySelectionFieldNegative",
+      "category": "test"
+    },
+    {
+      "path": "growatt_project_provider_test.go",
+      "symbol": "TestCX17ExtendedRoleChangeConflicts",
+      "category": "test"
+    },
+    {
+      "path": "growatt_project_provider_test.go",
+      "symbol": "TestCX17FieldEvictionAcrossGenerations",
+      "category": "test"
+    },
+    {
+      "path": "growatt_project_provider_test.go",
+      "symbol": "TestCX17FreshFrameDoesNotRenewSibling",
+      "category": "test"
+    },
+    {
+      "path": "growatt_project_provider_test.go",
+      "symbol": "TestCX17IdentityInvalidationNegatives",
+      "category": "test"
+    },
+    {
+      "path": "growatt_project_provider_test.go",
+      "symbol": "TestCX17IndependentAgesAndCopies",
+      "category": "test"
+    },
+    {
+      "path": "growatt_project_provider_test.go",
+      "symbol": "TestCX17IndexBoundsAssociationChangeConflicts",
+      "category": "test"
+    },
+    {
+      "path": "growatt_project_provider_test.go",
+      "symbol": "TestCX17InterleavedLINKKindsKeepIndependentIndexes",
+      "category": "test"
+    },
+    {
+      "path": "growatt_project_provider_test.go",
+      "symbol": "TestCX17InvalidIdentityFieldDoesNotConflict",
+      "category": "test"
+    },
+    {
+      "path": "growatt_project_provider_test.go",
+      "symbol": "TestCX17LINKCountDropDemotesRetainedCells",
+      "category": "test"
+    },
+    {
+      "path": "growatt_project_provider_test.go",
+      "symbol": "TestCX17LINKCountsAndValidityNegatives",
+      "category": "test"
+    },
+    {
+      "path": "growatt_project_provider_test.go",
+      "symbol": "TestCX17LINKRouteNegative",
+      "category": "test"
+    },
+    {
+      "path": "growatt_project_provider_test.go",
+      "symbol": "TestCX17LINKSensorAndGateNegatives",
+      "category": "test"
+    },
+    {
+      "path": "growatt_project_provider_test.go",
+      "symbol": "TestCX17LINKSerialReplacementConflicts",
+      "category": "test"
+    },
+    {
+      "path": "growatt_project_provider_test.go",
+      "symbol": "TestCX17LINKSerialWithoutIdentityRecordConflicts",
+      "category": "test"
+    },
+    {
+      "path": "growatt_project_provider_test.go",
+      "symbol": "TestCX17Lifecycle",
+      "category": "test"
+    },
+    {
+      "path": "growatt_project_provider_test.go",
+      "symbol": "TestCX17MalformedFirstObservationDoesNotSetBaseline",
+      "category": "test"
+    },
+    {
+      "path": "growatt_project_provider_test.go",
+      "symbol": "TestCX17MalformedObservationWithChangedAssociationDoesNotConflict",
+      "category": "test"
+    },
+    {
+      "path": "growatt_project_provider_test.go",
+      "symbol": "TestCX17MemberAssociationChangeConflicts",
+      "category": "test"
+    },
+    {
+      "path": "growatt_project_provider_test.go",
+      "symbol": "TestCX17NativeAssociationChangeConflicts",
+      "category": "test"
+    },
+    {
+      "path": "growatt_project_provider_test.go",
+      "symbol": "TestCX17NonzeroReservedByteDoesNotConflict",
+      "category": "test"
+    },
+    {
+      "path": "growatt_project_provider_test.go",
+      "symbol": "TestCX17OpaqueRoleFlagsDoNotConflict",
+      "category": "test"
+    },
+    {
+      "path": "growatt_project_provider_test.go",
+      "symbol": "TestCX17PCSFamilyChangeConflicts",
+      "category": "test"
+    },
+    {
+      "path": "growatt_project_provider_test.go",
+      "symbol": "TestCX17PCSFamilyOmittedTransitionConflicts",
+      "category": "test"
+    },
+    {
+      "path": "growatt_project_provider_test.go",
+      "symbol": "TestCX17PCSGaugeCountChangeDemotesEarlyCells",
+      "category": "test"
+    },
+    {
+      "path": "growatt_project_provider_test.go",
+      "symbol": "TestCX17PCSStandardSerialReplacementConflicts",
+      "category": "test"
+    },
+    {
+      "path": "growatt_project_provider_test.go",
+      "symbol": "TestCX17ParallelReplacementDTCDemotesOmittedIndex",
+      "category": "test"
+    },
+    {
+      "path": "growatt_project_provider_test.go",
+      "symbol": "TestCX17ParallelSerialReplacementConflicts",
+      "category": "test"
+    },
+    {
+      "path": "growatt_project_provider_test.go",
+      "symbol": "TestCX17RawRecordBoundsAndDetachedInput",
+      "category": "test"
+    },
+    {
+      "path": "growatt_project_provider_test.go",
+      "symbol": "TestCX17ReceiveFailureRetainsHistory",
+      "category": "test"
+    },
+    {
+      "path": "growatt_project_provider_test.go",
+      "symbol": "TestCX17RejectedLINKObservationDoesNotReconcile",
+      "category": "test"
+    },
+    {
+      "path": "growatt_project_provider_test.go",
+      "symbol": "TestCX17Release11TemperatureCountChangeDemotes",
+      "category": "test"
+    },
+    {
+      "path": "growatt_project_provider_test.go",
+      "symbol": "TestCX17ReplacementDTCDemotesOmittedIndex",
+      "category": "test"
+    },
+    {
+      "path": "growatt_project_provider_test.go",
+      "symbol": "TestCX17SequenceAndClockBoundaries",
+      "category": "test"
+    },
+    {
+      "path": "growatt_project_provider_test.go",
+      "symbol": "TestCX17SerialSlotAssociationChangeConflicts",
+      "category": "test"
+    },
+    {
+      "path": "growatt_project_provider_test.go",
+      "symbol": "TestCX17WireIdentityReuseAndRoleChange",
+      "category": "test"
+    },
+    {
+      "path": "growatt_project_provider_test.go",
+      "symbol": "cx17ErrorSource",
+      "category": "identifier"
+    },
+    {
+      "path": "growatt_project_provider_test.go",
+      "symbol": "cx17Event",
+      "category": "identifier"
+    },
+    {
+      "path": "growatt_project_provider_test.go",
+      "symbol": "cx17Fake",
+      "category": "identifier"
+    },
+    {
+      "path": "growatt_project_provider_test.go",
+      "symbol": "cx17GroupFixture",
+      "category": "identifier"
+    },
+    {
+      "path": "growatt_project_provider_test.go",
+      "symbol": "cx17Interface",
+      "category": "identifier"
+    },
+    {
+      "path": "growatt_project_provider_test.go",
+      "symbol": "cx17LateSource",
+      "category": "identifier"
+    },
+    {
+      "path": "growatt_project_provider_test.go",
+      "symbol": "cx17Send",
+      "category": "identifier"
+    },
+    {
+      "path": "growatt_project_provider_test.go",
+      "symbol": "cx17Source",
+      "category": "identifier"
+    },
+    {
+      "path": "growatt_project_selection.go",
+      "symbol": "CX01ConfirmNativeSelection",
+      "category": "identifier"
+    },
+    {
+      "path": "growatt_project_selection.go",
+      "symbol": "CX01FeatureGrade",
+      "category": "identifier"
+    },
+    {
+      "path": "growatt_project_selection.go",
+      "symbol": "CX01Grade",
+      "category": "identifier"
+    },
+    {
+      "path": "growatt_project_selection.go",
+      "symbol": "CX01Group",
+      "category": "identifier"
+    },
+    {
+      "path": "growatt_project_selection.go",
+      "symbol": "CX01Layout",
+      "category": "identifier"
+    },
+    {
+      "path": "growatt_project_selection.go",
+      "symbol": "CX01NativeIndication",
+      "category": "identifier"
+    },
+    {
+      "path": "growatt_project_selection.go",
+      "symbol": "CX01SelectionSpec",
+      "category": "identifier"
+    },
+    {
+      "path": "growatt_project_selection.go",
+      "symbol": "CX01Spec",
+      "category": "identifier"
+    },
+    {
+      "path": "growatt_project_selection.go",
+      "symbol": "cx01ASCII",
+      "category": "identifier"
+    },
+    {
+      "path": "growatt_project_selection_test.go",
+      "symbol": "TestCX01AmbiguousChoiceAndImmutability",
+      "category": "test"
+    },
+    {
+      "path": "growatt_project_selection_test.go",
+      "symbol": "TestCX01FeatureScopeAndReleaseBoundaries",
+      "category": "test"
+    },
+    {
+      "path": "growatt_project_selection_test.go",
+      "symbol": "TestCX01FlavorMatrix",
+      "category": "test"
+    },
+    {
+      "path": "growatt_project_selection_test.go",
+      "symbol": "TestCX01HypothesisSelectorNegatives",
+      "category": "test"
+    },
+    {
+      "path": "growatt_project_selection_test.go",
+      "symbol": "TestCX01InvalidSelection",
+      "category": "test"
+    },
+    {
+      "path": "growatt_project_selection_test.go",
+      "symbol": "TestCX01NativeIndicationNeverChooses",
+      "category": "test"
+    },
+    {
+      "path": "growatt_project_selection_test.go",
+      "symbol": "TestCX01Release11ReportRoute",
+      "category": "test"
+    },
+    {
+      "path": "growatt_project_selection_test.go",
+      "symbol": "TestCX01SelectorGroups",
+      "category": "test"
+    },
+    {
+      "path": "growatt_project_selection_test.go",
+      "symbol": "cx01Select",
+      "category": "identifier"
+    },
+    {
+      "path": "growatt_project_selection_test.go",
+      "symbol": "cx01Spec",
+      "category": "identifier"
+    },
+    {
+      "path": "growatt_v104.go",
+      "symbol": "GrowattLowVoltageBMSV104",
+      "category": "identifier"
+    },
+    {
+      "path": "growatt_v104.go",
+      "symbol": "GrowattLowVoltageBMSV104Limits",
+      "category": "identifier"
+    },
+    {
+      "path": "growatt_v104.go",
+      "symbol": "GrowattLowVoltageBMSV104Measurements",
+      "category": "identifier"
+    },
+    {
+      "path": "growatt_v104.go",
+      "symbol": "GrowattLowVoltageBMSV104Projection",
+      "category": "identifier"
+    },
+    {
+      "path": "growatt_v104.go",
+      "symbol": "GrowattLowVoltageBMSV104Status",
+      "category": "identifier"
+    },
+    {
+      "path": "growatt_v104.go",
+      "symbol": "growattLowVoltageBMSV104",
+      "category": "identifier"
+    },
+    {
+      "path": "growatt_v104.go",
+      "symbol": "growattLowVoltageBMSV104Profile",
+      "category": "identifier"
+    },
+    {
+      "path": "growatt_v104.go",
+      "symbol": "growattV104Aggregate",
+      "category": "identifier"
+    },
+    {
+      "path": "growatt_v104.go",
+      "symbol": "growattV104Geometry",
+      "category": "identifier"
+    },
+    {
+      "path": "growatt_v104.go",
+      "symbol": "growattV104ListedFrame",
+      "category": "identifier"
+    },
+    {
+      "path": "growatt_v104.go",
+      "symbol": "growattV104MaximumInterfaces",
+      "category": "identifier"
+    },
+    {
+      "path": "growatt_v104.go",
+      "symbol": "growattV104Valid",
+      "category": "identifier"
+    },
+    {
+      "path": "growatt_v104.go",
+      "symbol": "growattV104Window",
+      "category": "identifier"
+    },
+    {
+      "path": "growatt_v104.go",
+      "symbol": "growattV104WindowSize",
+      "category": "identifier"
+    },
+    {
+      "path": "growatt_v104.go",
+      "symbol": "growatt_v104.go",
+      "category": "filename"
+    },
+    {
+      "path": "growatt_v104_replay.go",
+      "symbol": "GrowattLowVoltageBMSV104QualificationReplay",
+      "category": "identifier"
+    },
+    {
+      "path": "growatt_v104_replay.go",
+      "symbol": "NewGrowattLowVoltageBMSV104QualificationReplay",
+      "category": "identifier"
+    },
+    {
+      "path": "growatt_v104_replay.go",
+      "symbol": "growattV104SameInterface",
+      "category": "identifier"
+    },
+    {
+      "path": "growatt_v104_replay.go",
+      "symbol": "growatt_v104_replay.go",
+      "category": "filename"
+    },
+    {
+      "path": "growatt_v104_replay_test.go",
+      "symbol": "TestGrowattV104QualificationReplayConcurrentObservations",
+      "category": "test"
+    },
+    {
+      "path": "growatt_v104_replay_test.go",
+      "symbol": "TestGrowattV104QualificationReplayExpiresAndUsesNewestTuple",
+      "category": "test"
+    },
+    {
+      "path": "growatt_v104_replay_test.go",
+      "symbol": "TestGrowattV104QualificationReplayFailsClosed",
+      "category": "test"
+    },
+    {
+      "path": "growatt_v104_replay_test.go",
+      "symbol": "TestGrowattV104QualificationReplayUsesProviderProfile",
+      "category": "test"
+    },
+    {
+      "path": "growatt_v104_replay_test.go",
+      "symbol": "growatt_v104_replay_test.go",
+      "category": "filename"
+    },
+    {
+      "path": "growatt_v104_test.go",
+      "symbol": "TestGrowattV104BoundsInterfaceState",
+      "category": "test"
+    },
+    {
+      "path": "growatt_v104_test.go",
+      "symbol": "TestGrowattV104ConcurrentClassification",
+      "category": "test"
+    },
+    {
+      "path": "growatt_v104_test.go",
+      "symbol": "TestGrowattV104InvalidDeclaredRangeResetsAdmission",
+      "category": "test"
+    },
+    {
+      "path": "growatt_v104_test.go",
+      "symbol": "TestGrowattV104MalformedListedFrameResetsAdmission",
+      "category": "test"
+    },
+    {
+      "path": "growatt_v104_test.go",
+      "symbol": "TestGrowattV104RejectsExtendedAndExpiresWindow",
+      "category": "test"
+    },
+    {
+      "path": "growatt_v104_test.go",
+      "symbol": "TestGrowattV104RequiresCompleteTupleFromOneInterface",
+      "category": "test"
+    },
+    {
+      "path": "growatt_v104_test.go",
+      "symbol": "TestGrowattV104UsesNewestValueAfterWindowRollover",
+      "category": "test"
+    },
+    {
+      "path": "growatt_v104_test.go",
+      "symbol": "growatt_v104_test.go",
+      "category": "filename"
+    },
+    {
+      "path": "o08_growatt_provider.go",
+      "symbol": "O08Evidence",
+      "category": "identifier"
+    },
+    {
+      "path": "o08_growatt_provider.go",
+      "symbol": "O08Generation",
+      "category": "identifier"
+    },
+    {
+      "path": "o08_growatt_provider.go",
+      "symbol": "O08GrowattProvider",
+      "category": "identifier"
+    },
+    {
+      "path": "o08_growatt_provider.go",
+      "symbol": "O08GrowattSnapshot",
+      "category": "identifier"
+    },
+    {
+      "path": "o08_growatt_provider.go",
+      "symbol": "O08HasRaw",
+      "category": "identifier"
+    },
+    {
+      "path": "o08_growatt_provider.go",
+      "symbol": "O08NewGrowattProvider",
+      "category": "identifier"
+    },
+    {
+      "path": "o08_growatt_provider.go",
+      "symbol": "O08Observation",
+      "category": "identifier"
+    },
+    {
+      "path": "o08_growatt_provider.go",
+      "symbol": "O08Projection",
+      "category": "identifier"
+    },
+    {
+      "path": "o08_growatt_provider.go",
+      "symbol": "O08ProjectionGeneration",
+      "category": "identifier"
+    },
+    {
+      "path": "o08_growatt_provider.go",
+      "symbol": "O08Raw",
+      "category": "identifier"
+    },
+    {
+      "path": "o08_growatt_provider.go",
+      "symbol": "O08RawGeneration",
+      "category": "identifier"
+    },
+    {
+      "path": "o08_growatt_provider.go",
+      "symbol": "O08Receive",
+      "category": "identifier"
+    },
+    {
+      "path": "o08_growatt_provider.go",
+      "symbol": "O08ReceiveSource",
+      "category": "identifier"
+    },
+    {
+      "path": "o08_growatt_provider.go",
+      "symbol": "O08RevisionV104",
+      "category": "identifier"
+    },
+    {
+      "path": "o08_growatt_provider.go",
+      "symbol": "O08Snapshot",
+      "category": "identifier"
+    },
+    {
+      "path": "o08_growatt_provider.go",
+      "symbol": "O08Start",
+      "category": "identifier"
+    },
+    {
+      "path": "o08_growatt_provider.go",
+      "symbol": "O08State",
+      "category": "identifier"
+    },
+    {
+      "path": "o08_growatt_provider.go",
+      "symbol": "O08Stop",
+      "category": "identifier"
+    },
+    {
+      "path": "o08_growatt_provider.go",
+      "symbol": "o08Apply",
+      "category": "identifier"
+    },
+    {
+      "path": "o08_growatt_provider.go",
+      "symbol": "o08Cancel",
+      "category": "identifier"
+    },
+    {
+      "path": "o08_growatt_provider.go",
+      "symbol": "o08Ctx",
+      "category": "identifier"
+    },
+    {
+      "path": "o08_growatt_provider.go",
+      "symbol": "o08Done",
+      "category": "identifier"
+    },
+    {
+      "path": "o08_growatt_provider.go",
+      "symbol": "o08Err",
+      "category": "identifier"
+    },
+    {
+      "path": "o08_growatt_provider.go",
+      "symbol": "o08Evidence",
+      "category": "identifier"
+    },
+    {
+      "path": "o08_growatt_provider.go",
+      "symbol": "o08Generation",
+      "category": "identifier"
+    },
+    {
+      "path": "o08_growatt_provider.go",
+      "symbol": "o08HasSequence",
+      "category": "identifier"
+    },
+    {
+      "path": "o08_growatt_provider.go",
+      "symbol": "o08Interface",
+      "category": "identifier"
+    },
+    {
+      "path": "o08_growatt_provider.go",
+      "symbol": "o08Invalid",
+      "category": "identifier"
+    },
+    {
+      "path": "o08_growatt_provider.go",
+      "symbol": "o08Lifecycle",
+      "category": "identifier"
+    },
+    {
+      "path": "o08_growatt_provider.go",
+      "symbol": "o08Mu",
+      "category": "identifier"
+    },
+    {
+      "path": "o08_growatt_provider.go",
+      "symbol": "o08OK",
+      "category": "identifier"
+    },
+    {
+      "path": "o08_growatt_provider.go",
+      "symbol": "o08Observation",
+      "category": "identifier"
+    },
+    {
+      "path": "o08_growatt_provider.go",
+      "symbol": "o08P",
+      "category": "identifier"
+    },
+    {
+      "path": "o08_growatt_provider.go",
+      "symbol": "o08Projection",
+      "category": "identifier"
+    },
+    {
+      "path": "o08_growatt_provider.go",
+      "symbol": "o08Receive",
+      "category": "identifier"
+    },
+    {
+      "path": "o08_growatt_provider.go",
+      "symbol": "o08Replay",
+      "category": "identifier"
+    },
+    {
+      "path": "o08_growatt_provider.go",
+      "symbol": "o08Revision",
+      "category": "identifier"
+    },
+    {
+      "path": "o08_growatt_provider.go",
+      "symbol": "o08Running",
+      "category": "identifier"
+    },
+    {
+      "path": "o08_growatt_provider.go",
+      "symbol": "o08Sequence",
+      "category": "identifier"
+    },
+    {
+      "path": "o08_growatt_provider.go",
+      "symbol": "o08Snapshot",
+      "category": "identifier"
+    },
+    {
+      "path": "o08_growatt_provider.go",
+      "symbol": "o08Source",
+      "category": "identifier"
+    },
+    {
+      "path": "o08_growatt_provider.go",
+      "symbol": "o08Stop",
+      "category": "identifier"
+    },
+    {
+      "path": "o08_growatt_provider.go",
+      "symbol": "o08_growatt_provider.go",
+      "category": "filename"
+    },
+    {
+      "path": "o08_growatt_provider_test.go",
+      "symbol": "O08Receive",
+      "category": "identifier"
+    },
+    {
+      "path": "o08_growatt_provider_test.go",
+      "symbol": "TestO08ActiveSuccessorJoinsAndResetsSequence",
+      "category": "test"
+    },
+    {
+      "path": "o08_growatt_provider_test.go",
+      "symbol": "TestO08IdentityFences",
+      "category": "test"
+    },
+    {
+      "path": "o08_growatt_provider_test.go",
+      "symbol": "TestO08InvalidStartPreservesRunningSource",
+      "category": "test"
+    },
+    {
+      "path": "o08_growatt_provider_test.go",
+      "symbol": "TestO08LossRecoveryAndDetachedHistory",
+      "category": "test"
+    },
+    {
+      "path": "o08_growatt_provider_test.go",
+      "symbol": "TestO08MalformedPartialRetainsHistory",
+      "category": "test"
+    },
+    {
+      "path": "o08_growatt_provider_test.go",
+      "symbol": "TestO08RevisionSelection",
+      "category": "test"
+    },
+    {
+      "path": "o08_growatt_provider_test.go",
+      "symbol": "TestO08StopCancelsJoinsAndFencesLateReceive",
+      "category": "test"
+    },
+    {
+      "path": "o08_growatt_provider_test.go",
+      "symbol": "TestO08ZeroFirstSequence",
+      "category": "test"
+    },
+    {
+      "path": "o08_growatt_provider_test.go",
+      "symbol": "o08Bad",
+      "category": "identifier"
+    },
+    {
+      "path": "o08_growatt_provider_test.go",
+      "symbol": "o08Before",
+      "category": "identifier"
+    },
+    {
+      "path": "o08_growatt_provider_test.go",
+      "symbol": "o08Bytes",
+      "category": "identifier"
+    },
+    {
+      "path": "o08_growatt_provider_test.go",
+      "symbol": "o08Candidate",
+      "category": "identifier"
+    },
+    {
+      "path": "o08_growatt_provider_test.go",
+      "symbol": "o08Case",
+      "category": "identifier"
+    },
+    {
+      "path": "o08_growatt_provider_test.go",
+      "symbol": "o08Ctx",
+      "category": "identifier"
+    },
+    {
+      "path": "o08_growatt_provider_test.go",
+      "symbol": "o08E",
+      "category": "identifier"
+    },
+    {
+      "path": "o08_growatt_provider_test.go",
+      "symbol": "o08Entered",
+      "category": "identifier"
+    },
+    {
+      "path": "o08_growatt_provider_test.go",
+      "symbol": "o08Err",
+      "category": "identifier"
+    },
+    {
+      "path": "o08_growatt_provider_test.go",
+      "symbol": "o08Evidence",
+      "category": "identifier"
+    },
+    {
+      "path": "o08_growatt_provider_test.go",
+      "symbol": "o08Feed",
+      "category": "identifier"
+    },
+    {
+      "path": "o08_growatt_provider_test.go",
+      "symbol": "o08Frame",
+      "category": "identifier"
+    },
+    {
+      "path": "o08_growatt_provider_test.go",
+      "symbol": "o08Generation",
+      "category": "identifier"
+    },
+    {
+      "path": "o08_growatt_provider_test.go",
+      "symbol": "o08Got",
+      "category": "identifier"
+    },
+    {
+      "path": "o08_growatt_provider_test.go",
+      "symbol": "o08I",
+      "category": "identifier"
+    },
+    {
+      "path": "o08_growatt_provider_test.go",
+      "symbol": "o08ID",
+      "category": "identifier"
+    },
+    {
+      "path": "o08_growatt_provider_test.go",
+      "symbol": "o08Identity",
+      "category": "identifier"
+    },
+    {
+      "path": "o08_growatt_provider_test.go",
+      "symbol": "o08Index",
+      "category": "identifier"
+    },
+    {
+      "path": "o08_growatt_provider_test.go",
+      "symbol": "o08Late",
+      "category": "identifier"
+    },
+    {
+      "path": "o08_growatt_provider_test.go",
+      "symbol": "o08Name",
+      "category": "identifier"
+    },
+    {
+      "path": "o08_growatt_provider_test.go",
+      "symbol": "o08NativeFrame",
+      "category": "identifier"
+    },
+    {
+      "path": "o08_growatt_provider_test.go",
+      "symbol": "o08NativeID",
+      "category": "identifier"
+    },
+    {
+      "path": "o08_growatt_provider_test.go",
+      "symbol": "o08NewSource",
+      "category": "identifier"
+    },
+    {
+      "path": "o08_growatt_provider_test.go",
+      "symbol": "o08Observation",
+      "category": "identifier"
+    },
+    {
+      "path": "o08_growatt_provider_test.go",
+      "symbol": "o08P",
+      "category": "identifier"
+    },
+    {
+      "path": "o08_growatt_provider_test.go",
+      "symbol": "o08PreviousDone",
+      "category": "identifier"
+    },
+    {
+      "path": "o08_growatt_provider_test.go",
+      "symbol": "o08Provider",
+      "category": "identifier"
+    },
+    {
+      "path": "o08_growatt_provider_test.go",
+      "symbol": "o08R",
+      "category": "identifier"
+    },
+    {
+      "path": "o08_growatt_provider_test.go",
+      "symbol": "o08Result",
+      "category": "identifier"
+    },
+    {
+      "path": "o08_growatt_provider_test.go",
+      "symbol": "o08Results",
+      "category": "identifier"
+    },
+    {
+      "path": "o08_growatt_provider_test.go",
+      "symbol": "o08Revision",
+      "category": "identifier"
+    },
+    {
+      "path": "o08_growatt_provider_test.go",
+      "symbol": "o08S",
+      "category": "identifier"
+    },
+    {
+      "path": "o08_growatt_provider_test.go",
+      "symbol": "o08Seq",
+      "category": "identifier"
+    },
+    {
+      "path": "o08_growatt_provider_test.go",
+      "symbol": "o08Sequence",
+      "category": "identifier"
+    },
+    {
+      "path": "o08_growatt_provider_test.go",
+      "symbol": "o08Snapshot",
+      "category": "identifier"
+    },
+    {
+      "path": "o08_growatt_provider_test.go",
+      "symbol": "o08Source",
+      "category": "identifier"
+    },
+    {
+      "path": "o08_growatt_provider_test.go",
+      "symbol": "o08Start",
+      "category": "identifier"
+    },
+    {
+      "path": "o08_growatt_provider_test.go",
+      "symbol": "o08Successor",
+      "category": "identifier"
+    },
+    {
+      "path": "o08_growatt_provider_test.go",
+      "symbol": "o08T",
+      "category": "identifier"
+    },
+    {
+      "path": "o08_growatt_provider_test.go",
+      "symbol": "o08Tuple",
+      "category": "identifier"
+    },
+    {
+      "path": "o08_growatt_provider_test.go",
+      "symbol": "o08_growatt_provider_test.go",
+      "category": "filename"
+    }
+  ]
+}

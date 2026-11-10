@@ -420,7 +420,7 @@ func TestCX05ExtremaAndLocationHypothesis(t *testing.T) {
 				t.Fatal(r)
 			}
 		case 0x322:
-			if r.Fields["maximum_temperature"].Numerator != 258 || r.Fields["minimum_temperature"].Numerator != 772 || r.Fields["maximum_temperature_index"].Numerator != 5 || r.Fields["maximum_index"].Status != "" || r.Fields["extra_6"].Status != "raw" {
+			if r.Fields["temperature_maximum"].Numerator != 258 || r.Fields["temperature_minimum"].Numerator != 772 || r.Fields["maximum_temperature_index"].Numerator != 5 || r.Fields["maximum_index"].Status != "" || r.Fields["extra_6"].Status != "raw" {
 				t.Fatal(r)
 			}
 		case 0x330:
@@ -437,7 +437,7 @@ func TestCX05ExtremaAndLocationHypothesis(t *testing.T) {
 		if r.Fields[idx].Status == "accepted" || r.Raw != i.Evidence.Frame.Bytes() {
 			t.Fatal("index scope")
 		}
-		if id == 0x322 && r.Fields["maximum_temperature"].Status != "accepted" {
+		if id == 0x322 && r.Fields["temperature_maximum"].Status != "accepted" {
 			t.Fatal("index erased measurement")
 		}
 	}
@@ -649,18 +649,18 @@ func TestCX05InvalidCodesAndConflictingRecords(t *testing.T) {
 func TestCX05ExtremaIndependentTemperatureGate(t *testing.T) {
 	s, i := cx05Fixture(t, 0x322, [8]byte{0xff, 0xf6, 0x80, 0, 0, 15, 9, 10})
 	r := CX05DecodePCSStandard(s, i)
-	if r.Fields["maximum_temperature"].Numerator != -10 || r.Fields["minimum_temperature"].Numerator != -32768 || r.Fields["minimum_temperature"].Denominator != 10 {
+	if r.Fields["temperature_maximum"].Numerator != -10 || r.Fields["temperature_minimum"].Numerator != -32768 || r.Fields["temperature_minimum"].Denominator != 10 {
 		t.Fatal(r)
 	}
-	i.FieldStates = map[string]string{"maximum_temperature": "invalid"}
+	i.FieldStates = map[string]string{"temperature_maximum": "invalid"}
 	r = CX05DecodePCSStandard(s, i)
-	if r.Fields["maximum_temperature"].Status != "invalid" || r.Fields["minimum_temperature"].Status != "accepted" || r.Fields["minimum_temperature_index"].Status != "accepted" {
+	if r.Fields["temperature_maximum"].Status != "invalid" || r.Fields["temperature_minimum"].Status != "accepted" || r.Fields["minimum_temperature_index"].Status != "accepted" {
 		t.Fatal("invalid maximum erased sibling", r)
 	}
 	i.FieldStates = nil
 	i.TemperatureValid = false
 	r = CX05DecodePCSStandard(s, i)
-	if r.Fields["maximum_temperature"].Status == "accepted" || r.Fields["minimum_temperature"].Status == "accepted" || r.Fields["maximum_temperature_index"].Status != "accepted" {
+	if r.Fields["temperature_maximum"].Status == "accepted" || r.Fields["temperature_minimum"].Status == "accepted" || r.Fields["maximum_temperature_index"].Status != "accepted" {
 		t.Fatal("temperature gate affected indices", r)
 	}
 }

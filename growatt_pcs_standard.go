@@ -179,8 +179,8 @@ func CX05DecodePCSStandard(s CXSelection, i CX05PCSInput) CX05PCSResult {
 		index("maximum_index", 5)
 		index("minimum_index", 6)
 	case 0x322:
-		value("maximum_temperature", signed(0), 10, "C", "maximum temperature", measured && i.TemperatureValid)
-		value("minimum_temperature", signed(2), 10, "C", "minimum temperature", measured && i.TemperatureValid)
+		value("temperature_maximum", signed(0), 10, "C", "maximum temperature", measured && i.TemperatureValid)
+		value("temperature_minimum", signed(2), 10, "C", "minimum temperature", measured && i.TemperatureValid)
 		index("maximum_temperature_index", 4)
 		index("minimum_temperature_index", 5)
 		for at, name := range []string{"extra_6", "extra_7"} {

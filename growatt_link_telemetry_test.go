@@ -249,7 +249,7 @@ func TestCX01NativeWordsAndIndependentValidity(t *testing.T) {
 		kind uint32
 		name string
 		want int64
-	}{{0x1800, "soc_status", 8}, {0x1801, "mixed", 1029}, {0x1803, "capacity", 1541}, {0x1804, "word_1", 134678021}, {0x1807, "b4", 1541}, {0x1808, "minimum_temperature", -36}, {0x180a, "counter", 262914}, {0x180b, "remaining_capacity", 2055}, {0x180c, "word_2", 1541}, {0x1840, "tail", 2055}} {
+	}{{0x1800, "soc_status", 8}, {0x1801, "mixed", 1029}, {0x1803, "capacity", 1541}, {0x1804, "word_1", 134678021}, {0x1807, "b4", 1541}, {0x1808, "temperature_minimum", -36}, {0x180a, "counter", 262914}, {0x180b, "remaining_capacity", 2055}, {0x180c, "word_2", 1541}, {0x1840, "tail", 2055}} {
 		r := CXDecodeLINKTelemetry(s, cx01Input(t, spec, v.kind, [8]byte{1, 2, 3, 4, 5, 6, 7, 8}))
 		if r.Fields[v.name].Numerator != v.want {
 			t.Fatalf("%x %s %#v", v.kind, v.name, r.Fields[v.name])

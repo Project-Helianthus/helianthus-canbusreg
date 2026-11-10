@@ -88,7 +88,7 @@ func TestCX11TemperatureAndSOHBoundaries(t *testing.T) {
 	for _, code := range []byte{0, 39, 40, 41, 255} {
 		p := [8]byte{1, 0, code, 2, 0, code, code, 0}
 		r := cx11Decode(t, c, 0x653, p, CX11ParallelContext{})
-		for _, k := range []string{"maximum_temperature", "minimum_temperature", "average_temperature"} {
+		for _, k := range []string{"temperature_maximum", "temperature_minimum", "average_temperature"} {
 			cx11Want(t, r, k, int64(code)-40, 1, "accepted", "Hypothesis")
 		}
 	}
@@ -110,15 +110,15 @@ func TestCX11TemperatureScopeNegative(t *testing.T) {
 	p := [8]byte{1, 0, 41, 2, 0, 39, 40, 255}
 	c.Scope = "aggregate"
 	r := cx11Decode(t, c, 0x653, p, CX11ParallelContext{SOHTenths: cx11Source(c, 2557)})
-	cx11Want(t, r, "maximum_temperature", 41, 1, "raw", "Unknown")
+	cx11Want(t, r, "temperature_maximum", 41, 1, "raw", "Unknown")
 	cx11Want(t, r, "soh", 255, 1, "raw", "Unknown")
 }
 func TestCX11TemperatureReservedNegative(t *testing.T) {
 	c := cx11Spec(t)
 	p := [8]byte{1, 1, 41, 2, 0, 39, 40, 0}
 	r := cx11Decode(t, c, 0x653, p, CX11ParallelContext{})
-	cx11Want(t, r, "maximum_temperature", 41, 1, "invalid", "Unknown")
-	cx11Want(t, r, "minimum_temperature", -1, 1, "accepted", "Hypothesis")
+	cx11Want(t, r, "temperature_maximum", 41, 1, "invalid", "Unknown")
+	cx11Want(t, r, "temperature_minimum", -1, 1, "accepted", "Hypothesis")
 }
 func TestCX11SOHSourceNegative(t *testing.T) {
 	c := cx11Spec(t)
@@ -388,7 +388,7 @@ func TestCX11SourceIdentityAndValidity(t *testing.T) {
 			}
 			r := cx11Decode(t, c, 0x653, p, CX11ParallelContext{SOHTenths: f})
 			cx11Want(t, r, "soh", 1, 1, "withheld", "Unknown")
-			cx11Want(t, r, "maximum_temperature", 0, 1, "accepted", "Hypothesis")
+			cx11Want(t, r, "temperature_maximum", 0, 1, "accepted", "Hypothesis")
 		})
 	}
 }
@@ -398,7 +398,7 @@ func TestCX11ConflictsAndIndependentSiblings(t *testing.T) {
 	p := [8]byte{1, 0, 41, 2, 0, 39, 40, 2}
 	r := cx11Decode(t, c, 0x653, p, CX11ParallelContext{SOHTenths: cx11Source(c, 10)})
 	cx11Want(t, r, "soh", 2, 1, "conflict", "Unknown")
-	cx11Want(t, r, "minimum_temperature", -1, 1, "accepted", "Hypothesis")
+	cx11Want(t, r, "temperature_minimum", -1, 1, "accepted", "Hypothesis")
 	p = [8]byte{5, 2, 0, 1, 0, 0, 0, 0}
 	x := CX11ParallelContext{CategoryFirst: cx11Source(c, 1), CategorySecond: cx11Source(c, 0), PackCode: cx11Source(c, 200), State: cx11Source(c, 1)}
 	r = cx11Decode(t, c, 0x6d3, p, x)

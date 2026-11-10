@@ -10,7 +10,6 @@
       "CHANGELOG-v0.5.0.md",
       "LICENSE",
       "README.md",
-      "SOURCE-FILES.txt",
       "active_error_frame_counting_test.go",
       "active_passive_deduplicator.go",
       "active_passive_deduplicator_test.go",
@@ -258,6 +257,9 @@
       "cmd/gateway/matter_binding_feed_v1_test.go",
       "cmd/gateway/matter_library_composition.go",
       "cmd/gateway/matter_library_composition_test.go",
+      "cmd/gateway/matter_profile_disabled.go",
+      "cmd/gateway/matter_profile_enabled.go",
+      "cmd/gateway/matter_profile_test.go",
       "cmd/gateway/mcp_bus_observability_integration_test.go",
       "cmd/gateway/mcp_tool_inventory_test.go",
       "cmd/gateway/mcp_watch_summary_integration_test.go",
@@ -470,6 +472,7 @@
       "docs/architecture/matter-binding-feed-v1.md",
       "docs/architecture/matter-output-binding-v1.md",
       "docs/architecture/mux-raw-symbol-continuity.md",
+      "docs/architecture/no-matter-build.md",
       "docs/architecture/portal-catalog-admission-transport-v1.md",
       "docs/architecture/portal-config-diagnostic-projection.md",
       "docs/architecture/portal-config-sharing.md",
@@ -1429,6 +1432,7 @@
       "scripts/build_portal_assets.sh",
       "scripts/capture_m8_source_window.sh",
       "scripts/capture_m8_source_window_test.py",
+      "scripts/check_no_matter_profile.py",
       "scripts/check_portal_assets.sh",
       "scripts/check_semantic_imports.py",
       "scripts/ci_local.sh",
@@ -1541,7 +1545,6 @@
       "LICENSE",
       "MCP_FIRST_ROLLOUT_GUARDRAILS.md",
       "README.md",
-      "SOURCE-FILES.txt",
       "custom_components/helianthus/__init__.py",
       "custom_components/helianthus/address.py",
       "custom_components/helianthus/admission.py",
@@ -1564,6 +1567,7 @@
       "custom_components/helianthus/energy.py",
       "custom_components/helianthus/entity_updates.py",
       "custom_components/helianthus/entry_cleanup.py",
+      "custom_components/helianthus/entry_runtime.py",
       "custom_components/helianthus/entry_services.py",
       "custom_components/helianthus/entry_setup.py",
       "custom_components/helianthus/evse_m2m.py",
@@ -1588,7 +1592,6 @@
       "custom_components/helianthus/sensor_descriptors.py",
       "custom_components/helianthus/sensor_setup.py",
       "custom_components/helianthus/services.yaml",
-      "custom_components/helianthus/smoke_profile.py",
       "custom_components/helianthus/storage_m2m.py",
       "custom_components/helianthus/strings.json",
       "custom_components/helianthus/subscriptions.py",
@@ -1600,6 +1603,7 @@
       "custom_components/helianthus/zone_parent.py",
       "docs/adversarial-runtime-contract.md",
       "docs/dhw-bound-reprobe.md",
+      "docs/entry-runtime-lifecycle.md",
       "docs/freshness-availability-contract.md",
       "docs/legacy-sensor-shared-migration.md",
       "docs/offline-consumer-acceptance-boundary.md",
@@ -1625,6 +1629,7 @@
       "scripts/readability-baseline.json",
       "scripts/run-ha-dual-topology-smoke.sh",
       "scripts/run_post_parity_adoption_checks.py",
+      "scripts/smoke_profile.py",
       "tests/conftest.py",
       "tests/fixtures/adversarial-runtime/v1/gateway/evaluated-fail.json",
       "tests/fixtures/adversarial-runtime/v1/gateway/execution-error.json",
@@ -1662,6 +1667,7 @@
       "tests/test_entity_icon_gate.py",
       "tests/test_entity_updates.py",
       "tests/test_entry_cleanup_retry_isolation.py",
+      "tests/test_entry_runtime_contract.py",
       "tests/test_entrypoint_phases.py",
       "tests/test_evse_binding_single_faults.py",
       "tests/test_evse_descriptor_collision_axes.py",
@@ -1723,6 +1729,7 @@
       "tests/test_semantic_snapshot_remaining_edges.py",
       "tests/test_semantic_snapshot_sensors.py",
       "tests/test_sensor.py",
+      "tests/test_smoke_cli_location.py",
       "tests/test_smoke_profile.py",
       "tests/test_solar_cylinder.py",
       "tests/test_storage_m2m.py",
@@ -1745,7 +1752,6 @@
       "AGENTS.md",
       "LICENSE",
       "README.md",
-      "SOURCE-FILES.txt",
       "cmd/vdev/main.go",
       "go.mod",
       "go.sum",
@@ -1773,7 +1779,6 @@
       "CONTRIBUTING.md",
       "LICENSE",
       "README.md",
-      "SOURCE-FILES.txt",
       "adoption/reference.go",
       "adoption/reference_test.go",
       "candidates/bridge/candidate.go",
@@ -1885,7 +1890,6 @@
       "CHANGELOG.md",
       "LICENSE",
       "README.md",
-      "SOURCE-FILES.txt",
       "artifacts/readme/browse.gif",
       "artifacts/readme/browse.png",
       "artifacts/readme/planner.gif",
@@ -2201,7 +2205,6 @@
       "AGENTS.md",
       "LICENSE",
       "README.md",
-      "SOURCE-FILES.txt",
       "cmd/aa29-smoke/aa31_smoke_linux_arm64.go",
       "cmd/aa29-smoke/aa31_smoke_linux_arm64_test.go",
       "cmd/aa29-smoke/aa31_smoke_unsupported.go",
@@ -2431,7 +2434,6 @@
       "CONTRIBUTING.md",
       "LICENSE",
       "README.md",
-      "SOURCE-FILES.txt",
       "backoff_rejected_budget_test.go",
       "backoff_reset_during_jitter_test.go",
       "coalescing_cancel_offset_residuals_test.go",
@@ -2574,7 +2576,6 @@
       "LICENSE",
       "Makefile",
       "README.md",
-      "SOURCE-FILES.txt",
       "cmd/adapterproto-oracle/main.go",
       "firmware/adapterproto/doc.go",
       "firmware/adapterproto/enh.go",
@@ -2621,7 +2622,6 @@
       "README.md",
       "RELEASE_COHORT.md",
       "SMOKE_RUNBOOK.md",
-      "SOURCE-FILES.txt",
       "docs/artifact-evidence.md",
       "docs/candidate-metadata-contract.md",
       "docs/cohort-upgrade-rollback.md",
@@ -26016,5 +26016,62 @@
     ]
   },
   "absence_searches": "Searches cover literal identifier tokens in the listed source-file inventories; indirect or dynamically constructed uses remain unresolved.",
-  "known_scope": "Gateway, HA integration, virtual device, Matter binding, explorer, eBUS, Modbus, tinyebus and add-on snapshots searched; classify actual bindings before adoption."
+  "known_scope": "Gateway, HA integration, virtual device, Matter binding, explorer, eBUS, Modbus, tinyebus and add-on snapshots searched; classify actual bindings before adoption.",
+  "adoption_contract": {
+    "scope": "Non-runtime consumer obligation for the supported CAN field map; no alias, duplicate field, fallback or migration step.",
+    "field_map": {
+      "maximum_temperature": "temperature_maximum",
+      "minimum_temperature": "temperature_minimum"
+    },
+    "emitted_fields": [
+      "temperature_maximum",
+      "temperature_minimum"
+    ],
+    "ebusgateway": {
+      "paths": [
+        "cmd/gateway/growatt_link_runtime.go",
+        "cmd/gateway/growatt_link_runtime_test.go",
+        "cmd/gateway/growatt_pcs_runtime.go",
+        "cmd/gateway/growatt_pcs_runtime_test.go",
+        "cmd/gateway/growatt_project_cli.go",
+        "cmd/gateway/growatt_project_cli_test.go",
+        "cmd/gateway/growatt_project_composition_test.go",
+        "cmd/gateway/growatt_project_conformance_test.go",
+        "cmd/gateway/growatt_project_provider.go",
+        "cmd/gateway/growatt_project_provider_test.go",
+        "cmd/gateway/managed_sidecar_composition.go",
+        "docs/observability/semantic-prometheus-coverage.md",
+        "growatt_project_config.go",
+        "growatt_project_config_test.go"
+      ],
+      "obligation": "Re-pin the library and validate native field-map passthrough, configuration, CLI, composition, provider and semantic metrics together. Preserve eBUS MCP method compatibility and GraphQL value-field parity. No exact historical field key occurs in the inspected consumer source."
+    },
+    "ha-integration": {
+      "paths": [
+        "custom_components/helianthus/semantic_snapshot.py",
+        "custom_components/helianthus/sensor.py"
+      ],
+      "obligation": "No direct key match. Explicit SemReg record selection and sensor projections do not consume the native extrema map; validate generic passthrough and schema consumers in the coordinated wave."
+    },
+    "ebus-vdev": {
+      "paths": [
+        "internal/datasource/graphql_zone.go",
+        "internal/config/config.go"
+      ],
+      "obligation": "No direct key match. Zone temperature/humidity and typed configuration do not consume the native extrema map; validate schema and generic consumers in the coordinated wave."
+    },
+    "matter-binding": {
+      "paths": [
+        "docs/target-profile/can-driver-coverage.md"
+      ],
+      "obligation": "Review family coverage correspondence; a lexical match does not establish identical native identity."
+    },
+    "vrc-explorer": {
+      "paths": [
+        "src/helianthus_vrc_explorer/data/myvaillant_register_map.csv"
+      ],
+      "obligation": "Review documentary register correspondence; do not equate eBUS identities with CAN quantities."
+    },
+    "release_evidence": "Class S: renew affected security, hardware and candidate evidence before release; synthetic comparisons establish no qualification."
+  }
 }

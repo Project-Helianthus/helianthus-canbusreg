@@ -126,7 +126,7 @@ func CX11DecodeParallel(s CXSelection, i CX01LINKInput, x CX11ParallelContext) C
 		zero("zero_1", 1)
 		proven("minimum_index", int64(p[3]))
 		zero("zero_4", 4)
-		for j, name := range []string{"maximum_temperature", "minimum_temperature", "average_temperature"} {
+		for j, name := range []string{"temperature_maximum", "temperature_minimum", "average_temperature"} {
 			at := []int{2, 5, 6}[j]
 			raw(name, int64(p[at]))
 			if i.Scope == "local" {
@@ -134,13 +134,13 @@ func CX11DecodeParallel(s CXSelection, i CX01LINKInput, x CX11ParallelContext) C
 			}
 		}
 		if p[1] != 0 {
-			raw("maximum_temperature", int64(p[2]))
-			mark("maximum_temperature", "invalid")
+			raw("temperature_maximum", int64(p[2]))
+			mark("temperature_maximum", "invalid")
 			mark("maximum_index", "invalid")
 		}
 		if p[4] != 0 {
-			raw("minimum_temperature", int64(p[5]))
-			mark("minimum_temperature", "invalid")
+			raw("temperature_minimum", int64(p[5]))
+			mark("temperature_minimum", "invalid")
 			mark("minimum_index", "invalid")
 		}
 		raw("soh", int64(p[7]))

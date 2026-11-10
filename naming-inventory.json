@@ -1,5 +1,5 @@
 {
-  "description": "Lexical source inventory for review; historical names are documentary only and are never runtime fallback keys. No renames are performed. Coverage and semantic identities require independent verification.",
+  "description": "Non-runtime naming inventory of the current emitted shape. Historical names are documentary correspondence only and never fallback keys. Candidate protocol grades do not establish native qualification.",
   "source_files": [
     ".github/workflows/behavior-names.yml",
     ".github/workflows/ci.yml",
@@ -8,6 +8,7 @@
     ".gitignore",
     ".golangci.yml",
     "AGENTS.md",
+    "CHANGELOG.md",
     "LICENSE",
     "README.md",
     "go.mod",
@@ -76,6 +77,9 @@
     "growatt_v104_replay.go",
     "growatt_v104_replay_test.go",
     "growatt_v104_test.go",
+    "naming-consumers.json",
+    "naming-inventory.json",
+    "naming_contract_test.go",
     "o08_growatt_provider.go",
     "o08_growatt_provider_test.go",
     "registry.go",
@@ -15462,12 +15466,12 @@
       "consumer_files": []
     },
     {
-      "identity": "growatt_link_telemetry.go:string_literal:source:maximum_temperature",
+      "identity": "growatt_link_telemetry.go:string_literal:source:temperature_maximum",
       "owning_file": "growatt_link_telemetry.go",
       "kind": "string_literal",
-      "current_name": "maximum_temperature",
+      "current_name": "temperature_maximum",
       "target": "temperature_maximum",
-      "status": "ready",
+      "status": "adopted",
       "role_decomposition": "object=temperature; bound=maximum",
       "evidence": [
         "growatt_link_telemetry.go"
@@ -15475,7 +15479,23 @@
       "value_class": "unresolved",
       "unit_metadata": "unresolved; see source",
       "open_question": null,
-      "consumer_files": []
+      "consumer_files": [
+        "ebusgateway/cmd/gateway/growatt_link_runtime.go",
+        "ebusgateway/cmd/gateway/growatt_link_runtime_test.go",
+        "ebusgateway/cmd/gateway/growatt_pcs_runtime.go",
+        "ebusgateway/cmd/gateway/growatt_pcs_runtime_test.go",
+        "ebusgateway/cmd/gateway/growatt_project_cli.go",
+        "ebusgateway/cmd/gateway/growatt_project_cli_test.go",
+        "ebusgateway/cmd/gateway/growatt_project_composition_test.go",
+        "ebusgateway/cmd/gateway/growatt_project_conformance_test.go",
+        "ebusgateway/cmd/gateway/growatt_project_provider.go",
+        "ebusgateway/cmd/gateway/growatt_project_provider_test.go",
+        "ebusgateway/cmd/gateway/managed_sidecar_composition.go",
+        "ebusgateway/docs/observability/semantic-prometheus-coverage.md",
+        "ebusgateway/growatt_project_config.go",
+        "ebusgateway/growatt_project_config_test.go"
+      ],
+      "historical_name": "maximum_temperature"
     },
     {
       "identity": "growatt_link_telemetry.go:string_literal:source:minimum",
@@ -15634,12 +15654,12 @@
       "consumer_files": []
     },
     {
-      "identity": "growatt_link_telemetry.go:string_literal:source:minimum_temperature",
+      "identity": "growatt_link_telemetry.go:string_literal:source:temperature_minimum",
       "owning_file": "growatt_link_telemetry.go",
       "kind": "string_literal",
-      "current_name": "minimum_temperature",
+      "current_name": "temperature_minimum",
       "target": "temperature_minimum",
-      "status": "ready",
+      "status": "adopted",
       "role_decomposition": "object=temperature; bound=minimum",
       "evidence": [
         "growatt_link_telemetry.go"
@@ -15647,7 +15667,23 @@
       "value_class": "unresolved",
       "unit_metadata": "unresolved; see source",
       "open_question": null,
-      "consumer_files": []
+      "consumer_files": [
+        "ebusgateway/cmd/gateway/growatt_link_runtime.go",
+        "ebusgateway/cmd/gateway/growatt_link_runtime_test.go",
+        "ebusgateway/cmd/gateway/growatt_pcs_runtime.go",
+        "ebusgateway/cmd/gateway/growatt_pcs_runtime_test.go",
+        "ebusgateway/cmd/gateway/growatt_project_cli.go",
+        "ebusgateway/cmd/gateway/growatt_project_cli_test.go",
+        "ebusgateway/cmd/gateway/growatt_project_composition_test.go",
+        "ebusgateway/cmd/gateway/growatt_project_conformance_test.go",
+        "ebusgateway/cmd/gateway/growatt_project_provider.go",
+        "ebusgateway/cmd/gateway/growatt_project_provider_test.go",
+        "ebusgateway/cmd/gateway/managed_sidecar_composition.go",
+        "ebusgateway/docs/observability/semantic-prometheus-coverage.md",
+        "ebusgateway/growatt_project_config.go",
+        "ebusgateway/growatt_project_config_test.go"
+      ],
+      "historical_name": "minimum_temperature"
     },
     {
       "identity": "growatt_link_telemetry.go:string_literal:source:mixed",
@@ -35020,12 +35056,12 @@
       "consumer_files": []
     },
     {
-      "identity": "growatt_pcs_parallel_release11.go:string_literal:source:maximum_temperature",
+      "identity": "growatt_pcs_parallel_release11.go:string_literal:source:temperature_maximum",
       "owning_file": "growatt_pcs_parallel_release11.go",
       "kind": "string_literal",
-      "current_name": "maximum_temperature",
+      "current_name": "temperature_maximum",
       "target": "temperature_maximum",
-      "status": "ready",
+      "status": "adopted",
       "role_decomposition": "object=temperature; bound=maximum",
       "evidence": [
         "growatt_pcs_parallel_release11.go"
@@ -35033,7 +35069,23 @@
       "value_class": "unresolved",
       "unit_metadata": "unresolved; see source",
       "open_question": null,
-      "consumer_files": []
+      "consumer_files": [
+        "ebusgateway/cmd/gateway/growatt_link_runtime.go",
+        "ebusgateway/cmd/gateway/growatt_link_runtime_test.go",
+        "ebusgateway/cmd/gateway/growatt_pcs_runtime.go",
+        "ebusgateway/cmd/gateway/growatt_pcs_runtime_test.go",
+        "ebusgateway/cmd/gateway/growatt_project_cli.go",
+        "ebusgateway/cmd/gateway/growatt_project_cli_test.go",
+        "ebusgateway/cmd/gateway/growatt_project_composition_test.go",
+        "ebusgateway/cmd/gateway/growatt_project_conformance_test.go",
+        "ebusgateway/cmd/gateway/growatt_project_provider.go",
+        "ebusgateway/cmd/gateway/growatt_project_provider_test.go",
+        "ebusgateway/cmd/gateway/managed_sidecar_composition.go",
+        "ebusgateway/docs/observability/semantic-prometheus-coverage.md",
+        "ebusgateway/growatt_project_config.go",
+        "ebusgateway/growatt_project_config_test.go"
+      ],
+      "historical_name": "maximum_temperature"
     },
     {
       "identity": "growatt_pcs_parallel_release11.go:string_literal:source:minimum_cell",
@@ -35068,12 +35120,12 @@
       "consumer_files": []
     },
     {
-      "identity": "growatt_pcs_parallel_release11.go:string_literal:source:minimum_temperature",
+      "identity": "growatt_pcs_parallel_release11.go:string_literal:source:temperature_minimum",
       "owning_file": "growatt_pcs_parallel_release11.go",
       "kind": "string_literal",
-      "current_name": "minimum_temperature",
+      "current_name": "temperature_minimum",
       "target": "temperature_minimum",
-      "status": "ready",
+      "status": "adopted",
       "role_decomposition": "object=temperature; bound=minimum",
       "evidence": [
         "growatt_pcs_parallel_release11.go"
@@ -35081,7 +35133,23 @@
       "value_class": "unresolved",
       "unit_metadata": "unresolved; see source",
       "open_question": null,
-      "consumer_files": []
+      "consumer_files": [
+        "ebusgateway/cmd/gateway/growatt_link_runtime.go",
+        "ebusgateway/cmd/gateway/growatt_link_runtime_test.go",
+        "ebusgateway/cmd/gateway/growatt_pcs_runtime.go",
+        "ebusgateway/cmd/gateway/growatt_pcs_runtime_test.go",
+        "ebusgateway/cmd/gateway/growatt_project_cli.go",
+        "ebusgateway/cmd/gateway/growatt_project_cli_test.go",
+        "ebusgateway/cmd/gateway/growatt_project_composition_test.go",
+        "ebusgateway/cmd/gateway/growatt_project_conformance_test.go",
+        "ebusgateway/cmd/gateway/growatt_project_provider.go",
+        "ebusgateway/cmd/gateway/growatt_project_provider_test.go",
+        "ebusgateway/cmd/gateway/managed_sidecar_composition.go",
+        "ebusgateway/docs/observability/semantic-prometheus-coverage.md",
+        "ebusgateway/growatt_project_config.go",
+        "ebusgateway/growatt_project_config_test.go"
+      ],
+      "historical_name": "minimum_temperature"
     },
     {
       "identity": "growatt_pcs_parallel_release11.go:string_literal:source:numeric_index",
@@ -43864,12 +43932,12 @@
       "consumer_files": []
     },
     {
-      "identity": "growatt_pcs_standard.go:string_literal:source:maximum_temperature",
+      "identity": "growatt_pcs_standard.go:string_literal:source:temperature_maximum",
       "owning_file": "growatt_pcs_standard.go",
       "kind": "string_literal",
-      "current_name": "maximum_temperature",
+      "current_name": "temperature_maximum",
       "target": "temperature_maximum",
-      "status": "ready",
+      "status": "adopted",
       "role_decomposition": "object=temperature; bound=maximum",
       "evidence": [
         "growatt_pcs_standard.go"
@@ -43877,7 +43945,23 @@
       "value_class": "unresolved",
       "unit_metadata": "unresolved; see source",
       "open_question": null,
-      "consumer_files": []
+      "consumer_files": [
+        "ebusgateway/cmd/gateway/growatt_link_runtime.go",
+        "ebusgateway/cmd/gateway/growatt_link_runtime_test.go",
+        "ebusgateway/cmd/gateway/growatt_pcs_runtime.go",
+        "ebusgateway/cmd/gateway/growatt_pcs_runtime_test.go",
+        "ebusgateway/cmd/gateway/growatt_project_cli.go",
+        "ebusgateway/cmd/gateway/growatt_project_cli_test.go",
+        "ebusgateway/cmd/gateway/growatt_project_composition_test.go",
+        "ebusgateway/cmd/gateway/growatt_project_conformance_test.go",
+        "ebusgateway/cmd/gateway/growatt_project_provider.go",
+        "ebusgateway/cmd/gateway/growatt_project_provider_test.go",
+        "ebusgateway/cmd/gateway/managed_sidecar_composition.go",
+        "ebusgateway/docs/observability/semantic-prometheus-coverage.md",
+        "ebusgateway/growatt_project_config.go",
+        "ebusgateway/growatt_project_config_test.go"
+      ],
+      "historical_name": "maximum_temperature"
     },
     {
       "identity": "growatt_pcs_standard.go:string_literal:source:maximum_temperature_index",
@@ -43944,12 +44028,12 @@
       "consumer_files": []
     },
     {
-      "identity": "growatt_pcs_standard.go:string_literal:source:minimum_temperature",
+      "identity": "growatt_pcs_standard.go:string_literal:source:temperature_minimum",
       "owning_file": "growatt_pcs_standard.go",
       "kind": "string_literal",
-      "current_name": "minimum_temperature",
+      "current_name": "temperature_minimum",
       "target": "temperature_minimum",
-      "status": "ready",
+      "status": "adopted",
       "role_decomposition": "object=temperature; bound=minimum",
       "evidence": [
         "growatt_pcs_standard.go"
@@ -43957,7 +44041,23 @@
       "value_class": "unresolved",
       "unit_metadata": "unresolved; see source",
       "open_question": null,
-      "consumer_files": []
+      "consumer_files": [
+        "ebusgateway/cmd/gateway/growatt_link_runtime.go",
+        "ebusgateway/cmd/gateway/growatt_link_runtime_test.go",
+        "ebusgateway/cmd/gateway/growatt_pcs_runtime.go",
+        "ebusgateway/cmd/gateway/growatt_pcs_runtime_test.go",
+        "ebusgateway/cmd/gateway/growatt_project_cli.go",
+        "ebusgateway/cmd/gateway/growatt_project_cli_test.go",
+        "ebusgateway/cmd/gateway/growatt_project_composition_test.go",
+        "ebusgateway/cmd/gateway/growatt_project_conformance_test.go",
+        "ebusgateway/cmd/gateway/growatt_project_provider.go",
+        "ebusgateway/cmd/gateway/growatt_project_provider_test.go",
+        "ebusgateway/cmd/gateway/managed_sidecar_composition.go",
+        "ebusgateway/docs/observability/semantic-prometheus-coverage.md",
+        "ebusgateway/growatt_project_config.go",
+        "ebusgateway/growatt_project_config_test.go"
+      ],
+      "historical_name": "minimum_temperature"
     },
     {
       "identity": "growatt_pcs_standard.go:string_literal:source:minimum_temperature_index",

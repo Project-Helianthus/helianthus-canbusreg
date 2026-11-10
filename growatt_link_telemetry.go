@@ -181,8 +181,8 @@ func CXDecodeLINKTelemetry(s CXSelection, i CX01LINKInput) CXNativeResult {
 		byteField("b6", 6)
 		byteField("b7", 7)
 		if localUnits {
-			accepted("maximum_temperature", int64(p[1])-40, 1, "C", "integer code")
-			accepted("minimum_temperature", int64(p[3])-40, 1, "C", "integer code")
+			accepted("temperature_maximum", int64(p[1])-40, 1, "C", "integer code")
+			accepted("temperature_minimum", int64(p[3])-40, 1, "C", "integer code")
 		}
 	case 0x1809:
 		if !cx01LINKDateAdmission(s, i) {

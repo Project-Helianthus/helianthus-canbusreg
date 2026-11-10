@@ -1,0 +1,99 @@
+// This helper is copied to tool scratch before execution.
+package main
+
+import (
+ "bytes"
+ "encoding/json"
+ "fmt"
+ "go/ast"
+ "go/format"
+ "go/parser"
+ "go/token"
+ "os"
+)
+
+type Row struct {
+ Path string `json:"path"`
+ Symbol string `json:"symbol"`
+ Metric string `json:"metric"`
+ Value int `json:"value"`
+ Test bool `json:"test"`
+}
+
+func main() {
+ rows := []Row{}
+ for _, path := range os.Args[1:] {
+  source, err := os.ReadFile(path)
+  if err != nil { fail(err) }
+  fs := token.NewFileSet()
+  file, err := parser.ParseFile(fs, path, source, parser.AllErrors)
+  if err != nil { fail(err) }
+  test := len(path) >= 8 && path[len(path)-8:] == "_test.go"
+  add := func(symbol, metric string, value int) {
+   rows = append(rows, Row{path, symbol, metric, value, test})
+  }
+  lines := bytes.Count(source, []byte{'\n'})
+  if len(source) > 0 && source[len(source)-1] != '\n' { lines++ }
+  add("<file>", "file_lines", lines)
+  count := 0
+  var walk func(string, ...ast.Node)
+  walk = func(enclosing string, nodes ...ast.Node) {
+   ordinal := 0
+   for _, node := range nodes {
+   ast.Inspect(node, func(n ast.Node) bool {
+    if n == nil { return false }
+    if lit, ok := n.(*ast.FuncLit); ok {
+     ordinal++
+     symbol := fmt.Sprintf("%s/literal%d", enclosing, ordinal)
+     count++
+     add(symbol, "function_lines", fs.PositionFor(lit.End(), false).Line-fs.PositionFor(lit.Pos(), false).Line+1)
+     walk(symbol, lit.Type, lit.Body) // signature literals share the ordinal sequence
+     return false
+    }
+    return true
+   })
+   }
+  }
+  anonymousNames := map[string]int{}
+  for _, decl := range file.Decls {
+   if fn, ok := decl.(*ast.FuncDecl); ok {
+    symbol := fn.Name.Name
+    if fn.Recv == nil && (symbol == "init" || symbol == "_") {
+     anonymousNames[symbol]++
+     symbol = fmt.Sprintf("%s#%d", symbol, anonymousNames[symbol])
+    }
+    if fn.Recv != nil {
+     var b bytes.Buffer
+     if err := format.Node(&b, fs, fn.Recv.List[0].Type); err != nil { fail(err) }
+     symbol = "(" + b.String() + ")." + symbol
+    }
+    count++
+    add(symbol, "function_lines", fs.PositionFor(fn.End(), false).Line-fs.PositionFor(fn.Pos(), false).Line+1)
+    walk(symbol, fn) // receiver, signature types and body share one ordinal sequence
+   } else if gen, ok := decl.(*ast.GenDecl); ok {
+    for _, spec := range gen.Specs {
+     if typeSpec, ok := spec.(*ast.TypeSpec); ok {
+      walk("type:"+typeSpec.Name.Name, typeSpec)
+     }
+     if value, ok := spec.(*ast.ValueSpec); ok {
+      names := ""
+      allBlank := true
+      for i, name := range value.Names {
+       if i > 0 { names += "," }; names += name.Name
+       if name.Name != "_" { allBlank = false }
+      }
+      if allBlank {
+       anonymousNames["var:"+names]++
+       names = fmt.Sprintf("%s#%d", names, anonymousNames["var:"+names])
+      }
+      walk("var:"+names, value)
+     }
+    }
+   }
+  }
+  add("<file>", "functions_per_file", count)
+ }
+ if err := json.NewEncoder(os.Stdout).Encode(rows); err != nil { fail(err) }
+}
+
+func fail(err error) { fmt.Fprintln(os.Stderr, err); os.Exit(1) }

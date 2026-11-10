@@ -1,0 +1,59 @@
+{
+  "version": 1,
+  "violations": [
+    {
+      "path": "gree_vrf_map_transform_test.go",
+      "symbol": "TestGreeVRFMapTransformsReplayCanonicalVectors",
+      "metric": "function_lines",
+      "value": 301
+    },
+    {
+      "path": "growatt_link_telemetry.go",
+      "symbol": "CXDecodeLINKTelemetry",
+      "metric": "function_lines",
+      "value": 222
+    },
+    {
+      "path": "growatt_pcs_extended.go",
+      "symbol": "CX09DecodePCSExtended",
+      "metric": "function_lines",
+      "value": 157
+    },
+    {
+      "path": "growatt_pcs_parallel_release11.go",
+      "symbol": "CX11DecodeParallel",
+      "metric": "function_lines",
+      "value": 199
+    },
+    {
+      "path": "growatt_pcs_standard.go",
+      "symbol": "CX05DecodePCSStandard",
+      "metric": "function_lines",
+      "value": 164
+    },
+    {
+      "path": "growatt_pcs_summaries.go",
+      "symbol": "CX14DecodePCSSummaries",
+      "metric": "function_lines",
+      "value": 170
+    },
+    {
+      "path": "growatt_project_provider.go",
+      "symbol": "(*CX17Provider).cx17Apply",
+      "metric": "function_lines",
+      "value": 183
+    },
+    {
+      "path": "growatt_project_provider_test.go",
+      "symbol": "<file>",
+      "metric": "file_lines",
+      "value": 1791
+    },
+    {
+      "path": "growatt_project_provider_test.go",
+      "symbol": "<file>",
+      "metric": "functions_per_file",
+      "value": 114
+    }
+  ]
+}

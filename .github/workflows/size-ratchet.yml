@@ -1,0 +1,32 @@
+name: Go size ratchet
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+permissions:
+  contents: read
+
+jobs:
+  size:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    env:
+      GOWORK: 'off'
+      GOFLAGS: -buildvcs=false
+      PYTHONDONTWRITEBYTECODE: '1'
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: actions/setup-go@v5
+        with:
+          go-version-file: go.mod
+          check-latest: false
+          cache: false
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.x'
+      - run: python3 -m unittest discover -s scripts/tests -p test_size_ratchet.py -v
+      - run: python3 scripts/check_size_ratchet.py

@@ -14,7 +14,7 @@ import (
 )
 
 func TestCX15RawRetentionAndLastKnownGood(t *testing.T) {
-	store, err := NewCX15OpaqueStore(2)
+	store, err := NewOpaqueStore(2)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -89,12 +89,12 @@ func TestCX15RawRetentionAndLastKnownGood(t *testing.T) {
 
 func TestCX15RetentionBoundsAndConcurrency(t *testing.T) {
 	for _, n := range []int{-1, 0, 1, 256, 257} {
-		_, err := NewCX15OpaqueStore(n)
+		_, err := NewOpaqueStore(n)
 		if (err == nil) != (n >= 1 && n <= 256) {
 			t.Fatal(n, err)
 		}
 	}
-	store, _ := NewCX15OpaqueStore(2)
+	store, _ := NewOpaqueStore(2)
 	s, c, i := capabilityTestFixture(t, 8, "link", "module-to-coordinator", "coordinator", 0x1800)
 	var wg sync.WaitGroup
 	for worker := 0; worker < 8; worker++ {
@@ -165,7 +165,7 @@ func TestCX15CapabilityEveryKeyFieldIndependent(t *testing.T) {
 	}
 	for name, mutate := range cases {
 		t.Run(name, func(t *testing.T) {
-			store, _ := NewCX15OpaqueStore(4)
+			store, _ := NewOpaqueStore(4)
 			for _, state := range []CapabilityState{ReceiverCapabilityUnknown, ReceiverCapabilityObserved, ReceiverCapabilityQualified, ReceiverCapabilityUnsupported} {
 				if err := store.AssertCapability(base, state); err != nil {
 					t.Fatal(err)
@@ -330,7 +330,7 @@ func TestCX15ReceiveOnlySurface(t *testing.T) {
 }
 
 func TestCX15ExplicitUnsupportedCannotOverrideRawRetention(t *testing.T) {
-	store, _ := NewCX15OpaqueStore(4)
+	store, _ := NewOpaqueStore(4)
 	s, c, i := capabilityTestFixture(t, 8, "link", "module-to-coordinator", "coordinator", 0x1800)
 	key := CapabilityKey{s, c, 0x1800}
 	if !store.Observe(s, c, i).Admitted || store.Capability(key) != ReceiverCapabilityObserved {
@@ -362,7 +362,7 @@ func TestCX15ExplicitUnsupportedCannotOverrideRawRetention(t *testing.T) {
 }
 
 func TestCX15DirectStatusPreservesPeriodicAlarmEvidence(t *testing.T) {
-	store, _ := NewCX15OpaqueStore(4)
+	store, _ := NewOpaqueStore(4)
 	s, c, _ := capabilityTestFixture(t, 8, "pcs-standard", "bms-to-controller", "controller", 0x3f7)
 	periodic := capabilityTestInput(t, s, c, 0x3f7, [8]byte{1, 2, 0, 0, 0, 1, 7, 8})
 	if !store.Observe(s, c, periodic).Admitted {

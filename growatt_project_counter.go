@@ -28,8 +28,8 @@ func ExplainTail(state int64) uint16 { return uint16(state) * 10 }
 
 // RefineCounter exposes a separate receive-only refinement for composition.
 // Both wire forms already contain transformed codes; no energy, capacity or
-// time unit is inferred and CX01 decoding is left intact.
-func RefineCounter(s CXSelection, i CounterInput) CXNativeResult {
+// time unit is inferred and DecodeLINKTelemetry decoding is left intact.
+func RefineCounter(s Selection, i CounterInput) NativeResult {
 	c := s.SelectionSpecValue()
 	status := pCSIdentityAdmit(s, i.PCSIdentityPCSInput)
 	link := c.Flavor == "link"

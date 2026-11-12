@@ -20,13 +20,13 @@ type MeasurementGate struct {
 
 // VectorSnapshot separates received channels, valid coverage and last-known-good values; durations use the caller's monotonic clock.
 type VectorSnapshot struct {
-	Selection                         CXSelection
+	Selection                         Selection
 	Kind                              string
 	ConfiguredCount, AddressableSlots int
 	CountValid, CompleteCoverage      bool
 	Fixed16Path                       bool
 	ReceivedIndices, ValidIndices     []int
-	Fields, LastGood                  map[int]CXNativeField
+	Fields, LastGood                  map[int]NativeField
 	Span, ReceivedSpan                time.Duration
 	AsOf, MaxAge                      time.Duration
 	PhysicalQualified                 bool
@@ -36,33 +36,33 @@ type VectorSnapshot struct {
 // supply measurement age and validity, rather than infer them from reception.
 type LINKVector struct {
 	mu              sync.Mutex
-	selection       CXSelection
+	selection       Selection
 	count, capacity int
 	countValid      bool
 	fixed16         bool
 	kind            string
-	fields, good    map[int]CXNativeField
+	fields, good    map[int]NativeField
 	sequence        uint64
 	monotonic       time.Duration
 }
 
 // NewLINKCells creates bounded history for up to sixteen cell channels using an independently asserted count.
-func NewLINKCells(s CXSelection, count int, countValid bool) *LINKVector {
+func NewLINKCells(s Selection, count int, countValid bool) *LINKVector {
 	return lINKVectorNewVector(s, count, countValid, 16, "cells")
 }
 
 // NewLINKFixed16Cells selects an independently asserted fixed-16 path.
 // The reported count stays separate and does not qualify that assertion.
-func NewLINKFixed16Cells(s CXSelection, count int, countValid bool) *LINKVector {
+func NewLINKFixed16Cells(s Selection, count int, countValid bool) *LINKVector {
 	a := lINKVectorNewVector(s, count, countValid, 16, "cells")
 	a.fixed16 = true
 	return a
 }
-func lINKVectorNewVector(s CXSelection, count int, valid bool, capacity int, kind string) *LINKVector {
-	return &LINKVector{selection: s, count: count, countValid: valid, capacity: capacity, kind: kind, fields: make(map[int]CXNativeField), good: make(map[int]CXNativeField)}
+func lINKVectorNewVector(s Selection, count int, valid bool, capacity int, kind string) *LINKVector {
+	return &LINKVector{selection: s, count: count, countValid: valid, capacity: capacity, kind: kind, fields: make(map[int]NativeField), good: make(map[int]NativeField)}
 }
-func lINKVectorField(i LINKInput, n int64) CXNativeField {
-	return CXNativeField{Numerator: n, Denominator: 1, Raw: i.Evidence.Frame.Bytes(), Evidence: i.Evidence, Epoch: i.Epoch, Scope: i.Scope, Bank: i.Bank, Endpoint: i.Endpoint, Group: i.Group, Slot: i.Slot, Age: i.FieldAge, Grade: "Unknown", Status: "raw"}
+func lINKVectorField(i LINKInput, n int64) NativeField {
+	return NativeField{Numerator: n, Denominator: 1, Raw: i.Evidence.Frame.Bytes(), Evidence: i.Evidence, Epoch: i.Epoch, Scope: i.Scope, Bank: i.Bank, Endpoint: i.Endpoint, Group: i.Group, Slot: i.Slot, Age: i.FieldAge, Grade: "Unknown", Status: "raw"}
 }
 func lINKVectorGate(g MeasurementGate) string {
 	if !g.Configured {
@@ -88,9 +88,9 @@ func lINKVectorGate(g MeasurementGate) string {
 	return "accepted"
 }
 
-// cx12GateRejection keeps the independent gate verdict and age on a field the
+// lINKVectorGateRejection keeps the independent gate verdict and age on a field the
 // gate refused, instead of reverting to the frame's own raw status and age.
-func lINKVectorGateRejection(f CXNativeField, g MeasurementGate) CXNativeField {
+func lINKVectorGateRejection(f NativeField, g MeasurementGate) NativeField {
 	st := lINKVectorGate(g)
 	if st == "accepted" || st == "unconfigured" {
 		return f
@@ -102,12 +102,12 @@ func lINKVectorGateRejection(f CXNativeField, g MeasurementGate) CXNativeField {
 	return f
 }
 
-func lINKVectorAdmit(s CXSelection, i LINKInput) bool {
+func lINKVectorAdmit(s Selection, i LINKInput) bool {
 	return lINKAdmission(s, i) && s.SelectionGroup() != "" && i.Evidence.Sequence > 0 && i.Evidence.Monotonic >= 0
 }
 
 // DecodeLINKVector serializes channel updates, rejects stale evidence and preserves last-known-good values when individual gates fail.
-func (a *LINKVector) DecodeLINKVector(i LINKInput, gates [4]MeasurementGate) CXNativeResult {
+func (a *LINKVector) DecodeLINKVector(i LINKInput, gates [4]MeasurementGate) NativeResult {
 	a.mu.Lock()
 	defer a.mu.Unlock()
 	r := selectionResult(a.selection, i, "invalid")
@@ -169,7 +169,7 @@ func (a *LINKVector) DecodeLINKVector(i LINKInput, gates [4]MeasurementGate) CXN
 	r.Status = "accepted"
 	return r
 }
-func lINKVectorAge(f CXNativeField, now time.Duration) (CXNativeField, bool) {
+func lINKVectorAge(f NativeField, now time.Duration) (NativeField, bool) {
 	if now < f.Evidence.Monotonic || f.Age < 0 {
 		return f, false
 	}
@@ -185,7 +185,7 @@ func lINKVectorAge(f CXNativeField, now time.Duration) (CXNativeField, bool) {
 func (a *LINKVector) SnapshotLINKVector(now, maxAge time.Duration) VectorSnapshot {
 	a.mu.Lock()
 	defer a.mu.Unlock()
-	v := VectorSnapshot{Selection: a.selection, Kind: a.kind, ConfiguredCount: a.count, AddressableSlots: a.capacity, CountValid: a.countValid, Fields: make(map[int]CXNativeField), LastGood: make(map[int]CXNativeField), AsOf: now, MaxAge: maxAge}
+	v := VectorSnapshot{Selection: a.selection, Kind: a.kind, ConfiguredCount: a.count, AddressableSlots: a.capacity, CountValid: a.countValid, Fields: make(map[int]NativeField), LastGood: make(map[int]NativeField), AsOf: now, MaxAge: maxAge}
 	v.Fixed16Path = a.fixed16
 	var first, last time.Duration
 	have := false
@@ -236,9 +236,9 @@ func (a *LINKVector) SnapshotLINKVector(now, maxAge time.Duration) VectorSnapsho
 	return v
 }
 
-// cx12Contributors rechecks detached snapshots at the summary's clock; callers
+// lINKVectorContributors rechecks detached snapshots at the summary's clock; callers
 // cannot use coverage alone to renew expired or differently associated values.
-func lINKVectorContributors(s CXSelection, i LINKInput, v VectorSnapshot, kind string, count int) (int64, bool) {
+func lINKVectorContributors(s Selection, i LINKInput, v VectorSnapshot, kind string, count int) (int64, bool) {
 	countGate := v.CountValid && v.ConfiguredCount == count
 	if v.Fixed16Path {
 		countGate = kind == "cells" && count == 16 && v.ConfiguredCount >= 0 && v.ConfiguredCount <= 16
@@ -283,7 +283,7 @@ func lINKVectorContributors(s CXSelection, i LINKInput, v VectorSnapshot, kind s
 }
 
 // DecodeLINKCellMean checks the supplied contributors and independent gate before assigning candidate meaning to the raw mean.
-func DecodeLINKCellMean(s CXSelection, i LINKInput, g MeasurementGate, v VectorSnapshot, fixed16Valid bool) CXNativeResult {
+func DecodeLINKCellMean(s Selection, i LINKInput, g MeasurementGate, v VectorSnapshot, fixed16Valid bool) NativeResult {
 	r := selectionResult(s, i, "invalid")
 	if !lINKVectorAdmit(s, i) {
 		return r

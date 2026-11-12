@@ -23,7 +23,7 @@ const (
 // Capability keys include the receiver identity and direction. A caller's
 // independent qualification assertion is never physical qualification.
 type CapabilityKey struct {
-	Selection CXSelection
+	Selection Selection
 	Context   ReceiverContext
 	PID       uint32
 }
@@ -33,7 +33,7 @@ type receiverCapabilityCapability struct {
 	state CapabilityState
 }
 type receiverCapabilityRetained struct {
-	selection CXSelection
+	selection Selection
 	result    ReceiverResult
 }
 
@@ -48,8 +48,8 @@ type OpaqueStore struct {
 	capabilities []receiverCapabilityCapability
 }
 
-// NewCX15OpaqueStore creates a synchronized journal with a retention bound of 1..256; other bounds return an error.
-func NewCX15OpaqueStore(limit int) (*OpaqueStore, error) {
+// NewOpaqueStore creates a synchronized journal with a retention bound of 1..256; other bounds return an error.
+func NewOpaqueStore(limit int) (*OpaqueStore, error) {
 	if limit < 1 || limit > 256 {
 		return nil, fmt.Errorf("raw retention bound must be 1..256")
 	}
@@ -95,12 +95,12 @@ func (s *OpaqueStore) setCapability(key CapabilityKey, state CapabilityState) {
 	}
 	s.capabilities = append(s.capabilities, receiverCapabilityCapability{key, state})
 }
-func receiverCapabilitySameStream(a receiverCapabilityRetained, selection CXSelection, r ReceiverResult) bool {
+func receiverCapabilitySameStream(a receiverCapabilityRetained, selection Selection, r ReceiverResult) bool {
 	return a.selection == selection && a.result.Context.Direction == r.Context.Direction && a.result.Context.Role == r.Context.Role && a.result.Context.Profile == r.Context.Profile && a.result.Context.Form == r.Context.Form && a.result.Input.Evidence.Frame.ID() == r.Input.Evidence.Frame.ID()
 }
 
 // Observe journals classification under lock; unsupported or stale observations cannot replace last-known-good evidence.
-func (s *OpaqueStore) Observe(selection CXSelection, c ReceiverContext, i LINKInput) ReceiverResult {
+func (s *OpaqueStore) Observe(selection Selection, c ReceiverContext, i LINKInput) ReceiverResult {
 	s.mu.Lock()
 	defer s.mu.Unlock()
 	r := ClassifyReceiver(selection, c, i)

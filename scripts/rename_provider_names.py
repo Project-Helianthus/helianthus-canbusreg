@@ -1,11 +1,28 @@
-"""Offline, token-aware provider identifier rename; literals remain unchanged."""
+"""Offline, token-aware provider identifier rename; literals remain unchanged.
+
+Identifiers and the names that comments cite are renamed; string, rune and raw
+literals are kept byte for byte. Metadata keys that collide after a rename must
+both be lists and are merged. Behavior-name baseline entries whose symbol this
+run renames to a name the guard no longer flags are removed.
+"""
 import json
 import re
 import subprocess
+import sys
 from pathlib import Path
 
+sys.path.insert(0, str(Path(__file__).resolve().parent))
+from check_behavior_names import TOKENS as CODED  # noqa: E402
+
 ROOT = Path(__file__).resolve().parents[1]
-RENAMES = {'CX01ConfirmNativeSelection': 'ConfirmNativeSelection',
+RENAMES = {'CXDecodeLINKTelemetry': 'DecodeLINKTelemetry',
+ 'CXNativeField': 'NativeField',
+ 'CXNativeResult': 'NativeResult',
+ 'CXSelection': 'Selection',
+ 'NewCX15OpaqueStore': 'NewOpaqueStore',
+ 'NewCX16SelectedProfile': 'NewSelectedProfile',
+ 'NewCXSelection': 'NewSelection',
+ 'CX01ConfirmNativeSelection': 'ConfirmNativeSelection',
  'CX01Decode': 'DecodeLINKIdentity',
  'CX01FeatureGrade': 'SelectionFeatureGrade',
  'CX01Grade': 'SelectionGrade',
@@ -330,21 +347,47 @@ METADATA = ['naming-consumers.json',
  'scripts/size-baseline.json']
 MOVES = {"o08_growatt_provider.go": "growatt_bms_provider.go", "o08_growatt_provider_test.go": "growatt_bms_provider_test.go"}
 TOKEN = re.compile(r"//[^\n]*|/\*[\s\S]*?\*/|\"(?:\\.|[^\"\\])*\"|`[^`]*`|'(?:\\.|[^'\\])*'|\b[A-Za-z_]\w*\b")
+WORD = re.compile(r"\b[A-Za-z_]\w*\b")
+
+
+def rename_words(text):
+    return WORD.sub(lambda match: RENAMES.get(match[0], match[0]), text)
 
 
 def rewrite(source):
-    return TOKEN.sub(lambda match: RENAMES.get(match[0], match[0]), source)
+    def token(match):
+        if match[0].startswith(("//", "/*")):
+            return rename_words(match[0])
+        return RENAMES.get(match[0], match[0])
+    return TOKEN.sub(token, source)
+
+
+def merge_keys(items):
+    merged = {}
+    for key, value in items:
+        if key not in merged:
+            merged[key] = value
+        elif isinstance(merged[key], list) and isinstance(value, list):
+            merged[key] = sorted(set(merged[key]) | set(value))
+        else:
+            raise SystemExit("renamed metadata key collides: " + key)
+    return merged
 
 
 def metadata(value):
     if isinstance(value, dict):
-        return {metadata(k): metadata(v) for k, v in value.items()}
+        return merge_keys((metadata(k), metadata(v)) for k, v in value.items())
     if isinstance(value, list):
         return [metadata(v) for v in value]
     if isinstance(value, str):
         value = MOVES.get(value, value)
-        return re.sub(r"\b[A-Za-z_]\w*\b", lambda m: RENAMES.get(m[0], m[0]), value)
+        return rename_words(value)
     return value
+
+
+def prune_baseline(original, updated):
+    return [new for old, new in zip(original, updated)
+            if new["symbol"] == old["symbol"] or CODED.search(new["symbol"])]
 
 
 def main():
@@ -365,6 +408,8 @@ def main():
         path = ROOT / name
         original = json.loads(path.read_text())
         updated = metadata(original)
+        if name == "scripts/behavior-name-baseline.json":
+            updated["baseline"] = prune_baseline(original["baseline"], updated["baseline"])
         if original != updated:
             path.write_text(json.dumps(updated, indent=2) + "\n")
 

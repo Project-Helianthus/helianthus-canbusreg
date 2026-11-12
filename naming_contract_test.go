@@ -11,7 +11,7 @@ import (
 	"github.com/Project-Helianthus/helianthus-canbus"
 )
 
-func namingNoAliases(t *testing.T, r CXNativeResult) {
+func namingNoAliases(t *testing.T, r NativeResult) {
 	t.Helper()
 	for _, old := range []string{"maximum_temperature", "minimum_temperature"} {
 		if _, ok := r.Fields[old]; ok {
@@ -22,14 +22,14 @@ func namingNoAliases(t *testing.T, r CXNativeResult) {
 
 func TestNamingSupportedTemperatureKeys(t *testing.T) {
 	c := selectionTestSpec(t, "QAAA", "0006")
-	link := CXDecodeLINKTelemetry(selectionTestSelect(t, c), selectionTestInput(t, c, 0x1808, [8]byte{2, 81, 3, 39, 40, 0, 0, 0}))
+	link := DecodeLINKTelemetry(selectionTestSelect(t, c), selectionTestInput(t, c, 0x1808, [8]byte{2, 81, 3, 39, 40, 0, 0, 0}))
 	s, i := standardTestFixture(t, 0x322, [8]byte{0xff, 0xf6, 0x80, 0, 2, 3, 0, 0})
-	standard := DecodePCSStandard(s, i).CXNativeResult
+	standard := DecodePCSStandard(s, i).NativeResult
 	pc := parallelReleaseTestSpec(t)
 	parallel := parallelReleaseTestDecode(t, pc, 0x653, [8]byte{2, 0, 81, 3, 0, 39, 40, 0}, ParallelContext{})
 	for _, tc := range []struct {
 		name                          string
-		result                        CXNativeResult
+		result                        NativeResult
 		maximum, minimum, denominator int64
 	}{
 		{"link", link, 41, -1, 1}, {"standard", standard, -10, -32768, 10}, {"parallel", parallel, 41, -1, 1},
@@ -66,7 +66,7 @@ func TestNamingFieldKeysAndPartialRetention(t *testing.T) {
 	for _, keys := range [][2]string{{"temperature_maximum", "maximum_temperature"}, {"temperature_minimum", "minimum_temperature"}} {
 		t.Run(keys[0], func(t *testing.T) {
 			s, i := standardTestFixture(t, 0x322, [8]byte{0, 10, 0, 20, 2, 3, 0, 0})
-			previous := DecodePCSStandard(s, i).CXNativeResult
+			previous := DecodePCSStandard(s, i).NativeResult
 			sibling := "temperature_minimum"
 			if keys[0] == sibling {
 				sibling = "temperature_maximum"
@@ -75,7 +75,7 @@ func TestNamingFieldKeysAndPartialRetention(t *testing.T) {
 				update := i
 				update.FieldStates = map[string]string{keys[0]: state}
 				update.FieldAges = map[string]time.Duration{keys[0]: 5 * time.Second, sibling: 2 * time.Second}
-				r := DecodePCSStandard(s, update).CXNativeResult
+				r := DecodePCSStandard(s, update).NativeResult
 				if r.Fields[keys[0]].Status != state || r.Fields[keys[0]].Age != 5*time.Second || r.Fields[keys[0]].Unit != "" || r.Fields[sibling].Status != "accepted" {
 					t.Fatal(state, r)
 				}
@@ -87,7 +87,7 @@ func TestNamingFieldKeysAndPartialRetention(t *testing.T) {
 			}
 			i.FieldStates = map[string]string{keys[1]: "invalid"}
 			i.FieldAges = map[string]time.Duration{keys[1]: -1}
-			r := DecodePCSStandard(s, i).CXNativeResult
+			r := DecodePCSStandard(s, i).NativeResult
 			if r.Fields[keys[0]] != previous.Fields[keys[0]] {
 				t.Fatal("old key resolved", r)
 			}
@@ -97,18 +97,18 @@ func TestNamingFieldKeysAndPartialRetention(t *testing.T) {
 }
 
 func TestNamingRetentionIdentityCollisionAxes(t *testing.T) {
-	// Each axis catches weakening CX05RetainAccepted's exact selection comparisons
+	// Each axis catches weakening RetainAccepted's exact selection comparisons
 	// to ones that ignore that axis while retaining the same decoded field key.
 	axes := []string{"interface-name", "interface-index", "flavor", "pcs-flavor", "project", "release", "choice", "direction", "scope", "bank", "endpoint", "group", "slot", "route-set", "destination", "source", "epoch"}
 	for _, surface := range []string{"selection", "member"} {
 		for _, axis := range axes {
 			t.Run(surface+"/"+axis, func(t *testing.T) {
 				s, i := standardTestFixture(t, 0x322, [8]byte{0, 10, 0, 20, 2, 3, 0, 0})
-				previous := DecodePCSStandard(s, i).CXNativeResult
+				previous := DecodePCSStandard(s, i).NativeResult
 				previous.Member = s
 				previous.HasMember = true
 				update := previous
-				update.Fields = map[string]CXNativeField{}
+				update.Fields = map[string]NativeField{}
 				c := s.SelectionSpecValue()
 				switch axis {
 				case "interface-name":
@@ -159,11 +159,11 @@ func TestNamingRetentionIdentityCollisionAxes(t *testing.T) {
 	}
 	t.Run("has-member", func(t *testing.T) {
 		s, i := standardTestFixture(t, 0x322, [8]byte{0, 10, 0, 20, 2, 3, 0, 0})
-		previous := DecodePCSStandard(s, i).CXNativeResult
+		previous := DecodePCSStandard(s, i).NativeResult
 		previous.Member = s
 		previous.HasMember = true
 		update := previous
-		update.Fields = map[string]CXNativeField{}
+		update.Fields = map[string]NativeField{}
 		update.HasMember = false
 		if len(RetainAccepted(previous, update).Fields) != 0 {
 			t.Fatal("member presence ignored")

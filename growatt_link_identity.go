@@ -9,21 +9,21 @@ import (
 // LINKIdentitySnapshot is detached candidate evidence, not authentication.
 // It carries a single explicitly selected source; allocation is bounded.
 type LINKIdentitySnapshot struct {
-	Selection                    CXSelection
+	Selection                    Selection
 	Grade                        string
 	ProjectCode, Release, Status string
 	Serial                       [16]byte
 	HasIdentity, HasSerial       bool
 	IdentityEvidence             Evidence
 	SerialEvidence               [3]Evidence
-	Fields                       map[string]CXNativeField
+	Fields                       map[string]NativeField
 	PhysicalQualified            bool
 }
 
 // LINKIdentityAssembler serializes identity assembly for one explicit selection; conflicts require a new assembler.
 type LINKIdentityAssembler struct {
 	mu            sync.Mutex
-	selection     CXSelection
+	selection     Selection
 	snapshot      LINKIdentitySnapshot
 	next          uint8
 	assembling    bool
@@ -34,8 +34,8 @@ type LINKIdentityAssembler struct {
 }
 
 // NewLINKIdentityAssembler creates an empty assembler bound to the supplied selection.
-func NewLINKIdentityAssembler(s CXSelection) *LINKIdentityAssembler {
-	return &LINKIdentityAssembler{selection: s, snapshot: LINKIdentitySnapshot{Selection: s, Grade: "Unknown", Status: "absent", Fields: make(map[string]CXNativeField)}}
+func NewLINKIdentityAssembler(s Selection) *LINKIdentityAssembler {
+	return &LINKIdentityAssembler{selection: s, snapshot: LINKIdentitySnapshot{Selection: s, Grade: "Unknown", Status: "absent", Fields: make(map[string]NativeField)}}
 }
 
 // SnapshotLINKIdentity returns a synchronized snapshot with a detached field map.
@@ -46,14 +46,14 @@ func (a *LINKIdentityAssembler) SnapshotLINKIdentity() LINKIdentitySnapshot {
 }
 func (a *LINKIdentityAssembler) snapshotLINKIdentity() LINKIdentitySnapshot {
 	s := a.snapshot
-	s.Fields = make(map[string]CXNativeField, len(a.snapshot.Fields))
+	s.Fields = make(map[string]NativeField, len(a.snapshot.Fields))
 	for k, v := range a.snapshot.Fields {
 		s.Fields[k] = v
 	}
 	return s
 }
 func (a *LINKIdentityAssembler) selectionInvalidate() {
-	a.snapshot = LINKIdentitySnapshot{Selection: a.selection, Grade: "Unknown", Status: "conflict", Fields: make(map[string]CXNativeField)}
+	a.snapshot = LINKIdentitySnapshot{Selection: a.selection, Grade: "Unknown", Status: "conflict", Fields: make(map[string]NativeField)}
 	a.assembling = false
 	a.fragments = [16]byte{}
 	a.evidence = [3]Evidence{}
@@ -63,7 +63,7 @@ func (a *LINKIdentityAssembler) selectionInvalidate() {
 // Decode validates identity continuity and retains independent last-known-good fields.
 // A conflict is sticky: a changed route role, identity, serial or newer epoch
 // needs a new selection/assembler. Obsolete evidence is reported stale instead.
-func (a *LINKIdentityAssembler) DecodeLINKIdentity(i LINKInput) CXNativeResult {
+func (a *LINKIdentityAssembler) DecodeLINKIdentity(i LINKInput) NativeResult {
 	a.mu.Lock()
 	defer a.mu.Unlock()
 	r := selectionResult(a.selection, i, "invalid")
@@ -169,7 +169,7 @@ func (a *LINKIdentityAssembler) DecodeLINKIdentity(i LINKInput) CXNativeResult {
 	}
 	// The 1800 flags byte is opaque: its unspecified bits cannot establish a
 	// role change, so it is retained raw (latest value) and never invalidates.
-	r = CXDecodeLINKTelemetry(a.selection, i)
+	r = DecodeLINKTelemetry(a.selection, i)
 	if r.Status == "conflict" {
 		a.selectionInvalidate()
 		return r

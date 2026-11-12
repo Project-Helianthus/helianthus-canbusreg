@@ -13,10 +13,10 @@ type PCSSlotPCSInput struct {
 	PCSIdentityPCSInput
 	SlotValid, GroupValid   bool
 	NativeSlot, NativeGroup uint8
-	Member                  *CXSelection
+	Member                  *Selection
 }
 
-func release11(s CXSelection) bool {
+func release11(s Selection) bool {
 	c := s.SelectionSpecValue()
 	return s.SelectionGroup() == "L8" && (c.ProjectCode == "QAAA" && c.Release == "0011" || c.ProjectCode == "QAAa" && c.Release == "9011" && c.Choice == "release11")
 }
@@ -24,7 +24,7 @@ func release11(s CXSelection) bool {
 // DecodePCSSlots consumes supplied evidence without bus I/O or caching.
 // The ordinary and parallel current offsets require Bank="standard" or
 // Bank="parallel" respectively; neither is inferred from current plausibility.
-func DecodePCSSlots(s CXSelection, i PCSSlotPCSInput) CXNativeResult {
+func DecodePCSSlots(s Selection, i PCSSlotPCSInput) NativeResult {
 	r := selectionResult(s, i.LINKInput, pCSIdentityAdmit(s, i.PCSIdentityPCSInput))
 	if i.Member != nil {
 		r.Member, r.HasMember = *i.Member, true

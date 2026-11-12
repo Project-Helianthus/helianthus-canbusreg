@@ -189,7 +189,7 @@ func receiverCapabilityRules() []receiverCapabilityRule {
 
 // ClassifyReceiver only describes an explicitly selected receiver. No payload
 // is decoded into measurements, identity, a client timeout, or a bus operation.
-func ClassifyReceiver(s CXSelection, c ReceiverContext, i LINKInput) ReceiverResult {
+func ClassifyReceiver(s Selection, c ReceiverContext, i LINKInput) ReceiverResult {
 	r := ReceiverResult{Input: i, Context: c, Raw: i.Evidence.Frame.Bytes(), Class: "U", Grade: "Unknown", Status: "invalid"}
 	spec := s.spec
 	f := i.Evidence.Frame
@@ -318,7 +318,7 @@ func ClassifyReceiver(s CXSelection, c ReceiverContext, i LINKInput) ReceiverRes
 	return r
 }
 
-func receiverCapabilityDescribe(s CXSelection, r *ReceiverResult, pid uint32) {
+func receiverCapabilityDescribe(s Selection, r *ReceiverResult, pid uint32) {
 	identity := s.spec.ProjectCode + s.spec.Release
 	if r.Context.Direction == "coordinator-to-module" && (pid == 0x18fe || pid == 0x1869) {
 		r.Grade = "Proven"

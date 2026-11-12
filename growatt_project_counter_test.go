@@ -33,7 +33,7 @@ func TestCX08CounterPreservesCachedCode(t *testing.T) {
 	c.Destination = 0xf4
 	c.Source = 1
 	c.Direction = "module-to-coordinator"
-	link, err := NewCXSelection(c)
+	link, err := NewSelection(c)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -41,7 +41,7 @@ func TestCX08CounterPreservesCachedCode(t *testing.T) {
 	r = RefineCounter(link, CounterInput{PCSIdentityPCSInput: j})
 	slotTestWant(t, r, "counter", "accepted", 16, 1, "")
 	c.Destination = 0xf5
-	bad, _ := NewCXSelection(c)
+	bad, _ := NewSelection(c)
 	if r = RefineCounter(bad, CounterInput{PCSIdentityPCSInput: j}); r.Status != "invalid" {
 		t.Fatal(r)
 	}
@@ -125,7 +125,7 @@ func TestCX08CounterWireBoundaries(t *testing.T) {
 		c.RouteSet = true
 		c.Destination = 0xf4
 		c.Source = 2
-		link, err := NewCXSelection(c)
+		link, err := NewSelection(c)
 		if err != nil {
 			t.Fatal(err)
 		}

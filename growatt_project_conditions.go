@@ -9,7 +9,7 @@ import "fmt"
 // A label annotates a received selected index, never activation, severity,
 // diagnosis, operating limits or physical qualification. No predicates are
 // evaluated from unreceived state or configurable thresholds.
-func LabelCondition(member CXSelection, index CXNativeField) CXNativeField {
+func LabelCondition(member Selection, index NativeField) NativeField {
 	r := index
 	r.Meaning, r.Grade, r.Status = "", "Unknown", "unsupported"
 	r.PhysicalQualified = false

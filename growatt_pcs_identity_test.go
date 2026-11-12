@@ -98,7 +98,7 @@ func TestCX06PlaceholderNegativeVectors(t *testing.T) {
 		t.Fatal("flavor")
 	}
 }
-func identityTestFragment(t *testing.T, s CXSelection, i PCSIdentityPCSInput, part byte) PCSIdentityPCSInput {
+func identityTestFragment(t *testing.T, s Selection, i PCSIdentityPCSInput, part byte) PCSIdentityPCSInput {
 	t.Helper()
 	p := [8]byte{part, 7, 8, 9, 10, 11, 12, 13}
 	if part == 0 {
@@ -229,7 +229,7 @@ func TestCX06SerialIdentityKey(t *testing.T) {
 			case "slot_valid":
 				i.SerialSlotValid = false
 			}
-			ss, err := NewCXSelection(c)
+			ss, err := NewSelection(c)
 			if err != nil {
 				t.Fatal(err)
 			}
@@ -321,7 +321,7 @@ func TestCX06SerialSlotAndDetachedEvidence(t *testing.T) {
 		t.Fatal("wrong anchor slot")
 	}
 	first := a.Consume(s, identityTestFragment(t, s, i, 0))
-	first.Record.Fields["byte_2"] = CXNativeField{Status: "corrupted"}
+	first.Record.Fields["byte_2"] = NativeField{Status: "corrupted"}
 	a.Consume(s, identityTestFragment(t, s, i, 1))
 	r := a.Consume(s, identityTestFragment(t, s, i, 2))
 	if r.Status != "complete" {

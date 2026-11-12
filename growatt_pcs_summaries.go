@@ -26,13 +26,13 @@ type PCSSummaryPCSInput struct {
 // set. ConditionalAlternatives require missing control-state evidence. Neither
 // list identifies a unique cause, even when it contains only one index.
 type SummaryBit struct {
-	Field                                 CXNativeField
+	Field                                 NativeField
 	Alternatives, ConditionalAlternatives []int
 }
 
 // PCSSummaryPCSResult retains candidate summary bits, alternative causes and diagnostic bytes without asserting an all-clear state.
 type PCSSummaryPCSResult struct {
-	CXNativeResult
+	NativeResult
 	Bits        map[string]SummaryBit
 	Diagnostics []byte
 }
@@ -40,8 +40,8 @@ type PCSSummaryPCSResult struct {
 // DecodePCSSummaries is receive-only and stateless. Clear summary bits say
 // nothing about independent current/retained diagnostics. Unknown, unassigned
 // and status-only bits remain visible; no all-clear conclusion is produced.
-func DecodePCSSummaries(s CXSelection, i PCSSummaryPCSInput) PCSSummaryPCSResult {
-	r := PCSSummaryPCSResult{CXNativeResult: selectionResult(s, i.LINKInput, "invalid"), Bits: make(map[string]SummaryBit), Diagnostics: append([]byte(nil), i.NativeRecord...)}
+func DecodePCSSummaries(s Selection, i PCSSummaryPCSInput) PCSSummaryPCSResult {
+	r := PCSSummaryPCSResult{NativeResult: selectionResult(s, i.LINKInput, "invalid"), Bits: make(map[string]SummaryBit), Diagnostics: append([]byte(nil), i.NativeRecord...)}
 	c := s.SelectionSpecValue()
 	f := i.Evidence.Frame
 	if len(i.NativeRecord) != 0 {
@@ -107,7 +107,7 @@ func DecodePCSSummaries(s CXSelection, i PCSSummaryPCSInput) PCSSummaryPCSResult
 	for _, w := range words {
 		for bit := 0; bit < w.width; bit++ {
 			key := fmt.Sprintf("%s/%d", w.name, bit)
-			field := CXNativeField{Numerator: int64((w.value >> bit) & 1), Denominator: 1, Grade: "Unknown", Status: "raw", Raw: r.Raw, Evidence: i.Evidence, Epoch: i.Epoch, Scope: i.Scope, Bank: i.Bank, Endpoint: i.Endpoint, Group: i.Group, Slot: i.Slot, Age: i.FieldAge}
+			field := NativeField{Numerator: int64((w.value >> bit) & 1), Denominator: 1, Grade: "Unknown", Status: "raw", Raw: r.Raw, Evidence: i.Evidence, Epoch: i.Epoch, Scope: i.Scope, Bank: i.Bank, Endpoint: i.Endpoint, Group: i.Group, Slot: i.Slot, Age: i.FieldAge}
 			b := SummaryBit{Field: field}
 			if supported && field.Numerator == 1 {
 				b.Alternatives = append([]int(nil), mappings[w.name][bit]...)

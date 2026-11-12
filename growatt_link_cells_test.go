@@ -177,7 +177,7 @@ func TestCX12AdmissionEveryAssociationField(t *testing.T) {
 			case "route-set":
 				other.RouteSet = false
 			}
-			s, err := NewCXSelection(other)
+			s, err := NewSelection(other)
 			if err != nil {
 				if key == "route-set" {
 					return

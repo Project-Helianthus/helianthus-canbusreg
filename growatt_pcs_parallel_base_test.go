@@ -15,9 +15,9 @@ func parallelIdentityTestSpec(t *testing.T) SelectionSpec {
 	}
 	return SelectionSpec{Interface: bus, Flavor: "pcs-parallel", ProjectCode: "QAAB", Release: "0004", Direction: "bms-to-pcs", Scope: "local", Bank: "bank", Endpoint: "endpoint", Group: "3", Epoch: 1}
 }
-func parallelIdentityTestSelection(t *testing.T, c SelectionSpec) CXSelection {
+func parallelIdentityTestSelection(t *testing.T, c SelectionSpec) Selection {
 	t.Helper()
-	s, e := NewCXSelection(c)
+	s, e := NewSelection(c)
 	if e != nil {
 		t.Fatal(e)
 	}
@@ -123,7 +123,7 @@ func TestCX10HypothesisContextNegatives(t *testing.T) {
 			case "unknown70X":
 				id = 0x703
 			}
-			s, e := NewCXSelection(c)
+			s, e := NewSelection(c)
 			if e != nil && valid {
 				t.Fatal(e)
 			}

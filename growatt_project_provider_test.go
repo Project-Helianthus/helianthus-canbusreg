@@ -112,8 +112,8 @@ func TestCX17IndependentAgesAndCopies(t *testing.T) {
 	if got.Current["core/voltage"].Status != "accepted" || got.Current["core/current"].Status != "stale" {
 		t.Fatal(got)
 	}
-	got.Current["core/voltage"] = CXNativeField{}
-	got.LastGood["core/voltage"] = CXNativeField{}
+	got.Current["core/voltage"] = NativeField{}
+	got.LastGood["core/voltage"] = NativeField{}
 	got.Raw[0].Status = "altered"
 	got = p.ProjectProviderSnapshot(2*time.Second, time.Second)
 	if got.Current["core/voltage"].Numerator != 5310 || got.LastGood["core/voltage"].Numerator != 5310 || got.Raw[0].Status == "altered" {
@@ -149,7 +149,7 @@ func TestCX17IdentityInvalidationNegatives(t *testing.T) {
 			case "profile":
 				c := s.SelectionSpecValue()
 				c.Release = "0011"
-				bad.Selection, _ = NewCXSelection(c)
+				bad.Selection, _ = NewSelection(c)
 			case "publisher":
 				bad.PCS.PublisherResolved = false
 			case "bank":
@@ -222,7 +222,7 @@ func TestCX17BoundsAndConcurrentSnapshots(t *testing.T) {
 			defer wg.Done()
 			for j := 0; j < 300; j++ {
 				snap := p.ProjectProviderSnapshot(time.Second, time.Second)
-				snap.Current["invented"] = CXNativeField{}
+				snap.Current["invented"] = NativeField{}
 			}
 		}()
 	}
@@ -495,7 +495,7 @@ func TestCX17EverySelectionFieldNegative(t *testing.T) {
 			c := s.SelectionSpecValue()
 			mutate(&c)
 			var err error
-			i.Selection, err = NewCXSelection(c)
+			i.Selection, err = NewSelection(c)
 			if err != nil {
 				t.Fatal(err)
 			}
@@ -520,14 +520,14 @@ func TestCX17ConstructorFailClosed(t *testing.T) {
 	c := s.SelectionSpecValue()
 	c.ProjectCode = "QAAa"
 	c.Release = "9011"
-	ambiguous, _ := NewCXSelection(c)
+	ambiguous, _ := NewSelection(c)
 	if _, err := NewPCSProvider(ambiguous); err == nil {
 		t.Fatal("ambiguous selection")
 	}
 	// The gateway-state selection has no native group, so its 0x1910 downstream address never reaches the fence.
 	c = s.SelectionSpecValue()
 	c.Flavor, c.ProjectCode, c.Release, c.Scope, c.Destination, c.Source = "pcs-extended19", "QCAA", "0001", "aggregate", 0xdf, 0xf2
-	gateway, err := NewCXSelection(c)
+	gateway, err := NewSelection(c)
 	if err != nil || gateway.SelectionGroup() != "" {
 		t.Fatal(err, gateway.SelectionGroup())
 	}
@@ -622,7 +622,7 @@ func TestCX17FieldEvictionAcrossGenerations(t *testing.T) {
 	for n := 0; n < 256; n++ {
 		key := fmt.Sprintf("history/%03d", n)
 		p.order = append(p.order, key)
-		p.snapshot.LastGood[key] = CXNativeField{Status: "accepted"}
+		p.snapshot.LastGood[key] = NativeField{Status: "accepted"}
 		p.snapshot.LastGoodGeneration[key] = 1
 	}
 	p.mu.Unlock()
@@ -1422,12 +1422,12 @@ func TestCX17LINKSerialWithoutIdentityRecordConflicts(t *testing.T) {
 // native association and serial slot baselines, so the following valid observation carrying its correct
 // associations permanently conflicted the generation. The malformed raw record is still retained.
 func TestCX17MalformedFirstObservationDoesNotSetBaseline(t *testing.T) {
-	cases := map[string]func(s *CXSelection, pcs *PCSSlotPCSInput){
-		"member": func(s *CXSelection, pcs *PCSSlotPCSInput) { pcs.Member = s },
-		"association": func(_ *CXSelection, pcs *PCSSlotPCSInput) {
+	cases := map[string]func(s *Selection, pcs *PCSSlotPCSInput){
+		"member": func(s *Selection, pcs *PCSSlotPCSInput) { pcs.Member = s },
+		"association": func(_ *Selection, pcs *PCSSlotPCSInput) {
 			pcs.SlotValid, pcs.NativeSlot, pcs.GroupValid, pcs.NativeGroup = true, 3, true, 2
 		},
-		"serial-slot": func(_ *CXSelection, pcs *PCSSlotPCSInput) { pcs.SerialSlotValid, pcs.SerialSlot = true, 5 },
+		"serial-slot": func(_ *Selection, pcs *PCSSlotPCSInput) { pcs.SerialSlotValid, pcs.SerialSlot = true, 5 },
 	}
 	for name, poison := range cases {
 		t.Run(name, func(t *testing.T) {
@@ -1658,13 +1658,13 @@ func TestCX17IndexBoundsAssociationChangeConflicts(t *testing.T) {
 	}
 }
 
-// cx17GroupFixture is the default PCS-standard fixture moved to another project release.
-func providerTestGroupFixture(t *testing.T, release, group string) (CXSelection, ReplayInput) {
+// providerTestGroupFixture is the default PCS-standard fixture moved to another project release.
+func providerTestGroupFixture(t *testing.T, release, group string) (Selection, ReplayInput) {
 	t.Helper()
 	s, i := replayTestFixture(t)
 	c := s.SelectionSpecValue()
 	c.Release = release
-	s, err := NewCXSelection(c)
+	s, err := NewSelection(c)
 	if err != nil || s.SelectionGroup() != group {
 		t.Fatal(err, s.SelectionGroup())
 	}

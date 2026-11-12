@@ -279,7 +279,7 @@ func TestCX13AdmissionEveryKey(t *testing.T) {
 				case "choice":
 					other.Choice = ""
 				}
-				selected, _ = NewCXSelection(other)
+				selected, _ = NewSelection(other)
 			}
 			r := DecodeLINKDiagnostics(selected, i)
 			if r.Status == "accepted" || len(r.Fields) != 0 || r.Evidence != i.Evidence || r.Raw != i.Evidence.Frame.Bytes() {

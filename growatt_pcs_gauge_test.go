@@ -7,7 +7,7 @@ import (
 	"time"
 )
 
-func identityTestFixture(t *testing.T, identity string, pid uint32, p [8]byte) (CXSelection, PCSIdentityPCSInput) {
+func identityTestFixture(t *testing.T, identity string, pid uint32, p [8]byte) (Selection, PCSIdentityPCSInput) {
 	t.Helper()
 	s, base := standardTestFixture(t, pid, p)
 	s, base = standardTestReselect(t, s, base, func(c *SelectionSpec) {
@@ -19,7 +19,7 @@ func identityTestFixture(t *testing.T, identity string, pid uint32, p [8]byte) (
 	})
 	return s, PCSIdentityPCSInput{PCSStandardPCSInput: base, ThresholdStateKnown: true, SerialSlotValid: true}
 }
-func identityTestWant(t *testing.T, r CXNativeResult, name, status string, n, d int64, unit string) {
+func identityTestWant(t *testing.T, r NativeResult, name, status string, n, d int64, unit string) {
 	t.Helper()
 	f, ok := r.Fields[name]
 	if !ok || f.Status != status || f.Numerator != n || f.Denominator != d || f.Unit != unit || f.PhysicalQualified || r.PhysicalQualified {

@@ -21,7 +21,7 @@ type ParallelIdentityAssembler struct {
 	lastMonotonic time.Duration
 	seen          bool
 	mu            sync.Mutex
-	selection     CXSelection
+	selection     Selection
 	module        uint8
 	next          uint8
 	active        bool
@@ -31,7 +31,7 @@ type ParallelIdentityAssembler struct {
 }
 
 // NewParallelIdentityAssembler binds one explicit bus/group/module/epoch.
-func NewParallelIdentityAssembler(s CXSelection, module uint8) *ParallelIdentityAssembler {
+func NewParallelIdentityAssembler(s Selection, module uint8) *ParallelIdentityAssembler {
 	return &ParallelIdentityAssembler{selection: s, module: module, snapshot: ParallelIdentitySnapshot{Grade: "Unknown", Status: "absent"}}
 }
 
@@ -43,7 +43,7 @@ func (a *ParallelIdentityAssembler) SnapshotParallelIdentity() ParallelIdentityS
 }
 
 // DecodeParallelIdentity admits ordered fragments for the selected module and retains the completed identity separately from pending assembly.
-func (a *ParallelIdentityAssembler) DecodeParallelIdentity(i LINKInput) CXNativeResult {
+func (a *ParallelIdentityAssembler) DecodeParallelIdentity(i LINKInput) NativeResult {
 	a.mu.Lock()
 	defer a.mu.Unlock()
 	r := selectionResult(a.selection, i, "invalid")

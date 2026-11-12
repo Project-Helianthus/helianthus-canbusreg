@@ -8,7 +8,7 @@ import "encoding/binary"
 // Selection, severity and clearing.
 // https://github.com/Project-Helianthus/helianthus-docs-canbus/blob/main/protocols/growatt/growatt-low-voltage-bms-can-link-protocol-v1.md
 // Section: Numeric dictionary and version gate.
-func dictionary(member CXSelection) (count int, binaryWords bool) {
+func dictionary(member Selection) (count int, binaryWords bool) {
 	c := member.SelectionSpecValue()
 	if member.SelectionGroup() != "L8" {
 		return 0, false
@@ -23,7 +23,7 @@ func dictionary(member CXSelection) (count int, binaryWords bool) {
 }
 
 // EncodeDTC maps a numeric index to a candidate word, without bus I/O.
-func EncodeDTC(member CXSelection, index int) (uint16, bool) {
+func EncodeDTC(member Selection, index int) (uint16, bool) {
 	count, modern := dictionary(member)
 	if index < 0 || index >= count {
 		return 0, false
@@ -46,7 +46,7 @@ func EncodeDTC(member CXSelection, index int) (uint16, bool) {
 // member must identify the actual reporting member, including any explicit
 // topology association; forwarding coordinator identity is not a substitute.
 // offset locates the word, not an active or retained bitmap. No state is mutated.
-func DecodeDTC(member CXSelection, i LINKInput, offset int) CXNativeResult {
+func DecodeDTC(member Selection, i LINKInput, offset int) NativeResult {
 	r := selectionResult(member, i, "invalid")
 	c := member.SelectionSpecValue()
 	f := i.Evidence.Frame
@@ -79,7 +79,7 @@ func DecodeDTC(member CXSelection, i LINKInput, offset int) CXNativeResult {
 		return r
 	}
 	word := order.Uint16(r.Raw[offset : offset+2])
-	field := CXNativeField{Numerator: int64(word), Denominator: 1, Raw: r.Raw, Evidence: i.Evidence, Epoch: i.Epoch, Scope: i.Scope, Bank: i.Bank, Endpoint: i.Endpoint, Group: i.Group, Slot: i.Slot, Age: i.FieldAge, Grade: "Hypothesis", Status: "unknown"}
+	field := NativeField{Numerator: int64(word), Denominator: 1, Raw: r.Raw, Evidence: i.Evidence, Epoch: i.Epoch, Scope: i.Scope, Bank: i.Bank, Endpoint: i.Endpoint, Group: i.Group, Slot: i.Slot, Age: i.FieldAge, Grade: "Hypothesis", Status: "unknown"}
 	r.Status = "unknown"
 	if word == 0 {
 		field.Grade, field.Status, field.Meaning = "Proven", "empty", "no selected code"
@@ -144,7 +144,7 @@ type DTCLocalSelection struct {
 }
 
 // ExplainLocalSelection explains local diagnostic category selection; unsupported dictionaries or out-of-range active indices are rejected.
-func ExplainLocalSelection(member CXSelection, active [136]bool) DTCLocalSelection {
+func ExplainLocalSelection(member Selection, active [136]bool) DTCLocalSelection {
 	r := DTCLocalSelection{Active: active, Categories: [4]int{-1, -1, -1, -1}, A: -1, B: -1, Status: "unsupported", Grade: "Unknown"}
 	count, _ := dictionary(member)
 	if count == 0 || member.SelectionSpecValue().Scope != "local" {

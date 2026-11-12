@@ -17,7 +17,7 @@ type BMSObservation struct {
 	Evidence   Evidence
 }
 
-// BMSReceiveSource must unblock O08Receive when its context is canceled.
+// BMSReceiveSource must unblock Receive when its context is canceled.
 // The caller owns acquisition; this interface grants no send or configuration access.
 type BMSReceiveSource interface {
 	Receive(context.Context) (BMSObservation, error)
@@ -36,7 +36,7 @@ type GrowattBMSSnapshot struct {
 }
 
 // GrowattBMSProvider wraps only the explicitly selected V1.04 replay.
-// Construct it with O08NewGrowattProvider; its zero value is not usable.
+// Construct it with NewGrowattBMSProvider; its zero value is not usable.
 type GrowattBMSProvider struct {
 	bmsLifecycle   sync.Mutex
 	bmsMu          sync.Mutex
@@ -129,7 +129,7 @@ func (bmsP *GrowattBMSProvider) bmsReceive(bmsCtx context.Context, bmsSource BMS
 	}
 }
 
-// o08Apply runs under o08Mu. Rejected identities never enter replay or raw history.
+// bmsApply runs under bmsMu. Rejected identities never enter replay or raw history.
 func (bmsP *GrowattBMSProvider) bmsApply(bmsObservation BMSObservation) {
 	bmsEvidence := bmsObservation.Evidence
 	if !bmsP.bmsRunning {

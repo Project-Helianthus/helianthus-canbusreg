@@ -11,7 +11,7 @@ import (
 // Sections: Extended PCS 19xx; Gateway interpretation rules.
 // DecodePCSExtended decodes candidate receive evidence only. Unspecified
 // units and validity rules remain raw; no field is physically qualified.
-func DecodePCSExtended(s CXSelection, i LINKInput) CXNativeResult {
+func DecodePCSExtended(s Selection, i LINKInput) NativeResult {
 	r := selectionResult(s, i, "invalid")
 	c := s.SelectionSpecValue()
 	f := i.Evidence.Frame
@@ -21,7 +21,7 @@ func DecodePCSExtended(s CXSelection, i LINKInput) CXNativeResult {
 		return r
 	}
 	r.Status = "unsupported"
-	if _, err := NewCXSelection(c); err != nil {
+	if _, err := NewSelection(c); err != nil {
 		return r
 	}
 	if c.Flavor != "pcs-extended19" || c.Direction != "bms-to-pcs" || c.Choice == "release11" {
@@ -48,7 +48,7 @@ func DecodePCSExtended(s CXSelection, i LINKInput) CXNativeResult {
 	}
 	p := r.Raw
 	add := func(name string, n, d int64, unit, meaning, status, grade string) {
-		r.Fields[name] = CXNativeField{Numerator: n, Denominator: d, Unit: unit, Meaning: meaning, Status: status, Grade: grade, Raw: p, Evidence: i.Evidence, Epoch: i.Epoch, Scope: i.Scope, Bank: i.Bank, Endpoint: i.Endpoint, Group: i.Group, Slot: i.Slot, Age: i.FieldAge}
+		r.Fields[name] = NativeField{Numerator: n, Denominator: d, Unit: unit, Meaning: meaning, Status: status, Grade: grade, Raw: p, Evidence: i.Evidence, Epoch: i.Epoch, Scope: i.Scope, Bank: i.Bank, Endpoint: i.Endpoint, Group: i.Group, Slot: i.Slot, Age: i.FieldAge}
 	}
 	raw := func(name string, n int64) { add(name, n, 1, "", "", "raw", "Unknown") }
 	known := func(name string, n int64) { add(name, n, 1, "", name, "accepted", "Hypothesis") }
@@ -174,20 +174,20 @@ func DecodePCSExtended(s CXSelection, i LINKInput) CXNativeResult {
 // A changed epoch or address requires a new decoder and explicit selection.
 type PCSExtendedDecoder struct {
 	mu        sync.Mutex
-	selection CXSelection
-	fields    map[string]CXNativeField
+	selection Selection
+	fields    map[string]NativeField
 	sequence  uint64
 	monotonic int64
 	seen      bool
 }
 
 // NewPCSExtendedDecoder creates an empty stateful decoder bound to one explicit selection.
-func NewPCSExtendedDecoder(s CXSelection) *PCSExtendedDecoder {
-	return &PCSExtendedDecoder{selection: s, fields: make(map[string]CXNativeField)}
+func NewPCSExtendedDecoder(s Selection) *PCSExtendedDecoder {
+	return &PCSExtendedDecoder{selection: s, fields: make(map[string]NativeField)}
 }
 
 // DecodePCSExtendedFrame serializes decoding and rejects stale updates without replacing retained fields.
-func (d *PCSExtendedDecoder) DecodePCSExtendedFrame(i LINKInput) CXNativeResult {
+func (d *PCSExtendedDecoder) DecodePCSExtendedFrame(i LINKInput) NativeResult {
 	d.mu.Lock()
 	defer d.mu.Unlock()
 	r := DecodePCSExtended(d.selection, i)
@@ -217,10 +217,10 @@ func (d *PCSExtendedDecoder) DecodePCSExtendedFrame(i LINKInput) CXNativeResult 
 }
 
 // SnapshotPCSExtended returns a synchronized copy of retained fields keyed by frame family and field name.
-func (d *PCSExtendedDecoder) SnapshotPCSExtended() map[string]CXNativeField {
+func (d *PCSExtendedDecoder) SnapshotPCSExtended() map[string]NativeField {
 	d.mu.Lock()
 	defer d.mu.Unlock()
-	r := make(map[string]CXNativeField, len(d.fields))
+	r := make(map[string]NativeField, len(d.fields))
 	for k, v := range d.fields {
 		r[k] = v
 	}

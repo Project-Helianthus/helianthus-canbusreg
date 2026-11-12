@@ -144,7 +144,8 @@ func (a *projectProviderLINKSerial) projectProviderConsume(s CXSelection, i LINK
 	return false
 }
 
-// NewPCSProvider validates an explicit PCS selection and retention bound before creating a stopped provider.
+// NewPCSProvider validates an explicit PCS selection and creates a stopped provider
+// with fixed bounds of 256 entries for each field dictionary and raw history.
 func NewPCSProvider(s CXSelection) (*Provider, error) {
 	if s.SelectionSpecValue().Flavor == "link" {
 		return nil, errors.New("PCS selection required")
@@ -152,7 +153,8 @@ func NewPCSProvider(s CXSelection) (*Provider, error) {
 	return projectProviderNew(s)
 }
 
-// NewLINKProvider validates an explicit LINK selection and retention bound before creating a stopped provider.
+// NewLINKProvider validates an explicit LINK selection and creates a stopped provider
+// with fixed bounds of 256 entries for each field dictionary and raw history.
 func NewLINKProvider(s CXSelection) (*Provider, error) {
 	if s.SelectionSpecValue().Flavor != "link" {
 		return nil, errors.New("LINK selection required")

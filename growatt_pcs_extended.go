@@ -6,6 +6,7 @@ import (
 	"sync"
 )
 
+// DecodePCSExtended decodes extended PCS candidate fields for an explicit selection.
 // Native contract: https://github.com/Project-Helianthus/helianthus-docs-canbus/blob/main/protocols/growatt/growatt-low-voltage-bms-can-pcs-protocol-v1.md
 // Sections: Extended PCS 19xx; Gateway interpretation rules.
 // DecodePCSExtended decodes candidate receive evidence only. Unspecified
@@ -180,9 +181,12 @@ type PCSExtendedDecoder struct {
 	seen      bool
 }
 
+// NewPCSExtendedDecoder creates an empty stateful decoder bound to one explicit selection.
 func NewPCSExtendedDecoder(s CXSelection) *PCSExtendedDecoder {
 	return &PCSExtendedDecoder{selection: s, fields: make(map[string]CXNativeField)}
 }
+
+// DecodePCSExtendedFrame serializes decoding and rejects stale updates without replacing retained fields.
 func (d *PCSExtendedDecoder) DecodePCSExtendedFrame(i LINKInput) CXNativeResult {
 	d.mu.Lock()
 	defer d.mu.Unlock()
@@ -211,6 +215,8 @@ func (d *PCSExtendedDecoder) DecodePCSExtendedFrame(i LINKInput) CXNativeResult 
 	}
 	return r
 }
+
+// SnapshotPCSExtended returns a synchronized copy of retained fields keyed by frame family and field name.
 func (d *PCSExtendedDecoder) SnapshotPCSExtended() map[string]CXNativeField {
 	d.mu.Lock()
 	defer d.mu.Unlock()

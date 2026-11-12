@@ -8,6 +8,7 @@ import (
 	"github.com/Project-Helianthus/helianthus-canbus"
 )
 
+// ReplayInput associates finite native evidence with explicit selection and validity gates.
 // Admission contracts, Profile selection / Data validity and consumer obligations:
 // https://github.com/Project-Helianthus/helianthus-docs-canbus/blob/main/protocols/growatt/growatt-low-voltage-bms-can-pcs-protocol-v1.md
 // Transport, addressing and data validity:
@@ -33,12 +34,18 @@ type ReplayInput struct {
 	TemperatureSummary               SummaryGates
 }
 
+// Diagnostic retains the associated input, native record and rejection or descriptive status.
 type Diagnostic struct {
 	Input        LINKInput
 	NativeRecord []byte
 	Status       string
 }
 
+// ReplayProjection separates current, retained and last-known-good candidate evidence from diagnostics and physical qualification.
+// Callers must check Current.Status == "descriptive" and each current native
+// result and field status before using current values. RetainedNative and LastGood
+// are historical values, including when Current reports rejection; their presence
+// does not establish acceptance of the current evidence or physical qualification.
 type ReplayProjection struct {
 	Current           CXNativeResult
 	Native            map[string]CXNativeResult
@@ -170,6 +177,13 @@ func fixture16Decode(s CXSelection, in ReplayInput) (map[string]CXNativeResult, 
 	return r, bits
 }
 
+// Classify returns current candidate results or rejection diagnostics, potentially
+// with retained historical values. Callers must check Current.Status == "descriptive"
+// and the current native result and field statuses before using current values;
+// RetainedNative and LastGood do not establish acceptance of the current evidence.
+// Unlisted evidence with overlapping frame geometry returns a diagnostic
+// classification that participates in Registry's collision rule, suppressing an
+// overlapping profile's fallback. Other unlisted evidence returns an empty classification.
 func (p *replaySelectedProfile) Classify(e Evidence) Classification {
 	p.mu.Lock()
 	defer p.mu.Unlock()

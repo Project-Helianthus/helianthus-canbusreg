@@ -2,10 +2,12 @@ package canbusreg
 
 import "encoding/binary"
 
+// NewLINKTemperatures creates bounded history for four sensor channels using an independently asserted count.
 func NewLINKTemperatures(s CXSelection, count int, countValid bool) *LINKVector {
 	return lINKVectorNewVector(s, count, countValid, 4, "temperatures")
 }
 
+// SummaryGates carries independent validity assertions and contributor evidence for temperature summaries.
 type SummaryGates struct {
 	FineTemperatureValid   bool
 	Maximum, Minimum, Mean MeasurementGate
@@ -13,6 +15,7 @@ type SummaryGates struct {
 	FixedFourPath          bool
 }
 
+// DecodeLINKTemperatureSummary applies per-field gates and contributor checks while preserving unresolved raw codes.
 func DecodeLINKTemperatureSummary(s CXSelection, i LINKInput, g SummaryGates) CXNativeResult {
 	r := selectionResult(s, i, "invalid")
 	if !lINKVectorAdmit(s, i) {

@@ -2,6 +2,7 @@ package canbusreg
 
 import "encoding/binary"
 
+// PCSSlotPCSInput supplies explicit slot admission and diagnostic context.
 // Native contract: https://github.com/Project-Helianthus/helianthus-docs-canbus/blob/main/protocols/growatt/growatt-low-voltage-bms-can-pcs-protocol-v1.md
 // Sections: 326, 327, 333, 334: optional slot extensions;
 // Measurement conversions; Opaque fields. All values remain candidates.

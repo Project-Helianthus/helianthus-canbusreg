@@ -7,6 +7,7 @@ import (
 	"time"
 )
 
+// MeasurementGate carries independent configuration, validity, status and age assertions.
 // Native contract: https://github.com/Project-Helianthus/helianthus-docs-canbus/blob/main/protocols/growatt/growatt-low-voltage-bms-can-link-protocol-v1.md
 // Sections: Cell and sensor counts; Cell voltages, temperatures and balancing;
 // Fine temperatures and algorithm fields. All meanings are candidate protocol
@@ -17,6 +18,7 @@ type MeasurementGate struct {
 	Age               time.Duration
 }
 
+// VectorSnapshot separates received channels, valid coverage and last-known-good values; durations use the caller's monotonic clock.
 type VectorSnapshot struct {
 	Selection                         CXSelection
 	Kind                              string
@@ -44,6 +46,7 @@ type LINKVector struct {
 	monotonic       time.Duration
 }
 
+// NewLINKCells creates bounded history for up to sixteen cell channels using an independently asserted count.
 func NewLINKCells(s CXSelection, count int, countValid bool) *LINKVector {
 	return lINKVectorNewVector(s, count, countValid, 16, "cells")
 }
@@ -102,6 +105,8 @@ func lINKVectorGateRejection(f CXNativeField, g MeasurementGate) CXNativeField {
 func lINKVectorAdmit(s CXSelection, i LINKInput) bool {
 	return lINKAdmission(s, i) && s.SelectionGroup() != "" && i.Evidence.Sequence > 0 && i.Evidence.Monotonic >= 0
 }
+
+// DecodeLINKVector serializes channel updates, rejects stale evidence and preserves last-known-good values when individual gates fail.
 func (a *LINKVector) DecodeLINKVector(i LINKInput, gates [4]MeasurementGate) CXNativeResult {
 	a.mu.Lock()
 	defer a.mu.Unlock()
@@ -175,6 +180,8 @@ func lINKVectorAge(f CXNativeField, now time.Duration) (CXNativeField, bool) {
 	f.Age += elapsed
 	return f, true
 }
+
+// SnapshotLINKVector returns detached channel maps aged at now; maxAge bounds current validity without discarding last-known-good values.
 func (a *LINKVector) SnapshotLINKVector(now, maxAge time.Duration) VectorSnapshot {
 	a.mu.Lock()
 	defer a.mu.Unlock()
@@ -275,6 +282,7 @@ func lINKVectorContributors(s CXSelection, i LINKInput, v VectorSnapshot, kind s
 	return sum / int64(count), true
 }
 
+// DecodeLINKCellMean checks the supplied contributors and independent gate before assigning candidate meaning to the raw mean.
 func DecodeLINKCellMean(s CXSelection, i LINKInput, g MeasurementGate, v VectorSnapshot, fixed16Valid bool) CXNativeResult {
 	r := selectionResult(s, i, "invalid")
 	if !lINKVectorAdmit(s, i) {

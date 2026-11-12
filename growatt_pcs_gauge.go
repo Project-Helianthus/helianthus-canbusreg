@@ -7,6 +7,7 @@ import (
 	"github.com/Project-Helianthus/helianthus-canbus"
 )
 
+// PCSIdentityPCSInput supplies independent gauge and identity interpretation gates.
 // Native contract: https://github.com/Project-Helianthus/helianthus-docs-canbus/blob/main/protocols/growatt/growatt-low-voltage-bms-can-pcs-protocol-v1.md
 // Sections: 316 layout selection from identity and other PIDs;
 // 315…318: cells, gauge fields and retained faults; Opaque fields.

@@ -9,6 +9,7 @@ import (
 	"time"
 )
 
+// Observation carries caller-associated receive evidence and independent interpretation gates.
 // Native consumer contracts (candidate grades never establish qualification):
 // https://github.com/Project-Helianthus/helianthus-docs-canbus/blob/main/protocols/growatt/growatt-low-voltage-bms-can-pcs-protocol-v1.md
 // Data validity and consumer obligations.
@@ -26,6 +27,7 @@ type ReceiveSource interface {
 	ProjectProviderReceive(context.Context) (Observation, error)
 }
 
+// ProjectProviderRaw retains a bounded native observation and its admission status.
 type ProjectProviderRaw struct {
 	Generation   uint64
 	Input        LINKInput
@@ -33,6 +35,7 @@ type ProjectProviderRaw struct {
 	Status       string
 }
 
+// ProjectProviderSnapshot separates current candidate fields, historical evidence and provider lifecycle state.
 type ProjectProviderSnapshot struct {
 	Selection                                             CXSelection
 	State                                                 string
@@ -141,12 +144,17 @@ func (a *projectProviderLINKSerial) projectProviderConsume(s CXSelection, i LINK
 	return false
 }
 
+// NewPCSProvider validates an explicit PCS selection and creates a stopped provider
+// with fixed bounds of 256 entries for each field dictionary and raw history.
 func NewPCSProvider(s CXSelection) (*Provider, error) {
 	if s.SelectionSpecValue().Flavor == "link" {
 		return nil, errors.New("PCS selection required")
 	}
 	return projectProviderNew(s)
 }
+
+// NewLINKProvider validates an explicit LINK selection and creates a stopped provider
+// with fixed bounds of 256 entries for each field dictionary and raw history.
 func NewLINKProvider(s CXSelection) (*Provider, error) {
 	if s.SelectionSpecValue().Flavor != "link" {
 		return nil, errors.New("LINK selection required")
@@ -160,6 +168,8 @@ func projectProviderNew(s CXSelection) (*Provider, error) {
 	}
 	return &Provider{selection: s, snapshot: ProjectProviderSnapshot{Selection: s, State: "stopped", Current: make(map[string]CXNativeField), LastGood: make(map[string]CXNativeField), LastGoodGeneration: make(map[string]uint64)}}, nil
 }
+
+// Start joins the predecessor and starts receiving with a strictly increasing positive generation; invalid sources or generations return an error.
 func (p *Provider) Start(source ReceiveSource, generation uint64) error {
 	p.lifecycle.Lock()
 	defer p.lifecycle.Unlock()
@@ -195,6 +205,8 @@ func (p *Provider) Start(source ReceiveSource, generation uint64) error {
 	go p.projectProviderReceive(ctx, source, generation, done)
 	return nil
 }
+
+// Stop fences current publication, cancels and joins the receiver while preserving historical evidence.
 func (p *Provider) Stop() { p.lifecycle.Lock(); defer p.lifecycle.Unlock(); p.projectProviderStop() }
 func (p *Provider) projectProviderWithhold(state string) {
 	p.snapshot.State = state
@@ -557,6 +569,7 @@ func (p *Provider) projectProviderDemote(name string, configured, valid bool, fr
 // ProjectProviderSnapshot uses caller logical time and an inclusive maximum age. Each
 // field ages from its own evidence and gate age; other frames cannot renew it.
 // LastGood is historical, with its origin generation explicitly retained.
+// ProjectProviderSnapshot returns detached evidence aged at now; maxAge bounds current validity while history remains retained.
 func (p *Provider) ProjectProviderSnapshot(now, maxAge time.Duration) ProjectProviderSnapshot {
 	p.mu.Lock()
 	defer p.mu.Unlock()

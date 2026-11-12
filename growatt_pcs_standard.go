@@ -7,6 +7,7 @@ import (
 	"github.com/Project-Helianthus/helianthus-canbus"
 )
 
+// PCSStandardPCSInput supplies independent source, validity and age assertions for standard PCS decoding.
 // Native contract: https://github.com/Project-Helianthus/helianthus-docs-canbus/blob/main/protocols/growatt/growatt-low-voltage-bms-can-pcs-protocol-v1.md
 // Sections: 311…314: limits, summary and capacity; Measurement conversions;
 // 319, 322, 330: extrema and location. All results remain candidates.
@@ -34,6 +35,7 @@ type PCSStandardPCSInput struct {
 	FieldAges                          map[string]time.Duration
 }
 
+// PCSStandardPCSResult retains candidate fields and a copy of the supplied diagnostic record.
 type PCSStandardPCSResult struct {
 	CXNativeResult
 	Diagnostics []byte

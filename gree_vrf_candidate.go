@@ -3,6 +3,7 @@ package canbusreg
 import "github.com/Project-Helianthus/helianthus-canbus"
 
 const (
+	// GreeVRFCandidateProfile identifies the explicitly enabled, opaque Gree VRF candidate profile.
 	GreeVRFCandidateProfile = "gree.vrf.canbus.candidate.v1"
 
 	greeVRFCandidateMask     = uint32(0x1fe0007f)
@@ -50,6 +51,7 @@ type greeVRFCandidate struct{}
 // only when a caller explicitly adds it to a registry.
 func GreeVRFCandidate() Profile { return greeVRFCandidate{} }
 
+// Classify classifies only admitted evidence for this profile; rejection produces no usable projection.
 func (greeVRFCandidate) Classify(e Evidence) Classification {
 	if e.Interface.Name() == "" || e.Interface.Index() <= 0 {
 		return Classification{}

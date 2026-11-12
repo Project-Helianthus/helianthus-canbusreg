@@ -2,6 +2,11 @@
 
 ## Unreleased
 
+- Document root package ownership and exported API contracts, including candidate
+  grades, fail-closed admission, lifecycle and retained evidence. Declaration
+  comments are artifact-changing and require renewed release evidence before
+  the final bill of materials freeze and coordinated gateway adoption.
+
 - Rename `O08 requires explicit V1.04 selection` to `Growatt BMS provider requires explicit V1.04 selection`.
 - Rename `O08 requires a valid interface` to `Growatt BMS provider requires a valid interface`.
 - Rename `O08 requires a source and a successor generation` to `Growatt BMS provider requires a source and a successor generation`.

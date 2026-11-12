@@ -5,6 +5,7 @@ import (
 	"github.com/Project-Helianthus/helianthus-canbus"
 )
 
+// CounterInput supplies explicit identity and optional counter-tail selection.
 // Native contract: https://github.com/Project-Helianthus/helianthus-docs-canbus/blob/main/protocols/growatt/growatt-low-voltage-bms-can-pcs-protocol-v1.md
 // Sections: 329: optional slot extensions; Measurement conversions; Opaque fields.
 // https://github.com/Project-Helianthus/helianthus-docs-canbus/blob/main/protocols/growatt/growatt-low-voltage-bms-can-link-protocol-v1.md

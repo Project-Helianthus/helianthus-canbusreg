@@ -6,6 +6,7 @@ import (
 	"time"
 )
 
+// DecodeLINKBalance decodes balancing evidence using an independent hardware-age assertion.
 // The age supplied here is the hardware read age, never CAN arrival age.
 func DecodeLINKBalance(s CXSelection, i LINKInput, count int, countValid bool, g MeasurementGate, hardwareAgeKnown bool, hardwareAge time.Duration) CXNativeResult {
 	r := selectionResult(s, i, "invalid")

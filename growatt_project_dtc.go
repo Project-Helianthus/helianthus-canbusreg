@@ -143,6 +143,7 @@ type DTCLocalSelection struct {
 	PhysicalQualified bool
 }
 
+// ExplainLocalSelection explains local diagnostic category selection; unsupported dictionaries or out-of-range active indices are rejected.
 func ExplainLocalSelection(member CXSelection, active [136]bool) DTCLocalSelection {
 	r := DTCLocalSelection{Active: active, Categories: [4]int{-1, -1, -1, -1}, A: -1, B: -1, Status: "unsupported", Grade: "Unknown"}
 	count, _ := dictionary(member)

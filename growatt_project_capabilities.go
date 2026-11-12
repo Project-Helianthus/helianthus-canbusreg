@@ -2,6 +2,7 @@ package canbusreg
 
 import "fmt"
 
+// ReceiverContext supplies independent receiver direction, role and capability context.
 // Native contracts, Receive-handler classes / Native receiver capability matrix /
 // Legacy receive behavior / Configuration and service channels:
 // https://github.com/Project-Helianthus/helianthus-docs-canbus/blob/main/protocols/growatt/growatt-low-voltage-bms-can-link-protocol-v1.md
@@ -17,6 +18,7 @@ type ReceiverContext struct {
 	NativeCount                                   uint32
 }
 
+// ReceiverResult retains receiver admission status and raw evidence without implying receiver capability qualification.
 type ReceiverResult struct {
 	Input                             LINKInput
 	Context                           ReceiverContext

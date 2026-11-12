@@ -46,6 +46,7 @@ func parallelIdentityFamily(s CXSelection, id uint32) (uint32, bool) {
 	return family, false
 }
 
+// ParallelIdentityDecodeParallel decodes admitted parallel telemetry using the explicit selection, retaining unknown fields as raw evidence.
 func ParallelIdentityDecodeParallel(s CXSelection, i LINKInput) CXNativeResult {
 	r := selectionResult(s, i, "unsupported")
 	if !parallelIdentityAdmission(s, i) {

@@ -5,6 +5,7 @@ import (
 	"fmt"
 )
 
+// DecodePCSIdentity decodes admitted identity records without selecting a profile from their contents.
 // Native contract: https://github.com/Project-Helianthus/helianthus-docs-canbus/blob/main/protocols/growatt/growatt-low-voltage-bms-can-pcs-protocol-v1.md
 // Sections: 320, 321, 323: identity and configuration;
 // 324, 325: serial fragments and placeholder; Opaque fields.
@@ -102,6 +103,8 @@ type PCSIdentitySerialAssembler struct {
 }
 
 func (a *PCSIdentitySerialAssembler) clear() { *a = PCSIdentitySerialAssembler{} }
+
+// Consume assembles ordered identity fragments, clearing pending assembly on rejected input; callers must serialize access.
 func (a *PCSIdentitySerialAssembler) Consume(s CXSelection, i PCSIdentityPCSInput) PCSIdentitySerialResult {
 	record := DecodePCSIdentity(s, i)
 	out := PCSIdentitySerialResult{Status: "rejected", Record: record}

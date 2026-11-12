@@ -136,6 +136,12 @@
     },
     {
       "path": "growatt_pcs_extended.go",
+      "symbol": "DecodePCSExtended",
+      "rule": "revive/exported",
+      "count": 1
+    },
+    {
+      "path": "growatt_pcs_extended.go",
       "symbol": "NewPCSExtendedDecoder",
       "rule": "revive/exported",
       "count": 1
@@ -232,7 +238,19 @@
     },
     {
       "path": "growatt_pcs_standard.go",
+      "symbol": "PCSStandardPCSInput",
+      "rule": "revive/exported",
+      "count": 1
+    },
+    {
+      "path": "growatt_pcs_standard.go",
       "symbol": "PCSStandardPCSResult",
+      "rule": "revive/exported",
+      "count": 1
+    },
+    {
+      "path": "growatt_pcs_summaries.go",
+      "symbol": "PCSSummaryPCSInput",
       "rule": "revive/exported",
       "count": 1
     },

@@ -10,7 +10,7 @@ import (
 // Native contracts, section PCS summary bits and their diagnostic sources:
 // https://github.com/Project-Helianthus/helianthus-docs-canbus/blob/main/protocols/growatt/growatt-low-voltage-bms-can-pcs-protocol-v1.md
 // https://github.com/Project-Helianthus/helianthus-docs-canbus/blob/main/protocols/growatt/growatt-low-voltage-bms-can-link-protocol-v1.md
-// CX14PCSInput carries caller-validated local state for this exact selection and
+// PCSSummaryPCSInput carries caller-validated local state for this exact selection and
 // epoch. Nil state is unknown. LocalSummaryQualified independently admits the
 // QAAA0006 summary contract; it never marks hardware physically qualified.
 // FieldStates and FieldAges use bit keys such as A/12 and B4/2.

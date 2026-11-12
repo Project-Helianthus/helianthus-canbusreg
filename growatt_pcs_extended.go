@@ -8,7 +8,7 @@ import (
 
 // Native contract: https://github.com/Project-Helianthus/helianthus-docs-canbus/blob/main/protocols/growatt/growatt-low-voltage-bms-can-pcs-protocol-v1.md
 // Sections: Extended PCS 19xx; Gateway interpretation rules.
-// CX09DecodePCSExtended decodes candidate receive evidence only. Unspecified
+// DecodePCSExtended decodes candidate receive evidence only. Unspecified
 // units and validity rules remain raw; no field is physically qualified.
 func DecodePCSExtended(s CXSelection, i LINKInput) CXNativeResult {
 	r := selectionResult(s, i, "invalid")

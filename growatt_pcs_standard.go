@@ -39,7 +39,7 @@ type PCSStandardPCSResult struct {
 	Diagnostics []byte
 }
 
-// CX05DecodePCSStandard is a pure receive-only decoder. It retains native evidence
+// DecodePCSStandard is a pure receive-only decoder. It retains native evidence
 // and does not aggregate publishers, maintain a cache or qualify hardware.
 func DecodePCSStandard(s CXSelection, i PCSStandardPCSInput) PCSStandardPCSResult {
 	r := PCSStandardPCSResult{CXNativeResult: selectionResult(s, i.LINKInput, "invalid"), Diagnostics: append([]byte(nil), i.NativeRecord...)}
@@ -206,7 +206,7 @@ func DecodePCSStandard(s CXSelection, i PCSStandardPCSInput) PCSStandardPCSResul
 	return r
 }
 
-// CX05RetainAccepted preserves independent last-known-good fields and their
+// RetainAccepted preserves independent last-known-good fields and their
 // original ages. Rejected updates and identity changes (including a change of
 // reporting-member dictionary) cannot refresh them;
 // a valid empty observation supersedes the retained value.

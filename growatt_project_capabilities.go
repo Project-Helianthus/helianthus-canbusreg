@@ -185,7 +185,7 @@ func receiverCapabilityRules() []receiverCapabilityRule {
 	return rows
 }
 
-// CX15ClassifyReceiver only describes an explicitly selected receiver. No payload
+// ClassifyReceiver only describes an explicitly selected receiver. No payload
 // is decoded into measurements, identity, a client timeout, or a bus operation.
 func ClassifyReceiver(s CXSelection, c ReceiverContext, i LINKInput) ReceiverResult {
 	r := ReceiverResult{Input: i, Context: c, Raw: i.Evidence.Frame.Bytes(), Class: "U", Grade: "Unknown", Status: "invalid"}

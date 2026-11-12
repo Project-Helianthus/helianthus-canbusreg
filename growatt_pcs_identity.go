@@ -80,7 +80,7 @@ func DecodePCSIdentity(s CXSelection, i PCSIdentityPCSInput) CXNativeResult {
 	return r
 }
 
-// CX06SerialResult is detached from the assembler and earlier telemetry.
+// PCSIdentitySerialResult is detached from the assembler and earlier telemetry.
 // Fragments retain all three native evidence records, including padding.
 type PCSIdentitySerialResult struct {
 	Status            string
@@ -90,7 +90,7 @@ type PCSIdentitySerialResult struct {
 	PhysicalQualified bool
 }
 
-// CX06SerialAssembler stores one bounded, uninterrupted receive sequence.
+// PCSIdentitySerialAssembler stores one bounded, uninterrupted receive sequence.
 // The caller owns serialization of Consume calls; no bus operations occur.
 type PCSIdentitySerialAssembler struct {
 	active    bool

@@ -17,15 +17,15 @@ type CounterInput struct {
 	TailSelected bool
 }
 
-// CX08ExplainCounter is a synthetic calculation, never a receiving transform.
+// ExplainCounter is a synthetic calculation, never a receiving transform.
 func ExplainCounter(c uint32) uint32 {
 	return uint32(uint64(c)*25+uint64(c)/2+uint64(c)/8) >> 8
 }
 
-// CX08ExplainTail computes low16(10*state), including negative synthetic states.
+// ExplainTail computes low16(10*state), including negative synthetic states.
 func ExplainTail(state int64) uint16 { return uint16(state) * 10 }
 
-// CX08RefineCounter exposes a separate receive-only refinement for composition.
+// RefineCounter exposes a separate receive-only refinement for composition.
 // Both wire forms already contain transformed codes; no energy, capacity or
 // time unit is inferred and CX01 decoding is left intact.
 func RefineCounter(s CXSelection, i CounterInput) CXNativeResult {

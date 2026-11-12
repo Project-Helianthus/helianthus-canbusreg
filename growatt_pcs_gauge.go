@@ -75,7 +75,7 @@ func pCSIdentityAdd(r *CXNativeResult, i PCSIdentityPCSInput, name string, n, d 
 	r.Fields[name] = CXNativeField{Numerator: n, Denominator: d, Unit: unit, Meaning: meaning, Grade: grade, Status: status, Raw: r.Raw, Evidence: i.Evidence, Epoch: i.Epoch, Scope: i.Scope, Bank: i.Bank, Endpoint: i.Endpoint, Group: i.Group, Slot: i.Slot, Age: age}
 }
 
-// CX06DecodePCSGauge consumes supplied frames only; it performs no I/O.
+// DecodePCSGauge consumes supplied frames only; it performs no I/O.
 func DecodePCSGauge(s CXSelection, i PCSIdentityPCSInput) CXNativeResult {
 	r := selectionResult(s, i.LINKInput, pCSIdentityAdmit(s, i))
 	if r.Status != "decoded" {

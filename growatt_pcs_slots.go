@@ -20,7 +20,7 @@ func release11(s CXSelection) bool {
 	return s.SelectionGroup() == "L8" && (c.ProjectCode == "QAAA" && c.Release == "0011" || c.ProjectCode == "QAAa" && c.Release == "9011" && c.Choice == "release11")
 }
 
-// CX08DecodePCSSlots consumes supplied evidence without bus I/O or caching.
+// DecodePCSSlots consumes supplied evidence without bus I/O or caching.
 // The ordinary and parallel current offsets require Bank="standard" or
 // Bank="parallel" respectively; neither is inferred from current plausibility.
 func DecodePCSSlots(s CXSelection, i PCSSlotPCSInput) CXNativeResult {

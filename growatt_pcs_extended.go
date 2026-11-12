@@ -168,7 +168,7 @@ func DecodePCSExtended(s CXSelection, i LINKInput) CXNativeResult {
 	return r
 }
 
-// CX09PCSExtendedDecoder retains independent last-known-good fields for one
+// PCSExtendedDecoder retains independent last-known-good fields for one
 // immutable selection. Rejected input never replaces retained evidence.
 // A changed epoch or address requires a new decoder and explicit selection.
 type PCSExtendedDecoder struct {

@@ -5,7 +5,7 @@ import (
 	"time"
 )
 
-// CX10ParallelIdentitySnapshot preserves each fragment's native evidence.
+// ParallelIdentitySnapshot preserves each fragment's native evidence.
 // It proves neither inventory completeness nor simultaneity with telemetry.
 type ParallelIdentitySnapshot struct {
 	Serial            [16]byte
@@ -29,7 +29,7 @@ type ParallelIdentityAssembler struct {
 	snapshot      ParallelIdentitySnapshot
 }
 
-// CX10NewParallelIdentityAssembler binds one explicit bus/group/module/epoch.
+// NewParallelIdentityAssembler binds one explicit bus/group/module/epoch.
 func NewParallelIdentityAssembler(s CXSelection, module uint8) *ParallelIdentityAssembler {
 	return &ParallelIdentityAssembler{selection: s, module: module, snapshot: ParallelIdentitySnapshot{Grade: "Unknown", Status: "absent"}}
 }

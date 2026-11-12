@@ -26,7 +26,7 @@ func sourceValue(s CXSelection, f *CXNativeField, maximum int64) (int64, bool) {
 	return f.Numerator, f.Status == "accepted" && (f.Grade == "Proven" || f.Grade == "Hypothesis") && f.Denominator == 1 && f.Numerator >= 0 && f.Numerator <= maximum && f.Evidence.Interface == c.Interface && f.Epoch == c.Epoch && f.Scope == c.Scope && f.Bank == c.Bank && f.Endpoint == c.Endpoint && f.Group == c.Group && f.Slot == c.Slot && f.Age >= 0
 }
 
-// CX11DecodeParallel is a pure receiver decoder. Context validates derived wire
+// ParallelReleaseDecodeParallel is a pure receiver decoder. Context validates derived wire
 // codes without constructing traffic or turning substituted codes into fresh
 // measurements. Candidate protocol grades never establish qualification.
 func ParallelReleaseDecodeParallel(s CXSelection, i LINKInput, x ParallelContext) CXNativeResult {

@@ -21,7 +21,7 @@ type PCSSummaryPCSInput struct {
 	StateCode                                 *uint8
 }
 
-// CX14SummaryBit contains bounded numeric OR alternatives, never an active fault
+// SummaryBit contains bounded numeric OR alternatives, never an active fault
 // set. ConditionalAlternatives require missing control-state evidence. Neither
 // list identifies a unique cause, even when it contains only one index.
 type SummaryBit struct {
@@ -34,7 +34,7 @@ type PCSSummaryPCSResult struct {
 	Diagnostics []byte
 }
 
-// CX14DecodePCSSummaries is receive-only and stateless. Clear summary bits say
+// DecodePCSSummaries is receive-only and stateless. Clear summary bits say
 // nothing about independent current/retained diagnostics. Unknown, unassigned
 // and status-only bits remain visible; no all-clear conclusion is produced.
 func DecodePCSSummaries(s CXSelection, i PCSSummaryPCSInput) PCSSummaryPCSResult {

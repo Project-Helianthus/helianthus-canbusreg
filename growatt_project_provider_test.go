@@ -19,9 +19,7 @@ type providerTestFake struct {
 	pending chan struct{}
 }
 
-func providerTestSource() *providerTestFake {
-	return &providerTestFake{events: make(chan providerTestEvent)}
-}
+func providerTestSource() *providerTestFake { return &providerTestFake{events: make(chan providerTestEvent)} }
 func (s *providerTestFake) ProjectProviderReceive(ctx context.Context) (Observation, error) {
 	if s.pending != nil {
 		close(s.pending)

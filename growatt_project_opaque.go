@@ -31,7 +31,7 @@ type receiverCapabilityRetained struct {
 	result    ReceiverResult
 }
 
-// CX15OpaqueStore is a bounded, receive-only evidence journal. Rejections enter
+// OpaqueStore is a bounded, receive-only evidence journal. Rejections enter
 // the journal but cannot replace an independently admitted last-known-good value.
 // Native records and their ages are copied verbatim; no timer units are inferred.
 type OpaqueStore struct {

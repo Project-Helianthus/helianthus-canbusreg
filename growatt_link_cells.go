@@ -30,7 +30,7 @@ type VectorSnapshot struct {
 	PhysicalQualified                 bool
 }
 
-// CX12LINKVector retains bounded independent channel history. A caller must
+// LINKVector retains bounded independent channel history. A caller must
 // supply measurement age and validity, rather than infer them from reception.
 type LINKVector struct {
 	mu              sync.Mutex
@@ -48,7 +48,7 @@ func NewLINKCells(s CXSelection, count int, countValid bool) *LINKVector {
 	return lINKVectorNewVector(s, count, countValid, 16, "cells")
 }
 
-// CX12NewLINKFixed16Cells selects an independently asserted fixed-16 path.
+// NewLINKFixed16Cells selects an independently asserted fixed-16 path.
 // The reported count stays separate and does not qualify that assertion.
 func NewLINKFixed16Cells(s CXSelection, count int, countValid bool) *LINKVector {
 	a := lINKVectorNewVector(s, count, countValid, 16, "cells")

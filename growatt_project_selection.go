@@ -7,7 +7,7 @@ import (
 	"github.com/Project-Helianthus/helianthus-canbus"
 )
 
-// CX01SelectionSpec is an explicit caller assertion, never inferred from traffic.
+// SelectionSpec is an explicit caller assertion, never inferred from traffic.
 // Native rules: https://github.com/Project-Helianthus/helianthus-docs-canbus/blob/main/protocols/growatt/growatt-low-voltage-bms-can-pcs-protocol-v1.md
 // Sections: PCS feature availability by version; Same-identity variants and native-contract selection.
 type SelectionSpec struct {
@@ -151,7 +151,7 @@ type CXNativeResult struct {
 	HasMember bool
 }
 
-// CX01NativeIndication requires a caller-supplied topology association for PCS
+// SelectionNativeIndication requires a caller-supplied topology association for PCS
 // evidence. Timing, matching identifiers and ordinary LINK frames supply none.
 type SelectionNativeIndication struct {
 	Input              LINKInput
@@ -213,7 +213,7 @@ func ConfirmNativeSelection(s CXSelection, indication SelectionNativeIndication)
 	return r
 }
 
-// CX01FeatureGrade reports a candidate contract gate, never qualification.
+// SelectionFeatureGrade reports a candidate contract gate, never qualification.
 func (s CXSelection) SelectionFeatureGrade(feature string) string {
 	switch feature {
 	case "three-word-pcs-gauge":

@@ -10,19 +10,19 @@ import (
 
 const BMSRevisionV104 = "V1.04"
 
-// O08Observation binds value-owned native evidence to the caller's source generation.
+// BMSObservation binds value-owned native evidence to the caller's source generation.
 type BMSObservation struct {
 	Generation uint64
 	Evidence   Evidence
 }
 
-// O08ReceiveSource must unblock O08Receive when its context is canceled.
+// BMSReceiveSource must unblock O08Receive when its context is canceled.
 // The caller owns acquisition; this interface grants no send or configuration access.
 type BMSReceiveSource interface {
 	Receive(context.Context) (BMSObservation, error)
 }
 
-// O08GrowattSnapshot retains at most one raw observation and one accepted tuple.
+// GrowattBMSSnapshot retains at most one raw observation and one accepted tuple.
 // A historical projection's generation can differ from the current source generation.
 type GrowattBMSSnapshot struct {
 	State                string
@@ -34,7 +34,7 @@ type GrowattBMSSnapshot struct {
 	Projection           *GrowattLowVoltageBMSV104Projection
 }
 
-// O08GrowattProvider wraps only the explicitly selected V1.04 replay.
+// GrowattBMSProvider wraps only the explicitly selected V1.04 replay.
 // Construct it with O08NewGrowattProvider; its zero value is not usable.
 type GrowattBMSProvider struct {
 	bmsLifecycle   sync.Mutex
@@ -60,7 +60,7 @@ func NewGrowattBMSProvider(bmsInterface canbus.InterfaceIdentity, bmsRevision st
 	return &GrowattBMSProvider{bmsInterface: bmsInterface, bmsReplay: bmsReplay, bmsSnapshot: GrowattBMSSnapshot{State: "stopped"}}, nil
 }
 
-// O08Start cancels and joins any predecessor before installing a fresh replay.
+// Start cancels and joins any predecessor before installing a fresh replay.
 // Generations must be positive and strictly increasing, including after loss/stop.
 func (bmsP *GrowattBMSProvider) Start(bmsSource BMSReceiveSource, bmsGeneration uint64) error {
 	bmsP.bmsLifecycle.Lock()
@@ -86,7 +86,7 @@ func (bmsP *GrowattBMSProvider) Start(bmsSource BMSReceiveSource, bmsGeneration 
 	return nil
 }
 
-// O08Stop fences publication before cancellation and waits for receive to exit.
+// Stop fences publication before cancellation and waits for receive to exit.
 // It retains detached historical evidence and is idempotent.
 func (bmsP *GrowattBMSProvider) Stop() {
 	bmsP.bmsLifecycle.Lock()

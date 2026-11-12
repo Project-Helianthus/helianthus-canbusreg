@@ -22,7 +22,7 @@ func dictionary(member CXSelection) (count int, binaryWords bool) {
 	return 0, false
 }
 
-// CX07EncodeDTC maps a numeric index to a candidate word, without bus I/O.
+// EncodeDTC maps a numeric index to a candidate word, without bus I/O.
 func EncodeDTC(member CXSelection, index int) (uint16, bool) {
 	count, modern := dictionary(member)
 	if index < 0 || index >= count {
@@ -42,7 +42,7 @@ func EncodeDTC(member CXSelection, index int) (uint16, bool) {
 	return word, true
 }
 
-// CX07DecodeDTC decodes one caller-located selected word in native evidence.
+// DecodeDTC decodes one caller-located selected word in native evidence.
 // member must identify the actual reporting member, including any explicit
 // topology association; forwarding coordinator identity is not a substitute.
 // offset locates the word, not an active or retained bitmap. No state is mutated.
@@ -131,7 +131,7 @@ func categories(index int) (int, int) {
 	}
 }
 
-// CX07LocalSelection is a pure explanation of a supplied active set, not a
+// DTCLocalSelection is a pure explanation of a supplied active set, not a
 // fault activation/clearing operation or a reconstruction from received words.
 // -1 denotes no index selected. Categories carry no severity labels.
 type DTCLocalSelection struct {

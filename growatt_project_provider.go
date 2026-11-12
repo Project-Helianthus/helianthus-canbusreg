@@ -19,7 +19,7 @@ type Observation struct {
 	Input      ReplayInput
 }
 
-// CX17ReceiveSource transfers exclusive ownership of each returned input until
+// ReceiveSource transfers exclusive ownership of each returned input until
 // the next receive call. Receive must unblock on context cancellation. It grants
 // no transmit, acknowledgement, probing or configuration capability.
 type ReceiveSource interface {
@@ -44,7 +44,7 @@ type ProjectProviderSnapshot struct {
 	Promotable, PhysicalQualified                         bool
 }
 
-// CX17Provider has exactly one configured source/selection, one identity
+// Provider has exactly one configured source/selection, one identity
 // assembly per identity kind (per native module for PCS-parallel serials, at
 // most 16) and one candidate group; only the pending serial fragments of those
 // assemblies are retained and there is no input queue.
@@ -554,7 +554,7 @@ func (p *Provider) projectProviderDemote(name string, configured, valid bool, fr
 	p.snapshot.Current[name] = f
 }
 
-// CX17Snapshot uses caller logical time and an inclusive maximum age. Each
+// ProjectProviderSnapshot uses caller logical time and an inclusive maximum age. Each
 // field ages from its own evidence and gate age; other frames cannot renew it.
 // LastGood is historical, with its origin generation explicitly retained.
 func (p *Provider) ProjectProviderSnapshot(now, maxAge time.Duration) ProjectProviderSnapshot {

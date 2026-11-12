@@ -6,7 +6,7 @@ import (
 	"time"
 )
 
-// CX01LINKIdentitySnapshot is detached candidate evidence, not authentication.
+// LINKIdentitySnapshot is detached candidate evidence, not authentication.
 // It carries a single explicitly selected source; allocation is bounded.
 type LINKIdentitySnapshot struct {
 	Selection                    CXSelection

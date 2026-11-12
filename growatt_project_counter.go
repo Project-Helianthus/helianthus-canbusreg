@@ -12,29 +12,29 @@ import (
 // TailSelected asserts the separate release11 hypothesis feature; payload
 // presence and zero padding never select it. Its residue has no physical unit
 // and cannot reconstruct the separate signed state uniquely.
-type CX08CounterInput struct {
-	CX06PCSInput
+type CounterInput struct {
+	PCSIdentityPCSInput
 	TailSelected bool
 }
 
 // CX08ExplainCounter is a synthetic calculation, never a receiving transform.
-func CX08ExplainCounter(c uint32) uint32 {
+func ExplainCounter(c uint32) uint32 {
 	return uint32(uint64(c)*25+uint64(c)/2+uint64(c)/8) >> 8
 }
 
 // CX08ExplainTail computes low16(10*state), including negative synthetic states.
-func CX08ExplainTail(state int64) uint16 { return uint16(state) * 10 }
+func ExplainTail(state int64) uint16 { return uint16(state) * 10 }
 
 // CX08RefineCounter exposes a separate receive-only refinement for composition.
 // Both wire forms already contain transformed codes; no energy, capacity or
 // time unit is inferred and CX01 decoding is left intact.
-func CX08RefineCounter(s CXSelection, i CX08CounterInput) CXNativeResult {
-	c := s.CX01Spec()
-	status := cx06Admit(s, i.CX06PCSInput)
+func RefineCounter(s CXSelection, i CounterInput) CXNativeResult {
+	c := s.SelectionSpecValue()
+	status := pCSIdentityAdmit(s, i.PCSIdentityPCSInput)
 	link := c.Flavor == "link"
 	if link {
 		status = "invalid"
-		if cx01LINKAdmission(s, i.CX01LINKInput) && i.Evidence.Frame.ID().Value()>>16 == 0x180a {
+		if lINKAdmission(s, i.LINKInput) && i.Evidence.Frame.ID().Value()>>16 == 0x180a {
 			// Preserve the selected LINK result and its native evidence.
 			status = "decoded"
 			if !i.PublisherResolved {
@@ -54,7 +54,7 @@ func CX08RefineCounter(s CXSelection, i CX08CounterInput) CXNativeResult {
 			}
 		}
 	}
-	r := cx01Result(s, i.CX01LINKInput, status)
+	r := selectionResult(s, i.LINKInput, status)
 	if status != "decoded" {
 		return r
 	}
@@ -67,16 +67,16 @@ func CX08RefineCounter(s CXSelection, i CX08CounterInput) CXNativeResult {
 	if link {
 		code = int64(p[1]) | int64(p[2])<<8 | int64(p[3])<<16
 	}
-	selected := cx08Release11(s) && c.Scope == "local"
+	selected := release11(s) && c.Scope == "local"
 	valid := selected && i.MeasurementValid
 	if !link {
 		valid = valid && p[4] == 0 && p[5] == 0
 	}
-	cx06Add(&r, i.CX06PCSInput, "counter", code, 1, "", "opaque transmitted counter code", "Proven", valid)
+	pCSIdentityAdd(&r, i.PCSIdentityPCSInput, "counter", code, 1, "", "opaque transmitted counter code", "Proven", valid)
 	if !link {
-		cx06Add(&r, i.CX06PCSInput, "module", int64(p[0]), 1, "", "native module", "Proven", selected && p[4] == 0 && p[5] == 0)
+		pCSIdentityAdd(&r, i.PCSIdentityPCSInput, "module", int64(p[0]), 1, "", "native module", "Proven", selected && p[4] == 0 && p[5] == 0)
 		tail := int64(binary.BigEndian.Uint16(p[6:8]))
-		cx06Add(&r, i.CX06PCSInput, "tail", tail, 1, "", "low16 of ten times a separate signed state; no unique inverse", "Hypothesis", valid && i.TailSelected)
+		pCSIdentityAdd(&r, i.PCSIdentityPCSInput, "tail", tail, 1, "", "low16 of ten times a separate signed state; no unique inverse", "Hypothesis", valid && i.TailSelected)
 	}
 	return r
 }

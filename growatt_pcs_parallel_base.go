@@ -10,18 +10,18 @@ import (
 // Sections: Standard parallel / clustering profile; Addressed families
 // 50X…68X, 6CX, 6DX; Coordinator summaries 590, 690, 6A0, 6B0, 6E0.
 // Candidate decoding never establishes physical qualification or inventory.
-func cx10Admission(s CXSelection, i CX01LINKInput) bool {
-	c := s.CX01Spec()
+func parallelIdentityAdmission(s CXSelection, i LINKInput) bool {
+	c := s.SelectionSpecValue()
 	f := i.Evidence.Frame
 	g, e := strconv.ParseUint(c.Group, 10, 8)
-	return e == nil && g < 8 && c.Group == strconv.FormatUint(g, 10) && c.Flavor == "pcs-parallel" && s.CX01Group() != "" && c.Direction == "bms-to-pcs" && !f.ID().Extended() && f.DLC() == 8 && f.RawDLC() == 8 && i.Evidence.Interface == c.Interface && i.Epoch == c.Epoch && i.Direction == c.Direction && i.Scope == c.Scope && i.Bank == c.Bank && i.Endpoint == c.Endpoint && i.Group == c.Group && i.Slot == c.Slot && i.FieldAge >= 0
+	return e == nil && g < 8 && c.Group == strconv.FormatUint(g, 10) && c.Flavor == "pcs-parallel" && s.SelectionGroup() != "" && c.Direction == "bms-to-pcs" && !f.ID().Extended() && f.DLC() == 8 && f.RawDLC() == 8 && i.Evidence.Interface == c.Interface && i.Epoch == c.Epoch && i.Direction == c.Direction && i.Scope == c.Scope && i.Bank == c.Bank && i.Endpoint == c.Endpoint && i.Group == c.Group && i.Slot == c.Slot && i.FieldAge >= 0
 }
 
-func cx10Family(s CXSelection, id uint32) (uint32, bool) {
-	c := s.CX01Spec()
+func parallelIdentityFamily(s CXSelection, id uint32) (uint32, bool) {
+	c := s.SelectionSpecValue()
 	g, _ := strconv.ParseUint(c.Group, 10, 8)
 	if id == 0x37f || id == 0x3f7 {
-		return id, s.CX01Group() == "L8"
+		return id, s.SelectionGroup() == "L8"
 	}
 	family := id &^ 15
 	if family == 0x590 || family == 0x690 || family == 0x6a0 || family == 0x6b0 || family == 0x6e0 {
@@ -31,7 +31,7 @@ func cx10Family(s CXSelection, id uint32) (uint32, bool) {
 	} else if id&15 != uint32(g) {
 		return 0, false
 	}
-	group := s.CX01Group()
+	group := s.SelectionGroup()
 	later := group == "L5" || group == "L7" || group == "L8"
 	switch family {
 	case 0x600, 0x610, 0x620, 0x630, 0x640, 0x650, 0x660, 0x670, 0x680, 0x6c0, 0x690, 0x6a0, 0x6b0:
@@ -46,19 +46,19 @@ func cx10Family(s CXSelection, id uint32) (uint32, bool) {
 	return family, false
 }
 
-func CX10DecodeParallel(s CXSelection, i CX01LINKInput) CXNativeResult {
-	r := cx01Result(s, i, "unsupported")
-	if !cx10Admission(s, i) {
+func ParallelIdentityDecodeParallel(s CXSelection, i LINKInput) CXNativeResult {
+	r := selectionResult(s, i, "unsupported")
+	if !parallelIdentityAdmission(s, i) {
 		r.Status = "invalid"
 		return r
 	}
-	family, ok := cx10Family(s, i.Evidence.Frame.ID().Value())
+	family, ok := parallelIdentityFamily(s, i.Evidence.Frame.ID().Value())
 	if !ok {
 		return r
 	}
 	p := r.Raw
 	add := func(name string, n int64, unit, meaning, status string) {
-		grade := s.CX01Grade()
+		grade := s.SelectionGrade()
 		if grade != "Proven" && grade != "Hypothesis" || status == "raw" {
 			grade = "Unknown"
 		}
@@ -162,11 +162,11 @@ func CX10DecodeParallel(s CXSelection, i CX01LINKInput) CXNativeResult {
 		}
 	case 0x6b0:
 		count := 1
-		c := s.CX01Spec()
+		c := s.SelectionSpecValue()
 		if c.ProjectCode+c.Release == "QAAB0004" {
 			count = 4
 		}
-		if c.ProjectCode+c.Release == "QAAb5004" || s.CX01Group() == "L7" || s.CX01Group() == "L8" {
+		if c.ProjectCode+c.Release == "QAAb5004" || s.SelectionGroup() == "L7" || s.SelectionGroup() == "L8" {
 			count = 5
 		}
 		for at := 0; at < count; at++ {

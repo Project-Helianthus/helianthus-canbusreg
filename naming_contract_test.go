@@ -21,12 +21,12 @@ func namingNoAliases(t *testing.T, r CXNativeResult) {
 }
 
 func TestNamingSupportedTemperatureKeys(t *testing.T) {
-	c := cx01Spec(t, "QAAA", "0006")
-	link := CXDecodeLINKTelemetry(cx01Select(t, c), cx01Input(t, c, 0x1808, [8]byte{2, 81, 3, 39, 40, 0, 0, 0}))
-	s, i := cx05Fixture(t, 0x322, [8]byte{0xff, 0xf6, 0x80, 0, 2, 3, 0, 0})
-	standard := CX05DecodePCSStandard(s, i).CXNativeResult
-	pc := cx11Spec(t)
-	parallel := cx11Decode(t, pc, 0x653, [8]byte{2, 0, 81, 3, 0, 39, 40, 0}, CX11ParallelContext{})
+	c := selectionTestSpec(t, "QAAA", "0006")
+	link := CXDecodeLINKTelemetry(selectionTestSelect(t, c), selectionTestInput(t, c, 0x1808, [8]byte{2, 81, 3, 39, 40, 0, 0, 0}))
+	s, i := standardTestFixture(t, 0x322, [8]byte{0xff, 0xf6, 0x80, 0, 2, 3, 0, 0})
+	standard := DecodePCSStandard(s, i).CXNativeResult
+	pc := parallelReleaseTestSpec(t)
+	parallel := parallelReleaseTestDecode(t, pc, 0x653, [8]byte{2, 0, 81, 3, 0, 39, 40, 0}, ParallelContext{})
 	for _, tc := range []struct {
 		name                          string
 		result                        CXNativeResult
@@ -44,8 +44,8 @@ func TestNamingSupportedTemperatureKeys(t *testing.T) {
 			}
 		})
 	}
-	ec := cx09Spec(t)
-	extended := CX09DecodePCSExtended(cx09Select(t, ec), cx09Input(t, ec, 0x1906, [8]byte{2, 0, 81, 3, 0, 39, 40, 0}))
+	ec := extendedTestSpec(t)
+	extended := DecodePCSExtended(extendedTestSelect(t, ec), extendedTestInput(t, ec, 0x1906, [8]byte{2, 0, 81, 3, 0, 39, 40, 0}))
 	namingNoAliases(t, extended)
 	for name, want := range map[string]int64{"maximum_temperature_code": 81, "minimum_temperature_code": 39} {
 		f := extended.Fields[name]
@@ -65,8 +65,8 @@ func TestNamingFieldKeysAndPartialRetention(t *testing.T) {
 	// FieldAges, a swapped key, or loss of the accepted sibling during retention.
 	for _, keys := range [][2]string{{"temperature_maximum", "maximum_temperature"}, {"temperature_minimum", "minimum_temperature"}} {
 		t.Run(keys[0], func(t *testing.T) {
-			s, i := cx05Fixture(t, 0x322, [8]byte{0, 10, 0, 20, 2, 3, 0, 0})
-			previous := CX05DecodePCSStandard(s, i).CXNativeResult
+			s, i := standardTestFixture(t, 0x322, [8]byte{0, 10, 0, 20, 2, 3, 0, 0})
+			previous := DecodePCSStandard(s, i).CXNativeResult
 			sibling := "temperature_minimum"
 			if keys[0] == sibling {
 				sibling = "temperature_maximum"
@@ -75,11 +75,11 @@ func TestNamingFieldKeysAndPartialRetention(t *testing.T) {
 				update := i
 				update.FieldStates = map[string]string{keys[0]: state}
 				update.FieldAges = map[string]time.Duration{keys[0]: 5 * time.Second, sibling: 2 * time.Second}
-				r := CX05DecodePCSStandard(s, update).CXNativeResult
+				r := DecodePCSStandard(s, update).CXNativeResult
 				if r.Fields[keys[0]].Status != state || r.Fields[keys[0]].Age != 5*time.Second || r.Fields[keys[0]].Unit != "" || r.Fields[sibling].Status != "accepted" {
 					t.Fatal(state, r)
 				}
-				merged := CX05RetainAccepted(previous, r)
+				merged := RetainAccepted(previous, r)
 				if merged.Fields[keys[0]] != previous.Fields[keys[0]] || merged.Fields[sibling].Age != 2*time.Second {
 					t.Fatal("partial retention", merged)
 				}
@@ -87,7 +87,7 @@ func TestNamingFieldKeysAndPartialRetention(t *testing.T) {
 			}
 			i.FieldStates = map[string]string{keys[1]: "invalid"}
 			i.FieldAges = map[string]time.Duration{keys[1]: -1}
-			r := CX05DecodePCSStandard(s, i).CXNativeResult
+			r := DecodePCSStandard(s, i).CXNativeResult
 			if r.Fields[keys[0]] != previous.Fields[keys[0]] {
 				t.Fatal("old key resolved", r)
 			}
@@ -103,13 +103,13 @@ func TestNamingRetentionIdentityCollisionAxes(t *testing.T) {
 	for _, surface := range []string{"selection", "member"} {
 		for _, axis := range axes {
 			t.Run(surface+"/"+axis, func(t *testing.T) {
-				s, i := cx05Fixture(t, 0x322, [8]byte{0, 10, 0, 20, 2, 3, 0, 0})
-				previous := CX05DecodePCSStandard(s, i).CXNativeResult
+				s, i := standardTestFixture(t, 0x322, [8]byte{0, 10, 0, 20, 2, 3, 0, 0})
+				previous := DecodePCSStandard(s, i).CXNativeResult
 				previous.Member = s
 				previous.HasMember = true
 				update := previous
 				update.Fields = map[string]CXNativeField{}
-				c := s.CX01Spec()
+				c := s.SelectionSpecValue()
 				switch axis {
 				case "interface-name":
 					c.Interface, _ = canbus.NewInterfaceIdentity("other", 1)
@@ -147,25 +147,25 @@ func TestNamingRetentionIdentityCollisionAxes(t *testing.T) {
 					c.Epoch++
 				}
 				if surface == "selection" {
-					update.Selection = cx01Select(t, c)
+					update.Selection = selectionTestSelect(t, c)
 				} else {
-					update.Member = cx01Select(t, c)
+					update.Member = selectionTestSelect(t, c)
 				}
-				if len(CX05RetainAccepted(previous, update).Fields) != 0 {
+				if len(RetainAccepted(previous, update).Fields) != 0 {
 					t.Fatal("cross-identity retained", axis)
 				}
 			})
 		}
 	}
 	t.Run("has-member", func(t *testing.T) {
-		s, i := cx05Fixture(t, 0x322, [8]byte{0, 10, 0, 20, 2, 3, 0, 0})
-		previous := CX05DecodePCSStandard(s, i).CXNativeResult
+		s, i := standardTestFixture(t, 0x322, [8]byte{0, 10, 0, 20, 2, 3, 0, 0})
+		previous := DecodePCSStandard(s, i).CXNativeResult
 		previous.Member = s
 		previous.HasMember = true
 		update := previous
 		update.Fields = map[string]CXNativeField{}
 		update.HasMember = false
-		if len(CX05RetainAccepted(previous, update).Fields) != 0 {
+		if len(RetainAccepted(previous, update).Fields) != 0 {
 			t.Fatal("member presence ignored")
 		}
 	})

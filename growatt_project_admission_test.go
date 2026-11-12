@@ -9,23 +9,23 @@ import (
 	"github.com/Project-Helianthus/helianthus-canbus"
 )
 
-func cx16Fixture(t *testing.T) (CXSelection, CX16ReplayInput) {
+func replayTestFixture(t *testing.T) (CXSelection, ReplayInput) {
 	t.Helper()
 	iface, err := canbus.NewInterfaceIdentity("synthetic", 1)
 	if err != nil {
 		t.Fatal(err)
 	}
-	s, err := NewCXSelection(CX01SelectionSpec{Interface: iface, Flavor: "pcs-standard", ProjectCode: "QAAA", Release: "0006", Direction: "bms-to-pcs", Scope: "local", Bank: "standard", Endpoint: "pack", Group: "0", Slot: "1", Epoch: 1})
+	s, err := NewCXSelection(SelectionSpec{Interface: iface, Flavor: "pcs-standard", ProjectCode: "QAAA", Release: "0006", Direction: "bms-to-pcs", Scope: "local", Bank: "standard", Endpoint: "pack", Group: "0", Slot: "1", Epoch: 1})
 	if err != nil {
 		t.Fatal(err)
 	}
 	id, _ := canbus.NewStandardID(0x313)
 	f, _ := canbus.NewFrame(id, []byte{0x14, 0xbe, 0xff, 0xf6, 0, 10, 50, 0xe4})
-	i := CX01LINKInput{Evidence: Evidence{Frame: f, Interface: iface, Sequence: 1, Monotonic: time.Second}, Epoch: 1, Direction: "bms-to-pcs", Scope: "local", Bank: "standard", Endpoint: "pack", Group: "0", Slot: "1", FieldAge: time.Second}
-	return s, CX16ReplayInput{Selection: s, PCS: CX08PCSInput{CX06PCSInput: CX06PCSInput{CX05PCSInput: CX05PCSInput{CX01LINKInput: i, PublisherResolved: true, MeasurementValid: true, TemperatureValid: true}}}}
+	i := LINKInput{Evidence: Evidence{Frame: f, Interface: iface, Sequence: 1, Monotonic: time.Second}, Epoch: 1, Direction: "bms-to-pcs", Scope: "local", Bank: "standard", Endpoint: "pack", Group: "0", Slot: "1", FieldAge: time.Second}
+	return s, ReplayInput{Selection: s, PCS: PCSSlotPCSInput{PCSIdentityPCSInput: PCSIdentityPCSInput{PCSStandardPCSInput: PCSStandardPCSInput{LINKInput: i, PublisherResolved: true, MeasurementValid: true, TemperatureValid: true}}}}
 }
 
-func cx16Profile(t *testing.T, s CXSelection, inputs ...CX16ReplayInput) Profile {
+func replayTestProfile(t *testing.T, s CXSelection, inputs ...ReplayInput) Profile {
 	t.Helper()
 	p, err := NewCX16SelectedProfile(s, inputs)
 	if err != nil {
@@ -34,10 +34,10 @@ func cx16Profile(t *testing.T, s CXSelection, inputs ...CX16ReplayInput) Profile
 	return p
 }
 
-func cx16Classify(t *testing.T, p Profile, e Evidence) CX16Projection {
+func replayTestClassify(t *testing.T, p Profile, e Evidence) ReplayProjection {
 	t.Helper()
 	c := NewRegistry(p).Classify(e)
-	r, ok := c.Projection.(CX16Projection)
+	r, ok := c.Projection.(ReplayProjection)
 	if !ok || c.Profile != "growatt.project.selected" {
 		t.Fatalf("classification: %#v", c)
 	}
@@ -48,15 +48,15 @@ func cx16Classify(t *testing.T, p Profile, e Evidence) CX16Projection {
 }
 
 func TestCX16SelectedCore(t *testing.T) {
-	s, i := cx16Fixture(t)
-	r := cx16Classify(t, cx16Profile(t, s, i), i.PCS.Evidence)
+	s, i := replayTestFixture(t)
+	r := replayTestClassify(t, replayTestProfile(t, s, i), i.PCS.Evidence)
 	f := r.Current.Fields["core/voltage"]
 	if f.Status != "accepted" || f.Numerator != 5310 || f.Denominator != 100 || f.Unit != "V" || f.Evidence != i.PCS.Evidence || f.Raw != i.PCS.Evidence.Frame.Bytes() || f.Age != time.Second || f.PhysicalQualified {
 		t.Fatalf("field: %#v", f)
 	}
 }
 
-func cx16Frame(t *testing.T, i *CX16ReplayInput, id uint32, extended bool, payload [8]byte) {
+func replayTestFrame(t *testing.T, i *ReplayInput, id uint32, extended bool, payload [8]byte) {
 	t.Helper()
 	var identifier canbus.Identifier
 	var err error
@@ -74,33 +74,33 @@ func cx16Frame(t *testing.T, i *CX16ReplayInput, id uint32, extended bool, paylo
 	}
 }
 
-func cx16Reselect(t *testing.T, i *CX16ReplayInput, spec CX01SelectionSpec) CXSelection {
+func replayTestReselect(t *testing.T, i *ReplayInput, spec SelectionSpec) CXSelection {
 	t.Helper()
 	s, err := NewCXSelection(spec)
 	if err != nil {
 		t.Fatal(err)
 	}
 	i.Selection = s
-	in := &i.PCS.CX01LINKInput
+	in := &i.PCS.LINKInput
 	in.Evidence.Interface = spec.Interface
 	in.Epoch, in.Direction, in.Scope, in.Bank, in.Endpoint, in.Group, in.Slot = spec.Epoch, spec.Direction, spec.Scope, spec.Bank, spec.Endpoint, spec.Group, spec.Slot
 	return s
 }
 
-func cx16LINK(t *testing.T, kind uint32, payload [8]byte) (CXSelection, CX16ReplayInput) {
+func replayTestLINK(t *testing.T, kind uint32, payload [8]byte) (CXSelection, ReplayInput) {
 	t.Helper()
-	s, i := cx16Fixture(t)
-	c := s.CX01Spec()
+	s, i := replayTestFixture(t)
+	c := s.SelectionSpecValue()
 	c.Flavor, c.PCSFlavor, c.Direction = "link", "pcs-standard", "module-to-coordinator"
 	c.RouteSet, c.Destination, c.Source = true, 0xf4, 1
-	s = cx16Reselect(t, &i, c)
-	cx16Frame(t, &i, kind<<16|0xf401, true, payload)
+	s = replayTestReselect(t, &i, c)
+	replayTestFrame(t, &i, kind<<16|0xf401, true, payload)
 	return s, i
 }
 
-func cx16Withheld(t *testing.T, r CX16Projection, i CX16ReplayInput) {
+func replayTestWithheld(t *testing.T, r ReplayProjection, i ReplayInput) {
 	t.Helper()
-	if r.Current.Raw != i.PCS.Evidence.Frame.Bytes() || r.Current.Evidence != i.PCS.Evidence || len(r.Diagnostics) == 0 || r.Diagnostics[len(r.Diagnostics)-1].Input != i.PCS.CX01LINKInput {
+	if r.Current.Raw != i.PCS.Evidence.Frame.Bytes() || r.Current.Evidence != i.PCS.Evidence || len(r.Diagnostics) == 0 || r.Diagnostics[len(r.Diagnostics)-1].Input != i.PCS.LINKInput {
 		t.Fatalf("raw/context lost: %#v", r)
 	}
 	for name, field := range r.Current.Fields {
@@ -111,36 +111,36 @@ func cx16Withheld(t *testing.T, r CX16Projection, i CX16ReplayInput) {
 }
 
 func TestCX16EverySelectionFieldNegative(t *testing.T) {
-	mutations := map[string]func(*CX01SelectionSpec){
-		"interface-name":  func(c *CX01SelectionSpec) { c.Interface, _ = canbus.NewInterfaceIdentity("other", 1) },
-		"interface-index": func(c *CX01SelectionSpec) { c.Interface, _ = canbus.NewInterfaceIdentity("synthetic", 2) },
-		"flavor":          func(c *CX01SelectionSpec) { c.Flavor = "pcs-parallel" },
-		"pcs-flavor":      func(c *CX01SelectionSpec) { c.PCSFlavor = "pcs-extended19" },
-		"project-case":    func(c *CX01SelectionSpec) { c.ProjectCode = "QAAa" },
-		"release":         func(c *CX01SelectionSpec) { c.Release = "0011" },
-		"choice":          func(c *CX01SelectionSpec) { c.Choice = "legacy19" },
-		"direction":       func(c *CX01SelectionSpec) { c.Direction = "coordinator-to-module" },
-		"scope":           func(c *CX01SelectionSpec) { c.Scope = "aggregate" },
-		"bank":            func(c *CX01SelectionSpec) { c.Bank = "parallel" },
-		"endpoint":        func(c *CX01SelectionSpec) { c.Endpoint = "other" },
-		"group":           func(c *CX01SelectionSpec) { c.Group = "1" },
-		"slot":            func(c *CX01SelectionSpec) { c.Slot = "2" },
-		"route-set":       func(c *CX01SelectionSpec) { c.RouteSet = true },
-		"destination":     func(c *CX01SelectionSpec) { c.Destination = 0xf5 },
-		"source":          func(c *CX01SelectionSpec) { c.Source = 2 },
-		"epoch":           func(c *CX01SelectionSpec) { c.Epoch = 2 },
+	mutations := map[string]func(*SelectionSpec){
+		"interface-name":  func(c *SelectionSpec) { c.Interface, _ = canbus.NewInterfaceIdentity("other", 1) },
+		"interface-index": func(c *SelectionSpec) { c.Interface, _ = canbus.NewInterfaceIdentity("synthetic", 2) },
+		"flavor":          func(c *SelectionSpec) { c.Flavor = "pcs-parallel" },
+		"pcs-flavor":      func(c *SelectionSpec) { c.PCSFlavor = "pcs-extended19" },
+		"project-case":    func(c *SelectionSpec) { c.ProjectCode = "QAAa" },
+		"release":         func(c *SelectionSpec) { c.Release = "0011" },
+		"choice":          func(c *SelectionSpec) { c.Choice = "legacy19" },
+		"direction":       func(c *SelectionSpec) { c.Direction = "coordinator-to-module" },
+		"scope":           func(c *SelectionSpec) { c.Scope = "aggregate" },
+		"bank":            func(c *SelectionSpec) { c.Bank = "parallel" },
+		"endpoint":        func(c *SelectionSpec) { c.Endpoint = "other" },
+		"group":           func(c *SelectionSpec) { c.Group = "1" },
+		"slot":            func(c *SelectionSpec) { c.Slot = "2" },
+		"route-set":       func(c *SelectionSpec) { c.RouteSet = true },
+		"destination":     func(c *SelectionSpec) { c.Destination = 0xf5 },
+		"source":          func(c *SelectionSpec) { c.Source = 2 },
+		"epoch":           func(c *SelectionSpec) { c.Epoch = 2 },
 	}
 	for name, mutate := range mutations {
 		t.Run(name, func(t *testing.T) {
-			s, i := cx16Fixture(t)
-			c := s.CX01Spec()
+			s, i := replayTestFixture(t)
+			c := s.SelectionSpecValue()
 			mutate(&c)
 			var err error
 			i.Selection, err = NewCXSelection(c)
 			if err != nil {
 				t.Fatal(err)
 			}
-			cx16Withheld(t, cx16Classify(t, cx16Profile(t, s, i), i.PCS.Evidence), i)
+			replayTestWithheld(t, replayTestClassify(t, replayTestProfile(t, s, i), i.PCS.Evidence), i)
 		})
 	}
 }
@@ -148,7 +148,7 @@ func TestCX16EverySelectionFieldNegative(t *testing.T) {
 func TestCX16EveryContextFieldNegative(t *testing.T) {
 	for _, name := range []string{"interface-name", "interface-index", "epoch", "direction", "scope", "bank", "endpoint", "group", "slot", "age", "sequence", "monotonic", "publisher"} {
 		t.Run(name, func(t *testing.T) {
-			s, i := cx16Fixture(t)
+			s, i := replayTestFixture(t)
 			switch name {
 			case "interface-name":
 				i.PCS.Evidence.Interface, _ = canbus.NewInterfaceIdentity("other", 1)
@@ -177,7 +177,7 @@ func TestCX16EveryContextFieldNegative(t *testing.T) {
 			case "publisher":
 				i.PCS.PublisherResolved = false
 			}
-			cx16Withheld(t, cx16Classify(t, cx16Profile(t, s, i), i.PCS.Evidence), i)
+			replayTestWithheld(t, replayTestClassify(t, replayTestProfile(t, s, i), i.PCS.Evidence), i)
 		})
 	}
 }
@@ -185,11 +185,11 @@ func TestCX16EveryContextFieldNegative(t *testing.T) {
 func TestCX16GeometryAndRawRecords(t *testing.T) {
 	for _, name := range []string{"ide", "dlc", "raw-dlc", "rtr", "fd", "error", "zero-record", "mismatched-record", "evidence-record"} {
 		t.Run(name, func(t *testing.T) {
-			s, i := cx16Fixture(t)
+			s, i := replayTestFixture(t)
 			payload := i.PCS.Evidence.Frame.Bytes()
 			switch name {
 			case "ide":
-				cx16Frame(t, &i, 0x313, true, payload)
+				replayTestFrame(t, &i, 0x313, true, payload)
 			case "dlc":
 				id, _ := canbus.NewStandardID(0x313)
 				i.PCS.Evidence.Frame, _ = canbus.NewFrame(id, payload[:7])
@@ -225,8 +225,8 @@ func TestCX16GeometryAndRawRecords(t *testing.T) {
 			case "evidence-record":
 				i.PCS.Evidence.RawRecord[0] = 1
 			}
-			r := cx16Classify(t, cx16Profile(t, s, i), i.PCS.Evidence)
-			cx16Withheld(t, r, i)
+			r := replayTestClassify(t, replayTestProfile(t, s, i), i.PCS.Evidence)
+			replayTestWithheld(t, r, i)
 			if string(r.Diagnostics[0].NativeRecord) != string(i.PCS.NativeRecord) {
 				t.Fatal("native bytes lost")
 			}
@@ -237,23 +237,23 @@ func TestCX16GeometryAndRawRecords(t *testing.T) {
 func TestCX16LINKRouteEpochIdentityAndNoFallback(t *testing.T) {
 	for _, name := range []string{"route", "source", "interface", "epoch", "partial-identity", "conflicting-identity"} {
 		t.Run(name, func(t *testing.T) {
-			s, i := cx16LINK(t, 0x1802, [8]byte{'Q', 'A', 'A', 'A', '0', '0', '0', '6'})
+			s, i := replayTestLINK(t, 0x1802, [8]byte{'Q', 'A', 'A', 'A', '0', '0', '0', '6'})
 			switch name {
 			case "route":
-				cx16Frame(t, &i, 0x1802f501, true, i.PCS.Evidence.Frame.Bytes())
+				replayTestFrame(t, &i, 0x1802f501, true, i.PCS.Evidence.Frame.Bytes())
 			case "source":
-				cx16Frame(t, &i, 0x1802f402, true, i.PCS.Evidence.Frame.Bytes())
+				replayTestFrame(t, &i, 0x1802f402, true, i.PCS.Evidence.Frame.Bytes())
 			case "interface":
 				i.PCS.Evidence.Interface, _ = canbus.NewInterfaceIdentity("other", 1)
 			case "epoch":
 				i.PCS.Epoch++
 			case "partial-identity":
-				cx16Frame(t, &i, 0x1802f401, true, [8]byte{'Q', 'A', 'A', 'A'})
+				replayTestFrame(t, &i, 0x1802f401, true, [8]byte{'Q', 'A', 'A', 'A'})
 			case "conflicting-identity":
-				cx16Frame(t, &i, 0x1802f401, true, [8]byte{'Q', 'A', 'A', 'A', '0', '0', '1', '1'})
+				replayTestFrame(t, &i, 0x1802f401, true, [8]byte{'Q', 'A', 'A', 'A', '0', '0', '1', '1'})
 			}
-			p := cx16Profile(t, s, i)
-			cx16Withheld(t, cx16Classify(t, p, i.PCS.Evidence), i)
+			p := replayTestProfile(t, s, i)
+			replayTestWithheld(t, replayTestClassify(t, p, i.PCS.Evidence), i)
 			// A wrong route/epoch never installs a legacy interpretation.
 			if c := NewRegistry(p, GrowattLowVoltageBMSV104()).Classify(i.PCS.Evidence); c.Profile == growattLowVoltageBMSV104Profile {
 				t.Fatal("fallback")
@@ -263,15 +263,15 @@ func TestCX16LINKRouteEpochIdentityAndNoFallback(t *testing.T) {
 }
 
 func TestCX16WireIdentityConflictStickyAndRaw(t *testing.T) {
-	s, i := cx16LINK(t, 0x1802, [8]byte{'Q', 'A', 'A', 'A', '0', '0', '1', '1'})
-	_, good := cx16LINK(t, 0x1805, [8]byte{})
+	s, i := replayTestLINK(t, 0x1802, [8]byte{'Q', 'A', 'A', 'A', '0', '0', '1', '1'})
+	_, good := replayTestLINK(t, 0x1805, [8]byte{})
 	good.PCS.Evidence.Sequence, good.PCS.Evidence.Monotonic = 2, 2*time.Second
-	p := cx16Profile(t, s, i, good)
-	if r := cx16Classify(t, p, i.PCS.Evidence); r.Current.Status != "conflict" {
+	p := replayTestProfile(t, s, i, good)
+	if r := replayTestClassify(t, p, i.PCS.Evidence); r.Current.Status != "conflict" {
 		t.Fatal(r)
 	}
-	r := cx16Classify(t, p, good.PCS.Evidence)
-	cx16Withheld(t, r, good)
+	r := replayTestClassify(t, p, good.PCS.Evidence)
+	replayTestWithheld(t, r, good)
 	if r.Current.Status != "conflict" {
 		t.Fatal(r)
 	}
@@ -280,12 +280,12 @@ func TestCX16WireIdentityConflictStickyAndRaw(t *testing.T) {
 func TestCX16SequenceConflictAndLastGood(t *testing.T) {
 	for _, name := range []string{"same-sequence", "older-sequence", "reversed-time"} {
 		t.Run(name, func(t *testing.T) {
-			s, first := cx16Fixture(t)
+			s, first := replayTestFixture(t)
 			first.PCS.Evidence.Sequence = 2
 			second := first
 			payload := first.PCS.Evidence.Frame.Bytes()
 			payload[0]++
-			cx16Frame(t, &second, 0x313, false, payload)
+			replayTestFrame(t, &second, 0x313, false, payload)
 			switch name {
 			case "older-sequence":
 				second.PCS.Evidence.Sequence = 1
@@ -293,10 +293,10 @@ func TestCX16SequenceConflictAndLastGood(t *testing.T) {
 				second.PCS.Evidence.Sequence = 3
 				second.PCS.Evidence.Monotonic = 0
 			}
-			p := cx16Profile(t, s, first, second)
-			before := cx16Classify(t, p, first.PCS.Evidence)
-			after := cx16Classify(t, p, second.PCS.Evidence)
-			cx16Withheld(t, after, second)
+			p := replayTestProfile(t, s, first, second)
+			before := replayTestClassify(t, p, first.PCS.Evidence)
+			after := replayTestClassify(t, p, second.PCS.Evidence)
+			replayTestWithheld(t, after, second)
 			if after.LastGood["core/voltage"] != before.LastGood["core/voltage"] {
 				t.Fatal("rejection erased/refreshed history")
 			}
@@ -307,15 +307,15 @@ func TestCX16SequenceConflictAndLastGood(t *testing.T) {
 func TestCX16IndependentStatusesZeroAndRetention(t *testing.T) {
 	for _, status := range []string{"absent", "invalid", "unsupported", "stale", "conflict", "unassigned"} {
 		t.Run(status, func(t *testing.T) {
-			s, first := cx16Fixture(t)
+			s, first := replayTestFixture(t)
 			second := first
 			second.PCS.Evidence.Sequence, second.PCS.Evidence.Monotonic = 2, 2*time.Second
-			cx16Frame(t, &second, 0x313, false, [8]byte{})
+			replayTestFrame(t, &second, 0x313, false, [8]byte{})
 			second.PCS.FieldStates = map[string]string{"voltage": status}
 			second.PCS.FieldAges = map[string]time.Duration{"voltage": 3 * time.Second}
-			p := cx16Profile(t, s, first, second)
-			old := cx16Classify(t, p, first.PCS.Evidence)
-			got := cx16Classify(t, p, second.PCS.Evidence)
+			p := replayTestProfile(t, s, first, second)
+			old := replayTestClassify(t, p, first.PCS.Evidence)
+			got := replayTestClassify(t, p, second.PCS.Evidence)
 			if got.Current.Fields["core/voltage"].Status != status || got.Current.Fields["core/voltage"].Age != 3*time.Second || got.LastGood["core/voltage"] != old.LastGood["core/voltage"] {
 				t.Fatal(got)
 			}
@@ -330,10 +330,10 @@ func TestCX16IndependentStatusesZeroAndRetention(t *testing.T) {
 }
 
 func TestCX16BoundsAndAmbiguousSelection(t *testing.T) {
-	s, i := cx16Fixture(t)
+	s, i := replayTestFixture(t)
 	for _, n := range []int{0, 1, 128, 129} {
 		t.Run(fmt.Sprint(n), func(t *testing.T) {
-			replay := make([]CX16ReplayInput, n)
+			replay := make([]ReplayInput, n)
 			for j := range replay {
 				replay[j] = i
 				replay[j].PCS.Evidence.Sequence = uint64(j + 1)
@@ -344,28 +344,28 @@ func TestCX16BoundsAndAmbiguousSelection(t *testing.T) {
 			}
 		})
 	}
-	if _, err := NewCX16SelectedProfile(s, []CX16ReplayInput{i, i}); err == nil {
+	if _, err := NewCX16SelectedProfile(s, []ReplayInput{i, i}); err == nil {
 		t.Fatal("duplicate evidence admitted")
 	}
 	for _, identity := range []string{"QAAa9011", "qAAA0006", "Qaaa0006", "QAAA0000", "QAAA9999"} {
-		c := s.CX01Spec()
+		c := s.SelectionSpecValue()
 		c.ProjectCode, c.Release = identity[:4], identity[4:]
 		selected, err := NewCXSelection(c)
 		if err != nil {
 			t.Fatal(err)
 		}
-		if _, err = NewCX16SelectedProfile(selected, []CX16ReplayInput{i}); err == nil {
+		if _, err = NewCX16SelectedProfile(selected, []ReplayInput{i}); err == nil {
 			t.Fatalf("unresolved selector %s admitted", identity)
 		}
 	}
 }
 
 func TestCX16BoundedDetachedDiagnosticsAndConcurrency(t *testing.T) {
-	s, i := cx16Fixture(t)
+	s, i := replayTestFixture(t)
 	i.PCS.NativeRecord = []byte{1, 2, 3}
-	p := cx16Profile(t, s, i)
+	p := replayTestProfile(t, s, i)
 	i.PCS.NativeRecord[0] = 9
-	first := cx16Classify(t, p, i.PCS.Evidence)
+	first := replayTestClassify(t, p, i.PCS.Evidence)
 	first.Diagnostics[0].NativeRecord[0] = 8
 	first.Current.Fields["invented"] = CXNativeField{Status: "accepted"}
 	var wg sync.WaitGroup
@@ -374,7 +374,7 @@ func TestCX16BoundedDetachedDiagnosticsAndConcurrency(t *testing.T) {
 		go func() { defer wg.Done(); p.Classify(i.PCS.Evidence) }()
 	}
 	wg.Wait()
-	last := cx16Classify(t, p, i.PCS.Evidence)
+	last := replayTestClassify(t, p, i.PCS.Evidence)
 	if len(last.Diagnostics) != 16 || last.Diagnostics[0].NativeRecord[0] != 1 || len(last.Current.Fields) != 0 {
 		t.Fatal(last)
 	}
@@ -384,8 +384,8 @@ func TestCX16EveryProjectAndReleaseCharacterNegative(t *testing.T) {
 	for _, field := range []string{"project", "release"} {
 		for position := 0; position < 4; position++ {
 			t.Run(fmt.Sprintf("%s/%d", field, position), func(t *testing.T) {
-				s, i := cx16Fixture(t)
-				c := s.CX01Spec()
+				s, i := replayTestFixture(t)
+				c := s.SelectionSpecValue()
 				if field == "project" {
 					text := []byte(c.ProjectCode)
 					text[position] += 32
@@ -400,25 +400,25 @@ func TestCX16EveryProjectAndReleaseCharacterNegative(t *testing.T) {
 				if err != nil {
 					t.Fatal(err)
 				}
-				cx16Withheld(t, cx16Classify(t, cx16Profile(t, s, i), i.PCS.Evidence), i)
+				replayTestWithheld(t, replayTestClassify(t, replayTestProfile(t, s, i), i.PCS.Evidence), i)
 			})
 		}
 	}
 }
 
 func TestCX16ExtendedFamiliesRetainedSeparately(t *testing.T) {
-	s, base := cx16Fixture(t)
-	c := s.CX01Spec()
+	s, base := replayTestFixture(t)
+	c := s.SelectionSpecValue()
 	c.Flavor, c.PCSFlavor, c.Direction = "pcs-extended19", "", "bms-to-pcs"
 	c.RouteSet, c.Destination, c.Source = true, 0xf2, 1
-	s = cx16Reselect(t, &base, c)
+	s = replayTestReselect(t, &base, c)
 	a, b := base, base
-	cx16Frame(t, &a, 0x1905<<16|0xf201, true, [8]byte{3, 0, 0x10, 0x0e, 5, 0, 0x20, 0x0d})
+	replayTestFrame(t, &a, 0x1905<<16|0xf201, true, [8]byte{3, 0, 0x10, 0x0e, 5, 0, 0x20, 0x0d})
 	b.PCS.Evidence.Sequence, b.PCS.Evidence.Monotonic = 2, 2*time.Second
-	cx16Frame(t, &b, 0x1906<<16|0xf201, true, [8]byte{9, 0, 0, 11, 0, 0, 0, 0})
-	p := cx16Profile(t, s, a, b)
-	cx16Classify(t, p, a.PCS.Evidence)
-	r := cx16Classify(t, p, b.PCS.Evidence)
+	replayTestFrame(t, &b, 0x1906<<16|0xf201, true, [8]byte{9, 0, 0, 11, 0, 0, 0, 0})
+	p := replayTestProfile(t, s, a, b)
+	replayTestClassify(t, p, a.PCS.Evidence)
+	r := replayTestClassify(t, p, b.PCS.Evidence)
 	va, vb := r.LastGood["extended/1905/maximum_index"], r.LastGood["extended/1906/maximum_index"]
 	if va.Status != "accepted" || vb.Status != "accepted" || va.Numerator != 3 || vb.Numerator != 9 {
 		t.Fatalf("cross-family overwrite: %#v %#v", va, vb)
@@ -432,17 +432,17 @@ func TestCX16ExtendedFamiliesRetainedSeparately(t *testing.T) {
 }
 
 func TestCX16GaugeFamiliesRetainedSeparately(t *testing.T) {
-	s, base := cx16Fixture(t)
-	c := s.CX01Spec()
+	s, base := replayTestFixture(t)
+	c := s.SelectionSpecValue()
 	c.ProjectCode, c.Release, c.Group = "QAAA", "0002", "L0"
-	s = cx16Reselect(t, &base, c)
+	s = replayTestReselect(t, &base, c)
 	a, b := base, base
-	cx16Frame(t, &a, 0x315, false, [8]byte{0, 1, 0, 2, 0, 3, 0, 4})
+	replayTestFrame(t, &a, 0x315, false, [8]byte{0, 1, 0, 2, 0, 3, 0, 4})
 	b.PCS.Evidence.Sequence, b.PCS.Evidence.Monotonic = 2, 2*time.Second
-	cx16Frame(t, &b, 0x317, false, [8]byte{0, 9, 0, 8, 0, 7, 0, 6})
-	p := cx16Profile(t, s, a, b)
-	cx16Classify(t, p, a.PCS.Evidence)
-	r := cx16Classify(t, p, b.PCS.Evidence)
+	replayTestFrame(t, &b, 0x317, false, [8]byte{0, 9, 0, 8, 0, 7, 0, 6})
+	p := replayTestProfile(t, s, a, b)
+	replayTestClassify(t, p, a.PCS.Evidence)
+	r := replayTestClassify(t, p, b.PCS.Evidence)
 	va, vb := r.LastGood["gauge/315/word_0"], r.LastGood["gauge/317/word_0"]
 	if va.Status != "accepted" || vb.Status != "accepted" || va.Numerator != 1 || vb.Numerator != 9 {
 		t.Fatalf("cross-PID overwrite: %#v %#v", va, vb)

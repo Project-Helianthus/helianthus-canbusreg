@@ -8,7 +8,7 @@ import (
 
 // CX01LINKIdentitySnapshot is detached candidate evidence, not authentication.
 // It carries a single explicitly selected source; allocation is bounded.
-type CX01LINKIdentitySnapshot struct {
+type LINKIdentitySnapshot struct {
 	Selection                    CXSelection
 	Grade                        string
 	ProjectCode, Release, Status string
@@ -19,10 +19,10 @@ type CX01LINKIdentitySnapshot struct {
 	Fields                       map[string]CXNativeField
 	PhysicalQualified            bool
 }
-type CX01LINKIdentityAssembler struct {
+type LINKIdentityAssembler struct {
 	mu            sync.Mutex
 	selection     CXSelection
-	snapshot      CX01LINKIdentitySnapshot
+	snapshot      LINKIdentitySnapshot
 	next          uint8
 	assembling    bool
 	fragments     [16]byte
@@ -31,15 +31,15 @@ type CX01LINKIdentityAssembler struct {
 	lastMonotonic time.Duration
 }
 
-func CX01NewLINKIdentityAssembler(s CXSelection) *CX01LINKIdentityAssembler {
-	return &CX01LINKIdentityAssembler{selection: s, snapshot: CX01LINKIdentitySnapshot{Selection: s, Grade: "Unknown", Status: "absent", Fields: make(map[string]CXNativeField)}}
+func NewLINKIdentityAssembler(s CXSelection) *LINKIdentityAssembler {
+	return &LINKIdentityAssembler{selection: s, snapshot: LINKIdentitySnapshot{Selection: s, Grade: "Unknown", Status: "absent", Fields: make(map[string]CXNativeField)}}
 }
-func (a *CX01LINKIdentityAssembler) CX01Snapshot() CX01LINKIdentitySnapshot {
+func (a *LINKIdentityAssembler) SnapshotLINKIdentity() LINKIdentitySnapshot {
 	a.mu.Lock()
 	defer a.mu.Unlock()
-	return a.cx01Snapshot()
+	return a.snapshotLINKIdentity()
 }
-func (a *CX01LINKIdentityAssembler) cx01Snapshot() CX01LINKIdentitySnapshot {
+func (a *LINKIdentityAssembler) snapshotLINKIdentity() LINKIdentitySnapshot {
 	s := a.snapshot
 	s.Fields = make(map[string]CXNativeField, len(a.snapshot.Fields))
 	for k, v := range a.snapshot.Fields {
@@ -47,8 +47,8 @@ func (a *CX01LINKIdentityAssembler) cx01Snapshot() CX01LINKIdentitySnapshot {
 	}
 	return s
 }
-func (a *CX01LINKIdentityAssembler) cx01Invalidate() {
-	a.snapshot = CX01LINKIdentitySnapshot{Selection: a.selection, Grade: "Unknown", Status: "conflict", Fields: make(map[string]CXNativeField)}
+func (a *LINKIdentityAssembler) selectionInvalidate() {
+	a.snapshot = LINKIdentitySnapshot{Selection: a.selection, Grade: "Unknown", Status: "conflict", Fields: make(map[string]CXNativeField)}
 	a.assembling = false
 	a.fragments = [16]byte{}
 	a.evidence = [3]Evidence{}
@@ -57,10 +57,10 @@ func (a *CX01LINKIdentityAssembler) cx01Invalidate() {
 // Decode validates identity continuity and retains independent last-known-good fields.
 // A conflict is sticky: a changed route role, identity, serial or newer epoch
 // needs a new selection/assembler. Obsolete evidence is reported stale instead.
-func (a *CX01LINKIdentityAssembler) CX01Decode(i CX01LINKInput) CXNativeResult {
+func (a *LINKIdentityAssembler) DecodeLINKIdentity(i LINKInput) CXNativeResult {
 	a.mu.Lock()
 	defer a.mu.Unlock()
-	r := cx01Result(a.selection, i, "invalid")
+	r := selectionResult(a.selection, i, "invalid")
 	c := a.selection.spec
 	f := i.Evidence.Frame
 	id := f.ID().Value()
@@ -77,17 +77,17 @@ func (a *CX01LINKIdentityAssembler) CX01Decode(i CX01LINKInput) CXNativeResult {
 	sameEpoch := i.Epoch == c.Epoch
 	if related && (i.Epoch < c.Epoch || (sameEpoch && (i.Evidence.Sequence <= a.lastSequence || i.Evidence.Monotonic < a.lastMonotonic))) {
 		r.Status = "stale"
-		if cx01LINKAdmission(a.selection, i) {
+		if lINKAdmission(a.selection, i) {
 			a.assembling = false
 		}
 		return r
 	}
 	if related && (i.Epoch != c.Epoch || i.Direction != c.Direction || i.Endpoint != c.Endpoint || i.Bank != c.Bank || i.Group != c.Group || i.Slot != c.Slot || i.Scope != c.Scope) {
-		a.cx01Invalidate()
+		a.selectionInvalidate()
 		r.Status = "conflict"
 		return r
 	}
-	if !cx01LINKAdmission(a.selection, i) {
+	if !lINKAdmission(a.selection, i) {
 		// Unrelated traffic must not disturb an in-progress serial assembly.
 		return r
 	}
@@ -99,13 +99,13 @@ func (a *CX01LINKIdentityAssembler) CX01Decode(i CX01LINKInput) CXNativeResult {
 		a.assembling = false
 	}
 	if kind == 0x1802 {
-		if !cx01ASCII(p[:]) {
+		if !selectionASCII(p[:]) {
 			r.Status = "invalid"
 			return r
 		}
 		code, release := string(p[:4]), string(p[4:])
 		if code != c.ProjectCode || release != c.Release || (a.snapshot.HasIdentity && (code != a.snapshot.ProjectCode || release != a.snapshot.Release)) {
-			a.cx01Invalidate()
+			a.selectionInvalidate()
 			r.Status = "conflict"
 			return r
 		}
@@ -149,7 +149,7 @@ func (a *CX01LINKIdentityAssembler) CX01Decode(i CX01LINKInput) CXNativeResult {
 		a.next = fragment + 1
 		if fragment == 2 {
 			if a.snapshot.HasSerial && a.snapshot.Serial != a.fragments {
-				a.cx01Invalidate()
+				a.selectionInvalidate()
 				r.Status = "conflict"
 				return r
 			}
@@ -165,7 +165,7 @@ func (a *CX01LINKIdentityAssembler) CX01Decode(i CX01LINKInput) CXNativeResult {
 	// role change, so it is retained raw (latest value) and never invalidates.
 	r = CXDecodeLINKTelemetry(a.selection, i)
 	if r.Status == "conflict" {
-		a.cx01Invalidate()
+		a.selectionInvalidate()
 		return r
 	}
 	if !a.snapshot.HasIdentity && kind != 0x1802 {

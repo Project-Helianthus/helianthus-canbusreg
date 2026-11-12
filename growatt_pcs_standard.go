@@ -20,8 +20,8 @@ import (
 // extrema of 322 use distinct field names so retention cannot mix quantities.
 // IndexMinimum/Maximum are inclusive caller-selected native bounds, not cell
 // geometry inferred from extrema. Count is used only for the fine-average gate.
-type CX05PCSInput struct {
-	CX01LINKInput
+type PCSStandardPCSInput struct {
+	LINKInput
 	NativeRecord                       []byte
 	PublisherResolved                  bool
 	MeasurementValid, TemperatureValid bool
@@ -34,16 +34,16 @@ type CX05PCSInput struct {
 	FieldAges                          map[string]time.Duration
 }
 
-type CX05PCSResult struct {
+type PCSStandardPCSResult struct {
 	CXNativeResult
 	Diagnostics []byte
 }
 
 // CX05DecodePCSStandard is a pure receive-only decoder. It retains native evidence
 // and does not aggregate publishers, maintain a cache or qualify hardware.
-func CX05DecodePCSStandard(s CXSelection, i CX05PCSInput) CX05PCSResult {
-	r := CX05PCSResult{CXNativeResult: cx01Result(s, i.CX01LINKInput, "invalid"), Diagnostics: append([]byte(nil), i.NativeRecord...)}
-	c := s.CX01Spec()
+func DecodePCSStandard(s CXSelection, i PCSStandardPCSInput) PCSStandardPCSResult {
+	r := PCSStandardPCSResult{CXNativeResult: selectionResult(s, i.LINKInput, "invalid"), Diagnostics: append([]byte(nil), i.NativeRecord...)}
+	c := s.SelectionSpecValue()
 	f := i.Evidence.Frame
 	if len(i.NativeRecord) != 0 {
 		decoded, err := canbus.DecodeSocketCANRecord(i.NativeRecord)
@@ -66,7 +66,7 @@ func CX05DecodePCSStandard(s CXSelection, i CX05PCSInput) CX05PCSResult {
 	}
 	p := r.Raw
 	local := c.ProjectCode == "QAAA" && c.Release == "0006" && c.Scope == "local"
-	release11 := s.CX01Group() == "L8"
+	release11 := s.SelectionGroup() == "L8"
 	gateway := c.ProjectCode == "QCAA" && c.Release == "0001" && c.Scope == "aggregate"
 	fixedAggregate := c.ProjectCode == "QAAB" && c.Release == "0004" && c.Scope == "aggregate"
 	supported := local || release11 || gateway || fixedAggregate
@@ -193,7 +193,7 @@ func CX05DecodePCSStandard(s CXSelection, i CX05PCSInput) CX05PCSResult {
 				index(name, at)
 			} else {
 				raw(name, int64(p[at]))
-				add(name+"_fixed_aggregate", int64(p[at]), 1, "", "fixed aggregate location", "Hypothesis", fixedAggregate && s.CX01Group() != "" && i.IndexValid && i.IndexScope == c.Scope && p[at] == 1)
+				add(name+"_fixed_aggregate", int64(p[at]), 1, "", "fixed aggregate location", "Hypothesis", fixedAggregate && s.SelectionGroup() != "" && i.IndexValid && i.IndexScope == c.Scope && p[at] == 1)
 			}
 		}
 		value("maximum_cell", be(4), 1, "mV", "maximum cell extremum", measured)
@@ -210,7 +210,7 @@ func CX05DecodePCSStandard(s CXSelection, i CX05PCSInput) CX05PCSResult {
 // original ages. Rejected updates and identity changes (including a change of
 // reporting-member dictionary) cannot refresh them;
 // a valid empty observation supersedes the retained value.
-func CX05RetainAccepted(previous, update CXNativeResult) CXNativeResult {
+func RetainAccepted(previous, update CXNativeResult) CXNativeResult {
 	out := update
 	out.Fields = make(map[string]CXNativeField)
 	if previous.Selection == update.Selection && previous.HasMember == update.HasMember && previous.Member == update.Member {

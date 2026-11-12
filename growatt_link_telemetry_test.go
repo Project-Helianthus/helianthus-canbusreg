@@ -7,7 +7,7 @@ import (
 	"time"
 )
 
-func cx01Input(t *testing.T, s CX01SelectionSpec, kind uint32, p [8]byte) CX01LINKInput {
+func selectionTestInput(t *testing.T, s SelectionSpec, kind uint32, p [8]byte) LINKInput {
 	t.Helper()
 	id, e := canbus.NewExtendedID(kind<<16 | uint32(s.Destination)<<8 | uint32(s.Source))
 	if e != nil {
@@ -17,15 +17,15 @@ func cx01Input(t *testing.T, s CX01SelectionSpec, kind uint32, p [8]byte) CX01LI
 	if e != nil {
 		t.Fatal(e)
 	}
-	return CX01LINKInput{Evidence: Evidence{Interface: s.Interface, Frame: f, Sequence: 1, Monotonic: time.Second}, Epoch: s.Epoch, Direction: s.Direction, Scope: s.Scope, Bank: s.Bank, Endpoint: s.Endpoint, Group: s.Group, Slot: s.Slot}
+	return LINKInput{Evidence: Evidence{Interface: s.Interface, Frame: f, Sequence: 1, Monotonic: time.Second}, Epoch: s.Epoch, Direction: s.Direction, Scope: s.Scope, Bank: s.Bank, Endpoint: s.Endpoint, Group: s.Group, Slot: s.Slot}
 }
 func TestCX01PackedTelemetry(t *testing.T) {
-	spec := cx01Spec(t, "QAAA", "0006")
-	s := cx01Select(t, spec)
+	spec := selectionTestSpec(t, "QAAA", "0006")
+	s := selectionTestSelect(t, spec)
 	for _, current := range []uint64{3990, 4000, 4010} {
 		var p [8]byte
 		binary.LittleEndian.PutUint64(p[:], 530|current<<14|531<<27|4095<<41|2047<<53)
-		r := CXDecodeLINKTelemetry(s, cx01Input(t, spec, 0x1805, p))
+		r := CXDecodeLINKTelemetry(s, selectionTestInput(t, spec, 0x1805, p))
 		for name, want := range map[string]int64{"pack_voltage": 530, "current": int64(current) - 4000, "port_voltage": 531, "discharge_limit": 4095, "charge_limit": 2047} {
 			f := r.Fields[name]
 			if f.Numerator != want {
@@ -41,7 +41,7 @@ func TestCX01PackedTelemetry(t *testing.T) {
 			var p [8]byte
 			shift := []uint{0, 14, 27, 41, 53}[i]
 			binary.LittleEndian.PutUint64(p[:], value<<shift)
-			r := CXDecodeLINKTelemetry(s, cx01Input(t, spec, 0x1805, p))
+			r := CXDecodeLINKTelemetry(s, selectionTestInput(t, spec, 0x1805, p))
 			names := []string{"pack_voltage", "current", "port_voltage", "discharge_limit", "charge_limit"}
 			for j, name := range names {
 				want := int64(0)
@@ -59,12 +59,12 @@ func TestCX01PackedTelemetry(t *testing.T) {
 	}
 }
 func TestCX01AdmissionKeys(t *testing.T) {
-	spec := cx01Spec(t, "QAAA", "0006")
-	s := cx01Select(t, spec)
+	spec := selectionTestSpec(t, "QAAA", "0006")
+	s := selectionTestSelect(t, spec)
 	p := [8]byte{1, 2, 3, 4, 5, 6, 7, 8}
 	for _, key := range []string{"interface-name", "interface-index", "epoch", "direction", "scope", "bank", "endpoint", "group", "slot", "destination", "source", "ide", "dlc"} {
 		t.Run(key, func(t *testing.T) {
-			i := cx01Input(t, spec, 0x1805, p)
+			i := selectionTestInput(t, spec, 0x1805, p)
 			switch key {
 			case "interface-name":
 				i.Evidence.Interface, _ = canbus.NewInterfaceIdentity("other", 1)
@@ -85,13 +85,13 @@ func TestCX01AdmissionKeys(t *testing.T) {
 			case "slot":
 				i.Slot = "other"
 			case "destination":
-				i = cx01Input(t, spec, 0x1805, p)
+				i = selectionTestInput(t, spec, 0x1805, p)
 				id, _ := canbus.NewExtendedID(0x1805f5f4)
 				i.Evidence.Frame, _ = canbus.NewFrame(id, p[:])
 			case "source":
 				spec2 := spec
 				spec2.Source++
-				i = cx01Input(t, spec2, 0x1805, p)
+				i = selectionTestInput(t, spec2, 0x1805, p)
 			case "ide":
 				id, _ := canbus.NewStandardID(5)
 				i.Evidence.Frame, _ = canbus.NewFrame(id, p[:])
@@ -109,8 +109,8 @@ func TestCX01AdmissionKeys(t *testing.T) {
 func TestCX01LayoutsAndRawSiblings(t *testing.T) {
 	p := [8]byte{1, 1, 2, 0, 9, 10, 3, 0}
 	for _, v := range []struct{ release, code, name string }{{"0005", "QAAA", "checkpoint_0"}, {"0006", "QAAA", "full_capacity"}, {"0006", "QAAB", "capacity_derived"}} {
-		spec := cx01Spec(t, v.code, v.release)
-		r := CXDecodeLINKTelemetry(cx01Select(t, spec), cx01Input(t, spec, 0x180b, p))
+		spec := selectionTestSpec(t, v.code, v.release)
+		r := CXDecodeLINKTelemetry(selectionTestSelect(t, spec), selectionTestInput(t, spec, 0x180b, p))
 		if _, ok := r.Fields[v.name]; !ok {
 			t.Fatalf("missing %s", v.name)
 		}
@@ -118,8 +118,8 @@ func TestCX01LayoutsAndRawSiblings(t *testing.T) {
 			t.Fatal("sibling lost")
 		}
 	}
-	spec := cx01Spec(t, "QAAA", "0006")
-	r := CXDecodeLINKTelemetry(cx01Select(t, spec), cx01Input(t, spec, 0x1806, [8]byte{255, 1, 2, 3, 4, 5, 6, 7}))
+	spec := selectionTestSpec(t, "QAAA", "0006")
+	r := CXDecodeLINKTelemetry(selectionTestSelect(t, spec), selectionTestInput(t, spec, 0x1806, [8]byte{255, 1, 2, 3, 4, 5, 6, 7}))
 	if r.Fields["maximum"].Numerator != 513 || r.Fields["tail"].Numerator != 1798 {
 		t.Fatal(r)
 	}
@@ -127,14 +127,14 @@ func TestCX01LayoutsAndRawSiblings(t *testing.T) {
 		t.Fatal("invented index")
 	}
 }
-func cx01ShortFrame(id canbus.Identifier) (canbus.Frame, error) {
+func selectionTestShortFrame(id canbus.Identifier) (canbus.Frame, error) {
 	return canbus.NewFrame(id, []byte{1})
 }
 
 func TestCX01DateHypothesisBoundaryPairs(t *testing.T) {
-	spec := cx01Spec(t, "QAAA", "0006")
+	spec := selectionTestSpec(t, "QAAA", "0006")
 	spec.Destination = 0xf5
-	s := cx01Select(t, spec)
+	s := selectionTestSelect(t, spec)
 	for _, v := range []struct {
 		name  string
 		p     [8]byte
@@ -147,7 +147,7 @@ func TestCX01DateHypothesisBoundaryPairs(t *testing.T) {
 		{"hour-23", [8]byte{0xe8, 7, 1, 1, 23}, true}, {"hour-24", [8]byte{0xe8, 7, 1, 1, 24}, false}, {"minute-59", [8]byte{0xe8, 7, 1, 1, 0, 59}, true}, {"minute-60", [8]byte{0xe8, 7, 1, 1, 0, 60}, false}, {"second-59", [8]byte{0xe8, 7, 1, 1, 0, 0, 59}, true}, {"second-60", [8]byte{0xe8, 7, 1, 1, 0, 0, 60}, false},
 	} {
 		t.Run(v.name, func(t *testing.T) {
-			r := CXDecodeLINKTelemetry(s, cx01Input(t, spec, 0x1809, v.p))
+			r := CXDecodeLINKTelemetry(s, selectionTestInput(t, spec, 0x1809, v.p))
 			if (r.Fields["year"].Status == "accepted") != v.valid || r.Raw != v.p || r.Fields["status"].Numerator != int64(v.p[7]) || r.PhysicalQualified {
 				t.Fatal(r)
 			}
@@ -166,7 +166,7 @@ func TestCX01DateHypothesisBoundaryPairs(t *testing.T) {
 			case "selector":
 				other.ProjectCode = "qAAA"
 			}
-			r := CXDecodeLINKTelemetry(cx01Select(t, other), cx01Input(t, other, 0x1809, [8]byte{0xe8, 7, 1, 1}))
+			r := CXDecodeLINKTelemetry(selectionTestSelect(t, other), selectionTestInput(t, other, 0x1809, [8]byte{0xe8, 7, 1, 1}))
 			if r.Fields["year"].Status == "accepted" {
 				t.Fatal("date admission")
 			}
@@ -174,14 +174,14 @@ func TestCX01DateHypothesisBoundaryPairs(t *testing.T) {
 	}
 }
 func TestCX01CoordinatorSeparateRole(t *testing.T) {
-	spec := cx01Spec(t, "QAAA", "0006")
+	spec := selectionTestSpec(t, "QAAA", "0006")
 	spec.Direction = "coordinator-to-module"
 	spec.Scope = "aggregate"
 	spec.Source = 0xf4
 	spec.Destination = 0xf5
-	s := cx01Select(t, spec)
+	s := selectionTestSelect(t, spec)
 	for _, kind := range []uint32{0x180d, 0x180e, 0x180f} {
-		r := CXDecodeLINKTelemetry(s, cx01Input(t, spec, kind, [8]byte{1, 2, 3, 4, 5, 6, 7, 8}))
+		r := CXDecodeLINKTelemetry(s, selectionTestInput(t, spec, kind, [8]byte{1, 2, 3, 4, 5, 6, 7, 8}))
 		if r.Status != "raw" || len(r.Fields) == 0 {
 			t.Fatal(r)
 		}
@@ -191,7 +191,7 @@ func TestCX01CoordinatorSeparateRole(t *testing.T) {
 			}
 		}
 	}
-	r := CXDecodeLINKTelemetry(s, cx01Input(t, spec, 0x1805, [8]byte{}))
+	r := CXDecodeLINKTelemetry(s, selectionTestInput(t, spec, 0x1805, [8]byte{}))
 	if len(r.Fields) != 0 {
 		t.Fatal("coordinator local parsing")
 	}
@@ -209,10 +209,10 @@ func TestCX01OpaqueHypothesesStayRaw(t *testing.T) {
 		{"321-no-release", 0x321, [8]byte{0, 'Q', 'A', 'A', 'A'}}, {"321-no-selector", 0x321, [8]byte{}}, {"321-tail-nonzero", 0x321, [8]byte{0, 'Q', 'A', 'A', 'A', 1}},
 		{"synchronization-zero-is-not-choice", 0x180a, [8]byte{}},
 	}
-	spec := cx01Spec(t, "QAAA", "0006")
+	spec := selectionTestSpec(t, "QAAA", "0006")
 	for _, v := range cases {
 		t.Run(v.name, func(t *testing.T) {
-			r := CXDecodeLINKTelemetry(cx01Select(t, spec), cx01Input(t, spec, v.kind, v.payload))
+			r := CXDecodeLINKTelemetry(selectionTestSelect(t, spec), selectionTestInput(t, spec, v.kind, v.payload))
 			if r.Raw != v.payload {
 				t.Fatal("raw lost")
 			}
@@ -225,7 +225,7 @@ func TestCX01OpaqueHypothesesStayRaw(t *testing.T) {
 	}
 	for _, source := range []uint8{0, 1, 9, 10, 244, 254, 255} {
 		spec.Source = source
-		r := CXDecodeLINKTelemetry(cx01Select(t, spec), cx01Input(t, spec, 0x1805, [8]byte{}))
+		r := CXDecodeLINKTelemetry(selectionTestSelect(t, spec), selectionTestInput(t, spec, 0x1805, [8]byte{}))
 		if source == 255 || source == 0xf4 {
 			if len(r.Fields) != 0 || r.Status != "invalid" {
 				t.Fatalf("reserved source %#x ordinary", source)
@@ -234,8 +234,8 @@ func TestCX01OpaqueHypothesesStayRaw(t *testing.T) {
 			t.Fatalf("universal module bound %d", source)
 		}
 	}
-	spec = cx01Spec(t, "QCAA", "0001")
-	r := CXDecodeLINKTelemetry(cx01Select(t, spec), cx01Input(t, spec, 0x1805, [8]byte{1}))
+	spec = selectionTestSpec(t, "QCAA", "0001")
+	r := CXDecodeLINKTelemetry(selectionTestSelect(t, spec), selectionTestInput(t, spec, 0x1805, [8]byte{1}))
 	for _, f := range r.Fields {
 		if f.Status == "accepted" {
 			t.Fatal("gateway native group")
@@ -243,14 +243,14 @@ func TestCX01OpaqueHypothesesStayRaw(t *testing.T) {
 	}
 }
 func TestCX01NativeWordsAndIndependentValidity(t *testing.T) {
-	spec := cx01Spec(t, "QAAA", "0006")
-	s := cx01Select(t, spec)
+	spec := selectionTestSpec(t, "QAAA", "0006")
+	s := selectionTestSelect(t, spec)
 	for _, v := range []struct {
 		kind uint32
 		name string
 		want int64
 	}{{0x1800, "soc_status", 8}, {0x1801, "mixed", 1029}, {0x1803, "capacity", 1541}, {0x1804, "word_1", 134678021}, {0x1807, "b4", 1541}, {0x1808, "temperature_minimum", -36}, {0x180a, "counter", 262914}, {0x180b, "remaining_capacity", 2055}, {0x180c, "word_2", 1541}, {0x1840, "tail", 2055}} {
-		r := CXDecodeLINKTelemetry(s, cx01Input(t, spec, v.kind, [8]byte{1, 2, 3, 4, 5, 6, 7, 8}))
+		r := CXDecodeLINKTelemetry(s, selectionTestInput(t, spec, v.kind, [8]byte{1, 2, 3, 4, 5, 6, 7, 8}))
 		if r.Fields[v.name].Numerator != v.want {
 			t.Fatalf("%x %s %#v", v.kind, v.name, r.Fields[v.name])
 		}
@@ -259,9 +259,9 @@ func TestCX01NativeWordsAndIndependentValidity(t *testing.T) {
 		}
 	}
 	for _, release := range []string{"0010", "0011"} {
-		spec = cx01Spec(t, "QAAA", release)
-		s = cx01Select(t, spec)
-		r := CXDecodeLINKTelemetry(s, cx01Input(t, spec, 0x180a, [8]byte{0, 0, 0, 0, 0, 0, 255, 255}))
+		spec = selectionTestSpec(t, "QAAA", release)
+		s = selectionTestSelect(t, spec)
+		r := CXDecodeLINKTelemetry(s, selectionTestInput(t, spec, 0x180a, [8]byte{0, 0, 0, 0, 0, 0, 255, 255}))
 		if r.Fields["tail"].Unit != "" || r.Fields["tail"].Numerator != 65535 {
 			t.Fatal("tail transformed")
 		}
@@ -269,10 +269,10 @@ func TestCX01NativeWordsAndIndependentValidity(t *testing.T) {
 }
 
 func TestCX01SnapshotEvidenceAndRelease11(t *testing.T) {
-	spec := cx01Spec(t, "QAAA", "0011")
-	s := cx01Select(t, spec)
+	spec := selectionTestSpec(t, "QAAA", "0011")
+	s := selectionTestSelect(t, spec)
 	p := [8]byte{1, 2, 3, 4, 5, 6, 7, 8}
-	i := cx01Input(t, spec, 0x1807, p)
+	i := selectionTestInput(t, spec, 0x1807, p)
 	i.FieldAge = 3 * time.Second
 	i.Evidence.RawRecord[0] = 17
 	r := CXDecodeLINKTelemetry(s, i)
@@ -286,14 +286,14 @@ func TestCX01SnapshotEvidenceAndRelease11(t *testing.T) {
 	if r.Evidence.RawRecord[0] != 17 || r.Fields["b4"].Raw[0] != 1 {
 		t.Fatal("alias")
 	}
-	r = CXDecodeLINKTelemetry(s, cx01Input(t, spec, 0x1803, [8]byte{1, 2, 3, 4, 5, 6, 7, 8}))
+	r = CXDecodeLINKTelemetry(s, selectionTestInput(t, spec, 0x1803, [8]byte{1, 2, 3, 4, 5, 6, 7, 8}))
 	if r.Fields["configuration"].Numerator != 258 || r.Fields["capacity"].Unit != "" {
 		t.Fatal("release11 configuration")
 	}
-	spec = cx01Spec(t, "QAAa", "9011")
-	s = cx01Select(t, spec)
+	spec = selectionTestSpec(t, "QAAa", "9011")
+	s = selectionTestSelect(t, spec)
 	for _, kind := range []uint32{0x1803, 0x1805, 0x1807, 0x1808, 0x180b} {
-		r = CXDecodeLINKTelemetry(s, cx01Input(t, spec, kind, [8]byte{}))
+		r = CXDecodeLINKTelemetry(s, selectionTestInput(t, spec, kind, [8]byte{}))
 		for _, f := range r.Fields {
 			if f.Status == "accepted" || f.Unit != "" {
 				t.Fatal("ambiguous units")
@@ -302,9 +302,9 @@ func TestCX01SnapshotEvidenceAndRelease11(t *testing.T) {
 	}
 }
 func TestCX01RawDLCGeometry(t *testing.T) {
-	spec := cx01Spec(t, "QAAA", "0006")
-	s := cx01Select(t, spec)
-	i := cx01Input(t, spec, 0x1805, [8]byte{1})
+	spec := selectionTestSpec(t, "QAAA", "0006")
+	s := selectionTestSelect(t, spec)
+	i := selectionTestInput(t, spec, 0x1805, [8]byte{1})
 	record := i.Evidence.RawRecord
 	// A classical record with len8_dlc=9 must retain that native geometry.
 	binary.LittleEndian.PutUint32(record[:4], 0x80000000|0x1805f402)
@@ -322,12 +322,12 @@ func TestCX01RawDLCGeometry(t *testing.T) {
 }
 
 func TestCX01ConstantBytesIndependent(t *testing.T) {
-	spec := cx01Spec(t, "QAAA", "0006")
-	s := cx01Select(t, spec)
+	spec := selectionTestSpec(t, "QAAA", "0006")
+	s := selectionTestSelect(t, spec)
 	for bad := 0; bad < 2; bad++ {
 		p := [8]byte{1, 1, 0, 0, 10}
 		p[bad] = 0
-		r := CXDecodeLINKTelemetry(s, cx01Input(t, spec, 0x1803, p))
+		r := CXDecodeLINKTelemetry(s, selectionTestInput(t, spec, 0x1803, p))
 		names := []string{"b0", "b1"}
 		if r.Fields[names[bad]].Status != "invalid" || r.Fields[names[1-bad]].Status == "invalid" || r.Fields["capacity"].Status != "accepted" {
 			t.Fatal("independent sibling invalidated")
@@ -336,14 +336,14 @@ func TestCX01ConstantBytesIndependent(t *testing.T) {
 }
 
 func TestCX01CoordinatorHighWordsKeepGeometry(t *testing.T) {
-	spec := cx01Spec(t, "QAAA", "0006")
+	spec := selectionTestSpec(t, "QAAA", "0006")
 	spec.Direction = "coordinator-to-module"
 	spec.Scope = "aggregate"
 	spec.Source = 0xf4
 	spec.Destination = 0xf5
-	s := cx01Select(t, spec)
+	s := selectionTestSelect(t, spec)
 	for kind, name := range map[uint32]string{0x180e: "additional_limit", 0x180f: "quotient"} {
-		r := CXDecodeLINKTelemetry(s, cx01Input(t, spec, kind, [8]byte{0, 0, 0, 0, 0, 0, 1, 2}))
+		r := CXDecodeLINKTelemetry(s, selectionTestInput(t, spec, kind, [8]byte{0, 0, 0, 0, 0, 0, 1, 2}))
 		if f := r.Fields[name]; f.Numerator != 513 || f.Status != "raw" || f.Unit != "" {
 			t.Fatalf("%x %s %#v", kind, name, f)
 		}

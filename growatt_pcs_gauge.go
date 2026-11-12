@@ -16,16 +16,16 @@ import (
 // ThresholdStateKnown with AlternativeEligible=false selects the supplied normal
 // threshold path; an unknown state or eligible alternative remains raw.
 // FieldStates and FieldAges retain the per-field withholding semantics of CX05.
-type CX06PCSInput struct {
-	CX05PCSInput
+type PCSIdentityPCSInput struct {
+	PCSStandardPCSInput
 	ZeroIntegration, FailedPrecheck          bool
 	ThresholdStateKnown, AlternativeEligible bool
 	SerialSlotValid                          bool
 	SerialSlot                               uint8
 }
 
-func cx06Admit(s CXSelection, i CX06PCSInput) string {
-	c := s.CX01Spec()
+func pCSIdentityAdmit(s CXSelection, i PCSIdentityPCSInput) string {
+	c := s.SelectionSpecValue()
 	f := i.Evidence.Frame
 	if c.Interface.Name() == "" || c.Interface.Index() <= 0 || c.Epoch == 0 || c.Bank == "" || c.Endpoint == "" || (c.Scope != "local" && c.Scope != "aggregate") || (c.Flavor != "pcs-standard" && c.Flavor != "pcs-parallel") || c.Direction != "bms-to-pcs" || i.Evidence.Interface != c.Interface || i.Epoch != c.Epoch || i.Direction != c.Direction || i.Scope != c.Scope || i.Bank != c.Bank || i.Endpoint != c.Endpoint || i.Group != c.Group || i.Slot != c.Slot || i.FieldAge < 0 || f.ID().Extended() || f.DLC() != 8 || f.RawDLC() != 8 {
 		return "invalid"
@@ -47,7 +47,7 @@ func cx06Admit(s CXSelection, i CX06PCSInput) string {
 	}
 	return "decoded"
 }
-func cx06Add(r *CXNativeResult, i CX06PCSInput, name string, n, d int64, unit, meaning, grade string, gate bool) {
+func pCSIdentityAdd(r *CXNativeResult, i PCSIdentityPCSInput, name string, n, d int64, unit, meaning, grade string, gate bool) {
 	status := "raw"
 	if gate {
 		status = "accepted"
@@ -76,14 +76,14 @@ func cx06Add(r *CXNativeResult, i CX06PCSInput, name string, n, d int64, unit, m
 }
 
 // CX06DecodePCSGauge consumes supplied frames only; it performs no I/O.
-func CX06DecodePCSGauge(s CXSelection, i CX06PCSInput) CXNativeResult {
-	r := cx01Result(s, i.CX01LINKInput, cx06Admit(s, i))
+func DecodePCSGauge(s CXSelection, i PCSIdentityPCSInput) CXNativeResult {
+	r := selectionResult(s, i.LINKInput, pCSIdentityAdmit(s, i))
 	if r.Status != "decoded" {
 		return r
 	}
 	p := r.Raw
-	c := s.CX01Spec()
-	g := s.CX01Group()
+	c := s.SelectionSpecValue()
+	g := s.SelectionGroup()
 	id := c.ProjectCode + c.Release
 	local := c.Scope == "local"
 	selected := g != "" && c.Flavor == "pcs-standard"
@@ -91,7 +91,7 @@ func CX06DecodePCSGauge(s CXSelection, i CX06PCSInput) CXNativeResult {
 	valid := selected && local && i.MeasurementValid
 	be := func(at int) int64 { return int64(binary.BigEndian.Uint16(p[at : at+2])) }
 	add := func(name string, n, d int64, unit, meaning, grade string, gate bool) {
-		cx06Add(&r, i, name, n, d, unit, meaning, grade, gate)
+		pCSIdentityAdd(&r, i, name, n, d, unit, meaning, grade, gate)
 	}
 	raw := func(name string, n int64) { add(name, n, 1, "", "", "Unknown", false) }
 	words := func(gate bool) {

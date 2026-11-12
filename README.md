@@ -46,3 +46,5 @@ physical acceptance, Gree raw/candidate lifecycle, actual interface ownership
 and gateway composition. These evidence labels are separate from V1.04 replay
 qualification. This partial provider slice makes no physical support or release
 closure claim; the API is not stable before Helianthus 1.0.
+
+Provider identifiers use behavior names for selection, replay, LINK, PCS and BMS providers. The offline rename is reproducible with `python3 scripts/rename_provider_names.py`. Native records, qualification and retained partial state are unchanged. Gateway adoption is coordinated in Project-Helianthus/helianthus-ebusgateway#1476.

@@ -8,21 +8,21 @@ import (
 // Native contract: https://github.com/Project-Helianthus/helianthus-docs-canbus/blob/main/protocols/growatt/growatt-low-voltage-bms-can-pcs-protocol-v1.md
 // Sections: 320, 321, 323: identity and configuration;
 // 324, 325: serial fragments and placeholder; Opaque fields.
-func CX06DecodePCSIdentity(s CXSelection, i CX06PCSInput) CXNativeResult {
-	r := cx01Result(s, i.CX01LINKInput, cx06Admit(s, i))
+func DecodePCSIdentity(s CXSelection, i PCSIdentityPCSInput) CXNativeResult {
+	r := selectionResult(s, i.LINKInput, pCSIdentityAdmit(s, i))
 	if r.Status != "decoded" {
 		return r
 	}
 	p := r.Raw
-	c := s.CX01Spec()
+	c := s.SelectionSpecValue()
 	id := c.ProjectCode + c.Release
-	g := s.CX01Group()
+	g := s.SelectionGroup()
 	selected := g != "" && c.Flavor == "pcs-standard"
 	local := c.Scope == "local"
 	gateway := id == "QCAA0001" && c.Scope == "aggregate"
 	pid := i.Evidence.Frame.ID().Value()
 	add := func(name string, n int64, unit, meaning, grade string, gate bool) {
-		cx06Add(&r, i, name, n, 1, unit, meaning, grade, gate)
+		pCSIdentityAdd(&r, i, name, n, 1, unit, meaning, grade, gate)
 	}
 	raw := func(name string, n int64) { add(name, n, "", "", "Unknown", false) }
 	if gateway && (pid == 0x321 || pid == 0x324 || pid == 0x325) || selected && local && (id == "QAaT8252" || id == "QAAA0002") && pid == 0x324 {
@@ -82,7 +82,7 @@ func CX06DecodePCSIdentity(s CXSelection, i CX06PCSInput) CXNativeResult {
 
 // CX06SerialResult is detached from the assembler and earlier telemetry.
 // Fragments retain all three native evidence records, including padding.
-type CX06SerialResult struct {
+type PCSIdentitySerialResult struct {
 	Status            string
 	Serial            [16]byte
 	Record            CXNativeResult
@@ -92,7 +92,7 @@ type CX06SerialResult struct {
 
 // CX06SerialAssembler stores one bounded, uninterrupted receive sequence.
 // The caller owns serialization of Consume calls; no bus operations occur.
-type CX06SerialAssembler struct {
+type PCSIdentitySerialAssembler struct {
 	active    bool
 	selection CXSelection
 	slot      uint8
@@ -101,20 +101,20 @@ type CX06SerialAssembler struct {
 	fragments [3]CXNativeResult
 }
 
-func (a *CX06SerialAssembler) clear() { *a = CX06SerialAssembler{} }
-func (a *CX06SerialAssembler) Consume(s CXSelection, i CX06PCSInput) CX06SerialResult {
-	record := CX06DecodePCSIdentity(s, i)
-	out := CX06SerialResult{Status: "rejected", Record: record}
+func (a *PCSIdentitySerialAssembler) clear() { *a = PCSIdentitySerialAssembler{} }
+func (a *PCSIdentitySerialAssembler) Consume(s CXSelection, i PCSIdentityPCSInput) PCSIdentitySerialResult {
+	record := DecodePCSIdentity(s, i)
+	out := PCSIdentitySerialResult{Status: "rejected", Record: record}
 	p := record.Raw
-	c := s.CX01Spec()
-	admissible := record.Status == "decoded" && i.Evidence.Frame.ID().Value() == 0x324 && s.CX01Group() != "" && c.Flavor == "pcs-standard" && c.Scope == "local" && i.SerialSlotValid && record.Fields["placeholder"].Status != "accepted" && c.ProjectCode+c.Release != "QAaT8252" && c.ProjectCode+c.Release != "QAAA0002"
+	c := s.SelectionSpecValue()
+	admissible := record.Status == "decoded" && i.Evidence.Frame.ID().Value() == 0x324 && s.SelectionGroup() != "" && c.Flavor == "pcs-standard" && c.Scope == "local" && i.SerialSlotValid && record.Fields["placeholder"].Status != "accepted" && c.ProjectCode+c.Release != "QAaT8252" && c.ProjectCode+c.Release != "QAAA0002"
 	if !admissible {
 		a.clear()
 		return out
 	}
 	fragment := record
 	fragment.Fields = make(map[string]CXNativeField)
-	cx06Add(&fragment, i, "serial_fragment", int64(p[0]), 1, "", "ordered identity fragment", "Proven", true)
+	pCSIdentityAdd(&fragment, i, "serial_fragment", int64(p[0]), 1, "", "ordered identity fragment", "Proven", true)
 	if fragment.Fields["serial_fragment"].Status != "accepted" {
 		a.clear()
 		out.Record = fragment

@@ -14,3 +14,5 @@
   and [consumer inventory](naming-consumers.json). This artifact-changing class S
   change requires renewed affected security, hardware and candidate evidence
   before release. Synthetic tests establish no physical qualification.
+
+Provider identifiers use behavior names for selection, replay, LINK, PCS and BMS providers. The offline rename is reproducible with `python3 scripts/rename_provider_names.py`. Native records, qualification and retained partial state are unchanged. Gateway adoption is coordinated in Project-Helianthus/helianthus-ebusgateway#1476.

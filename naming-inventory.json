@@ -80,8 +80,8 @@
     "naming-consumers.json",
     "naming-inventory.json",
     "naming_contract_test.go",
-    "o08_growatt_provider.go",
-    "o08_growatt_provider_test.go",
+    "growatt_bms_provider.go",
+    "growatt_bms_provider_test.go",
     "registry.go",
     "registry_test.go",
     "scripts/__pycache__/check_go_lint_baseline.cpython-314.pyc",
@@ -3482,11 +3482,11 @@
       "consumer_files": []
     },
     {
-      "identity": "growatt_link_balance.go:go_function:package_or_receiver:CX12DecodeLINKBalance",
+      "identity": "growatt_link_balance.go:go_function:package_or_receiver:DecodeLINKBalance",
       "owning_file": "growatt_link_balance.go",
       "kind": "go_function",
-      "current_name": "CX12DecodeLINKBalance",
-      "target": "CX12DecodeLINKBalance",
+      "current_name": "DecodeLINKBalance",
+      "target": "DecodeLINKBalance",
       "status": "unchanged",
       "role_decomposition": "unresolved",
       "evidence": [
@@ -4059,7 +4059,7 @@
       ]
     },
     {
-      "identity": "growatt_link_cells.go:go_field:CX12MeasurementGate:Age",
+      "identity": "growatt_link_cells.go:go_field:MeasurementGate:Age",
       "owning_file": "growatt_link_cells.go",
       "kind": "go_field",
       "current_name": "Age",
@@ -4092,7 +4092,7 @@
       ]
     },
     {
-      "identity": "growatt_link_cells.go:go_field:CX12MeasurementGate:Configured",
+      "identity": "growatt_link_cells.go:go_field:MeasurementGate:Configured",
       "owning_file": "growatt_link_cells.go",
       "kind": "go_field",
       "current_name": "Configured",
@@ -4146,7 +4146,7 @@
       ]
     },
     {
-      "identity": "growatt_link_cells.go:go_field:CX12MeasurementGate:Status",
+      "identity": "growatt_link_cells.go:go_field:MeasurementGate:Status",
       "owning_file": "growatt_link_cells.go",
       "kind": "go_field",
       "current_name": "Status",
@@ -4372,7 +4372,7 @@
       ]
     },
     {
-      "identity": "growatt_link_cells.go:go_field:CX12MeasurementGate:Valid",
+      "identity": "growatt_link_cells.go:go_field:MeasurementGate:Valid",
       "owning_file": "growatt_link_cells.go",
       "kind": "go_field",
       "current_name": "Valid",
@@ -4506,7 +4506,7 @@
       ]
     },
     {
-      "identity": "growatt_link_cells.go:go_field:CX12VectorSnapshot:AddressableSlots",
+      "identity": "growatt_link_cells.go:go_field:VectorSnapshot:AddressableSlots",
       "owning_file": "growatt_link_cells.go",
       "kind": "go_field",
       "current_name": "AddressableSlots",
@@ -4524,7 +4524,7 @@
       ]
     },
     {
-      "identity": "growatt_link_cells.go:go_field:CX12VectorSnapshot:AsOf",
+      "identity": "growatt_link_cells.go:go_field:VectorSnapshot:AsOf",
       "owning_file": "growatt_link_cells.go",
       "kind": "go_field",
       "current_name": "AsOf",
@@ -4543,7 +4543,7 @@
       ]
     },
     {
-      "identity": "growatt_link_cells.go:go_field:CX12VectorSnapshot:CompleteCoverage",
+      "identity": "growatt_link_cells.go:go_field:VectorSnapshot:CompleteCoverage",
       "owning_file": "growatt_link_cells.go",
       "kind": "go_field",
       "current_name": "CompleteCoverage",
@@ -4563,7 +4563,7 @@
       ]
     },
     {
-      "identity": "growatt_link_cells.go:go_field:CX12VectorSnapshot:ConfiguredCount",
+      "identity": "growatt_link_cells.go:go_field:VectorSnapshot:ConfiguredCount",
       "owning_file": "growatt_link_cells.go",
       "kind": "go_field",
       "current_name": "ConfiguredCount",
@@ -4583,7 +4583,7 @@
       ]
     },
     {
-      "identity": "growatt_link_cells.go:go_field:CX12VectorSnapshot:CountValid",
+      "identity": "growatt_link_cells.go:go_field:VectorSnapshot:CountValid",
       "owning_file": "growatt_link_cells.go",
       "kind": "go_field",
       "current_name": "CountValid",
@@ -4606,7 +4606,7 @@
       ]
     },
     {
-      "identity": "growatt_link_cells.go:go_field:CX12VectorSnapshot:Fields",
+      "identity": "growatt_link_cells.go:go_field:VectorSnapshot:Fields",
       "owning_file": "growatt_link_cells.go",
       "kind": "go_field",
       "current_name": "Fields",
@@ -4709,7 +4709,7 @@
       ]
     },
     {
-      "identity": "growatt_link_cells.go:go_field:CX12VectorSnapshot:Fixed16Path",
+      "identity": "growatt_link_cells.go:go_field:VectorSnapshot:Fixed16Path",
       "owning_file": "growatt_link_cells.go",
       "kind": "go_field",
       "current_name": "Fixed16Path",
@@ -4725,7 +4725,7 @@
       "consumer_files": []
     },
     {
-      "identity": "growatt_link_cells.go:go_field:CX12VectorSnapshot:Kind",
+      "identity": "growatt_link_cells.go:go_field:VectorSnapshot:Kind",
       "owning_file": "growatt_link_cells.go",
       "kind": "go_field",
       "current_name": "Kind",
@@ -5103,7 +5103,7 @@
       ]
     },
     {
-      "identity": "growatt_link_cells.go:go_field:CX12VectorSnapshot:LastGood",
+      "identity": "growatt_link_cells.go:go_field:VectorSnapshot:LastGood",
       "owning_file": "growatt_link_cells.go",
       "kind": "go_field",
       "current_name": "LastGood",
@@ -5132,7 +5132,7 @@
       ]
     },
     {
-      "identity": "growatt_link_cells.go:go_field:CX12VectorSnapshot:MaxAge",
+      "identity": "growatt_link_cells.go:go_field:VectorSnapshot:MaxAge",
       "owning_file": "growatt_link_cells.go",
       "kind": "go_field",
       "current_name": "MaxAge",
@@ -5155,7 +5155,7 @@
       ]
     },
     {
-      "identity": "growatt_link_cells.go:go_field:CX12VectorSnapshot:PhysicalQualified",
+      "identity": "growatt_link_cells.go:go_field:VectorSnapshot:PhysicalQualified",
       "owning_file": "growatt_link_cells.go",
       "kind": "go_field",
       "current_name": "PhysicalQualified",
@@ -5180,7 +5180,7 @@
       ]
     },
     {
-      "identity": "growatt_link_cells.go:go_field:CX12VectorSnapshot:ReceivedIndices",
+      "identity": "growatt_link_cells.go:go_field:VectorSnapshot:ReceivedIndices",
       "owning_file": "growatt_link_cells.go",
       "kind": "go_field",
       "current_name": "ReceivedIndices",
@@ -5200,7 +5200,7 @@
       ]
     },
     {
-      "identity": "growatt_link_cells.go:go_field:CX12VectorSnapshot:ReceivedSpan",
+      "identity": "growatt_link_cells.go:go_field:VectorSnapshot:ReceivedSpan",
       "owning_file": "growatt_link_cells.go",
       "kind": "go_field",
       "current_name": "ReceivedSpan",
@@ -5219,7 +5219,7 @@
       ]
     },
     {
-      "identity": "growatt_link_cells.go:go_field:CX12VectorSnapshot:Selection",
+      "identity": "growatt_link_cells.go:go_field:VectorSnapshot:Selection",
       "owning_file": "growatt_link_cells.go",
       "kind": "go_field",
       "current_name": "Selection",
@@ -5294,7 +5294,7 @@
       ]
     },
     {
-      "identity": "growatt_link_cells.go:go_field:CX12VectorSnapshot:Span",
+      "identity": "growatt_link_cells.go:go_field:VectorSnapshot:Span",
       "owning_file": "growatt_link_cells.go",
       "kind": "go_field",
       "current_name": "Span",
@@ -5313,7 +5313,7 @@
       ]
     },
     {
-      "identity": "growatt_link_cells.go:go_field:CX12VectorSnapshot:ValidIndices",
+      "identity": "growatt_link_cells.go:go_field:VectorSnapshot:ValidIndices",
       "owning_file": "growatt_link_cells.go",
       "kind": "go_field",
       "current_name": "ValidIndices",
@@ -5332,11 +5332,11 @@
       ]
     },
     {
-      "identity": "growatt_link_cells.go:go_function:package_or_receiver:CX12Decode",
+      "identity": "growatt_link_cells.go:go_function:package_or_receiver:DecodeLINKVector",
       "owning_file": "growatt_link_cells.go",
       "kind": "go_function",
-      "current_name": "CX12Decode",
-      "target": "CX12Decode",
+      "current_name": "DecodeLINKVector",
+      "target": "DecodeLINKVector",
       "status": "unchanged",
       "role_decomposition": "unresolved",
       "evidence": [
@@ -5348,11 +5348,11 @@
       "consumer_files": []
     },
     {
-      "identity": "growatt_link_cells.go:go_function:package_or_receiver:CX12DecodeLINKCellMean",
+      "identity": "growatt_link_cells.go:go_function:package_or_receiver:DecodeLINKCellMean",
       "owning_file": "growatt_link_cells.go",
       "kind": "go_function",
-      "current_name": "CX12DecodeLINKCellMean",
-      "target": "CX12DecodeLINKCellMean",
+      "current_name": "DecodeLINKCellMean",
+      "target": "DecodeLINKCellMean",
       "status": "unchanged",
       "role_decomposition": "unresolved",
       "evidence": [
@@ -5364,11 +5364,11 @@
       "consumer_files": []
     },
     {
-      "identity": "growatt_link_cells.go:go_function:package_or_receiver:CX12NewLINKCells",
+      "identity": "growatt_link_cells.go:go_function:package_or_receiver:NewLINKCells",
       "owning_file": "growatt_link_cells.go",
       "kind": "go_function",
-      "current_name": "CX12NewLINKCells",
-      "target": "CX12NewLINKCells",
+      "current_name": "NewLINKCells",
+      "target": "NewLINKCells",
       "status": "unchanged",
       "role_decomposition": "unresolved",
       "evidence": [
@@ -5380,11 +5380,11 @@
       "consumer_files": []
     },
     {
-      "identity": "growatt_link_cells.go:go_function:package_or_receiver:CX12NewLINKFixed16Cells",
+      "identity": "growatt_link_cells.go:go_function:package_or_receiver:NewLINKFixed16Cells",
       "owning_file": "growatt_link_cells.go",
       "kind": "go_function",
-      "current_name": "CX12NewLINKFixed16Cells",
-      "target": "CX12NewLINKFixed16Cells",
+      "current_name": "NewLINKFixed16Cells",
+      "target": "NewLINKFixed16Cells",
       "status": "unchanged",
       "role_decomposition": "unresolved",
       "evidence": [
@@ -5396,11 +5396,11 @@
       "consumer_files": []
     },
     {
-      "identity": "growatt_link_cells.go:go_function:package_or_receiver:CX12Snapshot",
+      "identity": "growatt_link_cells.go:go_function:package_or_receiver:SnapshotLINKVector",
       "owning_file": "growatt_link_cells.go",
       "kind": "go_function",
-      "current_name": "CX12Snapshot",
-      "target": "CX12Snapshot",
+      "current_name": "SnapshotLINKVector",
+      "target": "SnapshotLINKVector",
       "status": "unchanged",
       "role_decomposition": "unresolved",
       "evidence": [
@@ -5412,11 +5412,11 @@
       "consumer_files": []
     },
     {
-      "identity": "growatt_link_cells.go:go_type:package:CX12LINKVector",
+      "identity": "growatt_link_cells.go:go_type:package:LINKVector",
       "owning_file": "growatt_link_cells.go",
       "kind": "go_type",
-      "current_name": "CX12LINKVector",
-      "target": "CX12LINKVector",
+      "current_name": "LINKVector",
+      "target": "LINKVector",
       "status": "unchanged",
       "role_decomposition": "unresolved",
       "evidence": [
@@ -5428,11 +5428,11 @@
       "consumer_files": []
     },
     {
-      "identity": "growatt_link_cells.go:go_type:package:CX12MeasurementGate",
+      "identity": "growatt_link_cells.go:go_type:package:MeasurementGate",
       "owning_file": "growatt_link_cells.go",
       "kind": "go_type",
-      "current_name": "CX12MeasurementGate",
-      "target": "CX12MeasurementGate",
+      "current_name": "MeasurementGate",
+      "target": "MeasurementGate",
       "status": "unchanged",
       "role_decomposition": "unresolved",
       "evidence": [
@@ -5448,11 +5448,11 @@
       ]
     },
     {
-      "identity": "growatt_link_cells.go:go_type:package:CX12VectorSnapshot",
+      "identity": "growatt_link_cells.go:go_type:package:VectorSnapshot",
       "owning_file": "growatt_link_cells.go",
       "kind": "go_type",
-      "current_name": "CX12VectorSnapshot",
-      "target": "CX12VectorSnapshot",
+      "current_name": "VectorSnapshot",
+      "target": "VectorSnapshot",
       "status": "unchanged",
       "role_decomposition": "unresolved",
       "evidence": [
@@ -6866,11 +6866,11 @@
       ]
     },
     {
-      "identity": "growatt_link_diagnostics.go:go_function:package_or_receiver:CX13DecodeLINKDiagnostics",
+      "identity": "growatt_link_diagnostics.go:go_function:package_or_receiver:DecodeLINKDiagnostics",
       "owning_file": "growatt_link_diagnostics.go",
       "kind": "go_function",
-      "current_name": "CX13DecodeLINKDiagnostics",
-      "target": "CX13DecodeLINKDiagnostics",
+      "current_name": "DecodeLINKDiagnostics",
+      "target": "DecodeLINKDiagnostics",
       "status": "unchanged",
       "role_decomposition": "unresolved",
       "evidence": [
@@ -8974,7 +8974,7 @@
       "consumer_files": []
     },
     {
-      "identity": "growatt_link_identity.go:go_field:CX01LINKIdentitySnapshot:Fields",
+      "identity": "growatt_link_identity.go:go_field:LINKIdentitySnapshot:Fields",
       "owning_file": "growatt_link_identity.go",
       "kind": "go_field",
       "current_name": "Fields",
@@ -9077,7 +9077,7 @@
       ]
     },
     {
-      "identity": "growatt_link_identity.go:go_field:CX01LINKIdentitySnapshot:Grade",
+      "identity": "growatt_link_identity.go:go_field:LINKIdentitySnapshot:Grade",
       "owning_file": "growatt_link_identity.go",
       "kind": "go_field",
       "current_name": "Grade",
@@ -9109,7 +9109,7 @@
       ]
     },
     {
-      "identity": "growatt_link_identity.go:go_field:CX01LINKIdentitySnapshot:HasIdentity",
+      "identity": "growatt_link_identity.go:go_field:LINKIdentitySnapshot:HasIdentity",
       "owning_file": "growatt_link_identity.go",
       "kind": "go_field",
       "current_name": "HasIdentity",
@@ -9125,7 +9125,7 @@
       "consumer_files": []
     },
     {
-      "identity": "growatt_link_identity.go:go_field:CX01LINKIdentitySnapshot:HasSerial",
+      "identity": "growatt_link_identity.go:go_field:LINKIdentitySnapshot:HasSerial",
       "owning_file": "growatt_link_identity.go",
       "kind": "go_field",
       "current_name": "HasSerial",
@@ -9141,7 +9141,7 @@
       "consumer_files": []
     },
     {
-      "identity": "growatt_link_identity.go:go_field:CX01LINKIdentitySnapshot:IdentityEvidence",
+      "identity": "growatt_link_identity.go:go_field:LINKIdentitySnapshot:IdentityEvidence",
       "owning_file": "growatt_link_identity.go",
       "kind": "go_field",
       "current_name": "IdentityEvidence",
@@ -9157,7 +9157,7 @@
       "consumer_files": []
     },
     {
-      "identity": "growatt_link_identity.go:go_field:CX01LINKIdentitySnapshot:PhysicalQualified",
+      "identity": "growatt_link_identity.go:go_field:LINKIdentitySnapshot:PhysicalQualified",
       "owning_file": "growatt_link_identity.go",
       "kind": "go_field",
       "current_name": "PhysicalQualified",
@@ -9182,7 +9182,7 @@
       ]
     },
     {
-      "identity": "growatt_link_identity.go:go_field:CX01LINKIdentitySnapshot:ProjectCode",
+      "identity": "growatt_link_identity.go:go_field:LINKIdentitySnapshot:ProjectCode",
       "owning_file": "growatt_link_identity.go",
       "kind": "go_field",
       "current_name": "ProjectCode",
@@ -9210,7 +9210,7 @@
       ]
     },
     {
-      "identity": "growatt_link_identity.go:go_field:CX01LINKIdentitySnapshot:Release",
+      "identity": "growatt_link_identity.go:go_field:LINKIdentitySnapshot:Release",
       "owning_file": "growatt_link_identity.go",
       "kind": "go_field",
       "current_name": "Release",
@@ -9290,7 +9290,7 @@
       ]
     },
     {
-      "identity": "growatt_link_identity.go:go_field:CX01LINKIdentitySnapshot:Selection",
+      "identity": "growatt_link_identity.go:go_field:LINKIdentitySnapshot:Selection",
       "owning_file": "growatt_link_identity.go",
       "kind": "go_field",
       "current_name": "Selection",
@@ -9365,7 +9365,7 @@
       ]
     },
     {
-      "identity": "growatt_link_identity.go:go_field:CX01LINKIdentitySnapshot:Serial",
+      "identity": "growatt_link_identity.go:go_field:LINKIdentitySnapshot:Serial",
       "owning_file": "growatt_link_identity.go",
       "kind": "go_field",
       "current_name": "Serial",
@@ -9409,7 +9409,7 @@
       ]
     },
     {
-      "identity": "growatt_link_identity.go:go_field:CX01LINKIdentitySnapshot:SerialEvidence",
+      "identity": "growatt_link_identity.go:go_field:LINKIdentitySnapshot:SerialEvidence",
       "owning_file": "growatt_link_identity.go",
       "kind": "go_field",
       "current_name": "SerialEvidence",
@@ -9425,7 +9425,7 @@
       "consumer_files": []
     },
     {
-      "identity": "growatt_link_identity.go:go_field:CX01LINKIdentitySnapshot:Status",
+      "identity": "growatt_link_identity.go:go_field:LINKIdentitySnapshot:Status",
       "owning_file": "growatt_link_identity.go",
       "kind": "go_field",
       "current_name": "Status",
@@ -9651,11 +9651,11 @@
       ]
     },
     {
-      "identity": "growatt_link_identity.go:go_function:package_or_receiver:CX01Decode",
+      "identity": "growatt_link_identity.go:go_function:package_or_receiver:DecodeLINKIdentity",
       "owning_file": "growatt_link_identity.go",
       "kind": "go_function",
-      "current_name": "CX01Decode",
-      "target": "CX01Decode",
+      "current_name": "DecodeLINKIdentity",
+      "target": "DecodeLINKIdentity",
       "status": "unchanged",
       "role_decomposition": "unresolved",
       "evidence": [
@@ -9667,11 +9667,11 @@
       "consumer_files": []
     },
     {
-      "identity": "growatt_link_identity.go:go_function:package_or_receiver:CX01NewLINKIdentityAssembler",
+      "identity": "growatt_link_identity.go:go_function:package_or_receiver:NewLINKIdentityAssembler",
       "owning_file": "growatt_link_identity.go",
       "kind": "go_function",
-      "current_name": "CX01NewLINKIdentityAssembler",
-      "target": "CX01NewLINKIdentityAssembler",
+      "current_name": "NewLINKIdentityAssembler",
+      "target": "NewLINKIdentityAssembler",
       "status": "unchanged",
       "role_decomposition": "unresolved",
       "evidence": [
@@ -9683,11 +9683,11 @@
       "consumer_files": []
     },
     {
-      "identity": "growatt_link_identity.go:go_function:package_or_receiver:CX01Snapshot",
+      "identity": "growatt_link_identity.go:go_function:package_or_receiver:SnapshotLINKIdentity",
       "owning_file": "growatt_link_identity.go",
       "kind": "go_function",
-      "current_name": "CX01Snapshot",
-      "target": "CX01Snapshot",
+      "current_name": "SnapshotLINKIdentity",
+      "target": "SnapshotLINKIdentity",
       "status": "unchanged",
       "role_decomposition": "unresolved",
       "evidence": [
@@ -9699,11 +9699,11 @@
       "consumer_files": []
     },
     {
-      "identity": "growatt_link_identity.go:go_type:package:CX01LINKIdentityAssembler",
+      "identity": "growatt_link_identity.go:go_type:package:LINKIdentityAssembler",
       "owning_file": "growatt_link_identity.go",
       "kind": "go_type",
-      "current_name": "CX01LINKIdentityAssembler",
-      "target": "CX01LINKIdentityAssembler",
+      "current_name": "LINKIdentityAssembler",
+      "target": "LINKIdentityAssembler",
       "status": "unchanged",
       "role_decomposition": "unresolved",
       "evidence": [
@@ -9715,11 +9715,11 @@
       "consumer_files": []
     },
     {
-      "identity": "growatt_link_identity.go:go_type:package:CX01LINKIdentitySnapshot",
+      "identity": "growatt_link_identity.go:go_type:package:LINKIdentitySnapshot",
       "owning_file": "growatt_link_identity.go",
       "kind": "go_type",
-      "current_name": "CX01LINKIdentitySnapshot",
-      "target": "CX01LINKIdentitySnapshot",
+      "current_name": "LINKIdentitySnapshot",
+      "target": "LINKIdentitySnapshot",
       "status": "unchanged",
       "role_decomposition": "unresolved",
       "evidence": [
@@ -10741,7 +10741,7 @@
       ]
     },
     {
-      "identity": "growatt_link_telemetry.go:go_field:CX01LINKInput:Bank",
+      "identity": "growatt_link_telemetry.go:go_field:LINKInput:Bank",
       "owning_file": "growatt_link_telemetry.go",
       "kind": "go_field",
       "current_name": "Bank",
@@ -10768,7 +10768,7 @@
       ]
     },
     {
-      "identity": "growatt_link_telemetry.go:go_field:CX01LINKInput:Direction",
+      "identity": "growatt_link_telemetry.go:go_field:LINKInput:Direction",
       "owning_file": "growatt_link_telemetry.go",
       "kind": "go_field",
       "current_name": "Direction",
@@ -10875,7 +10875,7 @@
       ]
     },
     {
-      "identity": "growatt_link_telemetry.go:go_field:CX01LINKInput:Endpoint",
+      "identity": "growatt_link_telemetry.go:go_field:LINKInput:Endpoint",
       "owning_file": "growatt_link_telemetry.go",
       "kind": "go_field",
       "current_name": "Endpoint",
@@ -10999,7 +10999,7 @@
       ]
     },
     {
-      "identity": "growatt_link_telemetry.go:go_field:CX01LINKInput:Epoch",
+      "identity": "growatt_link_telemetry.go:go_field:LINKInput:Epoch",
       "owning_file": "growatt_link_telemetry.go",
       "kind": "go_field",
       "current_name": "Epoch",
@@ -11128,7 +11128,7 @@
       ]
     },
     {
-      "identity": "growatt_link_telemetry.go:go_field:CX01LINKInput:Evidence",
+      "identity": "growatt_link_telemetry.go:go_field:LINKInput:Evidence",
       "owning_file": "growatt_link_telemetry.go",
       "kind": "go_field",
       "current_name": "Evidence",
@@ -11345,7 +11345,7 @@
       ]
     },
     {
-      "identity": "growatt_link_telemetry.go:go_field:CX01LINKInput:FieldAge",
+      "identity": "growatt_link_telemetry.go:go_field:LINKInput:FieldAge",
       "owning_file": "growatt_link_telemetry.go",
       "kind": "go_field",
       "current_name": "FieldAge",
@@ -11369,7 +11369,7 @@
       ]
     },
     {
-      "identity": "growatt_link_telemetry.go:go_field:CX01LINKInput:Group",
+      "identity": "growatt_link_telemetry.go:go_field:LINKInput:Group",
       "owning_file": "growatt_link_telemetry.go",
       "kind": "go_field",
       "current_name": "Group",
@@ -11495,7 +11495,7 @@
       ]
     },
     {
-      "identity": "growatt_link_telemetry.go:go_field:CX01LINKInput:Scope",
+      "identity": "growatt_link_telemetry.go:go_field:LINKInput:Scope",
       "owning_file": "growatt_link_telemetry.go",
       "kind": "go_field",
       "current_name": "Scope",
@@ -11628,7 +11628,7 @@
       ]
     },
     {
-      "identity": "growatt_link_telemetry.go:go_field:CX01LINKInput:Slot",
+      "identity": "growatt_link_telemetry.go:go_field:LINKInput:Slot",
       "owning_file": "growatt_link_telemetry.go",
       "kind": "go_field",
       "current_name": "Slot",
@@ -11720,11 +11720,11 @@
       "consumer_files": []
     },
     {
-      "identity": "growatt_link_telemetry.go:go_type:package:CX01LINKInput",
+      "identity": "growatt_link_telemetry.go:go_type:package:LINKInput",
       "owning_file": "growatt_link_telemetry.go",
       "kind": "go_type",
-      "current_name": "CX01LINKInput",
-      "target": "CX01LINKInput",
+      "current_name": "LINKInput",
+      "target": "LINKInput",
       "status": "unchanged",
       "role_decomposition": "unresolved",
       "evidence": [
@@ -19780,7 +19780,7 @@
       ]
     },
     {
-      "identity": "growatt_link_temperatures.go:go_field:CX12SummaryGates:Contributors",
+      "identity": "growatt_link_temperatures.go:go_field:SummaryGates:Contributors",
       "owning_file": "growatt_link_temperatures.go",
       "kind": "go_field",
       "current_name": "Contributors",
@@ -19798,7 +19798,7 @@
       ]
     },
     {
-      "identity": "growatt_link_temperatures.go:go_field:CX12SummaryGates:FineTemperatureValid",
+      "identity": "growatt_link_temperatures.go:go_field:SummaryGates:FineTemperatureValid",
       "owning_file": "growatt_link_temperatures.go",
       "kind": "go_field",
       "current_name": "FineTemperatureValid",
@@ -19814,7 +19814,7 @@
       "consumer_files": []
     },
     {
-      "identity": "growatt_link_temperatures.go:go_field:CX12SummaryGates:FixedFourPath",
+      "identity": "growatt_link_temperatures.go:go_field:SummaryGates:FixedFourPath",
       "owning_file": "growatt_link_temperatures.go",
       "kind": "go_field",
       "current_name": "FixedFourPath",
@@ -19830,7 +19830,7 @@
       "consumer_files": []
     },
     {
-      "identity": "growatt_link_temperatures.go:go_field:CX12SummaryGates:Maximum",
+      "identity": "growatt_link_temperatures.go:go_field:SummaryGates:Maximum",
       "owning_file": "growatt_link_temperatures.go",
       "kind": "go_field",
       "current_name": "Maximum",
@@ -19868,7 +19868,7 @@
       ]
     },
     {
-      "identity": "growatt_link_temperatures.go:go_field:CX12SummaryGates:Mean",
+      "identity": "growatt_link_temperatures.go:go_field:SummaryGates:Mean",
       "owning_file": "growatt_link_temperatures.go",
       "kind": "go_field",
       "current_name": "Mean",
@@ -19884,7 +19884,7 @@
       "consumer_files": []
     },
     {
-      "identity": "growatt_link_temperatures.go:go_field:CX12SummaryGates:Minimum",
+      "identity": "growatt_link_temperatures.go:go_field:SummaryGates:Minimum",
       "owning_file": "growatt_link_temperatures.go",
       "kind": "go_field",
       "current_name": "Minimum",
@@ -19926,11 +19926,11 @@
       ]
     },
     {
-      "identity": "growatt_link_temperatures.go:go_function:package_or_receiver:CX12DecodeLINKTemperatureSummary",
+      "identity": "growatt_link_temperatures.go:go_function:package_or_receiver:DecodeLINKTemperatureSummary",
       "owning_file": "growatt_link_temperatures.go",
       "kind": "go_function",
-      "current_name": "CX12DecodeLINKTemperatureSummary",
-      "target": "CX12DecodeLINKTemperatureSummary",
+      "current_name": "DecodeLINKTemperatureSummary",
+      "target": "DecodeLINKTemperatureSummary",
       "status": "unchanged",
       "role_decomposition": "unresolved",
       "evidence": [
@@ -19942,11 +19942,11 @@
       "consumer_files": []
     },
     {
-      "identity": "growatt_link_temperatures.go:go_function:package_or_receiver:CX12NewLINKTemperatures",
+      "identity": "growatt_link_temperatures.go:go_function:package_or_receiver:NewLINKTemperatures",
       "owning_file": "growatt_link_temperatures.go",
       "kind": "go_function",
-      "current_name": "CX12NewLINKTemperatures",
-      "target": "CX12NewLINKTemperatures",
+      "current_name": "NewLINKTemperatures",
+      "target": "NewLINKTemperatures",
       "status": "unchanged",
       "role_decomposition": "unresolved",
       "evidence": [
@@ -19958,11 +19958,11 @@
       "consumer_files": []
     },
     {
-      "identity": "growatt_link_temperatures.go:go_type:package:CX12SummaryGates",
+      "identity": "growatt_link_temperatures.go:go_type:package:SummaryGates",
       "owning_file": "growatt_link_temperatures.go",
       "kind": "go_type",
-      "current_name": "CX12SummaryGates",
-      "target": "CX12SummaryGates",
+      "current_name": "SummaryGates",
+      "target": "SummaryGates",
       "status": "unchanged",
       "role_decomposition": "unresolved",
       "evidence": [
@@ -20608,11 +20608,11 @@
       ]
     },
     {
-      "identity": "growatt_pcs_extended.go:go_function:package_or_receiver:CX09Decode",
+      "identity": "growatt_pcs_extended.go:go_function:package_or_receiver:DecodePCSExtendedFrame",
       "owning_file": "growatt_pcs_extended.go",
       "kind": "go_function",
-      "current_name": "CX09Decode",
-      "target": "CX09Decode",
+      "current_name": "DecodePCSExtendedFrame",
+      "target": "DecodePCSExtendedFrame",
       "status": "unchanged",
       "role_decomposition": "unresolved",
       "evidence": [
@@ -20624,11 +20624,11 @@
       "consumer_files": []
     },
     {
-      "identity": "growatt_pcs_extended.go:go_function:package_or_receiver:CX09DecodePCSExtended",
+      "identity": "growatt_pcs_extended.go:go_function:package_or_receiver:DecodePCSExtended",
       "owning_file": "growatt_pcs_extended.go",
       "kind": "go_function",
-      "current_name": "CX09DecodePCSExtended",
-      "target": "CX09DecodePCSExtended",
+      "current_name": "DecodePCSExtended",
+      "target": "DecodePCSExtended",
       "status": "unchanged",
       "role_decomposition": "unresolved",
       "evidence": [
@@ -20640,11 +20640,11 @@
       "consumer_files": []
     },
     {
-      "identity": "growatt_pcs_extended.go:go_function:package_or_receiver:CX09NewPCSExtendedDecoder",
+      "identity": "growatt_pcs_extended.go:go_function:package_or_receiver:NewPCSExtendedDecoder",
       "owning_file": "growatt_pcs_extended.go",
       "kind": "go_function",
-      "current_name": "CX09NewPCSExtendedDecoder",
-      "target": "CX09NewPCSExtendedDecoder",
+      "current_name": "NewPCSExtendedDecoder",
+      "target": "NewPCSExtendedDecoder",
       "status": "unchanged",
       "role_decomposition": "unresolved",
       "evidence": [
@@ -20656,11 +20656,11 @@
       "consumer_files": []
     },
     {
-      "identity": "growatt_pcs_extended.go:go_function:package_or_receiver:CX09Snapshot",
+      "identity": "growatt_pcs_extended.go:go_function:package_or_receiver:SnapshotPCSExtended",
       "owning_file": "growatt_pcs_extended.go",
       "kind": "go_function",
-      "current_name": "CX09Snapshot",
-      "target": "CX09Snapshot",
+      "current_name": "SnapshotPCSExtended",
+      "target": "SnapshotPCSExtended",
       "status": "unchanged",
       "role_decomposition": "unresolved",
       "evidence": [
@@ -20672,11 +20672,11 @@
       "consumer_files": []
     },
     {
-      "identity": "growatt_pcs_extended.go:go_type:package:CX09PCSExtendedDecoder",
+      "identity": "growatt_pcs_extended.go:go_type:package:PCSExtendedDecoder",
       "owning_file": "growatt_pcs_extended.go",
       "kind": "go_type",
-      "current_name": "CX09PCSExtendedDecoder",
-      "target": "CX09PCSExtendedDecoder",
+      "current_name": "PCSExtendedDecoder",
+      "target": "PCSExtendedDecoder",
       "status": "unchanged",
       "role_decomposition": "unresolved",
       "evidence": [
@@ -23028,7 +23028,7 @@
       "consumer_files": []
     },
     {
-      "identity": "growatt_pcs_gauge.go:go_field:CX06PCSInput:AlternativeEligible",
+      "identity": "growatt_pcs_gauge.go:go_field:PCSIdentityPCSInput:AlternativeEligible",
       "owning_file": "growatt_pcs_gauge.go",
       "kind": "go_field",
       "current_name": "AlternativeEligible",
@@ -23044,7 +23044,7 @@
       "consumer_files": []
     },
     {
-      "identity": "growatt_pcs_gauge.go:go_field:CX06PCSInput:FailedPrecheck",
+      "identity": "growatt_pcs_gauge.go:go_field:PCSIdentityPCSInput:FailedPrecheck",
       "owning_file": "growatt_pcs_gauge.go",
       "kind": "go_field",
       "current_name": "FailedPrecheck",
@@ -23060,7 +23060,7 @@
       "consumer_files": []
     },
     {
-      "identity": "growatt_pcs_gauge.go:go_field:CX06PCSInput:SerialSlot",
+      "identity": "growatt_pcs_gauge.go:go_field:PCSIdentityPCSInput:SerialSlot",
       "owning_file": "growatt_pcs_gauge.go",
       "kind": "go_field",
       "current_name": "SerialSlot",
@@ -23079,7 +23079,7 @@
       ]
     },
     {
-      "identity": "growatt_pcs_gauge.go:go_field:CX06PCSInput:SerialSlotValid",
+      "identity": "growatt_pcs_gauge.go:go_field:PCSIdentityPCSInput:SerialSlotValid",
       "owning_file": "growatt_pcs_gauge.go",
       "kind": "go_field",
       "current_name": "SerialSlotValid",
@@ -23098,7 +23098,7 @@
       ]
     },
     {
-      "identity": "growatt_pcs_gauge.go:go_field:CX06PCSInput:ThresholdStateKnown",
+      "identity": "growatt_pcs_gauge.go:go_field:PCSIdentityPCSInput:ThresholdStateKnown",
       "owning_file": "growatt_pcs_gauge.go",
       "kind": "go_field",
       "current_name": "ThresholdStateKnown",
@@ -23114,7 +23114,7 @@
       "consumer_files": []
     },
     {
-      "identity": "growatt_pcs_gauge.go:go_field:CX06PCSInput:ZeroIntegration",
+      "identity": "growatt_pcs_gauge.go:go_field:PCSIdentityPCSInput:ZeroIntegration",
       "owning_file": "growatt_pcs_gauge.go",
       "kind": "go_field",
       "current_name": "ZeroIntegration",
@@ -23130,11 +23130,11 @@
       "consumer_files": []
     },
     {
-      "identity": "growatt_pcs_gauge.go:go_function:package_or_receiver:CX06DecodePCSGauge",
+      "identity": "growatt_pcs_gauge.go:go_function:package_or_receiver:DecodePCSGauge",
       "owning_file": "growatt_pcs_gauge.go",
       "kind": "go_function",
-      "current_name": "CX06DecodePCSGauge",
-      "target": "CX06DecodePCSGauge",
+      "current_name": "DecodePCSGauge",
+      "target": "DecodePCSGauge",
       "status": "unchanged",
       "role_decomposition": "unresolved",
       "evidence": [
@@ -23146,11 +23146,11 @@
       "consumer_files": []
     },
     {
-      "identity": "growatt_pcs_gauge.go:go_type:package:CX06PCSInput",
+      "identity": "growatt_pcs_gauge.go:go_type:package:PCSIdentityPCSInput",
       "owning_file": "growatt_pcs_gauge.go",
       "kind": "go_type",
-      "current_name": "CX06PCSInput",
-      "target": "CX06PCSInput",
+      "current_name": "PCSIdentityPCSInput",
+      "target": "PCSIdentityPCSInput",
       "status": "unchanged",
       "role_decomposition": "unresolved",
       "evidence": [
@@ -26567,7 +26567,7 @@
       "consumer_files": []
     },
     {
-      "identity": "growatt_pcs_identity.go:go_field:CX06SerialResult:Fragments",
+      "identity": "growatt_pcs_identity.go:go_field:PCSIdentitySerialResult:Fragments",
       "owning_file": "growatt_pcs_identity.go",
       "kind": "go_field",
       "current_name": "Fragments",
@@ -26586,7 +26586,7 @@
       ]
     },
     {
-      "identity": "growatt_pcs_identity.go:go_field:CX06SerialResult:PhysicalQualified",
+      "identity": "growatt_pcs_identity.go:go_field:PCSIdentitySerialResult:PhysicalQualified",
       "owning_file": "growatt_pcs_identity.go",
       "kind": "go_field",
       "current_name": "PhysicalQualified",
@@ -26611,7 +26611,7 @@
       ]
     },
     {
-      "identity": "growatt_pcs_identity.go:go_field:CX06SerialResult:Record",
+      "identity": "growatt_pcs_identity.go:go_field:PCSIdentitySerialResult:Record",
       "owning_file": "growatt_pcs_identity.go",
       "kind": "go_field",
       "current_name": "Record",
@@ -26720,7 +26720,7 @@
       ]
     },
     {
-      "identity": "growatt_pcs_identity.go:go_field:CX06SerialResult:Serial",
+      "identity": "growatt_pcs_identity.go:go_field:PCSIdentitySerialResult:Serial",
       "owning_file": "growatt_pcs_identity.go",
       "kind": "go_field",
       "current_name": "Serial",
@@ -26764,7 +26764,7 @@
       ]
     },
     {
-      "identity": "growatt_pcs_identity.go:go_field:CX06SerialResult:Status",
+      "identity": "growatt_pcs_identity.go:go_field:PCSIdentitySerialResult:Status",
       "owning_file": "growatt_pcs_identity.go",
       "kind": "go_field",
       "current_name": "Status",
@@ -26990,11 +26990,11 @@
       ]
     },
     {
-      "identity": "growatt_pcs_identity.go:go_function:package_or_receiver:CX06DecodePCSIdentity",
+      "identity": "growatt_pcs_identity.go:go_function:package_or_receiver:DecodePCSIdentity",
       "owning_file": "growatt_pcs_identity.go",
       "kind": "go_function",
-      "current_name": "CX06DecodePCSIdentity",
-      "target": "CX06DecodePCSIdentity",
+      "current_name": "DecodePCSIdentity",
+      "target": "DecodePCSIdentity",
       "status": "unchanged",
       "role_decomposition": "unresolved",
       "evidence": [
@@ -27035,11 +27035,11 @@
       ]
     },
     {
-      "identity": "growatt_pcs_identity.go:go_type:package:CX06SerialAssembler",
+      "identity": "growatt_pcs_identity.go:go_type:package:PCSIdentitySerialAssembler",
       "owning_file": "growatt_pcs_identity.go",
       "kind": "go_type",
-      "current_name": "CX06SerialAssembler",
-      "target": "CX06SerialAssembler",
+      "current_name": "PCSIdentitySerialAssembler",
+      "target": "PCSIdentitySerialAssembler",
       "status": "unchanged",
       "role_decomposition": "unresolved",
       "evidence": [
@@ -27051,11 +27051,11 @@
       "consumer_files": []
     },
     {
-      "identity": "growatt_pcs_identity.go:go_type:package:CX06SerialResult",
+      "identity": "growatt_pcs_identity.go:go_type:package:PCSIdentitySerialResult",
       "owning_file": "growatt_pcs_identity.go",
       "kind": "go_type",
-      "current_name": "CX06SerialResult",
-      "target": "CX06SerialResult",
+      "current_name": "PCSIdentitySerialResult",
+      "target": "PCSIdentitySerialResult",
       "status": "unchanged",
       "role_decomposition": "unresolved",
       "evidence": [
@@ -29631,11 +29631,11 @@
       ]
     },
     {
-      "identity": "growatt_pcs_parallel_base.go:go_function:package_or_receiver:CX10DecodeParallel",
+      "identity": "growatt_pcs_parallel_base.go:go_function:package_or_receiver:ParallelIdentityDecodeParallel",
       "owning_file": "growatt_pcs_parallel_base.go",
       "kind": "go_function",
-      "current_name": "CX10DecodeParallel",
-      "target": "CX10DecodeParallel",
+      "current_name": "ParallelIdentityDecodeParallel",
+      "target": "ParallelIdentityDecodeParallel",
       "status": "unchanged",
       "role_decomposition": "unresolved",
       "evidence": [
@@ -31439,7 +31439,7 @@
       "consumer_files": []
     },
     {
-      "identity": "growatt_pcs_parallel_identity.go:go_field:CX10ParallelIdentitySnapshot:Fragments",
+      "identity": "growatt_pcs_parallel_identity.go:go_field:ParallelIdentitySnapshot:Fragments",
       "owning_file": "growatt_pcs_parallel_identity.go",
       "kind": "go_field",
       "current_name": "Fragments",
@@ -31458,7 +31458,7 @@
       ]
     },
     {
-      "identity": "growatt_pcs_parallel_identity.go:go_field:CX10ParallelIdentitySnapshot:Grade",
+      "identity": "growatt_pcs_parallel_identity.go:go_field:ParallelIdentitySnapshot:Grade",
       "owning_file": "growatt_pcs_parallel_identity.go",
       "kind": "go_field",
       "current_name": "Grade",
@@ -31490,7 +31490,7 @@
       ]
     },
     {
-      "identity": "growatt_pcs_parallel_identity.go:go_field:CX10ParallelIdentitySnapshot:HasSerial",
+      "identity": "growatt_pcs_parallel_identity.go:go_field:ParallelIdentitySnapshot:HasSerial",
       "owning_file": "growatt_pcs_parallel_identity.go",
       "kind": "go_field",
       "current_name": "HasSerial",
@@ -31506,7 +31506,7 @@
       "consumer_files": []
     },
     {
-      "identity": "growatt_pcs_parallel_identity.go:go_field:CX10ParallelIdentitySnapshot:PhysicalQualified",
+      "identity": "growatt_pcs_parallel_identity.go:go_field:ParallelIdentitySnapshot:PhysicalQualified",
       "owning_file": "growatt_pcs_parallel_identity.go",
       "kind": "go_field",
       "current_name": "PhysicalQualified",
@@ -31531,7 +31531,7 @@
       ]
     },
     {
-      "identity": "growatt_pcs_parallel_identity.go:go_field:CX10ParallelIdentitySnapshot:Serial",
+      "identity": "growatt_pcs_parallel_identity.go:go_field:ParallelIdentitySnapshot:Serial",
       "owning_file": "growatt_pcs_parallel_identity.go",
       "kind": "go_field",
       "current_name": "Serial",
@@ -31575,7 +31575,7 @@
       ]
     },
     {
-      "identity": "growatt_pcs_parallel_identity.go:go_field:CX10ParallelIdentitySnapshot:Status",
+      "identity": "growatt_pcs_parallel_identity.go:go_field:ParallelIdentitySnapshot:Status",
       "owning_file": "growatt_pcs_parallel_identity.go",
       "kind": "go_field",
       "current_name": "Status",
@@ -31801,11 +31801,11 @@
       ]
     },
     {
-      "identity": "growatt_pcs_parallel_identity.go:go_function:package_or_receiver:CX10Decode",
+      "identity": "growatt_pcs_parallel_identity.go:go_function:package_or_receiver:DecodeParallelIdentity",
       "owning_file": "growatt_pcs_parallel_identity.go",
       "kind": "go_function",
-      "current_name": "CX10Decode",
-      "target": "CX10Decode",
+      "current_name": "DecodeParallelIdentity",
+      "target": "DecodeParallelIdentity",
       "status": "unchanged",
       "role_decomposition": "unresolved",
       "evidence": [
@@ -31817,11 +31817,11 @@
       "consumer_files": []
     },
     {
-      "identity": "growatt_pcs_parallel_identity.go:go_function:package_or_receiver:CX10NewParallelIdentityAssembler",
+      "identity": "growatt_pcs_parallel_identity.go:go_function:package_or_receiver:NewParallelIdentityAssembler",
       "owning_file": "growatt_pcs_parallel_identity.go",
       "kind": "go_function",
-      "current_name": "CX10NewParallelIdentityAssembler",
-      "target": "CX10NewParallelIdentityAssembler",
+      "current_name": "NewParallelIdentityAssembler",
+      "target": "NewParallelIdentityAssembler",
       "status": "unchanged",
       "role_decomposition": "unresolved",
       "evidence": [
@@ -31833,11 +31833,11 @@
       "consumer_files": []
     },
     {
-      "identity": "growatt_pcs_parallel_identity.go:go_function:package_or_receiver:CX10Snapshot",
+      "identity": "growatt_pcs_parallel_identity.go:go_function:package_or_receiver:SnapshotParallelIdentity",
       "owning_file": "growatt_pcs_parallel_identity.go",
       "kind": "go_function",
-      "current_name": "CX10Snapshot",
-      "target": "CX10Snapshot",
+      "current_name": "SnapshotParallelIdentity",
+      "target": "SnapshotParallelIdentity",
       "status": "unchanged",
       "role_decomposition": "unresolved",
       "evidence": [
@@ -31849,11 +31849,11 @@
       "consumer_files": []
     },
     {
-      "identity": "growatt_pcs_parallel_identity.go:go_type:package:CX10ParallelIdentityAssembler",
+      "identity": "growatt_pcs_parallel_identity.go:go_type:package:ParallelIdentityAssembler",
       "owning_file": "growatt_pcs_parallel_identity.go",
       "kind": "go_type",
-      "current_name": "CX10ParallelIdentityAssembler",
-      "target": "CX10ParallelIdentityAssembler",
+      "current_name": "ParallelIdentityAssembler",
+      "target": "ParallelIdentityAssembler",
       "status": "unchanged",
       "role_decomposition": "unresolved",
       "evidence": [
@@ -31865,11 +31865,11 @@
       "consumer_files": []
     },
     {
-      "identity": "growatt_pcs_parallel_identity.go:go_type:package:CX10ParallelIdentitySnapshot",
+      "identity": "growatt_pcs_parallel_identity.go:go_type:package:ParallelIdentitySnapshot",
       "owning_file": "growatt_pcs_parallel_identity.go",
       "kind": "go_type",
-      "current_name": "CX10ParallelIdentitySnapshot",
-      "target": "CX10ParallelIdentitySnapshot",
+      "current_name": "ParallelIdentitySnapshot",
+      "target": "ParallelIdentitySnapshot",
       "status": "unchanged",
       "role_decomposition": "unresolved",
       "evidence": [
@@ -32385,7 +32385,7 @@
       ]
     },
     {
-      "identity": "growatt_pcs_parallel_release11.go:go_field:CX11ParallelContext:CategoryFirst",
+      "identity": "growatt_pcs_parallel_release11.go:go_field:ParallelContext:CategoryFirst",
       "owning_file": "growatt_pcs_parallel_release11.go",
       "kind": "go_field",
       "current_name": "CategoryFirst",
@@ -32401,7 +32401,7 @@
       "consumer_files": []
     },
     {
-      "identity": "growatt_pcs_parallel_release11.go:go_field:CX11ParallelContext:CategorySecond",
+      "identity": "growatt_pcs_parallel_release11.go:go_field:ParallelContext:CategorySecond",
       "owning_file": "growatt_pcs_parallel_release11.go",
       "kind": "go_field",
       "current_name": "CategorySecond",
@@ -32417,7 +32417,7 @@
       "consumer_files": []
     },
     {
-      "identity": "growatt_pcs_parallel_release11.go:go_field:CX11ParallelContext:CellSumValid",
+      "identity": "growatt_pcs_parallel_release11.go:go_field:ParallelContext:CellSumValid",
       "owning_file": "growatt_pcs_parallel_release11.go",
       "kind": "go_field",
       "current_name": "CellSumValid",
@@ -32433,7 +32433,7 @@
       "consumer_files": []
     },
     {
-      "identity": "growatt_pcs_parallel_release11.go:go_field:CX11ParallelContext:PackCode",
+      "identity": "growatt_pcs_parallel_release11.go:go_field:ParallelContext:PackCode",
       "owning_file": "growatt_pcs_parallel_release11.go",
       "kind": "go_field",
       "current_name": "PackCode",
@@ -32449,7 +32449,7 @@
       "consumer_files": []
     },
     {
-      "identity": "growatt_pcs_parallel_release11.go:go_field:CX11ParallelContext:Permission",
+      "identity": "growatt_pcs_parallel_release11.go:go_field:ParallelContext:Permission",
       "owning_file": "growatt_pcs_parallel_release11.go",
       "kind": "go_field",
       "current_name": "Permission",
@@ -32467,7 +32467,7 @@
       ]
     },
     {
-      "identity": "growatt_pcs_parallel_release11.go:go_field:CX11ParallelContext:SOCTenths",
+      "identity": "growatt_pcs_parallel_release11.go:go_field:ParallelContext:SOCTenths",
       "owning_file": "growatt_pcs_parallel_release11.go",
       "kind": "go_field",
       "current_name": "SOCTenths",
@@ -32483,7 +32483,7 @@
       "consumer_files": []
     },
     {
-      "identity": "growatt_pcs_parallel_release11.go:go_field:CX11ParallelContext:SOHTenths",
+      "identity": "growatt_pcs_parallel_release11.go:go_field:ParallelContext:SOHTenths",
       "owning_file": "growatt_pcs_parallel_release11.go",
       "kind": "go_field",
       "current_name": "SOHTenths",
@@ -32499,7 +32499,7 @@
       "consumer_files": []
     },
     {
-      "identity": "growatt_pcs_parallel_release11.go:go_field:CX11ParallelContext:State",
+      "identity": "growatt_pcs_parallel_release11.go:go_field:ParallelContext:State",
       "owning_file": "growatt_pcs_parallel_release11.go",
       "kind": "go_field",
       "current_name": "State",
@@ -32800,11 +32800,11 @@
       ]
     },
     {
-      "identity": "growatt_pcs_parallel_release11.go:go_function:package_or_receiver:CX11DecodeParallel",
+      "identity": "growatt_pcs_parallel_release11.go:go_function:package_or_receiver:ParallelReleaseDecodeParallel",
       "owning_file": "growatt_pcs_parallel_release11.go",
       "kind": "go_function",
-      "current_name": "CX11DecodeParallel",
-      "target": "CX11DecodeParallel",
+      "current_name": "ParallelReleaseDecodeParallel",
+      "target": "ParallelReleaseDecodeParallel",
       "status": "unchanged",
       "role_decomposition": "unresolved",
       "evidence": [
@@ -32816,11 +32816,11 @@
       "consumer_files": []
     },
     {
-      "identity": "growatt_pcs_parallel_release11.go:go_type:package:CX11ParallelContext",
+      "identity": "growatt_pcs_parallel_release11.go:go_type:package:ParallelContext",
       "owning_file": "growatt_pcs_parallel_release11.go",
       "kind": "go_type",
-      "current_name": "CX11ParallelContext",
-      "target": "CX11ParallelContext",
+      "current_name": "ParallelContext",
+      "target": "ParallelContext",
       "status": "unchanged",
       "role_decomposition": "unresolved",
       "evidence": [
@@ -36836,7 +36836,7 @@
       "consumer_files": []
     },
     {
-      "identity": "growatt_pcs_slots.go:go_field:CX08PCSInput:GroupValid",
+      "identity": "growatt_pcs_slots.go:go_field:PCSSlotPCSInput:GroupValid",
       "owning_file": "growatt_pcs_slots.go",
       "kind": "go_field",
       "current_name": "GroupValid",
@@ -36855,7 +36855,7 @@
       ]
     },
     {
-      "identity": "growatt_pcs_slots.go:go_field:CX08PCSInput:Member",
+      "identity": "growatt_pcs_slots.go:go_field:PCSSlotPCSInput:Member",
       "owning_file": "growatt_pcs_slots.go",
       "kind": "go_field",
       "current_name": "Member",
@@ -36879,7 +36879,7 @@
       ]
     },
     {
-      "identity": "growatt_pcs_slots.go:go_field:CX08PCSInput:NativeGroup",
+      "identity": "growatt_pcs_slots.go:go_field:PCSSlotPCSInput:NativeGroup",
       "owning_file": "growatt_pcs_slots.go",
       "kind": "go_field",
       "current_name": "NativeGroup",
@@ -36898,7 +36898,7 @@
       ]
     },
     {
-      "identity": "growatt_pcs_slots.go:go_field:CX08PCSInput:NativeSlot",
+      "identity": "growatt_pcs_slots.go:go_field:PCSSlotPCSInput:NativeSlot",
       "owning_file": "growatt_pcs_slots.go",
       "kind": "go_field",
       "current_name": "NativeSlot",
@@ -36918,7 +36918,7 @@
       ]
     },
     {
-      "identity": "growatt_pcs_slots.go:go_field:CX08PCSInput:SlotValid",
+      "identity": "growatt_pcs_slots.go:go_field:PCSSlotPCSInput:SlotValid",
       "owning_file": "growatt_pcs_slots.go",
       "kind": "go_field",
       "current_name": "SlotValid",
@@ -36938,11 +36938,11 @@
       ]
     },
     {
-      "identity": "growatt_pcs_slots.go:go_function:package_or_receiver:CX08DecodePCSSlots",
+      "identity": "growatt_pcs_slots.go:go_function:package_or_receiver:DecodePCSSlots",
       "owning_file": "growatt_pcs_slots.go",
       "kind": "go_function",
-      "current_name": "CX08DecodePCSSlots",
-      "target": "CX08DecodePCSSlots",
+      "current_name": "DecodePCSSlots",
+      "target": "DecodePCSSlots",
       "status": "unchanged",
       "role_decomposition": "unresolved",
       "evidence": [
@@ -36954,11 +36954,11 @@
       "consumer_files": []
     },
     {
-      "identity": "growatt_pcs_slots.go:go_type:package:CX08PCSInput",
+      "identity": "growatt_pcs_slots.go:go_type:package:PCSSlotPCSInput",
       "owning_file": "growatt_pcs_slots.go",
       "kind": "go_type",
-      "current_name": "CX08PCSInput",
-      "target": "CX08PCSInput",
+      "current_name": "PCSSlotPCSInput",
+      "target": "PCSSlotPCSInput",
       "status": "unchanged",
       "role_decomposition": "unresolved",
       "evidence": [
@@ -41002,7 +41002,7 @@
       ]
     },
     {
-      "identity": "growatt_pcs_standard.go:go_field:CX05PCSInput:Count",
+      "identity": "growatt_pcs_standard.go:go_field:PCSStandardPCSInput:Count",
       "owning_file": "growatt_pcs_standard.go",
       "kind": "go_field",
       "current_name": "Count",
@@ -41098,7 +41098,7 @@
       ]
     },
     {
-      "identity": "growatt_pcs_standard.go:go_field:CX05PCSInput:CountValid",
+      "identity": "growatt_pcs_standard.go:go_field:PCSStandardPCSInput:CountValid",
       "owning_file": "growatt_pcs_standard.go",
       "kind": "go_field",
       "current_name": "CountValid",
@@ -41121,7 +41121,7 @@
       ]
     },
     {
-      "identity": "growatt_pcs_standard.go:go_field:CX05PCSInput:FieldAges",
+      "identity": "growatt_pcs_standard.go:go_field:PCSStandardPCSInput:FieldAges",
       "owning_file": "growatt_pcs_standard.go",
       "kind": "go_field",
       "current_name": "FieldAges",
@@ -41141,7 +41141,7 @@
       ]
     },
     {
-      "identity": "growatt_pcs_standard.go:go_field:CX05PCSInput:FieldStates",
+      "identity": "growatt_pcs_standard.go:go_field:PCSStandardPCSInput:FieldStates",
       "owning_file": "growatt_pcs_standard.go",
       "kind": "go_field",
       "current_name": "FieldStates",
@@ -41160,7 +41160,7 @@
       ]
     },
     {
-      "identity": "growatt_pcs_standard.go:go_field:CX05PCSInput:IndexMaximum",
+      "identity": "growatt_pcs_standard.go:go_field:PCSStandardPCSInput:IndexMaximum",
       "owning_file": "growatt_pcs_standard.go",
       "kind": "go_field",
       "current_name": "IndexMaximum",
@@ -41176,7 +41176,7 @@
       "consumer_files": []
     },
     {
-      "identity": "growatt_pcs_standard.go:go_field:CX05PCSInput:IndexMinimum",
+      "identity": "growatt_pcs_standard.go:go_field:PCSStandardPCSInput:IndexMinimum",
       "owning_file": "growatt_pcs_standard.go",
       "kind": "go_field",
       "current_name": "IndexMinimum",
@@ -41192,7 +41192,7 @@
       "consumer_files": []
     },
     {
-      "identity": "growatt_pcs_standard.go:go_field:CX05PCSInput:IndexScope",
+      "identity": "growatt_pcs_standard.go:go_field:PCSStandardPCSInput:IndexScope",
       "owning_file": "growatt_pcs_standard.go",
       "kind": "go_field",
       "current_name": "IndexScope",
@@ -41208,7 +41208,7 @@
       "consumer_files": []
     },
     {
-      "identity": "growatt_pcs_standard.go:go_field:CX05PCSInput:IndexValid",
+      "identity": "growatt_pcs_standard.go:go_field:PCSStandardPCSInput:IndexValid",
       "owning_file": "growatt_pcs_standard.go",
       "kind": "go_field",
       "current_name": "IndexValid",
@@ -41224,7 +41224,7 @@
       "consumer_files": []
     },
     {
-      "identity": "growatt_pcs_standard.go:go_field:CX05PCSInput:MeasurementValid",
+      "identity": "growatt_pcs_standard.go:go_field:PCSStandardPCSInput:MeasurementValid",
       "owning_file": "growatt_pcs_standard.go",
       "kind": "go_field",
       "current_name": "MeasurementValid",
@@ -41246,7 +41246,7 @@
       ]
     },
     {
-      "identity": "growatt_pcs_standard.go:go_field:CX05PCSInput:NativeRecord",
+      "identity": "growatt_pcs_standard.go:go_field:PCSStandardPCSInput:NativeRecord",
       "owning_file": "growatt_pcs_standard.go",
       "kind": "go_field",
       "current_name": "NativeRecord",
@@ -41267,7 +41267,7 @@
       ]
     },
     {
-      "identity": "growatt_pcs_standard.go:go_field:CX05PCSInput:PublisherResolved",
+      "identity": "growatt_pcs_standard.go:go_field:PCSStandardPCSInput:PublisherResolved",
       "owning_file": "growatt_pcs_standard.go",
       "kind": "go_field",
       "current_name": "PublisherResolved",
@@ -41290,7 +41290,7 @@
       ]
     },
     {
-      "identity": "growatt_pcs_standard.go:go_field:CX05PCSInput:TemperatureValid",
+      "identity": "growatt_pcs_standard.go:go_field:PCSStandardPCSInput:TemperatureValid",
       "owning_file": "growatt_pcs_standard.go",
       "kind": "go_field",
       "current_name": "TemperatureValid",
@@ -41310,7 +41310,7 @@
       ]
     },
     {
-      "identity": "growatt_pcs_standard.go:go_field:CX05PCSResult:Diagnostics",
+      "identity": "growatt_pcs_standard.go:go_field:PCSStandardPCSResult:Diagnostics",
       "owning_file": "growatt_pcs_standard.go",
       "kind": "go_field",
       "current_name": "Diagnostics",
@@ -41372,11 +41372,11 @@
       ]
     },
     {
-      "identity": "growatt_pcs_standard.go:go_function:package_or_receiver:CX05DecodePCSStandard",
+      "identity": "growatt_pcs_standard.go:go_function:package_or_receiver:DecodePCSStandard",
       "owning_file": "growatt_pcs_standard.go",
       "kind": "go_function",
-      "current_name": "CX05DecodePCSStandard",
-      "target": "CX05DecodePCSStandard",
+      "current_name": "DecodePCSStandard",
+      "target": "DecodePCSStandard",
       "status": "unchanged",
       "role_decomposition": "unresolved",
       "evidence": [
@@ -41388,11 +41388,11 @@
       "consumer_files": []
     },
     {
-      "identity": "growatt_pcs_standard.go:go_function:package_or_receiver:CX05RetainAccepted",
+      "identity": "growatt_pcs_standard.go:go_function:package_or_receiver:RetainAccepted",
       "owning_file": "growatt_pcs_standard.go",
       "kind": "go_function",
-      "current_name": "CX05RetainAccepted",
-      "target": "CX05RetainAccepted",
+      "current_name": "RetainAccepted",
+      "target": "RetainAccepted",
       "status": "unchanged",
       "role_decomposition": "unresolved",
       "evidence": [
@@ -41404,11 +41404,11 @@
       "consumer_files": []
     },
     {
-      "identity": "growatt_pcs_standard.go:go_type:package:CX05PCSInput",
+      "identity": "growatt_pcs_standard.go:go_type:package:PCSStandardPCSInput",
       "owning_file": "growatt_pcs_standard.go",
       "kind": "go_type",
-      "current_name": "CX05PCSInput",
-      "target": "CX05PCSInput",
+      "current_name": "PCSStandardPCSInput",
+      "target": "PCSStandardPCSInput",
       "status": "unchanged",
       "role_decomposition": "unresolved",
       "evidence": [
@@ -41420,11 +41420,11 @@
       "consumer_files": []
     },
     {
-      "identity": "growatt_pcs_standard.go:go_type:package:CX05PCSResult",
+      "identity": "growatt_pcs_standard.go:go_type:package:PCSStandardPCSResult",
       "owning_file": "growatt_pcs_standard.go",
       "kind": "go_type",
-      "current_name": "CX05PCSResult",
-      "target": "CX05PCSResult",
+      "current_name": "PCSStandardPCSResult",
+      "target": "PCSStandardPCSResult",
       "status": "unchanged",
       "role_decomposition": "unresolved",
       "evidence": [
@@ -46238,7 +46238,7 @@
       "consumer_files": []
     },
     {
-      "identity": "growatt_pcs_summaries.go:go_field:CX14PCSInput:Condition131",
+      "identity": "growatt_pcs_summaries.go:go_field:PCSSummaryPCSInput:Condition131",
       "owning_file": "growatt_pcs_summaries.go",
       "kind": "go_field",
       "current_name": "Condition131",
@@ -46254,7 +46254,7 @@
       "consumer_files": []
     },
     {
-      "identity": "growatt_pcs_summaries.go:go_field:CX14PCSInput:Condition132",
+      "identity": "growatt_pcs_summaries.go:go_field:PCSSummaryPCSInput:Condition132",
       "owning_file": "growatt_pcs_summaries.go",
       "kind": "go_field",
       "current_name": "Condition132",
@@ -46270,7 +46270,7 @@
       "consumer_files": []
     },
     {
-      "identity": "growatt_pcs_summaries.go:go_field:CX14PCSInput:ControlActive",
+      "identity": "growatt_pcs_summaries.go:go_field:PCSSummaryPCSInput:ControlActive",
       "owning_file": "growatt_pcs_summaries.go",
       "kind": "go_field",
       "current_name": "ControlActive",
@@ -46286,7 +46286,7 @@
       "consumer_files": []
     },
     {
-      "identity": "growatt_pcs_summaries.go:go_field:CX14PCSInput:LocalSummaryQualified",
+      "identity": "growatt_pcs_summaries.go:go_field:PCSSummaryPCSInput:LocalSummaryQualified",
       "owning_file": "growatt_pcs_summaries.go",
       "kind": "go_field",
       "current_name": "LocalSummaryQualified",
@@ -46302,7 +46302,7 @@
       "consumer_files": []
     },
     {
-      "identity": "growatt_pcs_summaries.go:go_field:CX14PCSInput:StateCode",
+      "identity": "growatt_pcs_summaries.go:go_field:PCSSummaryPCSInput:StateCode",
       "owning_file": "growatt_pcs_summaries.go",
       "kind": "go_field",
       "current_name": "StateCode",
@@ -46318,7 +46318,7 @@
       "consumer_files": []
     },
     {
-      "identity": "growatt_pcs_summaries.go:go_field:CX14PCSResult:Bits",
+      "identity": "growatt_pcs_summaries.go:go_field:PCSSummaryPCSResult:Bits",
       "owning_file": "growatt_pcs_summaries.go",
       "kind": "go_field",
       "current_name": "Bits",
@@ -46336,7 +46336,7 @@
       ]
     },
     {
-      "identity": "growatt_pcs_summaries.go:go_field:CX14PCSResult:Diagnostics",
+      "identity": "growatt_pcs_summaries.go:go_field:PCSSummaryPCSResult:Diagnostics",
       "owning_file": "growatt_pcs_summaries.go",
       "kind": "go_field",
       "current_name": "Diagnostics",
@@ -46398,7 +46398,7 @@
       ]
     },
     {
-      "identity": "growatt_pcs_summaries.go:go_field:CX14SummaryBit:Alternatives",
+      "identity": "growatt_pcs_summaries.go:go_field:SummaryBit:Alternatives",
       "owning_file": "growatt_pcs_summaries.go",
       "kind": "go_field",
       "current_name": "Alternatives",
@@ -46416,7 +46416,7 @@
       ]
     },
     {
-      "identity": "growatt_pcs_summaries.go:go_field:CX14SummaryBit:ConditionalAlternatives",
+      "identity": "growatt_pcs_summaries.go:go_field:SummaryBit:ConditionalAlternatives",
       "owning_file": "growatt_pcs_summaries.go",
       "kind": "go_field",
       "current_name": "ConditionalAlternatives",
@@ -46432,7 +46432,7 @@
       "consumer_files": []
     },
     {
-      "identity": "growatt_pcs_summaries.go:go_field:CX14SummaryBit:Field",
+      "identity": "growatt_pcs_summaries.go:go_field:SummaryBit:Field",
       "owning_file": "growatt_pcs_summaries.go",
       "kind": "go_field",
       "current_name": "Field",
@@ -46575,11 +46575,11 @@
       ]
     },
     {
-      "identity": "growatt_pcs_summaries.go:go_function:package_or_receiver:CX14DecodePCSSummaries",
+      "identity": "growatt_pcs_summaries.go:go_function:package_or_receiver:DecodePCSSummaries",
       "owning_file": "growatt_pcs_summaries.go",
       "kind": "go_function",
-      "current_name": "CX14DecodePCSSummaries",
-      "target": "CX14DecodePCSSummaries",
+      "current_name": "DecodePCSSummaries",
+      "target": "DecodePCSSummaries",
       "status": "unchanged",
       "role_decomposition": "unresolved",
       "evidence": [
@@ -46591,11 +46591,11 @@
       "consumer_files": []
     },
     {
-      "identity": "growatt_pcs_summaries.go:go_type:package:CX14PCSInput",
+      "identity": "growatt_pcs_summaries.go:go_type:package:PCSSummaryPCSInput",
       "owning_file": "growatt_pcs_summaries.go",
       "kind": "go_type",
-      "current_name": "CX14PCSInput",
-      "target": "CX14PCSInput",
+      "current_name": "PCSSummaryPCSInput",
+      "target": "PCSSummaryPCSInput",
       "status": "unchanged",
       "role_decomposition": "unresolved",
       "evidence": [
@@ -46607,11 +46607,11 @@
       "consumer_files": []
     },
     {
-      "identity": "growatt_pcs_summaries.go:go_type:package:CX14PCSResult",
+      "identity": "growatt_pcs_summaries.go:go_type:package:PCSSummaryPCSResult",
       "owning_file": "growatt_pcs_summaries.go",
       "kind": "go_type",
-      "current_name": "CX14PCSResult",
-      "target": "CX14PCSResult",
+      "current_name": "PCSSummaryPCSResult",
+      "target": "PCSSummaryPCSResult",
       "status": "unchanged",
       "role_decomposition": "unresolved",
       "evidence": [
@@ -46623,11 +46623,11 @@
       "consumer_files": []
     },
     {
-      "identity": "growatt_pcs_summaries.go:go_type:package:CX14SummaryBit",
+      "identity": "growatt_pcs_summaries.go:go_type:package:SummaryBit",
       "owning_file": "growatt_pcs_summaries.go",
       "kind": "go_type",
-      "current_name": "CX14SummaryBit",
-      "target": "CX14SummaryBit",
+      "current_name": "SummaryBit",
+      "target": "SummaryBit",
       "status": "unchanged",
       "role_decomposition": "unresolved",
       "evidence": [
@@ -47960,7 +47960,7 @@
       ]
     },
     {
-      "identity": "growatt_project_admission.go:go_field:CX16Diagnostic:Input",
+      "identity": "growatt_project_admission.go:go_field:Diagnostic:Input",
       "owning_file": "growatt_project_admission.go",
       "kind": "go_field",
       "current_name": "Input",
@@ -48049,7 +48049,7 @@
       ]
     },
     {
-      "identity": "growatt_project_admission.go:go_field:CX16Diagnostic:NativeRecord",
+      "identity": "growatt_project_admission.go:go_field:Diagnostic:NativeRecord",
       "owning_file": "growatt_project_admission.go",
       "kind": "go_field",
       "current_name": "NativeRecord",
@@ -48070,7 +48070,7 @@
       ]
     },
     {
-      "identity": "growatt_project_admission.go:go_field:CX16Diagnostic:Status",
+      "identity": "growatt_project_admission.go:go_field:Diagnostic:Status",
       "owning_file": "growatt_project_admission.go",
       "kind": "go_field",
       "current_name": "Status",
@@ -48296,7 +48296,7 @@
       ]
     },
     {
-      "identity": "growatt_project_admission.go:go_field:CX16Projection:Current",
+      "identity": "growatt_project_admission.go:go_field:ReplayProjection:Current",
       "owning_file": "growatt_project_admission.go",
       "kind": "go_field",
       "current_name": "Current",
@@ -48463,7 +48463,7 @@
       ]
     },
     {
-      "identity": "growatt_project_admission.go:go_field:CX16Projection:Diagnostics",
+      "identity": "growatt_project_admission.go:go_field:ReplayProjection:Diagnostics",
       "owning_file": "growatt_project_admission.go",
       "kind": "go_field",
       "current_name": "Diagnostics",
@@ -48525,7 +48525,7 @@
       ]
     },
     {
-      "identity": "growatt_project_admission.go:go_field:CX16Projection:LastGood",
+      "identity": "growatt_project_admission.go:go_field:ReplayProjection:LastGood",
       "owning_file": "growatt_project_admission.go",
       "kind": "go_field",
       "current_name": "LastGood",
@@ -48554,7 +48554,7 @@
       ]
     },
     {
-      "identity": "growatt_project_admission.go:go_field:CX16Projection:Native",
+      "identity": "growatt_project_admission.go:go_field:ReplayProjection:Native",
       "owning_file": "growatt_project_admission.go",
       "kind": "go_field",
       "current_name": "Native",
@@ -48741,7 +48741,7 @@
       ]
     },
     {
-      "identity": "growatt_project_admission.go:go_field:CX16Projection:PhysicalQualified",
+      "identity": "growatt_project_admission.go:go_field:ReplayProjection:PhysicalQualified",
       "owning_file": "growatt_project_admission.go",
       "kind": "go_field",
       "current_name": "PhysicalQualified",
@@ -48766,7 +48766,7 @@
       ]
     },
     {
-      "identity": "growatt_project_admission.go:go_field:CX16Projection:RetainedNative",
+      "identity": "growatt_project_admission.go:go_field:ReplayProjection:RetainedNative",
       "owning_file": "growatt_project_admission.go",
       "kind": "go_field",
       "current_name": "RetainedNative",
@@ -48785,7 +48785,7 @@
       ]
     },
     {
-      "identity": "growatt_project_admission.go:go_field:CX16Projection:SummaryBits",
+      "identity": "growatt_project_admission.go:go_field:ReplayProjection:SummaryBits",
       "owning_file": "growatt_project_admission.go",
       "kind": "go_field",
       "current_name": "SummaryBits",
@@ -48801,7 +48801,7 @@
       "consumer_files": []
     },
     {
-      "identity": "growatt_project_admission.go:go_field:CX16ReplayInput:BalanceGate",
+      "identity": "growatt_project_admission.go:go_field:ReplayInput:BalanceGate",
       "owning_file": "growatt_project_admission.go",
       "kind": "go_field",
       "current_name": "BalanceGate",
@@ -48817,7 +48817,7 @@
       "consumer_files": []
     },
     {
-      "identity": "growatt_project_admission.go:go_field:CX16ReplayInput:CellContributors",
+      "identity": "growatt_project_admission.go:go_field:ReplayInput:CellContributors",
       "owning_file": "growatt_project_admission.go",
       "kind": "go_field",
       "current_name": "CellContributors",
@@ -48835,7 +48835,7 @@
       ]
     },
     {
-      "identity": "growatt_project_admission.go:go_field:CX16ReplayInput:CellCount",
+      "identity": "growatt_project_admission.go:go_field:ReplayInput:CellCount",
       "owning_file": "growatt_project_admission.go",
       "kind": "go_field",
       "current_name": "CellCount",
@@ -48855,7 +48855,7 @@
       ]
     },
     {
-      "identity": "growatt_project_admission.go:go_field:CX16ReplayInput:CellCountValid",
+      "identity": "growatt_project_admission.go:go_field:ReplayInput:CellCountValid",
       "owning_file": "growatt_project_admission.go",
       "kind": "go_field",
       "current_name": "CellCountValid",
@@ -48875,7 +48875,7 @@
       ]
     },
     {
-      "identity": "growatt_project_admission.go:go_field:CX16ReplayInput:CellGates",
+      "identity": "growatt_project_admission.go:go_field:ReplayInput:CellGates",
       "owning_file": "growatt_project_admission.go",
       "kind": "go_field",
       "current_name": "CellGates",
@@ -48896,7 +48896,7 @@
       ]
     },
     {
-      "identity": "growatt_project_admission.go:go_field:CX16ReplayInput:HardwareAge",
+      "identity": "growatt_project_admission.go:go_field:ReplayInput:HardwareAge",
       "owning_file": "growatt_project_admission.go",
       "kind": "go_field",
       "current_name": "HardwareAge",
@@ -48912,7 +48912,7 @@
       "consumer_files": []
     },
     {
-      "identity": "growatt_project_admission.go:go_field:CX16ReplayInput:HardwareAgeKnown",
+      "identity": "growatt_project_admission.go:go_field:ReplayInput:HardwareAgeKnown",
       "owning_file": "growatt_project_admission.go",
       "kind": "go_field",
       "current_name": "HardwareAgeKnown",
@@ -48928,7 +48928,7 @@
       "consumer_files": []
     },
     {
-      "identity": "growatt_project_admission.go:go_field:CX16ReplayInput:MeanGate",
+      "identity": "growatt_project_admission.go:go_field:ReplayInput:MeanGate",
       "owning_file": "growatt_project_admission.go",
       "kind": "go_field",
       "current_name": "MeanGate",
@@ -48946,7 +48946,7 @@
       ]
     },
     {
-      "identity": "growatt_project_admission.go:go_field:CX16ReplayInput:PCS",
+      "identity": "growatt_project_admission.go:go_field:ReplayInput:PCS",
       "owning_file": "growatt_project_admission.go",
       "kind": "go_field",
       "current_name": "PCS",
@@ -48981,7 +48981,7 @@
       ]
     },
     {
-      "identity": "growatt_project_admission.go:go_field:CX16ReplayInput:Parallel",
+      "identity": "growatt_project_admission.go:go_field:ReplayInput:Parallel",
       "owning_file": "growatt_project_admission.go",
       "kind": "go_field",
       "current_name": "Parallel",
@@ -49147,7 +49147,7 @@
       ]
     },
     {
-      "identity": "growatt_project_admission.go:go_field:CX16ReplayInput:Selection",
+      "identity": "growatt_project_admission.go:go_field:ReplayInput:Selection",
       "owning_file": "growatt_project_admission.go",
       "kind": "go_field",
       "current_name": "Selection",
@@ -49222,7 +49222,7 @@
       ]
     },
     {
-      "identity": "growatt_project_admission.go:go_field:CX16ReplayInput:SensorCount",
+      "identity": "growatt_project_admission.go:go_field:ReplayInput:SensorCount",
       "owning_file": "growatt_project_admission.go",
       "kind": "go_field",
       "current_name": "SensorCount",
@@ -49240,7 +49240,7 @@
       ]
     },
     {
-      "identity": "growatt_project_admission.go:go_field:CX16ReplayInput:SensorCountValid",
+      "identity": "growatt_project_admission.go:go_field:ReplayInput:SensorCountValid",
       "owning_file": "growatt_project_admission.go",
       "kind": "go_field",
       "current_name": "SensorCountValid",
@@ -49258,7 +49258,7 @@
       ]
     },
     {
-      "identity": "growatt_project_admission.go:go_field:CX16ReplayInput:SensorGates",
+      "identity": "growatt_project_admission.go:go_field:ReplayInput:SensorGates",
       "owning_file": "growatt_project_admission.go",
       "kind": "go_field",
       "current_name": "SensorGates",
@@ -49276,7 +49276,7 @@
       ]
     },
     {
-      "identity": "growatt_project_admission.go:go_field:CX16ReplayInput:Summary",
+      "identity": "growatt_project_admission.go:go_field:ReplayInput:Summary",
       "owning_file": "growatt_project_admission.go",
       "kind": "go_field",
       "current_name": "Summary",
@@ -49333,7 +49333,7 @@
       ]
     },
     {
-      "identity": "growatt_project_admission.go:go_field:CX16ReplayInput:TemperatureSummary",
+      "identity": "growatt_project_admission.go:go_field:ReplayInput:TemperatureSummary",
       "owning_file": "growatt_project_admission.go",
       "kind": "go_field",
       "current_name": "TemperatureSummary",
@@ -49349,7 +49349,7 @@
       "consumer_files": []
     },
     {
-      "identity": "growatt_project_admission.go:go_field:CX16ReplayInput:TopologyAssociated",
+      "identity": "growatt_project_admission.go:go_field:ReplayInput:TopologyAssociated",
       "owning_file": "growatt_project_admission.go",
       "kind": "go_field",
       "current_name": "TopologyAssociated",
@@ -49411,11 +49411,11 @@
       "consumer_files": []
     },
     {
-      "identity": "growatt_project_admission.go:go_type:package:CX16Diagnostic",
+      "identity": "growatt_project_admission.go:go_type:package:Diagnostic",
       "owning_file": "growatt_project_admission.go",
       "kind": "go_type",
-      "current_name": "CX16Diagnostic",
-      "target": "CX16Diagnostic",
+      "current_name": "Diagnostic",
+      "target": "Diagnostic",
       "status": "unchanged",
       "role_decomposition": "unresolved",
       "evidence": [
@@ -49427,11 +49427,11 @@
       "consumer_files": []
     },
     {
-      "identity": "growatt_project_admission.go:go_type:package:CX16Projection",
+      "identity": "growatt_project_admission.go:go_type:package:ReplayProjection",
       "owning_file": "growatt_project_admission.go",
       "kind": "go_type",
-      "current_name": "CX16Projection",
-      "target": "CX16Projection",
+      "current_name": "ReplayProjection",
+      "target": "ReplayProjection",
       "status": "unchanged",
       "role_decomposition": "unresolved",
       "evidence": [
@@ -49443,11 +49443,11 @@
       "consumer_files": []
     },
     {
-      "identity": "growatt_project_admission.go:go_type:package:CX16ReplayInput",
+      "identity": "growatt_project_admission.go:go_type:package:ReplayInput",
       "owning_file": "growatt_project_admission.go",
       "kind": "go_type",
-      "current_name": "CX16ReplayInput",
-      "target": "CX16ReplayInput",
+      "current_name": "ReplayInput",
+      "target": "ReplayInput",
       "status": "unchanged",
       "role_decomposition": "unresolved",
       "evidence": [
@@ -50550,7 +50550,7 @@
       ]
     },
     {
-      "identity": "growatt_project_capabilities.go:go_field:CX15ReceiverContext:AddressingKnown",
+      "identity": "growatt_project_capabilities.go:go_field:ReceiverContext:AddressingKnown",
       "owning_file": "growatt_project_capabilities.go",
       "kind": "go_field",
       "current_name": "AddressingKnown",
@@ -50566,7 +50566,7 @@
       "consumer_files": []
     },
     {
-      "identity": "growatt_project_capabilities.go:go_field:CX15ReceiverContext:Assigned",
+      "identity": "growatt_project_capabilities.go:go_field:ReceiverContext:Assigned",
       "owning_file": "growatt_project_capabilities.go",
       "kind": "go_field",
       "current_name": "Assigned",
@@ -50584,7 +50584,7 @@
       ]
     },
     {
-      "identity": "growatt_project_capabilities.go:go_field:CX15ReceiverContext:CommunicationKnown",
+      "identity": "growatt_project_capabilities.go:go_field:ReceiverContext:CommunicationKnown",
       "owning_file": "growatt_project_capabilities.go",
       "kind": "go_field",
       "current_name": "CommunicationKnown",
@@ -50600,7 +50600,7 @@
       "consumer_files": []
     },
     {
-      "identity": "growatt_project_capabilities.go:go_field:CX15ReceiverContext:CommunicationState",
+      "identity": "growatt_project_capabilities.go:go_field:ReceiverContext:CommunicationState",
       "owning_file": "growatt_project_capabilities.go",
       "kind": "go_field",
       "current_name": "CommunicationState",
@@ -50616,7 +50616,7 @@
       "consumer_files": []
     },
     {
-      "identity": "growatt_project_capabilities.go:go_field:CX15ReceiverContext:Direction",
+      "identity": "growatt_project_capabilities.go:go_field:ReceiverContext:Direction",
       "owning_file": "growatt_project_capabilities.go",
       "kind": "go_field",
       "current_name": "Direction",
@@ -50723,7 +50723,7 @@
       ]
     },
     {
-      "identity": "growatt_project_capabilities.go:go_field:CX15ReceiverContext:Form",
+      "identity": "growatt_project_capabilities.go:go_field:ReceiverContext:Form",
       "owning_file": "growatt_project_capabilities.go",
       "kind": "go_field",
       "current_name": "Form",
@@ -50743,7 +50743,7 @@
       ]
     },
     {
-      "identity": "growatt_project_capabilities.go:go_field:CX15ReceiverContext:LocalCount",
+      "identity": "growatt_project_capabilities.go:go_field:ReceiverContext:LocalCount",
       "owning_file": "growatt_project_capabilities.go",
       "kind": "go_field",
       "current_name": "LocalCount",
@@ -50759,7 +50759,7 @@
       "consumer_files": []
     },
     {
-      "identity": "growatt_project_capabilities.go:go_field:CX15ReceiverContext:LocalCountKnown",
+      "identity": "growatt_project_capabilities.go:go_field:ReceiverContext:LocalCountKnown",
       "owning_file": "growatt_project_capabilities.go",
       "kind": "go_field",
       "current_name": "LocalCountKnown",
@@ -50775,7 +50775,7 @@
       "consumer_files": []
     },
     {
-      "identity": "growatt_project_capabilities.go:go_field:CX15ReceiverContext:NativeCount",
+      "identity": "growatt_project_capabilities.go:go_field:ReceiverContext:NativeCount",
       "owning_file": "growatt_project_capabilities.go",
       "kind": "go_field",
       "current_name": "NativeCount",
@@ -50791,7 +50791,7 @@
       "consumer_files": []
     },
     {
-      "identity": "growatt_project_capabilities.go:go_field:CX15ReceiverContext:Profile",
+      "identity": "growatt_project_capabilities.go:go_field:ReceiverContext:Profile",
       "owning_file": "growatt_project_capabilities.go",
       "kind": "go_field",
       "current_name": "Profile",
@@ -50940,7 +50940,7 @@
       ]
     },
     {
-      "identity": "growatt_project_capabilities.go:go_field:CX15ReceiverContext:Role",
+      "identity": "growatt_project_capabilities.go:go_field:ReceiverContext:Role",
       "owning_file": "growatt_project_capabilities.go",
       "kind": "go_field",
       "current_name": "Role",
@@ -51019,7 +51019,7 @@
       ]
     },
     {
-      "identity": "growatt_project_capabilities.go:go_field:CX15ReceiverContext:Session",
+      "identity": "growatt_project_capabilities.go:go_field:ReceiverContext:Session",
       "owning_file": "growatt_project_capabilities.go",
       "kind": "go_field",
       "current_name": "Session",
@@ -51070,7 +51070,7 @@
       ]
     },
     {
-      "identity": "growatt_project_capabilities.go:go_field:CX15ReceiverResult:Admitted",
+      "identity": "growatt_project_capabilities.go:go_field:ReceiverResult:Admitted",
       "owning_file": "growatt_project_capabilities.go",
       "kind": "go_field",
       "current_name": "Admitted",
@@ -51122,7 +51122,7 @@
       ]
     },
     {
-      "identity": "growatt_project_capabilities.go:go_field:CX15ReceiverResult:Class",
+      "identity": "growatt_project_capabilities.go:go_field:ReceiverResult:Class",
       "owning_file": "growatt_project_capabilities.go",
       "kind": "go_field",
       "current_name": "Class",
@@ -51186,7 +51186,7 @@
       ]
     },
     {
-      "identity": "growatt_project_capabilities.go:go_field:CX15ReceiverResult:Context",
+      "identity": "growatt_project_capabilities.go:go_field:ReceiverResult:Context",
       "owning_file": "growatt_project_capabilities.go",
       "kind": "go_field",
       "current_name": "Context",
@@ -51627,7 +51627,7 @@
       ]
     },
     {
-      "identity": "growatt_project_capabilities.go:go_field:CX15ReceiverResult:Description",
+      "identity": "growatt_project_capabilities.go:go_field:ReceiverResult:Description",
       "owning_file": "growatt_project_capabilities.go",
       "kind": "go_field",
       "current_name": "Description",
@@ -51724,7 +51724,7 @@
       ]
     },
     {
-      "identity": "growatt_project_capabilities.go:go_field:CX15ReceiverResult:Grade",
+      "identity": "growatt_project_capabilities.go:go_field:ReceiverResult:Grade",
       "owning_file": "growatt_project_capabilities.go",
       "kind": "go_field",
       "current_name": "Grade",
@@ -51756,7 +51756,7 @@
       ]
     },
     {
-      "identity": "growatt_project_capabilities.go:go_field:CX15ReceiverResult:Input",
+      "identity": "growatt_project_capabilities.go:go_field:ReceiverResult:Input",
       "owning_file": "growatt_project_capabilities.go",
       "kind": "go_field",
       "current_name": "Input",
@@ -51845,7 +51845,7 @@
       ]
     },
     {
-      "identity": "growatt_project_capabilities.go:go_field:CX15ReceiverResult:NativeFreshnessCount",
+      "identity": "growatt_project_capabilities.go:go_field:ReceiverResult:NativeFreshnessCount",
       "owning_file": "growatt_project_capabilities.go",
       "kind": "go_field",
       "current_name": "NativeFreshnessCount",
@@ -51861,7 +51861,7 @@
       "consumer_files": []
     },
     {
-      "identity": "growatt_project_capabilities.go:go_field:CX15ReceiverResult:PhysicalQualified",
+      "identity": "growatt_project_capabilities.go:go_field:ReceiverResult:PhysicalQualified",
       "owning_file": "growatt_project_capabilities.go",
       "kind": "go_field",
       "current_name": "PhysicalQualified",
@@ -51886,7 +51886,7 @@
       ]
     },
     {
-      "identity": "growatt_project_capabilities.go:go_field:CX15ReceiverResult:Raw",
+      "identity": "growatt_project_capabilities.go:go_field:ReceiverResult:Raw",
       "owning_file": "growatt_project_capabilities.go",
       "kind": "go_field",
       "current_name": "Raw",
@@ -52017,7 +52017,7 @@
       ]
     },
     {
-      "identity": "growatt_project_capabilities.go:go_field:CX15ReceiverResult:Status",
+      "identity": "growatt_project_capabilities.go:go_field:ReceiverResult:Status",
       "owning_file": "growatt_project_capabilities.go",
       "kind": "go_field",
       "current_name": "Status",
@@ -52243,11 +52243,11 @@
       ]
     },
     {
-      "identity": "growatt_project_capabilities.go:go_function:package_or_receiver:CX15ClassifyReceiver",
+      "identity": "growatt_project_capabilities.go:go_function:package_or_receiver:ClassifyReceiver",
       "owning_file": "growatt_project_capabilities.go",
       "kind": "go_function",
-      "current_name": "CX15ClassifyReceiver",
-      "target": "CX15ClassifyReceiver",
+      "current_name": "ClassifyReceiver",
+      "target": "ClassifyReceiver",
       "status": "unchanged",
       "role_decomposition": "unresolved",
       "evidence": [
@@ -52259,11 +52259,11 @@
       "consumer_files": []
     },
     {
-      "identity": "growatt_project_capabilities.go:go_type:package:CX15ReceiverContext",
+      "identity": "growatt_project_capabilities.go:go_type:package:ReceiverContext",
       "owning_file": "growatt_project_capabilities.go",
       "kind": "go_type",
-      "current_name": "CX15ReceiverContext",
-      "target": "CX15ReceiverContext",
+      "current_name": "ReceiverContext",
+      "target": "ReceiverContext",
       "status": "unchanged",
       "role_decomposition": "unresolved",
       "evidence": [
@@ -52275,11 +52275,11 @@
       "consumer_files": []
     },
     {
-      "identity": "growatt_project_capabilities.go:go_type:package:CX15ReceiverResult",
+      "identity": "growatt_project_capabilities.go:go_type:package:ReceiverResult",
       "owning_file": "growatt_project_capabilities.go",
       "kind": "go_type",
-      "current_name": "CX15ReceiverResult",
-      "target": "CX15ReceiverResult",
+      "current_name": "ReceiverResult",
+      "target": "ReceiverResult",
       "status": "unchanged",
       "role_decomposition": "unresolved",
       "evidence": [
@@ -54930,11 +54930,11 @@
       ]
     },
     {
-      "identity": "growatt_project_conditions.go:go_function:package_or_receiver:CX13LabelCondition",
+      "identity": "growatt_project_conditions.go:go_function:package_or_receiver:LabelCondition",
       "owning_file": "growatt_project_conditions.go",
       "kind": "go_function",
-      "current_name": "CX13LabelCondition",
-      "target": "CX13LabelCondition",
+      "current_name": "LabelCondition",
+      "target": "LabelCondition",
       "status": "unchanged",
       "role_decomposition": "unresolved",
       "evidence": [
@@ -55466,7 +55466,7 @@
       "consumer_files": []
     },
     {
-      "identity": "growatt_project_counter.go:go_field:CX08CounterInput:TailSelected",
+      "identity": "growatt_project_counter.go:go_field:CounterInput:TailSelected",
       "owning_file": "growatt_project_counter.go",
       "kind": "go_field",
       "current_name": "TailSelected",
@@ -55482,11 +55482,11 @@
       "consumer_files": []
     },
     {
-      "identity": "growatt_project_counter.go:go_function:package_or_receiver:CX08ExplainCounter",
+      "identity": "growatt_project_counter.go:go_function:package_or_receiver:ExplainCounter",
       "owning_file": "growatt_project_counter.go",
       "kind": "go_function",
-      "current_name": "CX08ExplainCounter",
-      "target": "CX08ExplainCounter",
+      "current_name": "ExplainCounter",
+      "target": "ExplainCounter",
       "status": "unchanged",
       "role_decomposition": "unresolved",
       "evidence": [
@@ -55498,11 +55498,11 @@
       "consumer_files": []
     },
     {
-      "identity": "growatt_project_counter.go:go_function:package_or_receiver:CX08ExplainTail",
+      "identity": "growatt_project_counter.go:go_function:package_or_receiver:ExplainTail",
       "owning_file": "growatt_project_counter.go",
       "kind": "go_function",
-      "current_name": "CX08ExplainTail",
-      "target": "CX08ExplainTail",
+      "current_name": "ExplainTail",
+      "target": "ExplainTail",
       "status": "unchanged",
       "role_decomposition": "unresolved",
       "evidence": [
@@ -55514,11 +55514,11 @@
       "consumer_files": []
     },
     {
-      "identity": "growatt_project_counter.go:go_function:package_or_receiver:CX08RefineCounter",
+      "identity": "growatt_project_counter.go:go_function:package_or_receiver:RefineCounter",
       "owning_file": "growatt_project_counter.go",
       "kind": "go_function",
-      "current_name": "CX08RefineCounter",
-      "target": "CX08RefineCounter",
+      "current_name": "RefineCounter",
+      "target": "RefineCounter",
       "status": "unchanged",
       "role_decomposition": "unresolved",
       "evidence": [
@@ -55530,11 +55530,11 @@
       "consumer_files": []
     },
     {
-      "identity": "growatt_project_counter.go:go_type:package:CX08CounterInput",
+      "identity": "growatt_project_counter.go:go_type:package:CounterInput",
       "owning_file": "growatt_project_counter.go",
       "kind": "go_type",
-      "current_name": "CX08CounterInput",
-      "target": "CX08CounterInput",
+      "current_name": "CounterInput",
+      "target": "CounterInput",
       "status": "unchanged",
       "role_decomposition": "unresolved",
       "evidence": [
@@ -55546,7 +55546,7 @@
       "consumer_files": []
     },
     {
-      "identity": "growatt_project_dtc.go:go_field:CX07LocalSelection:A",
+      "identity": "growatt_project_dtc.go:go_field:DTCLocalSelection:A",
       "owning_file": "growatt_project_dtc.go",
       "kind": "go_field",
       "current_name": "A",
@@ -55562,7 +55562,7 @@
       "consumer_files": []
     },
     {
-      "identity": "growatt_project_dtc.go:go_field:CX07LocalSelection:Active",
+      "identity": "growatt_project_dtc.go:go_field:DTCLocalSelection:Active",
       "owning_file": "growatt_project_dtc.go",
       "kind": "go_field",
       "current_name": "Active",
@@ -55673,7 +55673,7 @@
       ]
     },
     {
-      "identity": "growatt_project_dtc.go:go_field:CX07LocalSelection:B",
+      "identity": "growatt_project_dtc.go:go_field:DTCLocalSelection:B",
       "owning_file": "growatt_project_dtc.go",
       "kind": "go_field",
       "current_name": "B",
@@ -55689,7 +55689,7 @@
       "consumer_files": []
     },
     {
-      "identity": "growatt_project_dtc.go:go_field:CX07LocalSelection:Categories",
+      "identity": "growatt_project_dtc.go:go_field:DTCLocalSelection:Categories",
       "owning_file": "growatt_project_dtc.go",
       "kind": "go_field",
       "current_name": "Categories",
@@ -55709,7 +55709,7 @@
       ]
     },
     {
-      "identity": "growatt_project_dtc.go:go_field:CX07LocalSelection:Grade",
+      "identity": "growatt_project_dtc.go:go_field:DTCLocalSelection:Grade",
       "owning_file": "growatt_project_dtc.go",
       "kind": "go_field",
       "current_name": "Grade",
@@ -55741,7 +55741,7 @@
       ]
     },
     {
-      "identity": "growatt_project_dtc.go:go_field:CX07LocalSelection:PhysicalQualified",
+      "identity": "growatt_project_dtc.go:go_field:DTCLocalSelection:PhysicalQualified",
       "owning_file": "growatt_project_dtc.go",
       "kind": "go_field",
       "current_name": "PhysicalQualified",
@@ -55766,7 +55766,7 @@
       ]
     },
     {
-      "identity": "growatt_project_dtc.go:go_field:CX07LocalSelection:Status",
+      "identity": "growatt_project_dtc.go:go_field:DTCLocalSelection:Status",
       "owning_file": "growatt_project_dtc.go",
       "kind": "go_field",
       "current_name": "Status",
@@ -55992,7 +55992,7 @@
       ]
     },
     {
-      "identity": "growatt_project_dtc.go:go_field:CX07LocalSelection:WordA",
+      "identity": "growatt_project_dtc.go:go_field:DTCLocalSelection:WordA",
       "owning_file": "growatt_project_dtc.go",
       "kind": "go_field",
       "current_name": "WordA",
@@ -56008,7 +56008,7 @@
       "consumer_files": []
     },
     {
-      "identity": "growatt_project_dtc.go:go_field:CX07LocalSelection:WordB",
+      "identity": "growatt_project_dtc.go:go_field:DTCLocalSelection:WordB",
       "owning_file": "growatt_project_dtc.go",
       "kind": "go_field",
       "current_name": "WordB",
@@ -56024,11 +56024,11 @@
       "consumer_files": []
     },
     {
-      "identity": "growatt_project_dtc.go:go_function:package_or_receiver:CX07DecodeDTC",
+      "identity": "growatt_project_dtc.go:go_function:package_or_receiver:DecodeDTC",
       "owning_file": "growatt_project_dtc.go",
       "kind": "go_function",
-      "current_name": "CX07DecodeDTC",
-      "target": "CX07DecodeDTC",
+      "current_name": "DecodeDTC",
+      "target": "DecodeDTC",
       "status": "unchanged",
       "role_decomposition": "unresolved",
       "evidence": [
@@ -56040,11 +56040,11 @@
       "consumer_files": []
     },
     {
-      "identity": "growatt_project_dtc.go:go_function:package_or_receiver:CX07EncodeDTC",
+      "identity": "growatt_project_dtc.go:go_function:package_or_receiver:EncodeDTC",
       "owning_file": "growatt_project_dtc.go",
       "kind": "go_function",
-      "current_name": "CX07EncodeDTC",
-      "target": "CX07EncodeDTC",
+      "current_name": "EncodeDTC",
+      "target": "EncodeDTC",
       "status": "unchanged",
       "role_decomposition": "unresolved",
       "evidence": [
@@ -56056,11 +56056,11 @@
       "consumer_files": []
     },
     {
-      "identity": "growatt_project_dtc.go:go_function:package_or_receiver:CX07ExplainLocalSelection",
+      "identity": "growatt_project_dtc.go:go_function:package_or_receiver:ExplainLocalSelection",
       "owning_file": "growatt_project_dtc.go",
       "kind": "go_function",
-      "current_name": "CX07ExplainLocalSelection",
-      "target": "CX07ExplainLocalSelection",
+      "current_name": "ExplainLocalSelection",
+      "target": "ExplainLocalSelection",
       "status": "unchanged",
       "role_decomposition": "unresolved",
       "evidence": [
@@ -56072,11 +56072,11 @@
       "consumer_files": []
     },
     {
-      "identity": "growatt_project_dtc.go:go_type:package:CX07LocalSelection",
+      "identity": "growatt_project_dtc.go:go_type:package:DTCLocalSelection",
       "owning_file": "growatt_project_dtc.go",
       "kind": "go_type",
-      "current_name": "CX07LocalSelection",
-      "target": "CX07LocalSelection",
+      "current_name": "DTCLocalSelection",
+      "target": "DTCLocalSelection",
       "status": "unchanged",
       "role_decomposition": "unresolved",
       "evidence": [
@@ -57845,7 +57845,7 @@
       ]
     },
     {
-      "identity": "growatt_project_opaque.go:go_field:CX15CapabilityKey:Context",
+      "identity": "growatt_project_opaque.go:go_field:CapabilityKey:Context",
       "owning_file": "growatt_project_opaque.go",
       "kind": "go_field",
       "current_name": "Context",
@@ -58286,7 +58286,7 @@
       ]
     },
     {
-      "identity": "growatt_project_opaque.go:go_field:CX15CapabilityKey:PID",
+      "identity": "growatt_project_opaque.go:go_field:CapabilityKey:PID",
       "owning_file": "growatt_project_opaque.go",
       "kind": "go_field",
       "current_name": "PID",
@@ -58302,7 +58302,7 @@
       "consumer_files": []
     },
     {
-      "identity": "growatt_project_opaque.go:go_field:CX15CapabilityKey:Selection",
+      "identity": "growatt_project_opaque.go:go_field:CapabilityKey:Selection",
       "owning_file": "growatt_project_opaque.go",
       "kind": "go_field",
       "current_name": "Selection",
@@ -58624,11 +58624,11 @@
       ]
     },
     {
-      "identity": "growatt_project_opaque.go:go_type:package:CX15CapabilityKey",
+      "identity": "growatt_project_opaque.go:go_type:package:CapabilityKey",
       "owning_file": "growatt_project_opaque.go",
       "kind": "go_type",
-      "current_name": "CX15CapabilityKey",
-      "target": "CX15CapabilityKey",
+      "current_name": "CapabilityKey",
+      "target": "CapabilityKey",
       "status": "unchanged",
       "role_decomposition": "unresolved",
       "evidence": [
@@ -58640,11 +58640,11 @@
       "consumer_files": []
     },
     {
-      "identity": "growatt_project_opaque.go:go_type:package:CX15CapabilityState",
+      "identity": "growatt_project_opaque.go:go_type:package:CapabilityState",
       "owning_file": "growatt_project_opaque.go",
       "kind": "go_type",
-      "current_name": "CX15CapabilityState",
-      "target": "CX15CapabilityState",
+      "current_name": "CapabilityState",
+      "target": "CapabilityState",
       "status": "unchanged",
       "role_decomposition": "unresolved",
       "evidence": [
@@ -58656,11 +58656,11 @@
       "consumer_files": []
     },
     {
-      "identity": "growatt_project_opaque.go:go_type:package:CX15OpaqueStore",
+      "identity": "growatt_project_opaque.go:go_type:package:OpaqueStore",
       "owning_file": "growatt_project_opaque.go",
       "kind": "go_type",
-      "current_name": "CX15OpaqueStore",
-      "target": "CX15OpaqueStore",
+      "current_name": "OpaqueStore",
+      "target": "OpaqueStore",
       "status": "unchanged",
       "role_decomposition": "unresolved",
       "evidence": [
@@ -58672,7 +58672,7 @@
       "consumer_files": []
     },
     {
-      "identity": "growatt_project_provider.go:go_field:CX17Observation:Generation",
+      "identity": "growatt_project_provider.go:go_field:Observation:Generation",
       "owning_file": "growatt_project_provider.go",
       "kind": "go_field",
       "current_name": "Generation",
@@ -58884,7 +58884,7 @@
       ]
     },
     {
-      "identity": "growatt_project_provider.go:go_field:CX17Observation:Input",
+      "identity": "growatt_project_provider.go:go_field:Observation:Input",
       "owning_file": "growatt_project_provider.go",
       "kind": "go_field",
       "current_name": "Input",
@@ -58973,7 +58973,7 @@
       ]
     },
     {
-      "identity": "growatt_project_provider.go:go_field:CX17Raw:Generation",
+      "identity": "growatt_project_provider.go:go_field:ProjectProviderRaw:Generation",
       "owning_file": "growatt_project_provider.go",
       "kind": "go_field",
       "current_name": "Generation",
@@ -59185,7 +59185,7 @@
       ]
     },
     {
-      "identity": "growatt_project_provider.go:go_field:CX17Raw:Input",
+      "identity": "growatt_project_provider.go:go_field:ProjectProviderRaw:Input",
       "owning_file": "growatt_project_provider.go",
       "kind": "go_field",
       "current_name": "Input",
@@ -59274,7 +59274,7 @@
       ]
     },
     {
-      "identity": "growatt_project_provider.go:go_field:CX17Raw:NativeRecord",
+      "identity": "growatt_project_provider.go:go_field:ProjectProviderRaw:NativeRecord",
       "owning_file": "growatt_project_provider.go",
       "kind": "go_field",
       "current_name": "NativeRecord",
@@ -59295,7 +59295,7 @@
       ]
     },
     {
-      "identity": "growatt_project_provider.go:go_field:CX17Raw:Status",
+      "identity": "growatt_project_provider.go:go_field:ProjectProviderRaw:Status",
       "owning_file": "growatt_project_provider.go",
       "kind": "go_field",
       "current_name": "Status",
@@ -59521,7 +59521,7 @@
       ]
     },
     {
-      "identity": "growatt_project_provider.go:go_field:CX17Snapshot:Current",
+      "identity": "growatt_project_provider.go:go_field:ProjectProviderSnapshot:Current",
       "owning_file": "growatt_project_provider.go",
       "kind": "go_field",
       "current_name": "Current",
@@ -59688,7 +59688,7 @@
       ]
     },
     {
-      "identity": "growatt_project_provider.go:go_field:CX17Snapshot:EvictedFields",
+      "identity": "growatt_project_provider.go:go_field:ProjectProviderSnapshot:EvictedFields",
       "owning_file": "growatt_project_provider.go",
       "kind": "go_field",
       "current_name": "EvictedFields",
@@ -59704,7 +59704,7 @@
       "consumer_files": []
     },
     {
-      "identity": "growatt_project_provider.go:go_field:CX17Snapshot:EvictedRaw",
+      "identity": "growatt_project_provider.go:go_field:ProjectProviderSnapshot:EvictedRaw",
       "owning_file": "growatt_project_provider.go",
       "kind": "go_field",
       "current_name": "EvictedRaw",
@@ -59720,7 +59720,7 @@
       "consumer_files": []
     },
     {
-      "identity": "growatt_project_provider.go:go_field:CX17Snapshot:Generation",
+      "identity": "growatt_project_provider.go:go_field:ProjectProviderSnapshot:Generation",
       "owning_file": "growatt_project_provider.go",
       "kind": "go_field",
       "current_name": "Generation",
@@ -59932,7 +59932,7 @@
       ]
     },
     {
-      "identity": "growatt_project_provider.go:go_field:CX17Snapshot:LastGood",
+      "identity": "growatt_project_provider.go:go_field:ProjectProviderSnapshot:LastGood",
       "owning_file": "growatt_project_provider.go",
       "kind": "go_field",
       "current_name": "LastGood",
@@ -59961,7 +59961,7 @@
       ]
     },
     {
-      "identity": "growatt_project_provider.go:go_field:CX17Snapshot:LastGoodGeneration",
+      "identity": "growatt_project_provider.go:go_field:ProjectProviderSnapshot:LastGoodGeneration",
       "owning_file": "growatt_project_provider.go",
       "kind": "go_field",
       "current_name": "LastGoodGeneration",
@@ -59977,7 +59977,7 @@
       "consumer_files": []
     },
     {
-      "identity": "growatt_project_provider.go:go_field:CX17Snapshot:PhysicalQualified",
+      "identity": "growatt_project_provider.go:go_field:ProjectProviderSnapshot:PhysicalQualified",
       "owning_file": "growatt_project_provider.go",
       "kind": "go_field",
       "current_name": "PhysicalQualified",
@@ -60002,7 +60002,7 @@
       ]
     },
     {
-      "identity": "growatt_project_provider.go:go_field:CX17Snapshot:Promotable",
+      "identity": "growatt_project_provider.go:go_field:ProjectProviderSnapshot:Promotable",
       "owning_file": "growatt_project_provider.go",
       "kind": "go_field",
       "current_name": "Promotable",
@@ -60025,7 +60025,7 @@
       ]
     },
     {
-      "identity": "growatt_project_provider.go:go_field:CX17Snapshot:Raw",
+      "identity": "growatt_project_provider.go:go_field:ProjectProviderSnapshot:Raw",
       "owning_file": "growatt_project_provider.go",
       "kind": "go_field",
       "current_name": "Raw",
@@ -60156,7 +60156,7 @@
       ]
     },
     {
-      "identity": "growatt_project_provider.go:go_field:CX17Snapshot:Rejected",
+      "identity": "growatt_project_provider.go:go_field:ProjectProviderSnapshot:Rejected",
       "owning_file": "growatt_project_provider.go",
       "kind": "go_field",
       "current_name": "Rejected",
@@ -60189,7 +60189,7 @@
       ]
     },
     {
-      "identity": "growatt_project_provider.go:go_field:CX17Snapshot:Selection",
+      "identity": "growatt_project_provider.go:go_field:ProjectProviderSnapshot:Selection",
       "owning_file": "growatt_project_provider.go",
       "kind": "go_field",
       "current_name": "Selection",
@@ -60264,7 +60264,7 @@
       ]
     },
     {
-      "identity": "growatt_project_provider.go:go_field:CX17Snapshot:State",
+      "identity": "growatt_project_provider.go:go_field:ProjectProviderSnapshot:State",
       "owning_file": "growatt_project_provider.go",
       "kind": "go_field",
       "current_name": "State",
@@ -60565,7 +60565,7 @@
       ]
     },
     {
-      "identity": "growatt_project_provider.go:go_field:CX17Snapshot:TruncatedRecords",
+      "identity": "growatt_project_provider.go:go_field:ProjectProviderSnapshot:TruncatedRecords",
       "owning_file": "growatt_project_provider.go",
       "kind": "go_field",
       "current_name": "TruncatedRecords",
@@ -60581,11 +60581,11 @@
       "consumer_files": []
     },
     {
-      "identity": "growatt_project_provider.go:go_function:package_or_receiver:CX17NewLINKProvider",
+      "identity": "growatt_project_provider.go:go_function:package_or_receiver:NewLINKProvider",
       "owning_file": "growatt_project_provider.go",
       "kind": "go_function",
-      "current_name": "CX17NewLINKProvider",
-      "target": "CX17NewLINKProvider",
+      "current_name": "NewLINKProvider",
+      "target": "NewLINKProvider",
       "status": "unchanged",
       "role_decomposition": "unresolved",
       "evidence": [
@@ -60599,11 +60599,11 @@
       ]
     },
     {
-      "identity": "growatt_project_provider.go:go_function:package_or_receiver:CX17NewPCSProvider",
+      "identity": "growatt_project_provider.go:go_function:package_or_receiver:NewPCSProvider",
       "owning_file": "growatt_project_provider.go",
       "kind": "go_function",
-      "current_name": "CX17NewPCSProvider",
-      "target": "CX17NewPCSProvider",
+      "current_name": "NewPCSProvider",
+      "target": "NewPCSProvider",
       "status": "unchanged",
       "role_decomposition": "unresolved",
       "evidence": [
@@ -60617,11 +60617,11 @@
       ]
     },
     {
-      "identity": "growatt_project_provider.go:go_function:package_or_receiver:CX17Snapshot",
+      "identity": "growatt_project_provider.go:go_function:package_or_receiver:ProjectProviderSnapshot",
       "owning_file": "growatt_project_provider.go",
       "kind": "go_function",
-      "current_name": "CX17Snapshot",
-      "target": "CX17Snapshot",
+      "current_name": "ProjectProviderSnapshot",
+      "target": "ProjectProviderSnapshot",
       "status": "unchanged",
       "role_decomposition": "unresolved",
       "evidence": [
@@ -61031,11 +61031,11 @@
       ]
     },
     {
-      "identity": "growatt_project_provider.go:go_type:package:CX17Observation",
+      "identity": "growatt_project_provider.go:go_type:package:Observation",
       "owning_file": "growatt_project_provider.go",
       "kind": "go_type",
-      "current_name": "CX17Observation",
-      "target": "CX17Observation",
+      "current_name": "Observation",
+      "target": "Observation",
       "status": "unchanged",
       "role_decomposition": "unresolved",
       "evidence": [
@@ -61049,11 +61049,11 @@
       ]
     },
     {
-      "identity": "growatt_project_provider.go:go_type:package:CX17Provider",
+      "identity": "growatt_project_provider.go:go_type:package:Provider",
       "owning_file": "growatt_project_provider.go",
       "kind": "go_type",
-      "current_name": "CX17Provider",
-      "target": "CX17Provider",
+      "current_name": "Provider",
+      "target": "Provider",
       "status": "unchanged",
       "role_decomposition": "unresolved",
       "evidence": [
@@ -61067,11 +61067,11 @@
       ]
     },
     {
-      "identity": "growatt_project_provider.go:go_type:package:CX17Raw",
+      "identity": "growatt_project_provider.go:go_type:package:ProjectProviderRaw",
       "owning_file": "growatt_project_provider.go",
       "kind": "go_type",
-      "current_name": "CX17Raw",
-      "target": "CX17Raw",
+      "current_name": "ProjectProviderRaw",
+      "target": "ProjectProviderRaw",
       "status": "unchanged",
       "role_decomposition": "unresolved",
       "evidence": [
@@ -61083,11 +61083,11 @@
       "consumer_files": []
     },
     {
-      "identity": "growatt_project_provider.go:go_type:package:CX17ReceiveSource",
+      "identity": "growatt_project_provider.go:go_type:package:ReceiveSource",
       "owning_file": "growatt_project_provider.go",
       "kind": "go_type",
-      "current_name": "CX17ReceiveSource",
-      "target": "CX17ReceiveSource",
+      "current_name": "ReceiveSource",
+      "target": "ReceiveSource",
       "status": "unchanged",
       "role_decomposition": "unresolved",
       "evidence": [
@@ -61099,11 +61099,11 @@
       "consumer_files": []
     },
     {
-      "identity": "growatt_project_provider.go:go_type:package:CX17Snapshot",
+      "identity": "growatt_project_provider.go:go_type:package:ProjectProviderSnapshot",
       "owning_file": "growatt_project_provider.go",
       "kind": "go_type",
-      "current_name": "CX17Snapshot",
-      "target": "CX17Snapshot",
+      "current_name": "ProjectProviderSnapshot",
+      "target": "ProjectProviderSnapshot",
       "status": "unchanged",
       "role_decomposition": "unresolved",
       "evidence": [
@@ -62784,7 +62784,7 @@
       "consumer_files": []
     },
     {
-      "identity": "growatt_project_selection.go:go_field:CX01NativeIndication:Input",
+      "identity": "growatt_project_selection.go:go_field:SelectionNativeIndication:Input",
       "owning_file": "growatt_project_selection.go",
       "kind": "go_field",
       "current_name": "Input",
@@ -62873,7 +62873,7 @@
       ]
     },
     {
-      "identity": "growatt_project_selection.go:go_field:CX01NativeIndication:TopologyAssociated",
+      "identity": "growatt_project_selection.go:go_field:SelectionNativeIndication:TopologyAssociated",
       "owning_file": "growatt_project_selection.go",
       "kind": "go_field",
       "current_name": "TopologyAssociated",
@@ -62893,7 +62893,7 @@
       ]
     },
     {
-      "identity": "growatt_project_selection.go:go_field:CX01SelectionSpec:Bank",
+      "identity": "growatt_project_selection.go:go_field:SelectionSpec:Bank",
       "owning_file": "growatt_project_selection.go",
       "kind": "go_field",
       "current_name": "Bank",
@@ -62920,7 +62920,7 @@
       ]
     },
     {
-      "identity": "growatt_project_selection.go:go_field:CX01SelectionSpec:Choice",
+      "identity": "growatt_project_selection.go:go_field:SelectionSpec:Choice",
       "owning_file": "growatt_project_selection.go",
       "kind": "go_field",
       "current_name": "Choice",
@@ -62946,7 +62946,7 @@
       ]
     },
     {
-      "identity": "growatt_project_selection.go:go_field:CX01SelectionSpec:Destination",
+      "identity": "growatt_project_selection.go:go_field:SelectionSpec:Destination",
       "owning_file": "growatt_project_selection.go",
       "kind": "go_field",
       "current_name": "Destination",
@@ -62979,7 +62979,7 @@
       ]
     },
     {
-      "identity": "growatt_project_selection.go:go_field:CX01SelectionSpec:Direction",
+      "identity": "growatt_project_selection.go:go_field:SelectionSpec:Direction",
       "owning_file": "growatt_project_selection.go",
       "kind": "go_field",
       "current_name": "Direction",
@@ -63086,7 +63086,7 @@
       ]
     },
     {
-      "identity": "growatt_project_selection.go:go_field:CX01SelectionSpec:Endpoint",
+      "identity": "growatt_project_selection.go:go_field:SelectionSpec:Endpoint",
       "owning_file": "growatt_project_selection.go",
       "kind": "go_field",
       "current_name": "Endpoint",
@@ -63210,7 +63210,7 @@
       ]
     },
     {
-      "identity": "growatt_project_selection.go:go_field:CX01SelectionSpec:Epoch",
+      "identity": "growatt_project_selection.go:go_field:SelectionSpec:Epoch",
       "owning_file": "growatt_project_selection.go",
       "kind": "go_field",
       "current_name": "Epoch",
@@ -63339,7 +63339,7 @@
       ]
     },
     {
-      "identity": "growatt_project_selection.go:go_field:CX01SelectionSpec:Flavor",
+      "identity": "growatt_project_selection.go:go_field:SelectionSpec:Flavor",
       "owning_file": "growatt_project_selection.go",
       "kind": "go_field",
       "current_name": "Flavor",
@@ -63370,7 +63370,7 @@
       ]
     },
     {
-      "identity": "growatt_project_selection.go:go_field:CX01SelectionSpec:Group",
+      "identity": "growatt_project_selection.go:go_field:SelectionSpec:Group",
       "owning_file": "growatt_project_selection.go",
       "kind": "go_field",
       "current_name": "Group",
@@ -63496,7 +63496,7 @@
       ]
     },
     {
-      "identity": "growatt_project_selection.go:go_field:CX01SelectionSpec:Interface",
+      "identity": "growatt_project_selection.go:go_field:SelectionSpec:Interface",
       "owning_file": "growatt_project_selection.go",
       "kind": "go_field",
       "current_name": "Interface",
@@ -63587,7 +63587,7 @@
       ]
     },
     {
-      "identity": "growatt_project_selection.go:go_field:CX01SelectionSpec:PCSFlavor",
+      "identity": "growatt_project_selection.go:go_field:SelectionSpec:PCSFlavor",
       "owning_file": "growatt_project_selection.go",
       "kind": "go_field",
       "current_name": "PCSFlavor",
@@ -63611,7 +63611,7 @@
       ]
     },
     {
-      "identity": "growatt_project_selection.go:go_field:CX01SelectionSpec:ProjectCode",
+      "identity": "growatt_project_selection.go:go_field:SelectionSpec:ProjectCode",
       "owning_file": "growatt_project_selection.go",
       "kind": "go_field",
       "current_name": "ProjectCode",
@@ -63639,7 +63639,7 @@
       ]
     },
     {
-      "identity": "growatt_project_selection.go:go_field:CX01SelectionSpec:Release",
+      "identity": "growatt_project_selection.go:go_field:SelectionSpec:Release",
       "owning_file": "growatt_project_selection.go",
       "kind": "go_field",
       "current_name": "Release",
@@ -63719,7 +63719,7 @@
       ]
     },
     {
-      "identity": "growatt_project_selection.go:go_field:CX01SelectionSpec:RouteSet",
+      "identity": "growatt_project_selection.go:go_field:SelectionSpec:RouteSet",
       "owning_file": "growatt_project_selection.go",
       "kind": "go_field",
       "current_name": "RouteSet",
@@ -63744,7 +63744,7 @@
       ]
     },
     {
-      "identity": "growatt_project_selection.go:go_field:CX01SelectionSpec:Scope",
+      "identity": "growatt_project_selection.go:go_field:SelectionSpec:Scope",
       "owning_file": "growatt_project_selection.go",
       "kind": "go_field",
       "current_name": "Scope",
@@ -63877,7 +63877,7 @@
       ]
     },
     {
-      "identity": "growatt_project_selection.go:go_field:CX01SelectionSpec:Slot",
+      "identity": "growatt_project_selection.go:go_field:SelectionSpec:Slot",
       "owning_file": "growatt_project_selection.go",
       "kind": "go_field",
       "current_name": "Slot",
@@ -63953,7 +63953,7 @@
       ]
     },
     {
-      "identity": "growatt_project_selection.go:go_field:CX01SelectionSpec:Source",
+      "identity": "growatt_project_selection.go:go_field:SelectionSpec:Source",
       "owning_file": "growatt_project_selection.go",
       "kind": "go_field",
       "current_name": "Source",
@@ -66809,11 +66809,11 @@
       ]
     },
     {
-      "identity": "growatt_project_selection.go:go_function:package_or_receiver:CX01ConfirmNativeSelection",
+      "identity": "growatt_project_selection.go:go_function:package_or_receiver:ConfirmNativeSelection",
       "owning_file": "growatt_project_selection.go",
       "kind": "go_function",
-      "current_name": "CX01ConfirmNativeSelection",
-      "target": "CX01ConfirmNativeSelection",
+      "current_name": "ConfirmNativeSelection",
+      "target": "ConfirmNativeSelection",
       "status": "unchanged",
       "role_decomposition": "unresolved",
       "evidence": [
@@ -66827,11 +66827,11 @@
       ]
     },
     {
-      "identity": "growatt_project_selection.go:go_function:package_or_receiver:CX01FeatureGrade",
+      "identity": "growatt_project_selection.go:go_function:package_or_receiver:SelectionFeatureGrade",
       "owning_file": "growatt_project_selection.go",
       "kind": "go_function",
-      "current_name": "CX01FeatureGrade",
-      "target": "CX01FeatureGrade",
+      "current_name": "SelectionFeatureGrade",
+      "target": "SelectionFeatureGrade",
       "status": "unchanged",
       "role_decomposition": "unresolved",
       "evidence": [
@@ -66843,11 +66843,11 @@
       "consumer_files": []
     },
     {
-      "identity": "growatt_project_selection.go:go_function:package_or_receiver:CX01Grade",
+      "identity": "growatt_project_selection.go:go_function:package_or_receiver:SelectionGrade",
       "owning_file": "growatt_project_selection.go",
       "kind": "go_function",
-      "current_name": "CX01Grade",
-      "target": "CX01Grade",
+      "current_name": "SelectionGrade",
+      "target": "SelectionGrade",
       "status": "unchanged",
       "role_decomposition": "unresolved",
       "evidence": [
@@ -66859,11 +66859,11 @@
       "consumer_files": []
     },
     {
-      "identity": "growatt_project_selection.go:go_function:package_or_receiver:CX01Group",
+      "identity": "growatt_project_selection.go:go_function:package_or_receiver:SelectionGroup",
       "owning_file": "growatt_project_selection.go",
       "kind": "go_function",
-      "current_name": "CX01Group",
-      "target": "CX01Group",
+      "current_name": "SelectionGroup",
+      "target": "SelectionGroup",
       "status": "unchanged",
       "role_decomposition": "unresolved",
       "evidence": [
@@ -66877,11 +66877,11 @@
       ]
     },
     {
-      "identity": "growatt_project_selection.go:go_function:package_or_receiver:CX01Layout",
+      "identity": "growatt_project_selection.go:go_function:package_or_receiver:SelectionLayout",
       "owning_file": "growatt_project_selection.go",
       "kind": "go_function",
-      "current_name": "CX01Layout",
-      "target": "CX01Layout",
+      "current_name": "SelectionLayout",
+      "target": "SelectionLayout",
       "status": "unchanged",
       "role_decomposition": "unresolved",
       "evidence": [
@@ -66893,11 +66893,11 @@
       "consumer_files": []
     },
     {
-      "identity": "growatt_project_selection.go:go_function:package_or_receiver:CX01Spec",
+      "identity": "growatt_project_selection.go:go_function:package_or_receiver:SelectionSpecValue",
       "owning_file": "growatt_project_selection.go",
       "kind": "go_function",
-      "current_name": "CX01Spec",
-      "target": "CX01Spec",
+      "current_name": "SelectionSpecValue",
+      "target": "SelectionSpecValue",
       "status": "unchanged",
       "role_decomposition": "unresolved",
       "evidence": [
@@ -66942,11 +66942,11 @@
       ]
     },
     {
-      "identity": "growatt_project_selection.go:go_type:package:CX01NativeIndication",
+      "identity": "growatt_project_selection.go:go_type:package:SelectionNativeIndication",
       "owning_file": "growatt_project_selection.go",
       "kind": "go_type",
-      "current_name": "CX01NativeIndication",
-      "target": "CX01NativeIndication",
+      "current_name": "SelectionNativeIndication",
+      "target": "SelectionNativeIndication",
       "status": "unchanged",
       "role_decomposition": "unresolved",
       "evidence": [
@@ -66960,11 +66960,11 @@
       ]
     },
     {
-      "identity": "growatt_project_selection.go:go_type:package:CX01SelectionSpec",
+      "identity": "growatt_project_selection.go:go_type:package:SelectionSpec",
       "owning_file": "growatt_project_selection.go",
       "kind": "go_type",
-      "current_name": "CX01SelectionSpec",
-      "target": "CX01SelectionSpec",
+      "current_name": "SelectionSpec",
+      "target": "SelectionSpec",
       "status": "unchanged",
       "role_decomposition": "unresolved",
       "evidence": [
@@ -68144,15 +68144,15 @@
       "consumer_files": []
     },
     {
-      "identity": "o08_growatt_provider.go:go_constant_or_variable:package:O08RevisionV104",
-      "owning_file": "o08_growatt_provider.go",
+      "identity": "o08_growatt_provider.go:go_constant_or_variable:package:BMSRevisionV104",
+      "owning_file": "growatt_bms_provider.go",
       "kind": "go_constant_or_variable",
-      "current_name": "O08RevisionV104",
-      "target": "O08RevisionV104",
+      "current_name": "BMSRevisionV104",
+      "target": "BMSRevisionV104",
       "status": "unchanged",
       "role_decomposition": "unresolved",
       "evidence": [
-        "o08_growatt_provider.go"
+        "growatt_bms_provider.go"
       ],
       "value_class": "unresolved",
       "unit_metadata": "unresolved; see source",
@@ -68160,15 +68160,15 @@
       "consumer_files": []
     },
     {
-      "identity": "o08_growatt_provider.go:go_field:O08GrowattSnapshot:O08Generation",
-      "owning_file": "o08_growatt_provider.go",
+      "identity": "o08_growatt_provider.go:go_field:GrowattBMSSnapshot:Generation",
+      "owning_file": "growatt_bms_provider.go",
       "kind": "go_field",
-      "current_name": "O08Generation",
-      "target": "O08Generation",
+      "current_name": "Generation",
+      "target": "Generation",
       "status": "unchanged",
       "role_decomposition": "unresolved",
       "evidence": [
-        "o08_growatt_provider.go"
+        "growatt_bms_provider.go"
       ],
       "value_class": "unresolved",
       "unit_metadata": "unresolved; see source",
@@ -68176,15 +68176,15 @@
       "consumer_files": []
     },
     {
-      "identity": "o08_growatt_provider.go:go_field:O08GrowattSnapshot:O08HasRaw",
-      "owning_file": "o08_growatt_provider.go",
+      "identity": "o08_growatt_provider.go:go_field:GrowattBMSSnapshot:HasRaw",
+      "owning_file": "growatt_bms_provider.go",
       "kind": "go_field",
-      "current_name": "O08HasRaw",
-      "target": "O08HasRaw",
+      "current_name": "HasRaw",
+      "target": "HasRaw",
       "status": "unchanged",
       "role_decomposition": "unresolved",
       "evidence": [
-        "o08_growatt_provider.go"
+        "growatt_bms_provider.go"
       ],
       "value_class": "unresolved",
       "unit_metadata": "unresolved; see source",
@@ -68192,15 +68192,15 @@
       "consumer_files": []
     },
     {
-      "identity": "o08_growatt_provider.go:go_field:O08GrowattSnapshot:O08Projection",
-      "owning_file": "o08_growatt_provider.go",
+      "identity": "o08_growatt_provider.go:go_field:GrowattBMSSnapshot:Projection",
+      "owning_file": "growatt_bms_provider.go",
       "kind": "go_field",
-      "current_name": "O08Projection",
-      "target": "O08Projection",
+      "current_name": "Projection",
+      "target": "Projection",
       "status": "unchanged",
       "role_decomposition": "unresolved",
       "evidence": [
-        "o08_growatt_provider.go"
+        "growatt_bms_provider.go"
       ],
       "value_class": "unresolved",
       "unit_metadata": "unresolved; see source",
@@ -68208,15 +68208,15 @@
       "consumer_files": []
     },
     {
-      "identity": "o08_growatt_provider.go:go_field:O08GrowattSnapshot:O08ProjectionGeneration",
-      "owning_file": "o08_growatt_provider.go",
+      "identity": "o08_growatt_provider.go:go_field:GrowattBMSSnapshot:ProjectionGeneration",
+      "owning_file": "growatt_bms_provider.go",
       "kind": "go_field",
-      "current_name": "O08ProjectionGeneration",
-      "target": "O08ProjectionGeneration",
+      "current_name": "ProjectionGeneration",
+      "target": "ProjectionGeneration",
       "status": "unchanged",
       "role_decomposition": "unresolved",
       "evidence": [
-        "o08_growatt_provider.go"
+        "growatt_bms_provider.go"
       ],
       "value_class": "unresolved",
       "unit_metadata": "unresolved; see source",
@@ -68224,15 +68224,15 @@
       "consumer_files": []
     },
     {
-      "identity": "o08_growatt_provider.go:go_field:O08GrowattSnapshot:O08Raw",
-      "owning_file": "o08_growatt_provider.go",
+      "identity": "o08_growatt_provider.go:go_field:GrowattBMSSnapshot:Raw",
+      "owning_file": "growatt_bms_provider.go",
       "kind": "go_field",
-      "current_name": "O08Raw",
-      "target": "O08Raw",
+      "current_name": "Raw",
+      "target": "Raw",
       "status": "unchanged",
       "role_decomposition": "unresolved",
       "evidence": [
-        "o08_growatt_provider.go"
+        "growatt_bms_provider.go"
       ],
       "value_class": "unresolved",
       "unit_metadata": "unresolved; see source",
@@ -68240,15 +68240,15 @@
       "consumer_files": []
     },
     {
-      "identity": "o08_growatt_provider.go:go_field:O08GrowattSnapshot:O08RawGeneration",
-      "owning_file": "o08_growatt_provider.go",
+      "identity": "o08_growatt_provider.go:go_field:GrowattBMSSnapshot:RawGeneration",
+      "owning_file": "growatt_bms_provider.go",
       "kind": "go_field",
-      "current_name": "O08RawGeneration",
-      "target": "O08RawGeneration",
+      "current_name": "RawGeneration",
+      "target": "RawGeneration",
       "status": "unchanged",
       "role_decomposition": "unresolved",
       "evidence": [
-        "o08_growatt_provider.go"
+        "growatt_bms_provider.go"
       ],
       "value_class": "unresolved",
       "unit_metadata": "unresolved; see source",
@@ -68256,15 +68256,15 @@
       "consumer_files": []
     },
     {
-      "identity": "o08_growatt_provider.go:go_field:O08GrowattSnapshot:O08State",
-      "owning_file": "o08_growatt_provider.go",
+      "identity": "o08_growatt_provider.go:go_field:GrowattBMSSnapshot:State",
+      "owning_file": "growatt_bms_provider.go",
       "kind": "go_field",
-      "current_name": "O08State",
-      "target": "O08State",
+      "current_name": "State",
+      "target": "State",
       "status": "unchanged",
       "role_decomposition": "unresolved",
       "evidence": [
-        "o08_growatt_provider.go"
+        "growatt_bms_provider.go"
       ],
       "value_class": "unresolved",
       "unit_metadata": "unresolved; see source",
@@ -68272,15 +68272,15 @@
       "consumer_files": []
     },
     {
-      "identity": "o08_growatt_provider.go:go_field:O08Observation:O08Evidence",
-      "owning_file": "o08_growatt_provider.go",
+      "identity": "o08_growatt_provider.go:go_field:BMSObservation:Evidence",
+      "owning_file": "growatt_bms_provider.go",
       "kind": "go_field",
-      "current_name": "O08Evidence",
-      "target": "O08Evidence",
+      "current_name": "Evidence",
+      "target": "Evidence",
       "status": "unchanged",
       "role_decomposition": "unresolved",
       "evidence": [
-        "o08_growatt_provider.go"
+        "growatt_bms_provider.go"
       ],
       "value_class": "unresolved",
       "unit_metadata": "unresolved; see source",
@@ -68288,15 +68288,15 @@
       "consumer_files": []
     },
     {
-      "identity": "o08_growatt_provider.go:go_field:O08Observation:O08Generation",
-      "owning_file": "o08_growatt_provider.go",
+      "identity": "o08_growatt_provider.go:go_field:BMSObservation:Generation",
+      "owning_file": "growatt_bms_provider.go",
       "kind": "go_field",
-      "current_name": "O08Generation",
-      "target": "O08Generation",
+      "current_name": "Generation",
+      "target": "Generation",
       "status": "unchanged",
       "role_decomposition": "unresolved",
       "evidence": [
-        "o08_growatt_provider.go"
+        "growatt_bms_provider.go"
       ],
       "value_class": "unresolved",
       "unit_metadata": "unresolved; see source",
@@ -68304,15 +68304,15 @@
       "consumer_files": []
     },
     {
-      "identity": "o08_growatt_provider.go:go_function:package_or_receiver:O08NewGrowattProvider",
-      "owning_file": "o08_growatt_provider.go",
+      "identity": "o08_growatt_provider.go:go_function:package_or_receiver:NewGrowattBMSProvider",
+      "owning_file": "growatt_bms_provider.go",
       "kind": "go_function",
-      "current_name": "O08NewGrowattProvider",
-      "target": "O08NewGrowattProvider",
+      "current_name": "NewGrowattBMSProvider",
+      "target": "NewGrowattBMSProvider",
       "status": "unchanged",
       "role_decomposition": "unresolved",
       "evidence": [
-        "o08_growatt_provider.go"
+        "growatt_bms_provider.go"
       ],
       "value_class": "unresolved",
       "unit_metadata": "unresolved; see source",
@@ -68320,15 +68320,15 @@
       "consumer_files": []
     },
     {
-      "identity": "o08_growatt_provider.go:go_function:package_or_receiver:O08Snapshot",
-      "owning_file": "o08_growatt_provider.go",
+      "identity": "o08_growatt_provider.go:go_function:package_or_receiver:Snapshot",
+      "owning_file": "growatt_bms_provider.go",
       "kind": "go_function",
-      "current_name": "O08Snapshot",
-      "target": "O08Snapshot",
+      "current_name": "Snapshot",
+      "target": "Snapshot",
       "status": "unchanged",
       "role_decomposition": "unresolved",
       "evidence": [
-        "o08_growatt_provider.go"
+        "growatt_bms_provider.go"
       ],
       "value_class": "unresolved",
       "unit_metadata": "unresolved; see source",
@@ -68336,15 +68336,15 @@
       "consumer_files": []
     },
     {
-      "identity": "o08_growatt_provider.go:go_function:package_or_receiver:O08Start",
-      "owning_file": "o08_growatt_provider.go",
+      "identity": "o08_growatt_provider.go:go_function:package_or_receiver:Start",
+      "owning_file": "growatt_bms_provider.go",
       "kind": "go_function",
-      "current_name": "O08Start",
-      "target": "O08Start",
+      "current_name": "Start",
+      "target": "Start",
       "status": "unchanged",
       "role_decomposition": "unresolved",
       "evidence": [
-        "o08_growatt_provider.go"
+        "growatt_bms_provider.go"
       ],
       "value_class": "unresolved",
       "unit_metadata": "unresolved; see source",
@@ -68352,15 +68352,15 @@
       "consumer_files": []
     },
     {
-      "identity": "o08_growatt_provider.go:go_function:package_or_receiver:O08Stop",
-      "owning_file": "o08_growatt_provider.go",
+      "identity": "o08_growatt_provider.go:go_function:package_or_receiver:Stop",
+      "owning_file": "growatt_bms_provider.go",
       "kind": "go_function",
-      "current_name": "O08Stop",
-      "target": "O08Stop",
+      "current_name": "Stop",
+      "target": "Stop",
       "status": "unchanged",
       "role_decomposition": "unresolved",
       "evidence": [
-        "o08_growatt_provider.go"
+        "growatt_bms_provider.go"
       ],
       "value_class": "unresolved",
       "unit_metadata": "unresolved; see source",
@@ -68368,15 +68368,15 @@
       "consumer_files": []
     },
     {
-      "identity": "o08_growatt_provider.go:go_type:package:O08GrowattProvider",
-      "owning_file": "o08_growatt_provider.go",
+      "identity": "o08_growatt_provider.go:go_type:package:GrowattBMSProvider",
+      "owning_file": "growatt_bms_provider.go",
       "kind": "go_type",
-      "current_name": "O08GrowattProvider",
-      "target": "O08GrowattProvider",
+      "current_name": "GrowattBMSProvider",
+      "target": "GrowattBMSProvider",
       "status": "unchanged",
       "role_decomposition": "unresolved",
       "evidence": [
-        "o08_growatt_provider.go"
+        "growatt_bms_provider.go"
       ],
       "value_class": "unresolved",
       "unit_metadata": "unresolved; see source",
@@ -68384,15 +68384,15 @@
       "consumer_files": []
     },
     {
-      "identity": "o08_growatt_provider.go:go_type:package:O08GrowattSnapshot",
-      "owning_file": "o08_growatt_provider.go",
+      "identity": "o08_growatt_provider.go:go_type:package:GrowattBMSSnapshot",
+      "owning_file": "growatt_bms_provider.go",
       "kind": "go_type",
-      "current_name": "O08GrowattSnapshot",
-      "target": "O08GrowattSnapshot",
+      "current_name": "GrowattBMSSnapshot",
+      "target": "GrowattBMSSnapshot",
       "status": "unchanged",
       "role_decomposition": "unresolved",
       "evidence": [
-        "o08_growatt_provider.go"
+        "growatt_bms_provider.go"
       ],
       "value_class": "unresolved",
       "unit_metadata": "unresolved; see source",
@@ -68400,15 +68400,15 @@
       "consumer_files": []
     },
     {
-      "identity": "o08_growatt_provider.go:go_type:package:O08Observation",
-      "owning_file": "o08_growatt_provider.go",
+      "identity": "o08_growatt_provider.go:go_type:package:BMSObservation",
+      "owning_file": "growatt_bms_provider.go",
       "kind": "go_type",
-      "current_name": "O08Observation",
-      "target": "O08Observation",
+      "current_name": "BMSObservation",
+      "target": "BMSObservation",
       "status": "unchanged",
       "role_decomposition": "unresolved",
       "evidence": [
-        "o08_growatt_provider.go"
+        "growatt_bms_provider.go"
       ],
       "value_class": "unresolved",
       "unit_metadata": "unresolved; see source",
@@ -68416,15 +68416,15 @@
       "consumer_files": []
     },
     {
-      "identity": "o08_growatt_provider.go:go_type:package:O08ReceiveSource",
-      "owning_file": "o08_growatt_provider.go",
+      "identity": "o08_growatt_provider.go:go_type:package:BMSReceiveSource",
+      "owning_file": "growatt_bms_provider.go",
       "kind": "go_type",
-      "current_name": "O08ReceiveSource",
-      "target": "O08ReceiveSource",
+      "current_name": "BMSReceiveSource",
+      "target": "BMSReceiveSource",
       "status": "unchanged",
       "role_decomposition": "unresolved",
       "evidence": [
-        "o08_growatt_provider.go"
+        "growatt_bms_provider.go"
       ],
       "value_class": "unresolved",
       "unit_metadata": "unresolved; see source",

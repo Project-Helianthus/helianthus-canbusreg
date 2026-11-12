@@ -8,7 +8,7 @@ import "fmt"
 // PCS host input / Maintenance and firmware coordination channels:
 // https://github.com/Project-Helianthus/helianthus-docs-canbus/blob/main/protocols/growatt/growatt-low-voltage-bms-can-pcs-protocol-v1.md
 // These candidate descriptions never authorize an operation or qualify hardware.
-type CX15ReceiverContext struct {
+type ReceiverContext struct {
 	Direction, Role, Profile, Session, Form       string
 	Assigned, CommunicationKnown, AddressingKnown bool
 	CommunicationState                            uint8
@@ -17,30 +17,30 @@ type CX15ReceiverContext struct {
 	NativeCount                                   uint32
 }
 
-type CX15ReceiverResult struct {
-	Input                             CX01LINKInput
-	Context                           CX15ReceiverContext
+type ReceiverResult struct {
+	Input                             LINKInput
+	Context                           ReceiverContext
 	Raw                               [8]byte
 	Class, Grade, Status, Description string
 	Admitted, PhysicalQualified       bool
 	NativeFreshnessCount              uint32
 }
 
-type cx15Rule struct {
+type receiverCapabilityRule struct {
 	pid                                                       uint32
 	profile, direction, role, class, route, gate, description string
 	groups                                                    uint16
 }
 
-func cx15PIDName(pid uint32) string { return fmt.Sprintf("%04X", pid) }
+func receiverCapabilityPIDName(pid uint32) string { return fmt.Sprintf("%04X", pid) }
 
 // The finite table is private and is never extended by observed traffic.
-var cx15ReceiverRules = cx15Rules()
+var receiverRules = receiverCapabilityRules()
 
-func cx15Rules() []cx15Rule {
-	var rows []cx15Rule
+func receiverCapabilityRules() []receiverCapabilityRule {
+	var rows []receiverCapabilityRule
 	add := func(pid uint32, profile, direction, role, class, route, gate, description string, groups uint16) {
-		rows = append(rows, cx15Rule{pid, profile, direction, role, class, route, gate, description, groups})
+		rows = append(rows, receiverCapabilityRule{pid, profile, direction, role, class, route, gate, description, groups})
 	}
 	const all uint16 = 0x1ff
 	for _, pid := range []uint32{0x1800, 0x1802, 0x1803, 0x1804, 0x1805, 0x1806, 0x1807, 0x1808, 0x180a, 0x180b, 0x180c, 0x1850, 0x1801, 0x1809, 0x1810, 0x1811, 0x1812, 0x1813, 0x1830, 0x1840, 0x1851, 0x1852, 0x1853, 0x1861, 0x1862, 0x18fb} {
@@ -187,8 +187,8 @@ func cx15Rules() []cx15Rule {
 
 // CX15ClassifyReceiver only describes an explicitly selected receiver. No payload
 // is decoded into measurements, identity, a client timeout, or a bus operation.
-func CX15ClassifyReceiver(s CXSelection, c CX15ReceiverContext, i CX01LINKInput) CX15ReceiverResult {
-	r := CX15ReceiverResult{Input: i, Context: c, Raw: i.Evidence.Frame.Bytes(), Class: "U", Grade: "Unknown", Status: "invalid"}
+func ClassifyReceiver(s CXSelection, c ReceiverContext, i LINKInput) ReceiverResult {
+	r := ReceiverResult{Input: i, Context: c, Raw: i.Evidence.Frame.Bytes(), Class: "U", Grade: "Unknown", Status: "invalid"}
 	spec := s.spec
 	f := i.Evidence.Frame
 	id := f.ID().Value()
@@ -218,7 +218,7 @@ func CX15ClassifyReceiver(s CXSelection, c CX15ReceiverContext, i CX01LINKInput)
 		pid = id >> 16
 	}
 	r.Status = "unsupported"
-	for _, row := range cx15ReceiverRules {
+	for _, row := range receiverRules {
 		if row.pid != pid || row.profile != c.Profile || row.direction != c.Direction || row.role != c.Role {
 			continue
 		}
@@ -310,13 +310,13 @@ func CX15ClassifyReceiver(s CXSelection, c CX15ReceiverContext, i CX01LINKInput)
 		}
 		r.Admitted = true
 		r.Status = "raw"
-		cx15Describe(s, &r, pid)
+		receiverCapabilityDescribe(s, &r, pid)
 		return r
 	}
 	return r
 }
 
-func cx15Describe(s CXSelection, r *CX15ReceiverResult, pid uint32) {
+func receiverCapabilityDescribe(s CXSelection, r *ReceiverResult, pid uint32) {
 	identity := s.spec.ProjectCode + s.spec.Release
 	if r.Context.Direction == "coordinator-to-module" && (pid == 0x18fe || pid == 0x1869) {
 		r.Grade = "Proven"

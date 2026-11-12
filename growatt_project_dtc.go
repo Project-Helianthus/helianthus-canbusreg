@@ -8,9 +8,9 @@ import "encoding/binary"
 // Selection, severity and clearing.
 // https://github.com/Project-Helianthus/helianthus-docs-canbus/blob/main/protocols/growatt/growatt-low-voltage-bms-can-link-protocol-v1.md
 // Section: Numeric dictionary and version gate.
-func cx07Dictionary(member CXSelection) (count int, binaryWords bool) {
-	c := member.CX01Spec()
-	if member.CX01Group() != "L8" {
+func dictionary(member CXSelection) (count int, binaryWords bool) {
+	c := member.SelectionSpecValue()
+	if member.SelectionGroup() != "L8" {
 		return 0, false
 	}
 	if c.ProjectCode == "QAAA" && c.Release == "0011" {
@@ -23,8 +23,8 @@ func cx07Dictionary(member CXSelection) (count int, binaryWords bool) {
 }
 
 // CX07EncodeDTC maps a numeric index to a candidate word, without bus I/O.
-func CX07EncodeDTC(member CXSelection, index int) (uint16, bool) {
-	count, modern := cx07Dictionary(member)
+func EncodeDTC(member CXSelection, index int) (uint16, bool) {
+	count, modern := dictionary(member)
 	if index < 0 || index >= count {
 		return 0, false
 	}
@@ -46,9 +46,9 @@ func CX07EncodeDTC(member CXSelection, index int) (uint16, bool) {
 // member must identify the actual reporting member, including any explicit
 // topology association; forwarding coordinator identity is not a substitute.
 // offset locates the word, not an active or retained bitmap. No state is mutated.
-func CX07DecodeDTC(member CXSelection, i CX01LINKInput, offset int) CXNativeResult {
-	r := cx01Result(member, i, "invalid")
-	c := member.CX01Spec()
+func DecodeDTC(member CXSelection, i LINKInput, offset int) CXNativeResult {
+	r := selectionResult(member, i, "invalid")
+	c := member.SelectionSpecValue()
 	f := i.Evidence.Frame
 	id := f.ID().Value()
 	if offset < 0 || offset > 6 || f.DLC() != 8 || f.RawDLC() != 8 || i.FieldAge < 0 ||
@@ -58,7 +58,7 @@ func CX07DecodeDTC(member CXSelection, i CX01LINKInput, offset int) CXNativeResu
 	var order binary.ByteOrder = binary.BigEndian
 	switch c.Flavor {
 	case "link":
-		if !cx01LINKAdmission(member, i) || id>>16 != 0x1853 {
+		if !lINKAdmission(member, i) || id>>16 != 0x1853 {
 			return r
 		}
 		order = binary.LittleEndian
@@ -74,7 +74,7 @@ func CX07DecodeDTC(member CXSelection, i CX01LINKInput, offset int) CXNativeResu
 		return r
 	}
 	r.Status = "unsupported"
-	count, _ := cx07Dictionary(member)
+	count, _ := dictionary(member)
 	if count == 0 {
 		return r
 	}
@@ -87,7 +87,7 @@ func CX07DecodeDTC(member CXSelection, i CX01LINKInput, offset int) CXNativeResu
 	} else {
 		// Exact finite membership also rejects every nondecimal packed nibble.
 		for index := 0; index < count; index++ {
-			expected, _ := CX07EncodeDTC(member, index)
+			expected, _ := EncodeDTC(member, index)
 			if expected != word {
 				continue
 			}
@@ -104,7 +104,7 @@ func CX07DecodeDTC(member CXSelection, i CX01LINKInput, offset int) CXNativeResu
 	return r
 }
 
-func cx07Categories(index int) (int, int) {
+func categories(index int) (int, int) {
 	switch index {
 	case 19, 24, 30, 35, 56:
 		return 1, 1
@@ -134,7 +134,7 @@ func cx07Categories(index int) (int, int) {
 // CX07LocalSelection is a pure explanation of a supplied active set, not a
 // fault activation/clearing operation or a reconstruction from received words.
 // -1 denotes no index selected. Categories carry no severity labels.
-type CX07LocalSelection struct {
+type DTCLocalSelection struct {
 	Active            [136]bool
 	Categories        [4]int
 	A, B              int
@@ -143,10 +143,10 @@ type CX07LocalSelection struct {
 	PhysicalQualified bool
 }
 
-func CX07ExplainLocalSelection(member CXSelection, active [136]bool) CX07LocalSelection {
-	r := CX07LocalSelection{Active: active, Categories: [4]int{-1, -1, -1, -1}, A: -1, B: -1, Status: "unsupported", Grade: "Unknown"}
-	count, _ := cx07Dictionary(member)
-	if count == 0 || member.CX01Spec().Scope != "local" {
+func ExplainLocalSelection(member CXSelection, active [136]bool) DTCLocalSelection {
+	r := DTCLocalSelection{Active: active, Categories: [4]int{-1, -1, -1, -1}, A: -1, B: -1, Status: "unsupported", Grade: "Unknown"}
+	count, _ := dictionary(member)
+	if count == 0 || member.SelectionSpecValue().Scope != "local" {
 		return r
 	}
 	for index := count; index < len(active); index++ {
@@ -159,7 +159,7 @@ func CX07ExplainLocalSelection(member CXSelection, active [136]bool) CX07LocalSe
 		if !active[index] {
 			continue
 		}
-		a, b := cx07Categories(index)
+		a, b := categories(index)
 		if a != 0 {
 			r.Categories[a-1] = index
 			r.Categories[b-1] = index
@@ -174,10 +174,10 @@ func CX07ExplainLocalSelection(member CXSelection, active [136]bool) CX07LocalSe
 		r.B = r.Categories[3]
 	}
 	if r.A >= 0 {
-		r.WordA, _ = CX07EncodeDTC(member, r.A)
+		r.WordA, _ = EncodeDTC(member, r.A)
 	}
 	if r.B >= 0 {
-		r.WordB, _ = CX07EncodeDTC(member, r.B)
+		r.WordB, _ = EncodeDTC(member, r.B)
 	}
 	r.Status, r.Grade = "accepted", "Proven"
 	return r

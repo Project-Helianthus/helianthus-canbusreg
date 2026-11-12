@@ -10,7 +10,7 @@ import (
 // Sections: Common release-11 PCS contract; Standard parallel / clustering profile.
 // Sources are explicit, independently attributed candidate values, never inferred
 // from another byte or defaulted to zero. Nil means absent. No source is updated.
-type CX11ParallelContext struct {
+type ParallelContext struct {
 	SOHTenths, SOCTenths, Permission, State *CXNativeField
 	CategoryFirst, CategorySecond, PackCode *CXNativeField
 	// CellSumValid is independent evidence that the cell-sum word is a valid
@@ -18,8 +18,8 @@ type CX11ParallelContext struct {
 	CellSumValid *CXNativeField
 }
 
-func cx11SourceValue(s CXSelection, f *CXNativeField, maximum int64) (int64, bool) {
-	c := s.CX01Spec()
+func sourceValue(s CXSelection, f *CXNativeField, maximum int64) (int64, bool) {
+	c := s.SelectionSpecValue()
 	if f == nil {
 		return 0, false
 	}
@@ -29,16 +29,16 @@ func cx11SourceValue(s CXSelection, f *CXNativeField, maximum int64) (int64, boo
 // CX11DecodeParallel is a pure receiver decoder. Context validates derived wire
 // codes without constructing traffic or turning substituted codes into fresh
 // measurements. Candidate protocol grades never establish qualification.
-func CX11DecodeParallel(s CXSelection, i CX01LINKInput, x CX11ParallelContext) CXNativeResult {
-	r := cx01Result(s, i, "unsupported")
-	if !cx10Admission(s, i) {
+func ParallelReleaseDecodeParallel(s CXSelection, i LINKInput, x ParallelContext) CXNativeResult {
+	r := selectionResult(s, i, "unsupported")
+	if !parallelIdentityAdmission(s, i) {
 		r.Status = "invalid"
 		return r
 	}
-	if s.CX01Group() != "L8" {
+	if s.SelectionGroup() != "L8" {
 		return r
 	}
-	family, ok := cx10Family(s, i.Evidence.Frame.ID().Value())
+	family, ok := parallelIdentityFamily(s, i.Evidence.Frame.ID().Value())
 	if !ok {
 		return r
 	}
@@ -91,7 +91,7 @@ func CX11DecodeParallel(s CXSelection, i CX01LINKInput, x CX11ParallelContext) C
 		for at := 4; at < 7; at++ {
 			proven(fmt.Sprintf("state_%d", at), int64(p[at]))
 		}
-		if s.CX01Spec().ProjectCode == "QAAa" {
+		if s.SelectionSpecValue().ProjectCode == "QAAa" {
 			proven("state_7", int64(p[7]))
 		} else if i.Scope == "local" {
 			zero("state_7", 7)
@@ -101,7 +101,7 @@ func CX11DecodeParallel(s CXSelection, i CX01LINKInput, x CX11ParallelContext) C
 	case 0x520:
 		proven("slot", int64(p[0]))
 		for j, name := range []string{"dtc_a", "dtc_b"} {
-			d := CX07DecodeDTC(s, i, 1+2*j)
+			d := DecodeDTC(s, i, 1+2*j)
 			if f, exists := d.Fields["selected_word"]; exists {
 				r.Fields[name] = f
 			}
@@ -145,7 +145,7 @@ func CX11DecodeParallel(s CXSelection, i CX01LINKInput, x CX11ParallelContext) C
 		}
 		raw("soh", int64(p[7]))
 		if i.Scope == "local" {
-			n, known := cx11SourceValue(s, x.SOHTenths, 65535)
+			n, known := sourceValue(s, x.SOHTenths, 65535)
 			derived("soh", int64(p[7]), 1, (820*n/8192)%256, known, "", "derived SOH code; not an inverse measurement", "Hypothesis")
 		}
 	case 0x680:
@@ -155,8 +155,8 @@ func CX11DecodeParallel(s CXSelection, i CX01LINKInput, x CX11ParallelContext) C
 		raw("state_bit_2", int64(p[6]))
 		raw("state_bit_1", int64(p[7]))
 		if i.Scope == "local" {
-			permission, kp := cx11SourceValue(s, x.Permission, 1)
-			soc, ks := cx11SourceValue(s, x.SOCTenths, 65535)
+			permission, kp := sourceValue(s, x.Permission, 1)
+			soc, ks := sourceValue(s, x.SOCTenths, 65535)
 			expected := int64(0)
 			known := kp
 			meaning := "inactive SOC report; not a fresh measurement"
@@ -170,7 +170,7 @@ func CX11DecodeParallel(s CXSelection, i CX01LINKInput, x CX11ParallelContext) C
 				}
 			}
 			derived("soc_report", le(4), 10, expected, known, "percent", meaning, "Proven")
-			state, known := cx11SourceValue(s, x.State, 255)
+			state, known := sourceValue(s, x.State, 255)
 			derived("state_bit_2", int64(p[6]), 1, (state>>2)&1, known, "", "copy of state bit 2", "Proven")
 			derived("state_bit_1", int64(p[7]), 1, (state>>1)&1, known, "", "copy of state bit 1", "Proven")
 		}
@@ -182,8 +182,8 @@ func CX11DecodeParallel(s CXSelection, i CX01LINKInput, x CX11ParallelContext) C
 			zero(fmt.Sprintf("zero_%d", at), at)
 		}
 		if i.Scope == "local" {
-			a, ka := cx11SourceValue(s, x.CategoryFirst, 65535)
-			b, kb := cx11SourceValue(s, x.CategorySecond, 65535)
+			a, ka := sourceValue(s, x.CategoryFirst, 65535)
+			b, kb := sourceValue(s, x.CategorySecond, 65535)
 			add("cell_sum", le(0), 10, "V", "cell-sum voltage", "Hypothesis", "accepted")
 			if !ka || !kb {
 				mark("cell_sum", "withheld")
@@ -198,11 +198,11 @@ func CX11DecodeParallel(s CXSelection, i CX01LINKInput, x CX11ParallelContext) C
 				r.Fields["cell_sum"] = f
 			} else if le(0) == 65535 {
 				mark("cell_sum", "invalid")
-			} else if valid, kv := cx11SourceValue(s, x.CellSumValid, 1); !kv || valid != 1 {
+			} else if valid, kv := sourceValue(s, x.CellSumValid, 1); !kv || valid != 1 {
 				mark("cell_sum", "withheld")
 			}
-			pack, kp := cx11SourceValue(s, x.PackCode, 65535)
-			state, ks := cx11SourceValue(s, x.State, 255)
+			pack, kp := sourceValue(s, x.PackCode, 65535)
+			state, ks := sourceValue(s, x.State, 255)
 			flag := int64(0)
 			if pack > 200 {
 				flag = 1

@@ -5,15 +5,15 @@ import (
 	"testing"
 )
 
-func cx01Spec(t *testing.T, code, release string) CX01SelectionSpec {
+func selectionTestSpec(t *testing.T, code, release string) SelectionSpec {
 	t.Helper()
 	bus, err := canbus.NewInterfaceIdentity("synthetic", 1)
 	if err != nil {
 		t.Fatal(err)
 	}
-	return CX01SelectionSpec{Interface: bus, Flavor: "link", PCSFlavor: "pcs-standard", ProjectCode: code, Release: release, Direction: "module-to-coordinator", Scope: "local", Bank: "bank-a", Endpoint: "endpoint-a", RouteSet: true, Destination: 0xf4, Source: 2, Epoch: 1}
+	return SelectionSpec{Interface: bus, Flavor: "link", PCSFlavor: "pcs-standard", ProjectCode: code, Release: release, Direction: "module-to-coordinator", Scope: "local", Bank: "bank-a", Endpoint: "endpoint-a", RouteSet: true, Destination: 0xf4, Source: 2, Epoch: 1}
 }
-func cx01Select(t *testing.T, spec CX01SelectionSpec) CXSelection {
+func selectionTestSelect(t *testing.T, spec SelectionSpec) CXSelection {
 	t.Helper()
 	s, e := NewCXSelection(spec)
 	if e != nil {
@@ -30,9 +30,9 @@ func TestCX01SelectorGroups(t *testing.T) {
 	}
 	for _, v := range groups {
 		t.Run(v.code+v.release, func(t *testing.T) {
-			s := cx01Select(t, cx01Spec(t, v.code, v.release))
-			if s.CX01Group() != v.group || s.CX01Layout() != v.layout {
-				t.Fatalf("selection: %s %s", s.CX01Group(), s.CX01Layout())
+			s := selectionTestSelect(t, selectionTestSpec(t, v.code, v.release))
+			if s.SelectionGroup() != v.group || s.SelectionLayout() != v.layout {
+				t.Fatalf("selection: %s %s", s.SelectionGroup(), s.SelectionLayout())
 			}
 		})
 	}
@@ -42,7 +42,7 @@ func TestCX01HypothesisSelectorNegatives(t *testing.T) {
 		t.Run(v.group, func(t *testing.T) {
 			for _, gate := range []string{"case", "hole", "flavor", "direction"} {
 				t.Run(gate, func(t *testing.T) {
-					spec := cx01Spec(t, v.code, v.release)
+					spec := selectionTestSpec(t, v.code, v.release)
 					switch gate {
 					case "case":
 						spec.ProjectCode = "q" + spec.ProjectCode[1:]
@@ -53,9 +53,9 @@ func TestCX01HypothesisSelectorNegatives(t *testing.T) {
 					case "direction":
 						spec.Direction = "coordinator-to-module"
 					}
-					s := cx01Select(t, spec)
-					r := CXDecodeLINKTelemetry(s, cx01Input(t, spec, 0x180b, [8]byte{1, 2, 3, 4, 5, 6, 7, 8}))
-					if s.CX01Group() != "" || len(r.Fields) != 0 || r.Raw != [8]byte{1, 2, 3, 4, 5, 6, 7, 8} || r.Fields["full_capacity"].Status == "accepted" {
+					s := selectionTestSelect(t, spec)
+					r := CXDecodeLINKTelemetry(s, selectionTestInput(t, spec, 0x180b, [8]byte{1, 2, 3, 4, 5, 6, 7, 8}))
+					if s.SelectionGroup() != "" || len(r.Fields) != 0 || r.Raw != [8]byte{1, 2, 3, 4, 5, 6, 7, 8} || r.Fields["full_capacity"].Status == "accepted" {
 						t.Fatalf("admitted %#v", r)
 					}
 				})
@@ -64,26 +64,26 @@ func TestCX01HypothesisSelectorNegatives(t *testing.T) {
 	}
 }
 func TestCX01AmbiguousChoiceAndImmutability(t *testing.T) {
-	spec := cx01Spec(t, "QAAa", "9011")
-	s := cx01Select(t, spec)
-	if s.CX01Group() != "" || s.CX01Layout() != "W" {
+	spec := selectionTestSpec(t, "QAAa", "9011")
+	s := selectionTestSelect(t, spec)
+	if s.SelectionGroup() != "" || s.SelectionLayout() != "W" {
 		t.Fatal("ambiguity")
 	}
 	spec.Choice = "release11"
-	s = cx01Select(t, spec)
+	s = selectionTestSelect(t, spec)
 	spec.ProjectCode = "QAAA"
-	copy := s.CX01Spec()
+	copy := s.SelectionSpecValue()
 	copy.Release = "0006"
-	if s.CX01Group() != "L8" || s.CX01Spec().Release != "9011" {
+	if s.SelectionGroup() != "L8" || s.SelectionSpecValue().Release != "9011" {
 		t.Fatal("mutable")
 	}
-	spec = s.CX01Spec()
+	spec = s.SelectionSpecValue()
 	spec.PCSFlavor = "pcs-extended19"
-	if cx01Select(t, spec).CX01Group() != "" {
+	if selectionTestSelect(t, spec).SelectionGroup() != "" {
 		t.Fatal("L8 extended19")
 	}
 	spec.Choice = "legacy19"
-	if cx01Select(t, spec).CX01Group() != "L4" {
+	if selectionTestSelect(t, spec).SelectionGroup() != "L4" {
 		t.Fatal("legacy")
 	}
 }
@@ -94,18 +94,18 @@ func TestCX01FlavorMatrix(t *testing.T) {
 		allowed       []string
 	}{{"QAaT", "8252", []string{"pcs-standard"}}, {"QAAA", "0005", []string{"pcs-standard", "pcs-extended19"}}, {"QAAA", "0006", []string{"pcs-standard", "pcs-extended19"}}, {"QAAA", "0007", []string{"pcs-standard", "pcs-extended19"}}, {"QAAA", "0009", []string{"pcs-standard", "pcs-extended19"}}, {"QAAB", "0004", []string{"pcs-standard", "pcs-extended19", "pcs-parallel"}}, {"QAAB", "0002", []string{"pcs-standard", "pcs-extended19", "pcs-parallel"}}, {"QAAB", "0006", []string{"pcs-standard", "pcs-parallel"}}, {"QAAA", "0011", []string{"pcs-standard", "pcs-parallel"}}} {
 		for _, flavor := range []string{"pcs-standard", "pcs-extended19", "pcs-parallel"} {
-			spec := cx01Spec(t, v.code, v.release)
+			spec := selectionTestSpec(t, v.code, v.release)
 			spec.PCSFlavor = flavor
 			want := false
 			for _, a := range v.allowed {
 				want = want || a == flavor
 			}
-			if (cx01Select(t, spec).CX01Group() != "") != want {
+			if (selectionTestSelect(t, spec).SelectionGroup() != "") != want {
 				t.Fatalf("%s%s %s", v.code, v.release, flavor)
 			}
 			spec.Flavor = flavor
 			spec.Direction = "bms-to-pcs"
-			if (cx01Select(t, spec).CX01Group() != "") != want {
+			if (selectionTestSelect(t, spec).SelectionGroup() != "") != want {
 				t.Fatal("PCS selector parity")
 			}
 		}
@@ -113,12 +113,12 @@ func TestCX01FlavorMatrix(t *testing.T) {
 }
 func TestCX01NativeIndicationNeverChooses(t *testing.T) {
 	for _, choice := range []string{"", "legacy19", "release11"} {
-		spec := cx01Spec(t, "QAAa", "9011")
+		spec := selectionTestSpec(t, "QAAa", "9011")
 		spec.Choice = choice
-		s := cx01Select(t, spec)
+		s := selectionTestSelect(t, spec)
 		for _, id := range []uint32{0x18ffF202, 0x1900F202, 0x1909F202, 0x190aF202, 0x326, 0x327, 0x333, 0x334} {
 			for _, associated := range []bool{false, true} {
-				i := cx01Input(t, spec, 0x1805, [8]byte{})
+				i := selectionTestInput(t, spec, 0x1805, [8]byte{})
 				if id <= 0x7ff {
 					native, _ := canbus.NewStandardID(id)
 					i.Evidence.Frame, _ = canbus.NewFrame(native, make([]byte, 8))
@@ -127,7 +127,7 @@ func TestCX01NativeIndicationNeverChooses(t *testing.T) {
 					i.Evidence.Frame, _ = canbus.NewFrame(native, make([]byte, 8))
 				}
 				i.Direction = "bms-to-pcs"
-				r := CX01ConfirmNativeSelection(s, CX01NativeIndication{i, associated})
+				r := ConfirmNativeSelection(s, SelectionNativeIndication{i, associated})
 				want := "unsupported"
 				if choice != "" && associated && id != 0x18ffF202 && id != 0x190aF202 {
 					contract := "release11"
@@ -140,14 +140,14 @@ func TestCX01NativeIndicationNeverChooses(t *testing.T) {
 						want = "conflict"
 					}
 				}
-				if r.Status != want || r.Selection.CX01Spec().Choice != choice {
+				if r.Status != want || r.Selection.SelectionSpecValue().Choice != choice {
 					t.Fatalf("indication %x %s %v: %s", id, choice, associated, r.Status)
 				}
 			}
 		}
 		for _, kind := range []uint32{0x1805, 0x1853, 0x1861, 0x1869} {
-			i := cx01Input(t, spec, kind, [8]byte{})
-			r := CX01ConfirmNativeSelection(s, CX01NativeIndication{Input: i})
+			i := selectionTestInput(t, spec, kind, [8]byte{})
+			r := ConfirmNativeSelection(s, SelectionNativeIndication{Input: i})
 			want := "unsupported"
 			if kind != 0x1805 && kind != 0x1869 && choice != "" {
 				want = "confirmed"
@@ -163,22 +163,22 @@ func TestCX01NativeIndicationNeverChooses(t *testing.T) {
 }
 func TestCX01Release11ReportRoute(t *testing.T) {
 	for _, choice := range []string{"legacy19", "release11"} {
-		spec := cx01Spec(t, "QAAa", "9011")
+		spec := selectionTestSpec(t, "QAAa", "9011")
 		spec.Choice = choice
 		spec.Destination = 0xf5
-		s := cx01Select(t, spec)
-		i := cx01Input(t, spec, 0x1869, [8]byte{})
+		s := selectionTestSelect(t, spec)
+		i := selectionTestInput(t, spec, 0x1869, [8]byte{})
 		want := "confirmed"
 		if choice == "legacy19" {
 			want = "conflict"
 		}
-		if r := CX01ConfirmNativeSelection(s, CX01NativeIndication{Input: i}); r.Status != want {
+		if r := ConfirmNativeSelection(s, SelectionNativeIndication{Input: i}); r.Status != want {
 			t.Fatalf("1869 F5 %s: %s", choice, r.Status)
 		}
 		spec.Destination = 0xf3
-		s = cx01Select(t, spec)
-		i = cx01Input(t, spec, 0x1869, [8]byte{})
-		if r := CX01ConfirmNativeSelection(s, CX01NativeIndication{Input: i}); r.Status != "unsupported" {
+		s = selectionTestSelect(t, spec)
+		i = selectionTestInput(t, spec, 0x1869, [8]byte{})
+		if r := ConfirmNativeSelection(s, SelectionNativeIndication{Input: i}); r.Status != "unsupported" {
 			t.Fatalf("1869 other route: %s", r.Status)
 		}
 	}
@@ -186,7 +186,7 @@ func TestCX01Release11ReportRoute(t *testing.T) {
 func TestCX01InvalidSelection(t *testing.T) {
 	for _, gate := range []string{"code-length", "release-length", "ascii", "release-digit", "choice", "scope", "bank", "endpoint", "epoch", "route"} {
 		t.Run(gate, func(t *testing.T) {
-			s := cx01Spec(t, "QAAA", "0006")
+			s := selectionTestSpec(t, "QAAA", "0006")
 			switch gate {
 			case "code-length":
 				s.ProjectCode = "QAA"
@@ -225,15 +225,15 @@ func TestCX01FeatureScopeAndReleaseBoundaries(t *testing.T) {
 		{"QAAB", "0002", "0001", "0004", "broad-configuration", "Hypothesis"},
 	} {
 		t.Run(v.feature, func(t *testing.T) {
-			spec := cx01Spec(t, v.code, v.release)
-			s := cx01Select(t, spec)
-			if s.CX01FeatureGrade(v.feature) != v.grade {
+			spec := selectionTestSpec(t, v.code, v.release)
+			s := selectionTestSelect(t, spec)
+			if s.SelectionFeatureGrade(v.feature) != v.grade {
 				t.Fatal("feature")
 			}
 			for _, release := range []string{v.below, v.above} {
 				other := spec
 				other.Release = release
-				if cx01Select(t, other).CX01FeatureGrade(v.feature) != "Unknown" {
+				if selectionTestSelect(t, other).SelectionFeatureGrade(v.feature) != "Unknown" {
 					t.Fatal("numeric ordering")
 				}
 			}
@@ -247,7 +247,7 @@ func TestCX01FeatureScopeAndReleaseBoundaries(t *testing.T) {
 				case "flavor":
 					other.PCSFlavor = "link"
 				}
-				if cx01Select(t, other).CX01FeatureGrade(v.feature) != "Unknown" {
+				if selectionTestSelect(t, other).SelectionFeatureGrade(v.feature) != "Unknown" {
 					t.Fatal("feature gate")
 				}
 			}

@@ -10,9 +10,9 @@ import (
 // Sections: Extended PCS 19xx; Gateway interpretation rules.
 // CX09DecodePCSExtended decodes candidate receive evidence only. Unspecified
 // units and validity rules remain raw; no field is physically qualified.
-func CX09DecodePCSExtended(s CXSelection, i CX01LINKInput) CXNativeResult {
-	r := cx01Result(s, i, "invalid")
-	c := s.CX01Spec()
+func DecodePCSExtended(s CXSelection, i LINKInput) CXNativeResult {
+	r := selectionResult(s, i, "invalid")
+	c := s.SelectionSpecValue()
 	f := i.Evidence.Frame
 	id := f.ID().Value()
 	kind := uint16(id >> 16)
@@ -28,7 +28,7 @@ func CX09DecodePCSExtended(s CXSelection, i CX01LINKInput) CXNativeResult {
 	}
 	gateway := c.ProjectCode == "QCAA" && c.Release == "0001"
 	// Selection alone never enables legacy extended19 on known excluded families.
-	if !gateway && (s.CX01Group() == "" || s.CX01Group() == "L0" || s.CX01Group() == "L7" || s.CX01Group() == "L8") {
+	if !gateway && (s.SelectionGroup() == "" || s.SelectionGroup() == "L0" || s.SelectionGroup() == "L7" || s.SelectionGroup() == "L8") {
 		return r
 	}
 	gatewayState := kind == 0x1910 && c.Destination == 0xff && c.Source == 0xf4
@@ -171,7 +171,7 @@ func CX09DecodePCSExtended(s CXSelection, i CX01LINKInput) CXNativeResult {
 // CX09PCSExtendedDecoder retains independent last-known-good fields for one
 // immutable selection. Rejected input never replaces retained evidence.
 // A changed epoch or address requires a new decoder and explicit selection.
-type CX09PCSExtendedDecoder struct {
+type PCSExtendedDecoder struct {
 	mu        sync.Mutex
 	selection CXSelection
 	fields    map[string]CXNativeField
@@ -180,13 +180,13 @@ type CX09PCSExtendedDecoder struct {
 	seen      bool
 }
 
-func CX09NewPCSExtendedDecoder(s CXSelection) *CX09PCSExtendedDecoder {
-	return &CX09PCSExtendedDecoder{selection: s, fields: make(map[string]CXNativeField)}
+func NewPCSExtendedDecoder(s CXSelection) *PCSExtendedDecoder {
+	return &PCSExtendedDecoder{selection: s, fields: make(map[string]CXNativeField)}
 }
-func (d *CX09PCSExtendedDecoder) CX09Decode(i CX01LINKInput) CXNativeResult {
+func (d *PCSExtendedDecoder) DecodePCSExtendedFrame(i LINKInput) CXNativeResult {
 	d.mu.Lock()
 	defer d.mu.Unlock()
-	r := CX09DecodePCSExtended(d.selection, i)
+	r := DecodePCSExtended(d.selection, i)
 	if r.Status != "accepted" {
 		return r
 	}
@@ -211,7 +211,7 @@ func (d *CX09PCSExtendedDecoder) CX09Decode(i CX01LINKInput) CXNativeResult {
 	}
 	return r
 }
-func (d *CX09PCSExtendedDecoder) CX09Snapshot() map[string]CXNativeField {
+func (d *PCSExtendedDecoder) SnapshotPCSExtended() map[string]CXNativeField {
 	d.mu.Lock()
 	defer d.mu.Unlock()
 	r := make(map[string]CXNativeField, len(d.fields))

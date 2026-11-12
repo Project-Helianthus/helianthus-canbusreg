@@ -10,16 +10,16 @@ import (
 	"github.com/Project-Helianthus/helianthus-canbus"
 )
 
-func cx14Fixture(t *testing.T, id uint32, p [8]byte, legacy bool) (CXSelection, CX14PCSInput) {
+func summaryTestFixture(t *testing.T, id uint32, p [8]byte, legacy bool) (CXSelection, PCSSummaryPCSInput) {
 	t.Helper()
-	s, i := cx05Fixture(t, id, p)
+	s, i := standardTestFixture(t, id, p)
 	if !legacy {
-		s, i = cx05Reselect(t, s, i, func(c *CX01SelectionSpec) { c.Release = "0011" })
+		s, i = standardTestReselect(t, s, i, func(c *SelectionSpec) { c.Release = "0011" })
 	}
-	return s, CX14PCSInput{CX05PCSInput: i, LocalSummaryQualified: true}
+	return s, PCSSummaryPCSInput{PCSStandardPCSInput: i, LocalSummaryQualified: true}
 }
 
-var cx14Expected = []struct {
+var summaryTestExpected = []struct {
 	id      uint32
 	word    string
 	bit     int
@@ -41,21 +41,21 @@ var cx14Expected = []struct {
 	{0x323, "B7", 2, []int{57}}, {0x323, "B7", 3, []int{58}}, {0x323, "B7", 4, []int{85}}, {0x323, "B7", 5, []int{89}},
 }
 
-func cx14Payload(word string, bit int) (p [8]byte) {
+func summaryTestPayload(word string, bit int) (p [8]byte) {
 	at := map[string]int{"A": 0, "B": 2, "B4": 4, "B5": 5, "B6": 6, "B7": 7}[word]
 	p[at+bit/8] = 1 << (bit % 8)
 	return
 }
 func TestCX14MappedBitsAndIndependentContributors(t *testing.T) {
-	for _, v := range cx14Expected {
+	for _, v := range summaryTestExpected {
 		for _, source := range v.indices {
 			t.Run(fmt.Sprintf("%x/%s/%d/source%d", v.id, v.word, v.bit, source), func(t *testing.T) {
 				// Each synthetic source alone produces the same OR summary, never attribution.
-				s, i := cx14Fixture(t, v.id, cx14Payload(v.word, v.bit), false)
+				s, i := summaryTestFixture(t, v.id, summaryTestPayload(v.word, v.bit), false)
 				off := false
 				i.ControlActive = &off
 				key := fmt.Sprintf("%s/%d", v.word, v.bit)
-				r := CX14DecodePCSSummaries(s, i)
+				r := DecodePCSSummaries(s, i)
 				b := r.Bits[key]
 				if !reflect.DeepEqual(b.Alternatives, v.indices) || b.Field.Status != "accepted" || b.Field.Grade != "Proven" {
 					t.Fatalf("%s: %#v", key, b)
@@ -66,7 +66,7 @@ func TestCX14MappedBitsAndIndependentContributors(t *testing.T) {
 				}
 				zero, _ := canbus.NewFrame(i.Evidence.Frame.ID(), make([]byte, 8))
 				i.Evidence.Frame = zero
-				clear := CX14DecodePCSSummaries(s, i).Bits[key]
+				clear := DecodePCSSummaries(s, i).Bits[key]
 				if len(clear.Alternatives) != 0 || len(clear.ConditionalAlternatives) != 0 || clear.Field.Numerator != 0 || clear.Field.Status != "accepted" || clear.Field.Meaning != "summary bit clear; independent diagnostics not inferred" {
 					t.Fatal("clear summary interpreted", clear)
 				}
@@ -76,14 +76,14 @@ func TestCX14MappedBitsAndIndependentContributors(t *testing.T) {
 }
 
 func TestCX14SummaryA4Extra99Negative(t *testing.T) {
-	p := cx14Payload("A", 4)
-	s, i := cx14Fixture(t, 0x312, p, true)
-	b := CX14DecodePCSSummaries(s, i).Bits["A/4"]
+	p := summaryTestPayload("A", 4)
+	s, i := summaryTestFixture(t, 0x312, p, true)
+	b := DecodePCSSummaries(s, i).Bits["A/4"]
 	if !reflect.DeepEqual(b.Alternatives, []int{1, 62, 99}) || b.Field.Grade != "Hypothesis" {
 		t.Fatal(b)
 	}
-	s, i = cx14Fixture(t, 0x312, p, false)
-	b = CX14DecodePCSSummaries(s, i).Bits["A/4"]
+	s, i = summaryTestFixture(t, 0x312, p, false)
+	b = DecodePCSSummaries(s, i).Bits["A/4"]
 	if !reflect.DeepEqual(b.Alternatives, []int{1, 62}) || b.Field.Raw != p {
 		t.Fatal(b)
 	}
@@ -92,14 +92,14 @@ func TestCX14SummaryA11OnlyNegative(t *testing.T) {
 	for _, index := range []int{87, 90, 128, 133} {
 		t.Run(fmt.Sprint(index), func(t *testing.T) {
 			// Identical summary from each invented independent source cannot attribute it.
-			p := cx14Payload("A", 11)
-			s, i := cx14Fixture(t, 0x312, p, true)
-			b := CX14DecodePCSSummaries(s, i).Bits["A/11"]
+			p := summaryTestPayload("A", 11)
+			s, i := summaryTestFixture(t, 0x312, p, true)
+			b := DecodePCSSummaries(s, i).Bits["A/11"]
 			if !reflect.DeepEqual(b.Alternatives, []int{87, 90}) || b.Field.Grade != "Hypothesis" || b.Field.Raw != p {
 				t.Fatal(b)
 			}
-			s, i = cx14Fixture(t, 0x312, p, false)
-			b = CX14DecodePCSSummaries(s, i).Bits["A/11"]
+			s, i = summaryTestFixture(t, 0x312, p, false)
+			b = DecodePCSSummaries(s, i).Bits["A/11"]
 			if !reflect.DeepEqual(b.Alternatives, []int{87, 90, 128, 133}) {
 				t.Fatal(b)
 			}
@@ -109,14 +109,14 @@ func TestCX14SummaryA11OnlyNegative(t *testing.T) {
 func TestCX14SummaryA12Only41Negative(t *testing.T) {
 	for _, index := range []int{40, 41} {
 		t.Run(fmt.Sprint(index), func(t *testing.T) {
-			p := cx14Payload("A", 12)
-			s, i := cx14Fixture(t, 0x312, p, true)
-			b := CX14DecodePCSSummaries(s, i).Bits["A/12"]
+			p := summaryTestPayload("A", 12)
+			s, i := summaryTestFixture(t, 0x312, p, true)
+			b := DecodePCSSummaries(s, i).Bits["A/12"]
 			if !reflect.DeepEqual(b.Alternatives, []int{41}) || b.Field.Grade != "Hypothesis" || b.Field.Raw != p || len(b.ConditionalAlternatives) != 0 {
 				t.Fatal(b)
 			}
-			s, i = cx14Fixture(t, 0x312, p, false)
-			b = CX14DecodePCSSummaries(s, i).Bits["A/12"]
+			s, i = summaryTestFixture(t, 0x312, p, false)
+			b = DecodePCSSummaries(s, i).Bits["A/12"]
 			if !reflect.DeepEqual(b.Alternatives, []int{41}) || !reflect.DeepEqual(b.ConditionalAlternatives, []int{40}) {
 				t.Fatal(b)
 			}
@@ -126,23 +126,23 @@ func TestCX14SummaryA12Only41Negative(t *testing.T) {
 func TestCX14SummaryA0State5NegativeBoundaries(t *testing.T) {
 	for _, state := range []int{-1, 0, 4, 5, 6} {
 		t.Run(fmt.Sprint(state), func(t *testing.T) {
-			p := cx14Payload("A", 0)
-			s, i := cx14Fixture(t, 0x312, p, true)
+			p := summaryTestPayload("A", 0)
+			s, i := summaryTestFixture(t, 0x312, p, true)
 			if state >= 0 {
 				v := uint8(state)
 				i.StateCode = &v
 			}
-			b := CX14DecodePCSSummaries(s, i).Bits["A/0"]
+			b := DecodePCSSummaries(s, i).Bits["A/0"]
 			if (b.Field.Status == "accepted") != (state == 5) || len(b.Alternatives) != 0 || b.Field.Raw != p {
 				t.Fatal(b)
 			}
 			if state != 5 && (b.Field.Grade != "Unknown" || b.Field.Meaning != "") {
 				t.Fatal(b)
 			}
-			s, i = cx14Fixture(t, 0x312, p, false)
+			s, i = summaryTestFixture(t, 0x312, p, false)
 			v := uint8(5)
 			i.StateCode = &v
-			b = CX14DecodePCSSummaries(s, i).Bits["A/0"]
+			b = DecodePCSSummaries(s, i).Bits["A/0"]
 			if b.Field.Status != "conflict" || b.Field.Meaning != "" {
 				t.Fatal(b)
 			}
@@ -161,11 +161,11 @@ func TestCX14Condition40Gate(t *testing.T) {
 						v := n == 1
 						return &v
 					}
-					s, i := cx14Fixture(t, 0x312, cx14Payload("A", 12), false)
+					s, i := summaryTestFixture(t, 0x312, summaryTestPayload("A", 12), false)
 					i.ControlActive = ptr(control)
 					i.Condition131 = ptr(c131)
 					i.Condition132 = ptr(c132)
-					b := CX14DecodePCSSummaries(s, i).Bits["A/12"]
+					b := DecodePCSSummaries(s, i).Bits["A/12"]
 					want := []int{41}
 					var conditional []int
 					if control == 0 || c131 == 1 || c132 == 1 {
@@ -185,7 +185,7 @@ func TestCX14Condition40Gate(t *testing.T) {
 func TestCX14AdmissionEveryKey(t *testing.T) {
 	for _, key := range []string{"interface-name", "interface-index", "epoch", "direction", "scope", "bank", "endpoint", "group", "slot", "publisher", "ide", "dlc", "raw-dlc", "age", "native-record", "evidence-record"} {
 		t.Run(key, func(t *testing.T) {
-			s, i := cx14Fixture(t, 0x312, cx14Payload("A", 4), false)
+			s, i := summaryTestFixture(t, 0x312, summaryTestPayload("A", 4), false)
 			switch key {
 			case "interface-name":
 				i.Evidence.Interface, _ = canbus.NewInterfaceIdentity("other", 1)
@@ -231,7 +231,7 @@ func TestCX14AdmissionEveryKey(t *testing.T) {
 			case "evidence-record":
 				i.Evidence.RawRecord[0] = 1
 			}
-			r := CX14DecodePCSSummaries(s, i)
+			r := DecodePCSSummaries(s, i)
 			if len(r.Bits) != 0 || len(r.Fields) != 0 || r.Raw != i.Evidence.Frame.Bytes() || r.Evidence != i.Evidence || r.PhysicalQualified {
 				t.Fatal(r)
 			}
@@ -250,9 +250,9 @@ func TestCX14WrongProfilesAndHypothesisScopeNegatives(t *testing.T) {
 			bit  int
 		}{{0x312, "A", 4}, {0x312, "A", 11}, {0x312, "A", 12}, {0x312, "A", 0}, {0x323, "B4", 2}} {
 			t.Run(fmt.Sprintf("%s/%x/%s/%d", key, v.id, v.word, v.bit), func(t *testing.T) {
-				p := cx14Payload(v.word, v.bit)
-				s, i := cx14Fixture(t, v.id, p, true)
-				c := s.CX01Spec()
+				p := summaryTestPayload(v.word, v.bit)
+				s, i := summaryTestFixture(t, v.id, p, true)
+				c := s.SelectionSpecValue()
 				switch key {
 				case "project-case":
 					c.ProjectCode = "qAAA"
@@ -283,7 +283,7 @@ func TestCX14WrongProfilesAndHypothesisScopeNegatives(t *testing.T) {
 				}
 				state := uint8(5)
 				i.StateCode = &state
-				r := CX14DecodePCSSummaries(s, i)
+				r := DecodePCSSummaries(s, i)
 				if r.Raw != p || r.Evidence != i.Evidence {
 					t.Fatal(r)
 				}
@@ -297,20 +297,20 @@ func TestCX14WrongProfilesAndHypothesisScopeNegatives(t *testing.T) {
 	}
 }
 func TestCX14Local323IndependentQualification(t *testing.T) {
-	for _, v := range cx14Expected {
+	for _, v := range summaryTestExpected {
 		if v.id != 0x323 {
 			continue
 		}
 		for _, source := range v.indices {
 			t.Run(fmt.Sprintf("%s/%d/source%d", v.word, v.bit, source), func(t *testing.T) {
-				p := cx14Payload(v.word, v.bit)
-				s, i := cx14Fixture(t, v.id, p, true)
-				b := CX14DecodePCSSummaries(s, i).Bits[fmt.Sprintf("%s/%d", v.word, v.bit)]
+				p := summaryTestPayload(v.word, v.bit)
+				s, i := summaryTestFixture(t, v.id, p, true)
+				b := DecodePCSSummaries(s, i).Bits[fmt.Sprintf("%s/%d", v.word, v.bit)]
 				if !reflect.DeepEqual(b.Alternatives, v.indices) || b.Field.Grade != "Proven" || b.Field.PhysicalQualified {
 					t.Fatal(b)
 				}
 				i.LocalSummaryQualified = false
-				r := CX14DecodePCSSummaries(s, i)
+				r := DecodePCSSummaries(s, i)
 				for _, b := range r.Bits {
 					if b.Field.Status == "accepted" || len(b.Alternatives) > 0 {
 						t.Fatal(b)
@@ -337,9 +337,9 @@ func TestCX14UnassignedStatusAndExpectedClear(t *testing.T) {
 	} {
 		for _, bit := range v.bits {
 			t.Run(fmt.Sprintf("%x/%s/%d", v.id, v.word, bit), func(t *testing.T) {
-				p := cx14Payload(v.word, bit)
-				s, i := cx14Fixture(t, v.id, p, false)
-				r := CX14DecodePCSSummaries(s, i)
+				p := summaryTestPayload(v.word, bit)
+				s, i := summaryTestFixture(t, v.id, p, false)
+				r := DecodePCSSummaries(s, i)
 				b := r.Bits[fmt.Sprintf("%s/%d", v.word, bit)]
 				if b.Field.Status != v.status || b.Field.Numerator != 1 || b.Field.Raw != p || b.Field.Meaning != "" || len(b.Alternatives) > 0 {
 					t.Fatal(b)
@@ -349,10 +349,10 @@ func TestCX14UnassignedStatusAndExpectedClear(t *testing.T) {
 	}
 }
 func TestCX14PartialRetentionAndClearIndependentFault(t *testing.T) {
-	p := cx14Payload("A", 4)
+	p := summaryTestPayload("A", 4)
 	p[0] |= 2
-	s, i := cx14Fixture(t, 0x312, p, false)
-	previous := CX14DecodePCSSummaries(s, i)
+	s, i := summaryTestFixture(t, 0x312, p, false)
+	previous := DecodePCSSummaries(s, i)
 	for _, state := range []string{"absent", "invalid", "unsupported", "stale", "conflict", "unassigned", "bad-state", "negative-age"} {
 		t.Run(state, func(t *testing.T) {
 			next := i
@@ -362,18 +362,18 @@ func TestCX14PartialRetentionAndClearIndependentFault(t *testing.T) {
 				next.FieldStates = nil
 				next.FieldAges = map[string]time.Duration{"A/4": -1}
 			}
-			r := CX14DecodePCSSummaries(s, next)
+			r := DecodePCSSummaries(s, next)
 			if r.Bits["A/4"].Field.Status == "accepted" || len(r.Bits["A/4"].Alternatives) > 0 || r.Bits["A/1"].Field.Status != "accepted" {
 				t.Fatal(r)
 			}
-			retained := CX05RetainAccepted(previous.CXNativeResult, r.CXNativeResult)
+			retained := RetainAccepted(previous.CXNativeResult, r.CXNativeResult)
 			if retained.Fields["A/4"] != previous.Fields["A/4"] || retained.Fields["A/1"].Evidence != next.Evidence {
 				t.Fatal(retained)
 			}
 		})
 	}
-	s, i = cx14Fixture(t, 0x312, cx14Payload("B", 12), false)
-	r := CX14DecodePCSSummaries(s, i)
+	s, i = summaryTestFixture(t, 0x312, summaryTestPayload("B", 12), false)
+	r := DecodePCSSummaries(s, i)
 	if len(r.Bits["A/12"].Alternatives) != 0 || !reflect.DeepEqual(r.Bits["B/12"].Alternatives, []int{40}) {
 		t.Fatal(r)
 	}
@@ -382,8 +382,8 @@ func TestCX14ParallelLocalAndExplicitAmbiguity(t *testing.T) {
 	for _, flavor := range []string{"pcs-standard", "pcs-parallel"} {
 		for _, choice := range []string{"", "legacy19", "release11"} {
 			t.Run(flavor+choice, func(t *testing.T) {
-				s, i := cx14Fixture(t, 0x312, cx14Payload("A", 4), false)
-				c := s.CX01Spec()
+				s, i := summaryTestFixture(t, 0x312, summaryTestPayload("A", 4), false)
+				c := s.SelectionSpecValue()
 				c.ProjectCode = "QAAa"
 				c.Release = "9011"
 				c.Flavor = flavor
@@ -392,7 +392,7 @@ func TestCX14ParallelLocalAndExplicitAmbiguity(t *testing.T) {
 				if err != nil {
 					t.Fatal(err)
 				}
-				b := CX14DecodePCSSummaries(s, i).Bits["A/4"]
+				b := DecodePCSSummaries(s, i).Bits["A/4"]
 				if (len(b.Alternatives) > 0) != (choice == "release11") {
 					t.Fatal(b)
 				}
@@ -404,8 +404,8 @@ func TestCX14ParallelLocalAndExplicitAmbiguity(t *testing.T) {
 func TestCX14IndependentStatusSources(t *testing.T) {
 	for _, bit := range []int{8, 10} {
 		t.Run(fmt.Sprint(bit), func(t *testing.T) {
-			s, i := cx14Fixture(t, 0x312, cx14Payload("B", bit), false)
-			b := CX14DecodePCSSummaries(s, i).Bits[fmt.Sprintf("B/%d", bit)]
+			s, i := summaryTestFixture(t, 0x312, summaryTestPayload("B", bit), false)
+			b := DecodePCSSummaries(s, i).Bits[fmt.Sprintf("B/%d", bit)]
 			want := "independent status source; no diagnostic index"
 			if bit == 10 {
 				want = "parallel status selector 4; no local diagnostic index"
@@ -418,39 +418,39 @@ func TestCX14IndependentStatusSources(t *testing.T) {
 }
 
 func TestCX14ClearedSummaryReplacesRetainedSetBit(t *testing.T) {
-	s, i := cx14Fixture(t, 0x312, cx14Payload("A", 4), false)
-	previous := CX14DecodePCSSummaries(s, i)
+	s, i := summaryTestFixture(t, 0x312, summaryTestPayload("A", 4), false)
+	previous := DecodePCSSummaries(s, i)
 	if previous.Fields["A/4"].Status != "accepted" || previous.Fields["A/4"].Numerator != 1 {
 		t.Fatal(previous.Fields["A/4"])
 	}
-	s, clear := cx14Fixture(t, 0x312, [8]byte{}, false)
+	s, clear := summaryTestFixture(t, 0x312, [8]byte{}, false)
 	clear.Evidence.Sequence = i.Evidence.Sequence + 1
-	r := CX14DecodePCSSummaries(s, clear)
+	r := DecodePCSSummaries(s, clear)
 	b := r.Bits["A/4"]
 	if b.Field.Status != "accepted" || b.Field.Numerator != 0 || len(b.Alternatives) != 0 || b.Field.Meaning != "summary bit clear; independent diagnostics not inferred" {
 		t.Fatal(b)
 	}
-	retained := CX05RetainAccepted(previous.CXNativeResult, r.CXNativeResult)
+	retained := RetainAccepted(previous.CXNativeResult, r.CXNativeResult)
 	if retained.Fields["A/4"].Numerator != 0 || retained.Fields["A/4"].Evidence != clear.Evidence {
 		t.Fatal(retained.Fields["A/4"])
 	}
 }
 
 func TestCX14LegacyA0ClearReplacesRetainedState5(t *testing.T) {
-	s, i := cx14Fixture(t, 0x312, cx14Payload("A", 0), true)
+	s, i := summaryTestFixture(t, 0x312, summaryTestPayload("A", 0), true)
 	five := uint8(5)
 	i.StateCode = &five
-	previous := CX14DecodePCSSummaries(s, i)
+	previous := DecodePCSSummaries(s, i)
 	if f := previous.Fields["A/0"]; f.Status != "accepted" || f.Numerator != 1 {
 		t.Fatal(f)
 	}
-	s, clear := cx14Fixture(t, 0x312, [8]byte{}, true)
+	s, clear := summaryTestFixture(t, 0x312, [8]byte{}, true)
 	clear.Evidence.Sequence = i.Evidence.Sequence + 1
-	r := CX14DecodePCSSummaries(s, clear)
+	r := DecodePCSSummaries(s, clear)
 	if f := r.Fields["A/0"]; f.Status != "accepted" || f.Numerator != 0 || f.Grade != "Proven" {
 		t.Fatal(f)
 	}
-	retained := CX05RetainAccepted(previous.CXNativeResult, r.CXNativeResult)
+	retained := RetainAccepted(previous.CXNativeResult, r.CXNativeResult)
 	if f := retained.Fields["A/0"]; f.Numerator != 0 || f.Evidence != clear.Evidence {
 		t.Fatal(f)
 	}
@@ -460,18 +460,18 @@ func TestCX14ClearedIndependentStatusReplacesRetainedSetBit(t *testing.T) {
 	for _, bit := range []int{8, 10} {
 		t.Run(fmt.Sprint(bit), func(t *testing.T) {
 			key := fmt.Sprintf("B/%d", bit)
-			s, i := cx14Fixture(t, 0x312, cx14Payload("B", bit), false)
-			previous := CX14DecodePCSSummaries(s, i)
+			s, i := summaryTestFixture(t, 0x312, summaryTestPayload("B", bit), false)
+			previous := DecodePCSSummaries(s, i)
 			if previous.Fields[key].Status != "accepted" || previous.Fields[key].Numerator != 1 {
 				t.Fatal(previous.Fields[key])
 			}
-			s, clear := cx14Fixture(t, 0x312, [8]byte{}, false)
+			s, clear := summaryTestFixture(t, 0x312, [8]byte{}, false)
 			clear.Evidence.Sequence = i.Evidence.Sequence + 1
-			r := CX14DecodePCSSummaries(s, clear)
+			r := DecodePCSSummaries(s, clear)
 			if f := r.Fields[key]; f.Status != "accepted" || f.Numerator != 0 || f.Grade != "Proven" {
 				t.Fatal(f)
 			}
-			retained := CX05RetainAccepted(previous.CXNativeResult, r.CXNativeResult)
+			retained := RetainAccepted(previous.CXNativeResult, r.CXNativeResult)
 			if f := retained.Fields[key]; f.Numerator != 0 || f.Evidence != clear.Evidence {
 				t.Fatal(f)
 			}
@@ -480,18 +480,18 @@ func TestCX14ClearedIndependentStatusReplacesRetainedSetBit(t *testing.T) {
 }
 
 func TestCX14LegacyB10DiagnosticIndexAndReleaseElevenStatus(t *testing.T) {
-	s, i := cx14Fixture(t, 0x312, cx14Payload("B", 10), true)
-	b := CX14DecodePCSSummaries(s, i).Bits["B/10"]
+	s, i := summaryTestFixture(t, 0x312, summaryTestPayload("B", 10), true)
+	b := DecodePCSSummaries(s, i).Bits["B/10"]
 	if !reflect.DeepEqual(b.Alternatives, []int{4}) || b.Field.Status != "accepted" || b.Field.Grade != "Hypothesis" {
 		t.Fatal(b)
 	}
-	s, i = cx14Fixture(t, 0x312, [8]byte{}, true)
-	b = CX14DecodePCSSummaries(s, i).Bits["B/10"]
+	s, i = summaryTestFixture(t, 0x312, [8]byte{}, true)
+	b = DecodePCSSummaries(s, i).Bits["B/10"]
 	if b.Field.Status != "accepted" || len(b.Alternatives) != 0 || b.Field.Numerator != 0 {
 		t.Fatal(b)
 	}
-	s, i = cx14Fixture(t, 0x312, cx14Payload("B", 10), false)
-	b = CX14DecodePCSSummaries(s, i).Bits["B/10"]
+	s, i = summaryTestFixture(t, 0x312, summaryTestPayload("B", 10), false)
+	b = DecodePCSSummaries(s, i).Bits["B/10"]
 	if len(b.Alternatives) != 0 || b.Field.Meaning != "parallel status selector 4; no local diagnostic index" {
 		t.Fatal(b)
 	}

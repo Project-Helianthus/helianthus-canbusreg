@@ -185,6 +185,7 @@ type PCSExtendedDecoder struct {
 func NewPCSExtendedDecoder(s CXSelection) *PCSExtendedDecoder {
 	return &PCSExtendedDecoder{selection: s, fields: make(map[string]CXNativeField)}
 }
+
 // DecodePCSExtendedFrame serializes decoding and rejects stale updates without replacing retained fields.
 func (d *PCSExtendedDecoder) DecodePCSExtendedFrame(i LINKInput) CXNativeResult {
 	d.mu.Lock()
@@ -214,6 +215,7 @@ func (d *PCSExtendedDecoder) DecodePCSExtendedFrame(i LINKInput) CXNativeResult 
 	}
 	return r
 }
+
 // SnapshotPCSExtended returns a synchronized copy of retained fields keyed by frame family and field name.
 func (d *PCSExtendedDecoder) SnapshotPCSExtended() map[string]CXNativeField {
 	d.mu.Lock()

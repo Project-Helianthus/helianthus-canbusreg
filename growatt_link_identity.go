@@ -19,6 +19,7 @@ type LINKIdentitySnapshot struct {
 	Fields                       map[string]CXNativeField
 	PhysicalQualified            bool
 }
+
 // LINKIdentityAssembler serializes identity assembly for one explicit selection; conflicts require a new assembler.
 type LINKIdentityAssembler struct {
 	mu            sync.Mutex
@@ -36,6 +37,7 @@ type LINKIdentityAssembler struct {
 func NewLINKIdentityAssembler(s CXSelection) *LINKIdentityAssembler {
 	return &LINKIdentityAssembler{selection: s, snapshot: LINKIdentitySnapshot{Selection: s, Grade: "Unknown", Status: "absent", Fields: make(map[string]CXNativeField)}}
 }
+
 // SnapshotLINKIdentity returns a synchronized snapshot with a detached field map.
 func (a *LINKIdentityAssembler) SnapshotLINKIdentity() LINKIdentitySnapshot {
 	a.mu.Lock()

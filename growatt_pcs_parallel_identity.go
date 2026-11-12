@@ -34,12 +34,14 @@ type ParallelIdentityAssembler struct {
 func NewParallelIdentityAssembler(s CXSelection, module uint8) *ParallelIdentityAssembler {
 	return &ParallelIdentityAssembler{selection: s, module: module, snapshot: ParallelIdentitySnapshot{Grade: "Unknown", Status: "absent"}}
 }
+
 // SnapshotParallelIdentity returns a synchronized value copy of the assembled identity and fragment evidence.
 func (a *ParallelIdentityAssembler) SnapshotParallelIdentity() ParallelIdentitySnapshot {
 	a.mu.Lock()
 	defer a.mu.Unlock()
 	return a.snapshot
 }
+
 // DecodeParallelIdentity admits ordered fragments for the selected module and retains the completed identity separately from pending assembly.
 func (a *ParallelIdentityAssembler) DecodeParallelIdentity(i LINKInput) CXNativeResult {
 	a.mu.Lock()

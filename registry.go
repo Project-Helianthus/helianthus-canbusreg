@@ -24,8 +24,10 @@ type Classification struct {
 	Profile    string
 	Projection any
 }
+
 // Profile classifies supplied evidence without owning transport I/O.
 type Profile interface{ Classify(Evidence) Classification }
+
 // Registry holds explicitly supplied profiles; overlapping matches fail closed.
 type Registry struct{ profiles []Profile }
 

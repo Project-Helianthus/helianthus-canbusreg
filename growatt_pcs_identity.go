@@ -103,6 +103,7 @@ type PCSIdentitySerialAssembler struct {
 }
 
 func (a *PCSIdentitySerialAssembler) clear() { *a = PCSIdentitySerialAssembler{} }
+
 // Consume assembles ordered identity fragments, clearing pending assembly on rejected input; callers must serialize access.
 func (a *PCSIdentitySerialAssembler) Consume(s CXSelection, i PCSIdentityPCSInput) PCSIdentitySerialResult {
 	record := DecodePCSIdentity(s, i)

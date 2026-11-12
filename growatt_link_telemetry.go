@@ -44,6 +44,7 @@ func lINKCoordinatorAdmission(s CXSelection, i LINKInput) bool {
 	c := s.spec
 	return lINKFrameAdmission(s, i) && c.Direction == "coordinator-to-module" && c.Scope == "aggregate" && c.Source == 0xf4 && (c.Destination == 0xf5 || c.Destination == 0xdf)
 }
+
 // CXDecodeLINKTelemetry decodes admitted LINK telemetry while retaining raw evidence and candidate grades.
 func CXDecodeLINKTelemetry(s CXSelection, i LINKInput) CXNativeResult {
 	r := selectionResult(s, i, "unsupported")

@@ -151,6 +151,7 @@ func NewPCSProvider(s CXSelection) (*Provider, error) {
 	}
 	return projectProviderNew(s)
 }
+
 // NewLINKProvider validates an explicit LINK selection and retention bound before creating a stopped provider.
 func NewLINKProvider(s CXSelection) (*Provider, error) {
 	if s.SelectionSpecValue().Flavor != "link" {
@@ -165,6 +166,7 @@ func projectProviderNew(s CXSelection) (*Provider, error) {
 	}
 	return &Provider{selection: s, snapshot: ProjectProviderSnapshot{Selection: s, State: "stopped", Current: make(map[string]CXNativeField), LastGood: make(map[string]CXNativeField), LastGoodGeneration: make(map[string]uint64)}}, nil
 }
+
 // Start joins the predecessor and starts receiving with a strictly increasing positive generation; invalid sources or generations return an error.
 func (p *Provider) Start(source ReceiveSource, generation uint64) error {
 	p.lifecycle.Lock()
@@ -201,6 +203,7 @@ func (p *Provider) Start(source ReceiveSource, generation uint64) error {
 	go p.projectProviderReceive(ctx, source, generation, done)
 	return nil
 }
+
 // Stop fences current publication, cancels and joins the receiver while preserving historical evidence.
 func (p *Provider) Stop() { p.lifecycle.Lock(); defer p.lifecycle.Unlock(); p.projectProviderStop() }
 func (p *Provider) projectProviderWithhold(state string) {

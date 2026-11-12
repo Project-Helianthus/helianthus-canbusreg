@@ -19,7 +19,9 @@ type providerTestFake struct {
 	pending chan struct{}
 }
 
-func providerTestSource() *providerTestFake { return &providerTestFake{events: make(chan providerTestEvent)} }
+func providerTestSource() *providerTestFake {
+	return &providerTestFake{events: make(chan providerTestEvent)}
+}
 func (s *providerTestFake) ProjectProviderReceive(ctx context.Context) (Observation, error) {
 	if s.pending != nil {
 		close(s.pending)
@@ -782,7 +784,6 @@ func TestCX17ReplacementDTCDemotesOmittedIndex(t *testing.T) {
 		t.Fatal(got.Current[name], got.LastGood[name])
 	}
 }
-
 func TestCX17ParallelReplacementDTCDemotesOmittedIndex(t *testing.T) {
 	c := parallelReleaseTestSpec(t)
 	c.ProjectCode, c.Release, c.Choice = "QAAa", "9011", "release11"
@@ -811,7 +812,6 @@ func TestCX17ParallelReplacementDTCDemotesOmittedIndex(t *testing.T) {
 		t.Fatal(got.Current[name], got.LastGood[name])
 	}
 }
-
 func TestCX17NonzeroReservedByteDoesNotConflict(t *testing.T) {
 	s, i := replayTestFixture(t)
 	p, _ := NewPCSProvider(s)

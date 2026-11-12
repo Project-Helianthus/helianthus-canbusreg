@@ -29,6 +29,7 @@ type SummaryBit struct {
 	Field                                 CXNativeField
 	Alternatives, ConditionalAlternatives []int
 }
+
 // PCSSummaryPCSResult retains candidate summary bits, alternative causes and diagnostic bytes without asserting an all-clear state.
 type PCSSummaryPCSResult struct {
 	CXNativeResult

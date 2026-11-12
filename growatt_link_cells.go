@@ -105,6 +105,7 @@ func lINKVectorGateRejection(f CXNativeField, g MeasurementGate) CXNativeField {
 func lINKVectorAdmit(s CXSelection, i LINKInput) bool {
 	return lINKAdmission(s, i) && s.SelectionGroup() != "" && i.Evidence.Sequence > 0 && i.Evidence.Monotonic >= 0
 }
+
 // DecodeLINKVector serializes channel updates, rejects stale evidence and preserves last-known-good values when individual gates fail.
 func (a *LINKVector) DecodeLINKVector(i LINKInput, gates [4]MeasurementGate) CXNativeResult {
 	a.mu.Lock()
@@ -179,6 +180,7 @@ func lINKVectorAge(f CXNativeField, now time.Duration) (CXNativeField, bool) {
 	f.Age += elapsed
 	return f, true
 }
+
 // SnapshotLINKVector returns detached channel maps aged at now; maxAge bounds current validity without discarding last-known-good values.
 func (a *LINKVector) SnapshotLINKVector(now, maxAge time.Duration) VectorSnapshot {
 	a.mu.Lock()

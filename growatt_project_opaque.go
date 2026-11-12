@@ -10,11 +10,11 @@ type CapabilityState string
 
 const (
 	// ReceiverCapabilityUnknown denotes missing capability evidence.
-	ReceiverCapabilityUnknown     CapabilityState = "unknown"
+	ReceiverCapabilityUnknown CapabilityState = "unknown"
 	// ReceiverCapabilityObserved denotes an admitted observation without a qualification assertion.
-	ReceiverCapabilityObserved    CapabilityState = "observed"
+	ReceiverCapabilityObserved CapabilityState = "observed"
 	// ReceiverCapabilityQualified denotes an external capability assertion, not physical qualification.
-	ReceiverCapabilityQualified   CapabilityState = "qualified"
+	ReceiverCapabilityQualified CapabilityState = "qualified"
 	// ReceiverCapabilityUnsupported denotes an explicit capability denial.
 	ReceiverCapabilityUnsupported CapabilityState = "unsupported"
 )
@@ -164,12 +164,14 @@ func (s *OpaqueStore) Observe(selection CXSelection, c ReceiverContext, i LINKIn
 	}
 	return r
 }
+
 // RawSnapshot returns a copied journal slice under lock.
 func (s *OpaqueStore) RawSnapshot() []ReceiverResult {
 	s.mu.Lock()
 	defer s.mu.Unlock()
 	return append([]ReceiverResult(nil), s.journal...)
 }
+
 // LastKnownGood returns a copied slice of independently admitted retained results under lock.
 func (s *OpaqueStore) LastKnownGood() []ReceiverResult {
 	s.mu.Lock()

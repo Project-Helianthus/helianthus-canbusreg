@@ -114,14 +114,18 @@ func NewCXSelection(spec SelectionSpec) (CXSelection, error) {
 	}
 	return s, nil
 }
+
 // SelectionSpecValue returns the caller assertion by value.
 func (s CXSelection) SelectionSpecValue() SelectionSpec { return s.spec }
+
 // SelectionGroup returns the selected contract group, or empty when unresolved.
-func (s CXSelection) SelectionGroup() string            { return s.group }
+func (s CXSelection) SelectionGroup() string { return s.group }
+
 // SelectionLayout returns the selected layout code, or empty when unresolved.
-func (s CXSelection) SelectionLayout() string           { return s.layout }
+func (s CXSelection) SelectionLayout() string { return s.layout }
+
 // SelectionGrade returns Proven, Hypothesis or Unknown for the contract selection, never physical qualification.
-func (s CXSelection) SelectionGrade() string            { return s.grade }
+func (s CXSelection) SelectionGrade() string { return s.grade }
 func selectionASCII(p []byte) bool {
 	for _, b := range p {
 		if b < 0x21 || b > 0x7e {
@@ -143,6 +147,7 @@ type CXNativeField struct {
 	Age                                time.Duration
 	PhysicalQualified                  bool
 }
+
 // CXNativeResult retains native evidence and per-field candidate results separately from physical qualification.
 type CXNativeResult struct {
 	Selection         CXSelection

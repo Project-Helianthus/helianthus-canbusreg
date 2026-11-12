@@ -282,3 +282,36 @@ func TestO08ZeroFirstSequence(bmsT *testing.T) {
 		bmsT.Fatal("zero first sequence was rejected")
 	}
 }
+
+func TestGrowattBMSProviderErrorTexts(t *testing.T) {
+	id := bmsIdentity(t, "can0", 1)
+	_, revisionErr := NewGrowattBMSProvider(id, "")
+	_, interfaceErr := NewGrowattBMSProvider(canbus.InterfaceIdentity{}, BMSRevisionV104)
+	p, err := NewGrowattBMSProvider(id, BMSRevisionV104)
+	if err != nil {
+		t.Fatal(err)
+	}
+	p.bmsSnapshot.Generation = 2
+	cases := []struct {
+		name   string
+		err    error
+		suffix string
+	}{
+		{"revision", revisionErr, "explicit V1.04 selection"},
+		{"interface", interfaceErr, "a valid interface"},
+		{"nil source", p.Start(nil, 3), "a source and a successor generation"},
+		{"zero generation", p.Start(bmsNewSource(), 0), "a source and a successor generation"},
+		{"equal generation", p.Start(bmsNewSource(), 2), "a source and a successor generation"},
+		{"older generation", p.Start(bmsNewSource(), 1), "a source and a successor generation"},
+	}
+	for _, tc := range cases {
+		t.Run(tc.name, func(t *testing.T) {
+			if tc.err == nil {
+				t.Fatal("expected error")
+			}
+			if got := tc.err.Error(); got == "O08 requires "+tc.suffix || got != "Growatt BMS provider requires "+tc.suffix {
+				t.Fatalf("unexpected error: %q", got)
+			}
+		})
+	}
+}

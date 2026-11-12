@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+- Rename `O08 requires explicit V1.04 selection` to `Growatt BMS provider requires explicit V1.04 selection`.
+- Rename `O08 requires a valid interface` to `Growatt BMS provider requires a valid interface`.
+- Rename `O08 requires a source and a successor generation` to `Growatt BMS provider requires a source and a successor generation`.
+
 - Adopt `temperature_maximum` and `temperature_minimum` in the named fields of
   Growatt LINK, standard PCS and release-11 parallel PCS results, following the
   [public naming contract](https://github.com/Project-Helianthus/helianthus-docs-canbus/blob/main/architecture/naming-contract.md).

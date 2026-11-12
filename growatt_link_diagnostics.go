@@ -9,31 +9,31 @@ import (
 // Sections: Faults and additional status; Release-11 field and behavior gates.
 // This is a stateless receive-only projection. Current bits, selected words,
 // member state and coordinator state remain separate observations.
-func CX13DecodeLINKDiagnostics(s CXSelection, i CX01LINKInput) CXNativeResult {
-	r := cx01Result(s, i, "invalid")
+func DecodeLINKDiagnostics(s CXSelection, i LINKInput) CXNativeResult {
+	r := selectionResult(s, i, "invalid")
 	if i.Evidence.Sequence == 0 || i.Evidence.Monotonic < 0 {
 		return r
 	}
 	kind := i.Evidence.Frame.ID().Value() >> 16
-	module := cx01LINKAdmission(s, i)
-	monitor := cx01LINKReportAdmission(s, i) && kind == 0x1869
-	coordinator := cx01LINKCoordinatorAdmission(s, i) && s.spec.Destination == 0xdf && kind == 0x1869
+	module := lINKAdmission(s, i)
+	monitor := lINKReportAdmission(s, i) && kind == 0x1869
+	coordinator := lINKCoordinatorAdmission(s, i) && s.spec.Destination == 0xdf && kind == 0x1869
 	if !module && !monitor && !coordinator {
 		return r
 	}
 	r.Status = "unsupported"
-	group := s.CX01Group()
+	group := s.SelectionGroup()
 	if coordinator {
 		// The immutable selector intentionally withholds module features for a
 		// coordinator direction. Resolve the explicit member family separately;
 		// the returned result still carries the original coordinator selection.
-		c := s.CX01Spec()
+		c := s.SelectionSpecValue()
 		c.Direction = "module-to-coordinator"
 		member, err := NewCXSelection(c)
 		if err != nil {
 			return r
 		}
-		group = member.CX01Group()
+		group = member.SelectionGroup()
 	}
 	if group == "" {
 		return r

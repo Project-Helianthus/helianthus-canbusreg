@@ -9,13 +9,13 @@ import (
 	"github.com/Project-Helianthus/helianthus-canbus"
 )
 
-func cx05Fixture(t *testing.T, id uint32, p [8]byte) (CXSelection, CX05PCSInput) {
+func standardTestFixture(t *testing.T, id uint32, p [8]byte) (CXSelection, PCSStandardPCSInput) {
 	t.Helper()
 	iface, err := canbus.NewInterfaceIdentity("synthetic", 1)
 	if err != nil {
 		t.Fatal(err)
 	}
-	spec := CX01SelectionSpec{Interface: iface, Flavor: "pcs-standard", ProjectCode: "QAAA", Release: "0006", Direction: "bms-to-pcs", Scope: "local", Bank: "standard", Endpoint: "pack", Group: "group", Slot: "slot", Epoch: 1}
+	spec := SelectionSpec{Interface: iface, Flavor: "pcs-standard", ProjectCode: "QAAA", Release: "0006", Direction: "bms-to-pcs", Scope: "local", Bank: "standard", Endpoint: "pack", Group: "group", Slot: "slot", Epoch: 1}
 	s, err := NewCXSelection(spec)
 	if err != nil {
 		t.Fatal(err)
@@ -28,12 +28,12 @@ func cx05Fixture(t *testing.T, id uint32, p [8]byte) (CXSelection, CX05PCSInput)
 	if err != nil {
 		t.Fatal(err)
 	}
-	return s, CX05PCSInput{CX01LINKInput: CX01LINKInput{Evidence: Evidence{Interface: iface, Frame: frame, Sequence: 7, Monotonic: 9 * time.Second}, Epoch: 1, Direction: spec.Direction, Scope: spec.Scope, Bank: spec.Bank, Endpoint: spec.Endpoint, Group: spec.Group, Slot: spec.Slot, FieldAge: time.Second}, PublisherResolved: true, MeasurementValid: true, TemperatureValid: true, CountValid: true, Count: 2, IndexScope: "local", IndexMinimum: 0, IndexMaximum: 15, IndexValid: true}
+	return s, PCSStandardPCSInput{LINKInput: LINKInput{Evidence: Evidence{Interface: iface, Frame: frame, Sequence: 7, Monotonic: 9 * time.Second}, Epoch: 1, Direction: spec.Direction, Scope: spec.Scope, Bank: spec.Bank, Endpoint: spec.Endpoint, Group: spec.Group, Slot: spec.Slot, FieldAge: time.Second}, PublisherResolved: true, MeasurementValid: true, TemperatureValid: true, CountValid: true, Count: 2, IndexScope: "local", IndexMinimum: 0, IndexMaximum: 15, IndexValid: true}
 }
 
 func TestCX05CoreArithmetic(t *testing.T) {
-	s, i := cx05Fixture(t, 0x313, [8]byte{0x14, 0xbe, 0xff, 0xf6, 0xff, 0xf6, 100, 0xe4})
-	r := CX05DecodePCSStandard(s, i)
+	s, i := standardTestFixture(t, 0x313, [8]byte{0x14, 0xbe, 0xff, 0xf6, 0xff, 0xf6, 100, 0xe4})
+	r := DecodePCSStandard(s, i)
 	for name, want := range map[string]struct {
 		n, d int64
 		unit string
@@ -46,16 +46,16 @@ func TestCX05CoreArithmetic(t *testing.T) {
 			t.Fatalf("evidence %s: %#v", name, f)
 		}
 	}
-	s, i = cx05Fixture(t, 0x314, [8]byte{4, 0xd2, 0, 0, 0, 8, 0, 9})
-	r = CX05DecodePCSStandard(s, i)
+	s, i = standardTestFixture(t, 0x314, [8]byte{4, 0xd2, 0, 0, 0, 8, 0, 9})
+	r = DecodePCSStandard(s, i)
 	if r.Fields["remaining_capacity"].Numerator != 1234 || r.Fields["remaining_capacity"].Denominator != 100 || r.Fields["full_capacity"].Numerator != 0 || r.Fields["full_capacity"].Status != "accepted" || r.Fields["spread"].Unit != "mV" || r.Fields["cycles"].Numerator != 9 {
 		t.Fatal(r)
 	}
 }
 
-func cx05Reselect(t *testing.T, s CXSelection, i CX05PCSInput, change func(*CX01SelectionSpec)) (CXSelection, CX05PCSInput) {
+func standardTestReselect(t *testing.T, s CXSelection, i PCSStandardPCSInput, change func(*SelectionSpec)) (CXSelection, PCSStandardPCSInput) {
 	t.Helper()
-	c := s.CX01Spec()
+	c := s.SelectionSpecValue()
 	change(&c)
 	next, err := NewCXSelection(c)
 	if err != nil {
@@ -69,7 +69,7 @@ func cx05Reselect(t *testing.T, s CXSelection, i CX05PCSInput, change func(*CX01
 func TestCX05AdmissionKeys(t *testing.T) {
 	for _, key := range []string{"interface-name", "interface-index", "epoch", "direction", "scope", "bank", "endpoint", "group", "slot", "publisher", "ide", "dlc", "raw-dlc", "negative-age"} {
 		t.Run(key, func(t *testing.T) {
-			s, i := cx05Fixture(t, 0x313, [8]byte{0x14, 0xbe, 0xff, 0xf6, 0xff, 0xf6, 44, 60})
+			s, i := standardTestFixture(t, 0x313, [8]byte{0x14, 0xbe, 0xff, 0xf6, 0xff, 0xf6, 44, 60})
 			switch key {
 			case "interface-name":
 				i.Evidence.Interface, _ = canbus.NewInterfaceIdentity("other", 1)
@@ -111,7 +111,7 @@ func TestCX05AdmissionKeys(t *testing.T) {
 					t.Fatal(err)
 				}
 			}
-			r := CX05DecodePCSStandard(s, i)
+			r := DecodePCSStandard(s, i)
 			if len(r.Fields) != 0 || r.Raw != i.Evidence.Frame.Bytes() || r.Evidence != i.Evidence || r.PhysicalQualified {
 				t.Fatal(r)
 			}
@@ -122,7 +122,7 @@ func TestCX05AdmissionKeys(t *testing.T) {
 func TestCX05NativeDiagnostics(t *testing.T) {
 	for _, kind := range []string{"malformed", "rtr", "error", "fd", "record-frame-conflict", "evidence-record-rtr"} {
 		t.Run(kind, func(t *testing.T) {
-			s, i := cx05Fixture(t, 0x313, [8]byte{1, 2, 3, 4, 5, 6, 7, 8})
+			s, i := standardTestFixture(t, 0x313, [8]byte{1, 2, 3, 4, 5, 6, 7, 8})
 			record := make([]byte, 16)
 			binary.NativeEndian.PutUint32(record[:4], 0x313)
 			record[4] = 8
@@ -145,7 +145,7 @@ func TestCX05NativeDiagnostics(t *testing.T) {
 			} else {
 				i.NativeRecord = record
 			}
-			r := CX05DecodePCSStandard(s, i)
+			r := DecodePCSStandard(s, i)
 			if len(r.Fields) != 0 || r.Status != "invalid" || r.Evidence != i.Evidence {
 				t.Fatal(r)
 			}
@@ -160,11 +160,11 @@ func TestCX05NativeDiagnostics(t *testing.T) {
 			}
 		})
 	}
-	s, i := cx05Fixture(t, 0x313, [8]byte{})
+	s, i := standardTestFixture(t, 0x313, [8]byte{})
 	i.NativeRecord = make([]byte, 16)
 	binary.NativeEndian.PutUint32(i.NativeRecord[:4], 0x313)
 	i.NativeRecord[4] = 8
-	if CX05DecodePCSStandard(s, i).Fields["voltage"].Status != "accepted" {
+	if DecodePCSStandard(s, i).Fields["voltage"].Status != "accepted" {
 		t.Fatal("valid record rejected")
 	}
 }
@@ -172,8 +172,8 @@ func TestCX05NativeDiagnostics(t *testing.T) {
 func TestCX05SelectorAndScopeGates(t *testing.T) {
 	for _, key := range []string{"project", "case", "release", "flavor", "direction", "aggregate", "ambiguous", "legacy-choice"} {
 		t.Run(key, func(t *testing.T) {
-			s, i := cx05Fixture(t, 0x313, [8]byte{0x14, 0xbe, 0xff, 0xf6, 0xff, 0xf6, 44, 60})
-			s, i = cx05Reselect(t, s, i, func(c *CX01SelectionSpec) {
+			s, i := standardTestFixture(t, 0x313, [8]byte{0x14, 0xbe, 0xff, 0xf6, 0xff, 0xf6, 44, 60})
+			s, i = standardTestReselect(t, s, i, func(c *SelectionSpec) {
 				switch key {
 				case "project":
 					c.ProjectCode = "QAAB"
@@ -193,7 +193,7 @@ func TestCX05SelectorAndScopeGates(t *testing.T) {
 					c.ProjectCode, c.Release, c.Choice = "QAAa", "9011", "legacy19"
 				}
 			})
-			r := CX05DecodePCSStandard(s, i)
+			r := DecodePCSStandard(s, i)
 			for _, f := range r.Fields {
 				if f.Status == "accepted" || f.Unit != "" || f.Meaning != "" {
 					t.Fatal(key, f)
@@ -210,30 +210,30 @@ func TestCX05StatusHypothesisNegatives(t *testing.T) {
 	cases := []struct {
 		name, field string
 		mask        uint16
-		change      func(*CX01SelectionSpec)
+		change      func(*SelectionSpec)
 	}{
-		{"raw-state-aggregate", "raw_state", 3, func(c *CX01SelectionSpec) { c.Scope = "aggregate" }},
-		{"fault-wrong-project", "fault_hint", 4, func(c *CX01SelectionSpec) { c.ProjectCode = "QAAB" }},
-		{"sleep-wrong-case", "sleep_hint", 0x10, func(c *CX01SelectionSpec) { c.ProjectCode = "qAAA" }},
-		{"discharge-wrong-flavor", "discharge_hint", 0x20, func(c *CX01SelectionSpec) { c.Flavor = "pcs-parallel" }},
+		{"raw-state-aggregate", "raw_state", 3, func(c *SelectionSpec) { c.Scope = "aggregate" }},
+		{"fault-wrong-project", "fault_hint", 4, func(c *SelectionSpec) { c.ProjectCode = "QAAB" }},
+		{"sleep-wrong-case", "sleep_hint", 0x10, func(c *SelectionSpec) { c.ProjectCode = "qAAA" }},
+		{"discharge-wrong-flavor", "discharge_hint", 0x20, func(c *SelectionSpec) { c.Flavor = "pcs-parallel" }},
 		{"charge-wrong-endpoint", "charge_hint", 0x40, nil},
-		{"force-wrong-release", "force_hint", 0x400, func(c *CX01SelectionSpec) { c.Release = "0007" }},
+		{"force-wrong-release", "force_hint", 0x400, func(c *SelectionSpec) { c.Release = "0007" }},
 	}
 	for _, v := range cases {
 		t.Run(v.name, func(t *testing.T) {
 			p := [8]byte{}
 			binary.BigEndian.PutUint16(p[6:], v.mask)
-			s, i := cx05Fixture(t, 0x311, p)
-			good := CX05DecodePCSStandard(s, i)
+			s, i := standardTestFixture(t, 0x311, p)
+			good := DecodePCSStandard(s, i)
 			if good.Fields[v.field].Status != "accepted" {
 				t.Fatal(good)
 			}
 			if v.change == nil {
 				i.Endpoint = "other"
 			} else {
-				s, i = cx05Reselect(t, s, i, v.change)
+				s, i = standardTestReselect(t, s, i, v.change)
 			}
-			r := CX05DecodePCSStandard(s, i)
+			r := DecodePCSStandard(s, i)
 			if r.Fields[v.field].Status == "accepted" || r.Raw != p {
 				t.Fatal(r)
 			}
@@ -244,8 +244,8 @@ func TestCX05StatusHypothesisNegatives(t *testing.T) {
 			for _, word := range []uint16{0, 1 << bit} {
 				p := [8]byte{}
 				binary.BigEndian.PutUint16(p[6:], word)
-				s, i := cx05Fixture(t, 0x311, p)
-				r := CX05DecodePCSStandard(s, i)
+				s, i := standardTestFixture(t, 0x311, p)
+				r := DecodePCSStandard(s, i)
 				if r.Fields["status"].Numerator != int64(word) || r.Raw != p {
 					t.Fatal(r)
 				}
@@ -272,11 +272,11 @@ func TestCX05StatusHypothesisNegatives(t *testing.T) {
 func TestCX05TemperatureHypothesisNegatives(t *testing.T) {
 	for _, key := range []string{"local-measurement", "local-temperature", "local-scope", "local-release", "release11-temperature", "release11-count-valid", "release11-count-zero", "release11-measurement"} {
 		t.Run(key, func(t *testing.T) {
-			s, i := cx05Fixture(t, 0x313, [8]byte{0x14, 0xbe, 0xff, 0xf6, 0xff, 0xf6, 40, 60})
+			s, i := standardTestFixture(t, 0x313, [8]byte{0x14, 0xbe, 0xff, 0xf6, 0xff, 0xf6, 40, 60})
 			if len(key) >= 9 && key[:9] == "release11" {
-				s, i = cx05Reselect(t, s, i, func(c *CX01SelectionSpec) { c.Release = "0011" })
+				s, i = standardTestReselect(t, s, i, func(c *SelectionSpec) { c.Release = "0011" })
 			}
-			if CX05DecodePCSStandard(s, i).Fields["temperature"].Status != "accepted" {
+			if DecodePCSStandard(s, i).Fields["temperature"].Status != "accepted" {
 				t.Fatal("positive control")
 			}
 			switch key {
@@ -285,15 +285,15 @@ func TestCX05TemperatureHypothesisNegatives(t *testing.T) {
 			case "local-temperature", "release11-temperature":
 				i.TemperatureValid = false
 			case "local-scope":
-				s, i = cx05Reselect(t, s, i, func(c *CX01SelectionSpec) { c.Scope = "aggregate" })
+				s, i = standardTestReselect(t, s, i, func(c *SelectionSpec) { c.Scope = "aggregate" })
 			case "local-release":
-				s, i = cx05Reselect(t, s, i, func(c *CX01SelectionSpec) { c.Release = "0007" })
+				s, i = standardTestReselect(t, s, i, func(c *SelectionSpec) { c.Release = "0007" })
 			case "release11-count-valid":
 				i.CountValid = false
 			case "release11-count-zero":
 				i.Count = 0
 			}
-			r := CX05DecodePCSStandard(s, i)
+			r := DecodePCSStandard(s, i)
 			if r.Fields["temperature"].Status == "accepted" || r.Raw != i.Evidence.Frame.Bytes() {
 				t.Fatal(r)
 			}
@@ -303,19 +303,19 @@ func TestCX05TemperatureHypothesisNegatives(t *testing.T) {
 		for _, code := range []uint16{0, 1, 0x7fff, 0x8000, 0xfff6, 0xffff} {
 			p := [8]byte{}
 			binary.BigEndian.PutUint16(p[4:], code)
-			s, i := cx05Fixture(t, 0x313, p)
-			s, i = cx05Reselect(t, s, i, func(c *CX01SelectionSpec) { c.Release = release })
-			r := CX05DecodePCSStandard(s, i)
+			s, i := standardTestFixture(t, 0x313, p)
+			s, i = standardTestReselect(t, s, i, func(c *SelectionSpec) { c.Release = release })
+			r := DecodePCSStandard(s, i)
 			if r.Fields["temperature"].Numerator != int64(int16(code)) || r.Fields["temperature"].Denominator != 10 {
 				t.Fatal(r)
 			}
 		}
 	}
 	for _, count := range []uint16{0, 1, 2, 65535} {
-		s, i := cx05Fixture(t, 0x313, [8]byte{})
-		s, i = cx05Reselect(t, s, i, func(c *CX01SelectionSpec) { c.Release = "0011" })
+		s, i := standardTestFixture(t, 0x313, [8]byte{})
+		s, i = standardTestReselect(t, s, i, func(c *SelectionSpec) { c.Release = "0011" })
 		i.Count = count
-		if (CX05DecodePCSStandard(s, i).Fields["temperature"].Status == "accepted") != (count > 0) {
+		if (DecodePCSStandard(s, i).Fields["temperature"].Status == "accepted") != (count > 0) {
 			t.Fatal(count)
 		}
 	}
@@ -332,14 +332,14 @@ func TestCX05Release11SOHHypothesis(t *testing.T) {
 			if v.tenths < 601 || v.diagnostic {
 				b |= 128
 			}
-			s, i := cx05Fixture(t, 0x313, [8]byte{0, 0, 0, 0, 0, 0, 100, b})
-			s, i = cx05Reselect(t, s, i, func(c *CX01SelectionSpec) { c.Release = "0011" })
-			r := CX05DecodePCSStandard(s, i)
+			s, i := standardTestFixture(t, 0x313, [8]byte{0, 0, 0, 0, 0, 0, 100, b})
+			s, i = standardTestReselect(t, s, i, func(c *SelectionSpec) { c.Release = "0011" })
+			r := DecodePCSStandard(s, i)
 			if r.Fields["soh_high_bit"].Numerator != int64(b>>7) || r.Fields["soh_high_bit"].Grade != "Hypothesis" || r.Fields["soh"].Numerator != int64(b&127) || r.Fields["voltage"].Meaning != "output-port voltage" {
 				t.Fatal(r)
 			}
-			s, i = cx05Reselect(t, s, i, func(c *CX01SelectionSpec) { c.Release = "0006" })
-			r = CX05DecodePCSStandard(s, i)
+			s, i = standardTestReselect(t, s, i, func(c *SelectionSpec) { c.Release = "0006" })
+			r = DecodePCSStandard(s, i)
 			if r.Fields["soh_high_bit"].Grade == "Hypothesis" || r.Raw != i.Evidence.Frame.Bytes() {
 				t.Fatal("legacy inherited OR rule")
 			}
@@ -347,14 +347,14 @@ func TestCX05Release11SOHHypothesis(t *testing.T) {
 	}
 	for _, gate := range []string{"measurement", "field-stale"} {
 		t.Run(gate, func(t *testing.T) {
-			s, i := cx05Fixture(t, 0x313, [8]byte{0, 0, 0, 0, 0, 0, 100, 188})
-			s, i = cx05Reselect(t, s, i, func(c *CX01SelectionSpec) { c.Release = "0011" })
+			s, i := standardTestFixture(t, 0x313, [8]byte{0, 0, 0, 0, 0, 0, 100, 188})
+			s, i = standardTestReselect(t, s, i, func(c *SelectionSpec) { c.Release = "0011" })
 			if gate == "measurement" {
 				i.MeasurementValid = false
 			} else {
 				i.FieldStates = map[string]string{"soh_high_bit": "stale"}
 			}
-			r := CX05DecodePCSStandard(s, i)
+			r := DecodePCSStandard(s, i)
 			if r.Fields["soh_high_bit"].Status == "accepted" || r.Raw != i.Evidence.Frame.Bytes() {
 				t.Fatal(r)
 			}
@@ -365,19 +365,19 @@ func TestCX05Release11SOHHypothesis(t *testing.T) {
 func TestCX05GatewaySOCHypothesis(t *testing.T) {
 	for _, gate := range []string{"project", "release", "scope", "measurement", "extra6-invalid", "extra7-invalid"} {
 		t.Run(gate, func(t *testing.T) {
-			s, i := cx05Fixture(t, 0x322, [8]byte{0, 1, 0, 2, 3, 4, 100, 0})
-			s, i = cx05Reselect(t, s, i, func(c *CX01SelectionSpec) { c.ProjectCode, c.Release, c.Scope = "QCAA", "0001", "aggregate" })
-			good := CX05DecodePCSStandard(s, i)
+			s, i := standardTestFixture(t, 0x322, [8]byte{0, 1, 0, 2, 3, 4, 100, 0})
+			s, i = standardTestReselect(t, s, i, func(c *SelectionSpec) { c.ProjectCode, c.Release, c.Scope = "QCAA", "0001", "aggregate" })
+			good := DecodePCSStandard(s, i)
 			if good.Fields["extra_6"].Status != "accepted" || good.Fields["extra_7"].Status != "accepted" {
 				t.Fatal(good)
 			}
 			switch gate {
 			case "project":
-				s, i = cx05Reselect(t, s, i, func(c *CX01SelectionSpec) { c.ProjectCode = "QAAA" })
+				s, i = standardTestReselect(t, s, i, func(c *SelectionSpec) { c.ProjectCode = "QAAA" })
 			case "release":
-				s, i = cx05Reselect(t, s, i, func(c *CX01SelectionSpec) { c.Release = "0002" })
+				s, i = standardTestReselect(t, s, i, func(c *SelectionSpec) { c.Release = "0002" })
 			case "scope":
-				s, i = cx05Reselect(t, s, i, func(c *CX01SelectionSpec) { c.Scope = "local" })
+				s, i = standardTestReselect(t, s, i, func(c *SelectionSpec) { c.Scope = "local" })
 			case "measurement":
 				i.MeasurementValid = false
 			case "extra6-invalid":
@@ -385,7 +385,7 @@ func TestCX05GatewaySOCHypothesis(t *testing.T) {
 			case "extra7-invalid":
 				i.FieldStates = map[string]string{"extra_7": "invalid"}
 			}
-			r := CX05DecodePCSStandard(s, i)
+			r := DecodePCSStandard(s, i)
 			name := "extra_6"
 			if gate == "extra7-invalid" {
 				name = "extra_7"
@@ -399,9 +399,9 @@ func TestCX05GatewaySOCHypothesis(t *testing.T) {
 		})
 	}
 	for _, n := range []byte{0, 1, 99, 100, 101, 255} {
-		s, i := cx05Fixture(t, 0x322, [8]byte{0, 0, 0, 0, 0, 0, n, n})
-		s, i = cx05Reselect(t, s, i, func(c *CX01SelectionSpec) { c.ProjectCode, c.Release, c.Scope = "QCAA", "0001", "aggregate" })
-		r := CX05DecodePCSStandard(s, i)
+		s, i := standardTestFixture(t, 0x322, [8]byte{0, 0, 0, 0, 0, 0, n, n})
+		s, i = standardTestReselect(t, s, i, func(c *SelectionSpec) { c.ProjectCode, c.Release, c.Scope = "QCAA", "0001", "aggregate" })
+		r := DecodePCSStandard(s, i)
 		for _, name := range []string{"extra_6", "extra_7"} {
 			if (r.Fields[name].Status == "accepted") != (n <= 100) {
 				t.Fatal(n, r)
@@ -412,8 +412,8 @@ func TestCX05GatewaySOCHypothesis(t *testing.T) {
 
 func TestCX05ExtremaAndLocationHypothesis(t *testing.T) {
 	for _, id := range []uint32{0x319, 0x322, 0x330} {
-		s, i := cx05Fixture(t, id, [8]byte{1, 2, 3, 4, 5, 6, 7, 8})
-		r := CX05DecodePCSStandard(s, i)
+		s, i := standardTestFixture(t, id, [8]byte{1, 2, 3, 4, 5, 6, 7, 8})
+		r := DecodePCSStandard(s, i)
 		switch id {
 		case 0x319:
 			if r.Fields["maximum_cell"].Numerator != 515 || r.Fields["minimum_cell"].Numerator != 1029 || r.Fields["maximum_index"].Numerator != 6 || r.Fields["minimum_index"].Numerator != 7 || r.Fields["state_0"].Numerator != 1 || r.Fields["state_7"].Numerator != 8 {
@@ -429,7 +429,7 @@ func TestCX05ExtremaAndLocationHypothesis(t *testing.T) {
 			}
 		}
 		i.IndexScope = "aggregate"
-		r = CX05DecodePCSStandard(s, i)
+		r = DecodePCSStandard(s, i)
 		idx := "maximum_index"
 		if id == 0x322 {
 			idx = "maximum_temperature_index"
@@ -443,19 +443,19 @@ func TestCX05ExtremaAndLocationHypothesis(t *testing.T) {
 	}
 	for _, gate := range []string{"project", "release", "scope", "index-scope", "index-valid", "location-state"} {
 		t.Run("fixed-location-"+gate, func(t *testing.T) {
-			s, i := cx05Fixture(t, 0x330, [8]byte{1, 2, 1, 4, 5, 6, 7, 8})
-			s, i = cx05Reselect(t, s, i, func(c *CX01SelectionSpec) { c.ProjectCode, c.Release, c.Scope = "QAAB", "0004", "aggregate" })
+			s, i := standardTestFixture(t, 0x330, [8]byte{1, 2, 1, 4, 5, 6, 7, 8})
+			s, i = standardTestReselect(t, s, i, func(c *SelectionSpec) { c.ProjectCode, c.Release, c.Scope = "QAAB", "0004", "aggregate" })
 			i.IndexScope = "aggregate"
-			if CX05DecodePCSStandard(s, i).Fields["maximum_location_fixed_aggregate"].Status != "accepted" {
+			if DecodePCSStandard(s, i).Fields["maximum_location_fixed_aggregate"].Status != "accepted" {
 				t.Fatal("positive")
 			}
 			switch gate {
 			case "project":
-				s, i = cx05Reselect(t, s, i, func(c *CX01SelectionSpec) { c.ProjectCode = "QAAA" })
+				s, i = standardTestReselect(t, s, i, func(c *SelectionSpec) { c.ProjectCode = "QAAA" })
 			case "release":
-				s, i = cx05Reselect(t, s, i, func(c *CX01SelectionSpec) { c.Release = "0099" })
+				s, i = standardTestReselect(t, s, i, func(c *SelectionSpec) { c.Release = "0099" })
 			case "scope":
-				s, i = cx05Reselect(t, s, i, func(c *CX01SelectionSpec) { c.Scope = "local" })
+				s, i = standardTestReselect(t, s, i, func(c *SelectionSpec) { c.Scope = "local" })
 			case "index-scope":
 				i.IndexScope = "local"
 			case "index-valid":
@@ -463,27 +463,27 @@ func TestCX05ExtremaAndLocationHypothesis(t *testing.T) {
 			case "location-state":
 				i.FieldStates = map[string]string{"maximum_location_fixed_aggregate": "unassigned"}
 			}
-			r := CX05DecodePCSStandard(s, i)
+			r := DecodePCSStandard(s, i)
 			if r.Fields["maximum_location_fixed_aggregate"].Status == "accepted" || r.Raw != i.Evidence.Frame.Bytes() {
 				t.Fatal(r)
 			}
 		})
 	}
 	for _, location := range []byte{0, 1, 2, 255} {
-		s, i := cx05Fixture(t, 0x330, [8]byte{location, 2, location, 4})
-		s, i = cx05Reselect(t, s, i, func(c *CX01SelectionSpec) { c.ProjectCode, c.Release, c.Scope = "QAAB", "0004", "aggregate" })
+		s, i := standardTestFixture(t, 0x330, [8]byte{location, 2, location, 4})
+		s, i = standardTestReselect(t, s, i, func(c *SelectionSpec) { c.ProjectCode, c.Release, c.Scope = "QAAB", "0004", "aggregate" })
 		i.IndexScope = "aggregate"
-		r := CX05DecodePCSStandard(s, i)
+		r := DecodePCSStandard(s, i)
 		if (r.Fields["maximum_location_fixed_aggregate"].Status == "accepted") != (location == 1) {
 			t.Fatal(r)
 		}
 	}
 	for _, id := range []uint32{0x319, 0x322, 0x330} {
-		s, i := cx05Fixture(t, id, [8]byte{1, 2, 1, 4, 5, 6, 7, 8})
-		s, i = cx05Reselect(t, s, i, func(c *CX01SelectionSpec) { c.ProjectCode, c.Release, c.Scope = "QAAB", "0099", "aggregate" })
+		s, i := standardTestFixture(t, id, [8]byte{1, 2, 1, 4, 5, 6, 7, 8})
+		s, i = standardTestReselect(t, s, i, func(c *SelectionSpec) { c.ProjectCode, c.Release, c.Scope = "QAAB", "0099", "aggregate" })
 		i.IndexScope = "aggregate"
 		i.IndexValid = true
-		r := CX05DecodePCSStandard(s, i)
+		r := DecodePCSStandard(s, i)
 		for name, f := range r.Fields {
 			if f.Status == "accepted" && (strings.HasSuffix(name, "_index") || strings.HasSuffix(name, "_fixed_aggregate")) {
 				t.Fatalf("unknown QAAB release accepted %s: %v", name, r)
@@ -491,8 +491,8 @@ func TestCX05ExtremaAndLocationHypothesis(t *testing.T) {
 		}
 	}
 	for _, n := range []byte{0, 1, 14, 15, 16, 255} {
-		s, i := cx05Fixture(t, 0x319, [8]byte{0, 0, 0, 0, 0, n, n})
-		r := CX05DecodePCSStandard(s, i)
+		s, i := standardTestFixture(t, 0x319, [8]byte{0, 0, 0, 0, 0, n, n})
+		r := DecodePCSStandard(s, i)
 		if (r.Fields["maximum_index"].Status == "accepted") != (n <= 15) {
 			t.Fatal(r)
 		}
@@ -500,17 +500,17 @@ func TestCX05ExtremaAndLocationHypothesis(t *testing.T) {
 }
 
 func TestCX05PartialStatesAndLastKnownGood(t *testing.T) {
-	s, i := cx05Fixture(t, 0x313, [8]byte{0x14, 0xbe, 0xff, 0xf6, 0xff, 0xf6, 40, 60})
-	previous := CX05DecodePCSStandard(s, i).CXNativeResult
+	s, i := standardTestFixture(t, 0x313, [8]byte{0x14, 0xbe, 0xff, 0xf6, 0xff, 0xf6, 40, 60})
+	previous := DecodePCSStandard(s, i).CXNativeResult
 	for _, state := range []string{"absent", "invalid", "unsupported", "stale", "conflict", "unassigned", "unrecognized"} {
 		t.Run(state, func(t *testing.T) {
 			i.FieldStates = map[string]string{"temperature": state}
 			i.FieldAges = map[string]time.Duration{"temperature": 5 * time.Second, "voltage": 2 * time.Second}
-			r := CX05DecodePCSStandard(s, i)
+			r := DecodePCSStandard(s, i)
 			if r.Fields["temperature"].Status == "accepted" || r.Fields["voltage"].Status != "accepted" || r.Fields["voltage"].Age != 2*time.Second {
 				t.Fatal(r)
 			}
-			merged := CX05RetainAccepted(previous, r.CXNativeResult)
+			merged := RetainAccepted(previous, r.CXNativeResult)
 			if merged.Fields["temperature"] != previous.Fields["temperature"] || merged.Fields["voltage"].Age != 2*time.Second {
 				t.Fatal("retention/age")
 			}
@@ -522,12 +522,12 @@ func TestCX05PartialStatesAndLastKnownGood(t *testing.T) {
 	}
 	i.FieldStates = nil
 	i.FieldAges = map[string]time.Duration{"temperature": -1}
-	if CX05DecodePCSStandard(s, i).Fields["temperature"].Status != "invalid" {
+	if DecodePCSStandard(s, i).Fields["temperature"].Status != "invalid" {
 		t.Fatal("negative field age")
 	}
 	for _, key := range []string{"interface-name", "interface-index", "flavor", "project", "release", "choice", "direction", "scope", "bank", "endpoint", "group", "slot", "epoch", "pcs-flavor", "route-set", "destination", "source"} {
 		t.Run("retention-key-"+key, func(t *testing.T) {
-			c := s.CX01Spec()
+			c := s.SelectionSpecValue()
 			switch key {
 			case "interface-name":
 				c.Interface, _ = canbus.NewInterfaceIdentity("other", 1)
@@ -569,7 +569,7 @@ func TestCX05PartialStatesAndLastKnownGood(t *testing.T) {
 				t.Fatal(err)
 			}
 			update := CXNativeResult{Selection: next, Fields: map[string]CXNativeField{}}
-			if len(CX05RetainAccepted(previous, update).Fields) != 0 {
+			if len(RetainAccepted(previous, update).Fields) != 0 {
 				t.Fatal("cross-key retention")
 			}
 		})
@@ -577,8 +577,8 @@ func TestCX05PartialStatesAndLastKnownGood(t *testing.T) {
 }
 
 func TestCX05SummaryLimitsAndRanges(t *testing.T) {
-	s, i := cx05Fixture(t, 0x312, [8]byte{1, 2, 3, 4, 5, 6, 7, 8})
-	r := CX05DecodePCSStandard(s, i)
+	s, i := standardTestFixture(t, 0x312, [8]byte{1, 2, 3, 4, 5, 6, 7, 8})
+	r := DecodePCSStandard(s, i)
 	for name, want := range map[string]int64{"status_a": 513, "status_b": 1027, "reported_count": 5, "padding_5": 6, "padding_6": 7, "padding_7": 8} {
 		if r.Fields[name].Numerator != want || r.Fields[name].Status != "raw" {
 			t.Fatal(name, r)
@@ -587,19 +587,19 @@ func TestCX05SummaryLimitsAndRanges(t *testing.T) {
 	if len(r.Fields) != 6 {
 		t.Fatal("invented cell/manufacturer fields")
 	}
-	s, i = cx05Fixture(t, 0x311, [8]byte{0x12, 0x34, 0x23, 0x45, 0x34, 0x56, 0x45, 0x67})
-	r = CX05DecodePCSStandard(s, i)
+	s, i = standardTestFixture(t, 0x311, [8]byte{0x12, 0x34, 0x23, 0x45, 0x34, 0x56, 0x45, 0x67})
+	r = DecodePCSStandard(s, i)
 	if r.Fields["voltage_limit"].Numerator != 0x1234 || r.Fields["voltage_limit"].Denominator != 10 || r.Fields["charge_limit"].Numerator != 0x2345 || r.Fields["discharge_limit"].Numerator != 0x3456 {
 		t.Fatal(r)
 	}
-	s, i = cx05Reselect(t, s, i, func(c *CX01SelectionSpec) { c.ProjectCode, c.Release, c.Scope = "QCAA", "0001", "aggregate" })
-	r = CX05DecodePCSStandard(s, i)
+	s, i = standardTestReselect(t, s, i, func(c *SelectionSpec) { c.ProjectCode, c.Release, c.Scope = "QCAA", "0001", "aggregate" })
+	r = DecodePCSStandard(s, i)
 	if r.Fields["charge_limit"].Numerator != 0x3456 || r.Fields["discharge_limit"].Numerator != 0x2345 || r.Fields["charge_limit"].Unit != "" {
 		t.Fatal("gateway mapping/scale", r)
 	}
 	for _, n := range []byte{0, 1, 99, 100, 101, 127, 128, 255} {
-		s, i = cx05Fixture(t, 0x313, [8]byte{0, 0, 0, 0, 0, 0, n, n})
-		r = CX05DecodePCSStandard(s, i)
+		s, i = standardTestFixture(t, 0x313, [8]byte{0, 0, 0, 0, 0, 0, n, n})
+		r = DecodePCSStandard(s, i)
 		if (r.Fields["soc"].Status == "accepted") != (n <= 100) || (r.Fields["soh"].Status == "accepted") != (n&127 <= 100) {
 			t.Fatal(n, r)
 		}
@@ -609,57 +609,57 @@ func TestCX05SummaryLimitsAndRanges(t *testing.T) {
 		for at := 0; at < 8; at += 2 {
 			binary.BigEndian.PutUint16(p[at:], n)
 		}
-		s, i = cx05Fixture(t, 0x314, p)
-		r = CX05DecodePCSStandard(s, i)
+		s, i = standardTestFixture(t, 0x314, p)
+		r = DecodePCSStandard(s, i)
 		for _, name := range []string{"remaining_capacity", "full_capacity", "spread", "cycles"} {
 			if r.Fields[name].Numerator != int64(n) {
 				t.Fatal(name, r)
 			}
 		}
-		s, i = cx05Fixture(t, 0x313, p)
-		r = CX05DecodePCSStandard(s, i)
+		s, i = standardTestFixture(t, 0x313, p)
+		r = DecodePCSStandard(s, i)
 		if r.Fields["voltage"].Numerator != int64(n) || r.Fields["current"].Numerator != int64(int16(n)) {
 			t.Fatal(r)
 		}
 	}
-	s, i = cx05Fixture(t, 0x301, [8]byte{})
-	if CX05DecodePCSStandard(s, i).Status != "unsupported" {
+	s, i = standardTestFixture(t, 0x301, [8]byte{})
+	if DecodePCSStandard(s, i).Status != "unsupported" {
 		t.Fatal("input PID decoded")
 	}
 }
 
 func TestCX05InvalidCodesAndConflictingRecords(t *testing.T) {
-	s, i := cx05Fixture(t, 0x313, [8]byte{0, 0, 0, 0, 0, 0, 101, 101})
-	r := CX05DecodePCSStandard(s, i)
+	s, i := standardTestFixture(t, 0x313, [8]byte{0, 0, 0, 0, 0, 0, 101, 101})
+	r := DecodePCSStandard(s, i)
 	if r.Fields["soc"].Status != "invalid" || r.Fields["soh"].Status != "invalid" || r.Fields["voltage"].Status != "accepted" {
 		t.Fatal("invalid codes must remain distinct from unknown units", r)
 	}
-	s, i = cx05Fixture(t, 0x313, [8]byte{})
+	s, i = standardTestFixture(t, 0x313, [8]byte{})
 	i.NativeRecord = make([]byte, 16)
 	binary.NativeEndian.PutUint32(i.NativeRecord[:4], 0x313)
 	i.NativeRecord[4] = 8
 	copy(i.Evidence.RawRecord[:], i.NativeRecord)
 	i.Evidence.RawRecord[8] = 1
-	r = CX05DecodePCSStandard(s, i)
+	r = DecodePCSStandard(s, i)
 	if len(r.Fields) != 0 || r.Evidence != i.Evidence || string(r.Diagnostics) != string(i.NativeRecord) {
 		t.Fatal("contradictory raw record admitted", r)
 	}
 }
 
 func TestCX05ExtremaIndependentTemperatureGate(t *testing.T) {
-	s, i := cx05Fixture(t, 0x322, [8]byte{0xff, 0xf6, 0x80, 0, 0, 15, 9, 10})
-	r := CX05DecodePCSStandard(s, i)
+	s, i := standardTestFixture(t, 0x322, [8]byte{0xff, 0xf6, 0x80, 0, 0, 15, 9, 10})
+	r := DecodePCSStandard(s, i)
 	if r.Fields["temperature_maximum"].Numerator != -10 || r.Fields["temperature_minimum"].Numerator != -32768 || r.Fields["temperature_minimum"].Denominator != 10 {
 		t.Fatal(r)
 	}
 	i.FieldStates = map[string]string{"temperature_maximum": "invalid"}
-	r = CX05DecodePCSStandard(s, i)
+	r = DecodePCSStandard(s, i)
 	if r.Fields["temperature_maximum"].Status != "invalid" || r.Fields["temperature_minimum"].Status != "accepted" || r.Fields["minimum_temperature_index"].Status != "accepted" {
 		t.Fatal("invalid maximum erased sibling", r)
 	}
 	i.FieldStates = nil
 	i.TemperatureValid = false
-	r = CX05DecodePCSStandard(s, i)
+	r = DecodePCSStandard(s, i)
 	if r.Fields["temperature_maximum"].Status == "accepted" || r.Fields["temperature_minimum"].Status == "accepted" || r.Fields["maximum_temperature_index"].Status != "accepted" {
 		t.Fatal("temperature gate affected indices", r)
 	}
@@ -667,9 +667,9 @@ func TestCX05ExtremaIndependentTemperatureGate(t *testing.T) {
 
 func TestCX05IndexRequiresSupportedContract(t *testing.T) {
 	for _, id := range []uint32{0x319, 0x322, 0x330} {
-		s, i := cx05Fixture(t, id, [8]byte{0, 0, 0, 0, 1, 2, 3, 4})
-		s, i = cx05Reselect(t, s, i, func(c *CX01SelectionSpec) { c.ProjectCode, c.Release = "QZZZ", "9999" })
-		r := CX05DecodePCSStandard(s, i)
+		s, i := standardTestFixture(t, id, [8]byte{0, 0, 0, 0, 1, 2, 3, 4})
+		s, i = standardTestReselect(t, s, i, func(c *SelectionSpec) { c.ProjectCode, c.Release = "QZZZ", "9999" })
+		r := DecodePCSStandard(s, i)
 		for name, f := range r.Fields {
 			if (name == "maximum_index" || name == "minimum_index" || name == "maximum_temperature_index" || name == "minimum_temperature_index") && (f.Status == "accepted" || f.Grade == "Proven") {
 				t.Fatal(id, name, f)
@@ -679,11 +679,11 @@ func TestCX05IndexRequiresSupportedContract(t *testing.T) {
 }
 
 func TestCX05RetentionKeepsCellAndTemperatureIndicesApart(t *testing.T) {
-	s, i := cx05Fixture(t, 0x319, [8]byte{0, 0, 0, 0, 0, 6, 7, 0})
-	cell := CX05DecodePCSStandard(s, i)
-	_, i2 := cx05Fixture(t, 0x322, [8]byte{0, 0, 0, 0, 5, 4, 0, 0})
-	temp := CX05DecodePCSStandard(s, i2)
-	merged := CX05RetainAccepted(cell.CXNativeResult, temp.CXNativeResult)
+	s, i := standardTestFixture(t, 0x319, [8]byte{0, 0, 0, 0, 0, 6, 7, 0})
+	cell := DecodePCSStandard(s, i)
+	_, i2 := standardTestFixture(t, 0x322, [8]byte{0, 0, 0, 0, 5, 4, 0, 0})
+	temp := DecodePCSStandard(s, i2)
+	merged := RetainAccepted(cell.CXNativeResult, temp.CXNativeResult)
 	if merged.Fields["maximum_index"].Numerator != 6 || merged.Fields["minimum_index"].Numerator != 7 || merged.Fields["maximum_temperature_index"].Numerator != 5 || merged.Fields["minimum_temperature_index"].Numerator != 4 {
 		t.Fatal(merged.Fields)
 	}

@@ -9,43 +9,43 @@ import (
 // LINK native contract: https://github.com/Project-Helianthus/helianthus-docs-canbus/blob/main/protocols/growatt/growatt-low-voltage-bms-can-link-protocol-v1.md
 // Sections: Identify the peer before interpreting version-dependent fields;
 // Identity and ordinary module telemetry; Serial number and date announcements.
-type CX01LINKInput struct {
+type LINKInput struct {
 	Evidence                                      Evidence
 	Epoch                                         uint64
 	Direction, Scope, Bank, Endpoint, Group, Slot string
 	FieldAge                                      time.Duration
 }
 
-func cx01Result(s CXSelection, i CX01LINKInput, status string) CXNativeResult {
+func selectionResult(s CXSelection, i LINKInput, status string) CXNativeResult {
 	return CXNativeResult{Selection: s, Evidence: i.Evidence, Raw: i.Evidence.Frame.Bytes(), Epoch: i.Epoch, Status: status, Fields: make(map[string]CXNativeField)}
 }
-func cx01LINKFrameAdmission(s CXSelection, i CX01LINKInput) bool {
+func lINKFrameAdmission(s CXSelection, i LINKInput) bool {
 	f := i.Evidence.Frame
 	c := s.spec
 	id := f.ID().Value()
 	return c.Flavor == "link" && c.RouteSet && f.ID().Extended() && f.DLC() == 8 && f.RawDLC() == 8 && id>>24 == 0x18 && uint8(id>>8) == c.Destination && uint8(id) == c.Source && i.Evidence.Interface == c.Interface && i.Epoch == c.Epoch && i.Direction == c.Direction && i.Scope == c.Scope && i.Bank == c.Bank && i.Endpoint == c.Endpoint && i.Group == c.Group && i.Slot == c.Slot && i.FieldAge >= 0
 }
-func cx01LINKAdmission(s CXSelection, i CX01LINKInput) bool {
+func lINKAdmission(s CXSelection, i LINKInput) bool {
 	c := s.spec
-	return cx01LINKFrameAdmission(s, i) && c.Direction == "module-to-coordinator" && c.Destination == 0xf4 && c.Source != 0xff && c.Source != 0xf4 && c.Scope == "local"
+	return lINKFrameAdmission(s, i) && c.Direction == "module-to-coordinator" && c.Destination == 0xf4 && c.Source != 0xff && c.Source != 0xf4 && c.Scope == "local"
 }
 
 // cx01LINKReportAdmission admits module reports addressed to the F5 route.
-func cx01LINKReportAdmission(s CXSelection, i CX01LINKInput) bool {
+func lINKReportAdmission(s CXSelection, i LINKInput) bool {
 	c := s.spec
-	return cx01LINKFrameAdmission(s, i) && c.Direction == "module-to-coordinator" && c.Destination == 0xf5 && c.Source != 0xff && c.Source != 0xf4 && c.Scope == "local"
+	return lINKFrameAdmission(s, i) && c.Direction == "module-to-coordinator" && c.Destination == 0xf5 && c.Source != 0xff && c.Source != 0xf4 && c.Scope == "local"
 }
-func cx01LINKDateAdmission(s CXSelection, i CX01LINKInput) bool {
+func lINKDateAdmission(s CXSelection, i LINKInput) bool {
 	c := s.spec
-	return cx01LINKFrameAdmission(s, i) && c.Direction == "module-to-coordinator" && c.Destination == 0xf5 && c.Source != 0xff && c.Source != 0xf4 && c.Scope == "local" && i.Evidence.Frame.ID().Value()>>16 == 0x1809
+	return lINKFrameAdmission(s, i) && c.Direction == "module-to-coordinator" && c.Destination == 0xf5 && c.Source != 0xff && c.Source != 0xf4 && c.Scope == "local" && i.Evidence.Frame.ID().Value()>>16 == 0x1809
 }
-func cx01LINKCoordinatorAdmission(s CXSelection, i CX01LINKInput) bool {
+func lINKCoordinatorAdmission(s CXSelection, i LINKInput) bool {
 	c := s.spec
-	return cx01LINKFrameAdmission(s, i) && c.Direction == "coordinator-to-module" && c.Scope == "aggregate" && c.Source == 0xf4 && (c.Destination == 0xf5 || c.Destination == 0xdf)
+	return lINKFrameAdmission(s, i) && c.Direction == "coordinator-to-module" && c.Scope == "aggregate" && c.Source == 0xf4 && (c.Destination == 0xf5 || c.Destination == 0xdf)
 }
-func CXDecodeLINKTelemetry(s CXSelection, i CX01LINKInput) CXNativeResult {
-	r := cx01Result(s, i, "unsupported")
-	if !cx01LINKAdmission(s, i) && !cx01LINKDateAdmission(s, i) && !cx01LINKCoordinatorAdmission(s, i) {
+func CXDecodeLINKTelemetry(s CXSelection, i LINKInput) CXNativeResult {
+	r := selectionResult(s, i, "unsupported")
+	if !lINKAdmission(s, i) && !lINKDateAdmission(s, i) && !lINKCoordinatorAdmission(s, i) {
 		r.Status = "invalid"
 		return r
 	}
@@ -60,7 +60,7 @@ func CXDecodeLINKTelemetry(s CXSelection, i CX01LINKInput) CXNativeResult {
 		add(name, n, d, unit, meaning, s.grade, "accepted")
 	}
 	kind := uint16(i.Evidence.Frame.ID().Value() >> 16)
-	if cx01LINKCoordinatorAdmission(s, i) {
+	if lINKCoordinatorAdmission(s, i) {
 		if s.spec.Destination != 0xf5 {
 			return r
 		}
@@ -101,7 +101,7 @@ func CXDecodeLINKTelemetry(s CXSelection, i CX01LINKInput) CXNativeResult {
 		byteField("version", 6)
 		byteField("reserved", 7)
 	case 0x1802:
-		if !cx01ASCII(p[:]) {
+		if !selectionASCII(p[:]) {
 			r.Status = "invalid"
 			return r
 		}
@@ -185,7 +185,7 @@ func CXDecodeLINKTelemetry(s CXSelection, i CX01LINKInput) CXNativeResult {
 			accepted("temperature_minimum", int64(p[3])-40, 1, "C", "integer code")
 		}
 	case 0x1809:
-		if !cx01LINKDateAdmission(s, i) {
+		if !lINKDateAdmission(s, i) {
 			return r
 		}
 		raw("year", le(0))

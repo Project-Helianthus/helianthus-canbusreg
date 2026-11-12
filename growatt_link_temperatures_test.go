@@ -7,16 +7,16 @@ import (
 )
 
 func TestCX12FineMeanEachStaleContributorAndAgeBoundary(t *testing.T) {
-	spec := cx01Spec(t, "QAAA", "0011")
-	s := cx01Select(t, spec)
-	raw := cx12Words(424, 400, 412, 0)
+	spec := selectionTestSpec(t, "QAAA", "0011")
+	s := selectionTestSelect(t, spec)
+	raw := vectorTestWords(424, 400, 412, 0)
 	for bad := 0; bad < 4; bad++ {
 		for _, age := range []time.Duration{time.Second, time.Second + 1} {
 			t.Run(fmt.Sprintf("slot-%d-age-%d", bad+1, age), func(t *testing.T) {
-				gates := cx12Gates()
+				gates := vectorTestGates()
 				gates[bad].Age = age
-				v := cx12Sensors(t, spec, 4, cx12Words(400, 408, 416, 424), gates)
-				r := CX12DecodeLINKTemperatureSummary(s, cx12SummaryInput(t, spec, 0x1862, raw), CX12SummaryGates{FineTemperatureValid: true, Mean: cx12Gates()[0], Contributors: v})
+				v := vectorTestSensors(t, spec, 4, vectorTestWords(400, 408, 416, 424), gates)
+				r := DecodeLINKTemperatureSummary(s, vectorTestSummaryInput(t, spec, 0x1862, raw), SummaryGates{FineTemperatureValid: true, Mean: vectorTestGates()[0], Contributors: v})
 				if r.Raw != raw || (r.Fields["mean"].Status == "accepted") != (age == time.Second) {
 					t.Fatal(r)
 				}
@@ -26,18 +26,18 @@ func TestCX12FineMeanEachStaleContributorAndAgeBoundary(t *testing.T) {
 }
 
 func TestCX12TemperatureSelectorAndIndependentWords(t *testing.T) {
-	raw := cx12Words(408, 400, 404, 1)
+	raw := vectorTestWords(408, 400, 404, 1)
 	for _, id := range []struct {
 		code, release, choice string
 		mean                  bool
 	}{{"QAAA", "0009", "", true}, {"QAAA", "0010", "", true}, {"QAAA", "0011", "", true}, {"QAAa", "9010", "", false}, {"QAAa", "9011", "legacy19", false}, {"QAAa", "9011", "release11", true}} {
 		t.Run(id.code+id.release+id.choice, func(t *testing.T) {
-			spec := cx01Spec(t, id.code, id.release)
+			spec := selectionTestSpec(t, id.code, id.release)
 			spec.Choice = id.choice
-			s := cx01Select(t, spec)
-			v := cx12Sensors(t, spec, 2, cx12Words(400, 408, 0, 0), cx12Gates())
-			g := CX12SummaryGates{FineTemperatureValid: true, Maximum: cx12Gates()[0], Mean: cx12Gates()[0], Contributors: v}
-			r := CX12DecodeLINKTemperatureSummary(s, cx12SummaryInput(t, spec, 0x1862, raw), g)
+			s := selectionTestSelect(t, spec)
+			v := vectorTestSensors(t, spec, 2, vectorTestWords(400, 408, 0, 0), vectorTestGates())
+			g := SummaryGates{FineTemperatureValid: true, Maximum: vectorTestGates()[0], Mean: vectorTestGates()[0], Contributors: v}
+			r := DecodeLINKTemperatureSummary(s, vectorTestSummaryInput(t, spec, 0x1862, raw), g)
 			if (r.Fields["mean"].Status == "accepted") != id.mean || r.Fields["maximum"].Status != "accepted" || r.Fields["minimum"].Status == "accepted" || r.Fields["reserved"].Status != "invalid" || r.Raw != raw {
 				t.Fatal(r)
 			}
@@ -46,12 +46,12 @@ func TestCX12TemperatureSelectorAndIndependentWords(t *testing.T) {
 }
 
 func TestCX12NoPhysicalSensorAssociation(t *testing.T) {
-	spec := cx01Spec(t, "QAAA", "0011")
-	p := cx12Words(400, 400, 400, 400)
+	spec := selectionTestSpec(t, "QAAA", "0011")
+	p := vectorTestWords(400, 400, 400, 400)
 	for _, configured := range []bool{false, true} {
-		g := cx12Gates()
+		g := vectorTestGates()
 		g[0].Configured = configured
-		v := cx12Sensors(t, spec, 4, p, g)
+		v := vectorTestSensors(t, spec, 4, p, g)
 		f := v.Fields[1]
 		if f.Raw != p || f.PhysicalQualified || (f.Meaning != "" && f.Meaning != "fine sensor code; location unspecified") {
 			t.Fatal(f)
@@ -60,9 +60,9 @@ func TestCX12NoPhysicalSensorAssociation(t *testing.T) {
 }
 
 func TestCX12SummaryAssociationAndEvidenceRetention(t *testing.T) {
-	spec := cx01Spec(t, "QAAA", "0011")
-	s := cx01Select(t, spec)
-	raw := cx12Words(408, 400, 404, 0)
+	spec := selectionTestSpec(t, "QAAA", "0011")
+	s := selectionTestSelect(t, spec)
+	raw := vectorTestWords(408, 400, 404, 0)
 	for _, key := range []string{"source", "epoch", "project", "release", "flavor", "pcs-flavor", "choice", "scope", "bank", "endpoint", "group", "slot", "direction", "route-set", "destination", "interface-name", "interface-index", "later-summary", "count-valid", "missing-field", "invalid-field"} {
 		t.Run(key, func(t *testing.T) {
 			other := spec
@@ -98,11 +98,11 @@ func TestCX12SummaryAssociationAndEvidenceRetention(t *testing.T) {
 			case "destination":
 				other.Destination++
 			case "interface-name":
-				other.Interface = cx12OtherInterface(t, "other", 1)
+				other.Interface = vectorTestOtherInterface(t, "other", 1)
 			case "interface-index":
-				other.Interface = cx12OtherInterface(t, "synthetic", 2)
+				other.Interface = vectorTestOtherInterface(t, "synthetic", 2)
 			}
-			v := cx12Sensors(t, spec, 2, cx12Words(400, 408, 0, 0), cx12Gates())
+			v := vectorTestSensors(t, spec, 2, vectorTestWords(400, 408, 0, 0), vectorTestGates())
 			if key != "later-summary" && key != "count-valid" && key != "missing-field" && key != "invalid-field" {
 				v.Selection.spec = other
 			}
@@ -117,11 +117,11 @@ func TestCX12SummaryAssociationAndEvidenceRetention(t *testing.T) {
 				f.Status = "invalid"
 				v.Fields[2] = f
 			}
-			i := cx12SummaryInput(t, spec, 0x1862, raw)
+			i := vectorTestSummaryInput(t, spec, 0x1862, raw)
 			if key == "later-summary" {
 				i.Evidence.Monotonic = 3 * time.Second
 			}
-			r := CX12DecodeLINKTemperatureSummary(s, i, CX12SummaryGates{FineTemperatureValid: true, Mean: cx12Gates()[0], Contributors: v})
+			r := DecodeLINKTemperatureSummary(s, i, SummaryGates{FineTemperatureValid: true, Mean: vectorTestGates()[0], Contributors: v})
 			if r.Raw != raw || r.Fields["mean"].Status == "accepted" {
 				t.Fatal(r)
 			}
@@ -129,40 +129,40 @@ func TestCX12SummaryAssociationAndEvidenceRetention(t *testing.T) {
 	}
 }
 
-func cx12Sensors(t *testing.T, spec CX01SelectionSpec, count int, p [8]byte, g [4]CX12MeasurementGate) CX12VectorSnapshot {
-	a := CX12NewLINKTemperatures(cx01Select(t, spec), count, true)
-	a.CX12Decode(cx01Input(t, spec, 0x1830, p), g)
-	return a.CX12Snapshot(time.Second, time.Second)
+func vectorTestSensors(t *testing.T, spec SelectionSpec, count int, p [8]byte, g [4]MeasurementGate) VectorSnapshot {
+	a := NewLINKTemperatures(selectionTestSelect(t, spec), count, true)
+	a.DecodeLINKVector(selectionTestInput(t, spec, 0x1830, p), g)
+	return a.SnapshotLINKVector(time.Second, time.Second)
 }
 func TestCX12FineTemperaturesAndMean(t *testing.T) {
-	spec := cx01Spec(t, "QAAA", "0011")
-	s := cx01Select(t, spec)
-	p := cx12Words(400, 408, 0, 0)
-	v := cx12Sensors(t, spec, 2, p, cx12Gates())
+	spec := selectionTestSpec(t, "QAAA", "0011")
+	s := selectionTestSelect(t, spec)
+	p := vectorTestWords(400, 408, 0, 0)
+	v := vectorTestSensors(t, spec, 2, p, vectorTestGates())
 	f := v.Fields[1]
 	if f.Numerator != 80 || f.Denominator != 8 || f.Unit != "C" || f.Meaning != "fine sensor code; location unspecified" || f.PhysicalQualified {
 		t.Fatal(f)
 	}
-	g := CX12SummaryGates{FineTemperatureValid: true, Maximum: cx12Gates()[0], Minimum: cx12Gates()[0], Mean: cx12Gates()[0], Contributors: v}
-	r := CX12DecodeLINKTemperatureSummary(s, cx12SummaryInput(t, spec, 0x1862, cx12Words(408, 400, 404, 0)), g)
+	g := SummaryGates{FineTemperatureValid: true, Maximum: vectorTestGates()[0], Minimum: vectorTestGates()[0], Mean: vectorTestGates()[0], Contributors: v}
+	r := DecodeLINKTemperatureSummary(s, vectorTestSummaryInput(t, spec, 0x1862, vectorTestWords(408, 400, 404, 0)), g)
 	if f := r.Fields["mean"]; f.Status != "accepted" || f.Numerator != 84 || f.Denominator != 8 {
 		t.Fatal(r)
 	}
 }
 func TestCX12MeanCountAndInvalidContributorNegatives(t *testing.T) {
-	spec := cx01Spec(t, "QAAA", "0011")
-	s := cx01Select(t, spec)
-	p := cx12Words(400, 408, 416, 424)
+	spec := selectionTestSpec(t, "QAAA", "0011")
+	s := selectionTestSelect(t, spec)
+	p := vectorTestWords(400, 408, 416, 424)
 	for _, count := range []int{0, 1, 4, 5} {
 		t.Run(string(rune('A'+count)), func(t *testing.T) {
-			v := cx12Sensors(t, spec, count, p, cx12Gates())
+			v := vectorTestSensors(t, spec, count, p, vectorTestGates())
 			code := uint16(400)
 			if count == 4 {
 				code = 412
 			}
-			raw := cx12Words(424, 400, code, 0)
-			g := CX12SummaryGates{FineTemperatureValid: true, Mean: cx12Gates()[0], Contributors: v}
-			r := CX12DecodeLINKTemperatureSummary(s, cx12SummaryInput(t, spec, 0x1862, raw), g)
+			raw := vectorTestWords(424, 400, code, 0)
+			g := SummaryGates{FineTemperatureValid: true, Mean: vectorTestGates()[0], Contributors: v}
+			r := DecodeLINKTemperatureSummary(s, vectorTestSummaryInput(t, spec, 0x1862, raw), g)
 			if (r.Fields["mean"].Status == "accepted") != (count == 1 || count == 4) || r.Raw != raw {
 				t.Fatal(r)
 			}
@@ -170,7 +170,7 @@ func TestCX12MeanCountAndInvalidContributorNegatives(t *testing.T) {
 	}
 	for _, bad := range []string{"invalid-1", "invalid-2", "stale-1", "stale-2", "ffff-contribution", "fixed-four", "count-unqualified", "fine-gate"} {
 		t.Run(bad, func(t *testing.T) {
-			gates := cx12Gates()
+			gates := vectorTestGates()
 			rawSensors := p
 			switch bad {
 			case "invalid-1":
@@ -182,15 +182,15 @@ func TestCX12MeanCountAndInvalidContributorNegatives(t *testing.T) {
 			case "stale-2":
 				gates[1].Age = 2 * time.Second
 			case "ffff-contribution":
-				rawSensors = cx12Words(400, 65535, 416, 424)
+				rawSensors = vectorTestWords(400, 65535, 416, 424)
 			}
-			v := cx12Sensors(t, spec, 2, rawSensors, gates)
+			v := vectorTestSensors(t, spec, 2, rawSensors, gates)
 			if bad == "count-unqualified" {
 				v.CountValid = false
 			}
-			g := CX12SummaryGates{FineTemperatureValid: bad != "fine-gate", Mean: cx12Gates()[0], Contributors: v, FixedFourPath: bad == "fixed-four"}
-			raw := cx12Words(408, 400, 404, 0)
-			r := CX12DecodeLINKTemperatureSummary(s, cx12SummaryInput(t, spec, 0x1862, raw), g)
+			g := SummaryGates{FineTemperatureValid: bad != "fine-gate", Mean: vectorTestGates()[0], Contributors: v, FixedFourPath: bad == "fixed-four"}
+			raw := vectorTestWords(408, 400, 404, 0)
+			r := DecodeLINKTemperatureSummary(s, vectorTestSummaryInput(t, spec, 0x1862, raw), g)
 			if r.Raw != raw || r.Fields["mean"].Status == "accepted" {
 				t.Fatal(r)
 			}
@@ -198,36 +198,36 @@ func TestCX12MeanCountAndInvalidContributorNegatives(t *testing.T) {
 	}
 }
 func TestCX12FineZeroFFFFAndUnconfigured(t *testing.T) {
-	spec := cx01Spec(t, "QAAA", "0011")
-	a := CX12NewLINKTemperatures(cx01Select(t, spec), 4, true)
-	g := cx12Gates()
+	spec := selectionTestSpec(t, "QAAA", "0011")
+	a := NewLINKTemperatures(selectionTestSelect(t, spec), 4, true)
+	g := vectorTestGates()
 	g[2].Configured = false
-	r := a.CX12Decode(cx01Input(t, spec, 0x1830, cx12Words(0, 65535, 400, 400)), g)
+	r := a.DecodeLINKVector(selectionTestInput(t, spec, 0x1830, vectorTestWords(0, 65535, 400, 400)), g)
 	if r.Fields["sensor_1"].Numerator != -320 || r.Fields["sensor_2"].Status != "invalid" || r.Fields["sensor_3"].Status != "unconfigured" || r.Fields["sensor_4"].Status != "accepted" {
 		t.Fatal(r)
 	}
 }
 
-func cx12SummaryInput(t *testing.T, spec CX01SelectionSpec, kind uint32, p [8]byte) CX01LINKInput {
-	i := cx01Input(t, spec, kind, p)
+func vectorTestSummaryInput(t *testing.T, spec SelectionSpec, kind uint32, p [8]byte) LINKInput {
+	i := selectionTestInput(t, spec, kind, p)
 	i.Evidence.Sequence = 10
 	return i
 }
 
 func TestCX12MeanFloorAndInvalidCodesNeverFiltered(t *testing.T) {
-	spec := cx01Spec(t, "QAAA", "0011")
-	s := cx01Select(t, spec)
-	v := cx12Sensors(t, spec, 2, cx12Words(400, 409, 0, 0), cx12Gates())
-	raw := cx12Words(409, 400, 404, 0)
-	r := CX12DecodeLINKTemperatureSummary(s, cx12SummaryInput(t, spec, 0x1862, raw), CX12SummaryGates{FineTemperatureValid: true, Mean: cx12Gates()[0], Contributors: v})
+	spec := selectionTestSpec(t, "QAAA", "0011")
+	s := selectionTestSelect(t, spec)
+	v := vectorTestSensors(t, spec, 2, vectorTestWords(400, 409, 0, 0), vectorTestGates())
+	raw := vectorTestWords(409, 400, 404, 0)
+	r := DecodeLINKTemperatureSummary(s, vectorTestSummaryInput(t, spec, 0x1862, raw), SummaryGates{FineTemperatureValid: true, Mean: vectorTestGates()[0], Contributors: v})
 	if r.Fields["mean"].Status != "accepted" || r.Fields["mean"].Numerator != 84 {
 		t.Fatal(r)
 	}
 	for _, reported := range []uint16{400, 32967} {
 		t.Run(fmt.Sprint(reported), func(t *testing.T) {
-			v := cx12Sensors(t, spec, 2, cx12Words(400, 65535, 0, 0), cx12Gates())
-			raw := cx12Words(65535, 400, reported, 0)
-			r := CX12DecodeLINKTemperatureSummary(s, cx12SummaryInput(t, spec, 0x1862, raw), CX12SummaryGates{FineTemperatureValid: true, Mean: cx12Gates()[0], Contributors: v})
+			v := vectorTestSensors(t, spec, 2, vectorTestWords(400, 65535, 0, 0), vectorTestGates())
+			raw := vectorTestWords(65535, 400, reported, 0)
+			r := DecodeLINKTemperatureSummary(s, vectorTestSummaryInput(t, spec, 0x1862, raw), SummaryGates{FineTemperatureValid: true, Mean: vectorTestGates()[0], Contributors: v})
 			if r.Raw != raw || r.Fields["mean"].Status == "accepted" {
 				t.Fatal(r)
 			}
@@ -236,12 +236,12 @@ func TestCX12MeanFloorAndInvalidCodesNeverFiltered(t *testing.T) {
 }
 
 func TestCX12SummaryRejectsReusedContributorEvidence(t *testing.T) {
-	spec := cx01Spec(t, "QAAA", "0011")
-	s := cx01Select(t, spec)
-	raw := cx12Words(408, 400, 404, 0)
+	spec := selectionTestSpec(t, "QAAA", "0011")
+	s := selectionTestSelect(t, spec)
+	raw := vectorTestWords(408, 400, 404, 0)
 	for _, bad := range []string{"epoch", "source", "destination", "interface", "scope", "bank", "endpoint", "group", "slot", "same-sequence", "future-sequence", "future-clock", "raw", "wrong-family"} {
 		t.Run(bad, func(t *testing.T) {
-			v := cx12Sensors(t, spec, 2, cx12Words(400, 408, 0, 0), cx12Gates())
+			v := vectorTestSensors(t, spec, 2, vectorTestWords(400, 408, 0, 0), vectorTestGates())
 			f := v.Fields[1]
 			switch bad {
 			case "epoch":
@@ -249,13 +249,13 @@ func TestCX12SummaryRejectsReusedContributorEvidence(t *testing.T) {
 			case "source":
 				other := spec
 				other.Source++
-				f.Evidence = cx01Input(t, other, 0x1830, f.Raw).Evidence
+				f.Evidence = selectionTestInput(t, other, 0x1830, f.Raw).Evidence
 			case "destination":
 				other := spec
 				other.Destination++
-				f.Evidence = cx01Input(t, other, 0x1830, f.Raw).Evidence
+				f.Evidence = selectionTestInput(t, other, 0x1830, f.Raw).Evidence
 			case "interface":
-				f.Evidence.Interface = cx12OtherInterface(t, "other", 1)
+				f.Evidence.Interface = vectorTestOtherInterface(t, "other", 1)
 			case "scope":
 				f.Scope = "aggregate"
 			case "bank":
@@ -275,10 +275,10 @@ func TestCX12SummaryRejectsReusedContributorEvidence(t *testing.T) {
 			case "raw":
 				f.Raw[0]++
 			case "wrong-family":
-				f.Evidence = cx01Input(t, spec, 0x1810, f.Raw).Evidence
+				f.Evidence = selectionTestInput(t, spec, 0x1810, f.Raw).Evidence
 			}
 			v.Fields[1] = f
-			r := CX12DecodeLINKTemperatureSummary(s, cx12SummaryInput(t, spec, 0x1862, raw), CX12SummaryGates{FineTemperatureValid: true, Mean: cx12Gates()[0], Contributors: v})
+			r := DecodeLINKTemperatureSummary(s, vectorTestSummaryInput(t, spec, 0x1862, raw), SummaryGates{FineTemperatureValid: true, Mean: vectorTestGates()[0], Contributors: v})
 			if r.Raw != raw || r.Fields["mean"].Status == "accepted" {
 				t.Fatal(r)
 			}
@@ -287,12 +287,12 @@ func TestCX12SummaryRejectsReusedContributorEvidence(t *testing.T) {
 }
 
 func TestCX12SummaryGateRejectionKeepsGateStatusAndAge(t *testing.T) {
-	spec := cx01Spec(t, "QAAA", "0011")
-	s := cx01Select(t, spec)
-	v := cx12Sensors(t, spec, 2, cx12Words(400, 408, 0, 0), cx12Gates())
-	stale := CX12MeasurementGate{Configured: true, Valid: false, Status: "stale", Age: 7 * time.Second}
-	g := CX12SummaryGates{FineTemperatureValid: true, Maximum: stale, Minimum: cx12Gates()[0], Mean: stale, Contributors: v}
-	r := CX12DecodeLINKTemperatureSummary(s, cx12SummaryInput(t, spec, 0x1862, cx12Words(408, 400, 404, 0)), g)
+	spec := selectionTestSpec(t, "QAAA", "0011")
+	s := selectionTestSelect(t, spec)
+	v := vectorTestSensors(t, spec, 2, vectorTestWords(400, 408, 0, 0), vectorTestGates())
+	stale := MeasurementGate{Configured: true, Valid: false, Status: "stale", Age: 7 * time.Second}
+	g := SummaryGates{FineTemperatureValid: true, Maximum: stale, Minimum: vectorTestGates()[0], Mean: stale, Contributors: v}
+	r := DecodeLINKTemperatureSummary(s, vectorTestSummaryInput(t, spec, 0x1862, vectorTestWords(408, 400, 404, 0)), g)
 	for _, name := range []string{"maximum", "mean"} {
 		if f := r.Fields[name]; f.Status != "stale" || f.Age != 7*time.Second {
 			t.Fatal(name, f)
@@ -304,11 +304,11 @@ func TestCX12SummaryGateRejectionKeepsGateStatusAndAge(t *testing.T) {
 }
 
 func TestCX12SummarySentinelStaysInvalidWithValidGates(t *testing.T) {
-	spec := cx01Spec(t, "QAAA", "0011")
-	s := cx01Select(t, spec)
-	v := cx12Sensors(t, spec, 2, cx12Words(400, 408, 0, 0), cx12Gates())
-	g := CX12SummaryGates{FineTemperatureValid: true, Maximum: cx12Gates()[0], Minimum: cx12Gates()[0], Mean: cx12Gates()[0], Contributors: v}
-	r := CX12DecodeLINKTemperatureSummary(s, cx12SummaryInput(t, spec, 0x1862, cx12Words(65535, 65535, 65535, 0)), g)
+	spec := selectionTestSpec(t, "QAAA", "0011")
+	s := selectionTestSelect(t, spec)
+	v := vectorTestSensors(t, spec, 2, vectorTestWords(400, 408, 0, 0), vectorTestGates())
+	g := SummaryGates{FineTemperatureValid: true, Maximum: vectorTestGates()[0], Minimum: vectorTestGates()[0], Mean: vectorTestGates()[0], Contributors: v}
+	r := DecodeLINKTemperatureSummary(s, vectorTestSummaryInput(t, spec, 0x1862, vectorTestWords(65535, 65535, 65535, 0)), g)
 	for _, name := range []string{"maximum", "minimum", "mean"} {
 		if f := r.Fields[name]; f.Status != "invalid" || f.Unit != "" || f.Grade == "Proven" {
 			t.Fatal(name, f)

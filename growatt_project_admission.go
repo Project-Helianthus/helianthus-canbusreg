@@ -16,53 +16,53 @@ import (
 // https://github.com/Project-Helianthus/helianthus-docs-canbus/blob/main/protocols/growatt/growatt-low-voltage-bms-can-monitor-addressed-profile-v1.md
 // This adapter consumes finite caller-associated evidence only. Protocol grades
 // remain candidates. Neither the classifier nor native identity selects a profile.
-type CX16ReplayInput struct {
+type ReplayInput struct {
 	Selection                        CXSelection
-	PCS                              CX08PCSInput
-	Parallel                         CX11ParallelContext
-	Summary                          CX14PCSInput
+	PCS                              PCSSlotPCSInput
+	Parallel                         ParallelContext
+	Summary                          PCSSummaryPCSInput
 	TopologyAssociated               bool
 	CellCount, SensorCount           int
 	CellCountValid, SensorCountValid bool
-	CellGates, SensorGates           [4]CX12MeasurementGate
-	BalanceGate                      CX12MeasurementGate
+	CellGates, SensorGates           [4]MeasurementGate
+	BalanceGate                      MeasurementGate
 	HardwareAgeKnown                 bool
 	HardwareAge                      time.Duration
-	MeanGate                         CX12MeasurementGate
-	CellContributors                 CX12VectorSnapshot
-	TemperatureSummary               CX12SummaryGates
+	MeanGate                         MeasurementGate
+	CellContributors                 VectorSnapshot
+	TemperatureSummary               SummaryGates
 }
 
-type CX16Diagnostic struct {
-	Input        CX01LINKInput
+type Diagnostic struct {
+	Input        LINKInput
 	NativeRecord []byte
 	Status       string
 }
 
-type CX16Projection struct {
+type ReplayProjection struct {
 	Current           CXNativeResult
 	Native            map[string]CXNativeResult
 	RetainedNative    map[string]CXNativeResult
 	LastGood          map[string]CXNativeField
-	Diagnostics       []CX16Diagnostic
-	SummaryBits       map[string]CX14SummaryBit
+	Diagnostics       []Diagnostic
+	SummaryBits       map[string]SummaryBit
 	PhysicalQualified bool
 }
 
-type cx16Entry struct {
-	input        CX01LINKInput
+type replayEntry struct {
+	input        LINKInput
 	nativeRecord []byte
 	parts        map[string]CXNativeResult
-	bits         map[string]CX14SummaryBit
+	bits         map[string]SummaryBit
 	status       string
 }
 
-type cx16SelectedProfile struct {
+type replaySelectedProfile struct {
 	mu                        sync.Mutex
 	selection                 CXSelection
-	replay                    map[Evidence]cx16Entry
+	replay                    map[Evidence]replayEntry
 	retained                  map[string]CXNativeResult
-	diagnostics               []CX16Diagnostic
+	diagnostics               []Diagnostic
 	last                      Evidence
 	hasLast, identityConflict bool
 }
@@ -72,30 +72,30 @@ type cx16SelectedProfile struct {
 // is diagnostic-only. Register this profile explicitly; do not add it to a
 // default registry. A diagnostic classification also participates in the existing
 // collision rule, preventing an overlapping profile from supplying a fallback.
-func NewCX16SelectedProfile(s CXSelection, replay []CX16ReplayInput) (Profile, error) {
-	validated, err := NewCXSelection(s.CX01Spec())
-	if err != nil || validated != s || s.CX01Group() == "" {
+func NewCX16SelectedProfile(s CXSelection, replay []ReplayInput) (Profile, error) {
+	validated, err := NewCXSelection(s.SelectionSpecValue())
+	if err != nil || validated != s || s.SelectionGroup() == "" {
 		return nil, fmt.Errorf("explicit supported selection required")
 	}
 	if len(replay) < 1 || len(replay) > 128 {
 		return nil, fmt.Errorf("replay bound must be 1..128")
 	}
-	p := &cx16SelectedProfile{selection: s, replay: make(map[Evidence]cx16Entry), retained: make(map[string]CXNativeResult)}
+	p := &replaySelectedProfile{selection: s, replay: make(map[Evidence]replayEntry), retained: make(map[string]CXNativeResult)}
 	for _, in := range replay {
-		i := in.PCS.CX01LINKInput
+		i := in.PCS.LINKInput
 		if len(in.PCS.NativeRecord) > 72 {
 			return nil, fmt.Errorf("native record exceeds bounded diagnostic size")
 		}
 		if _, exists := p.replay[i.Evidence]; exists {
 			return nil, fmt.Errorf("duplicate evidence association")
 		}
-		e := cx16Entry{input: i, nativeRecord: append([]byte(nil), in.PCS.NativeRecord...), status: "invalid", parts: make(map[string]CXNativeResult)}
-		if in.Selection == s && cx16Context(s, i, in.PCS.NativeRecord) {
+		e := replayEntry{input: i, nativeRecord: append([]byte(nil), in.PCS.NativeRecord...), status: "invalid", parts: make(map[string]CXNativeResult)}
+		if in.Selection == s && replayContext(s, i, in.PCS.NativeRecord) {
 			e.status = "descriptive"
-			if (s.CX01Spec().Flavor == "pcs-standard" || s.CX01Spec().Flavor == "pcs-parallel") && !in.PCS.PublisherResolved {
+			if (s.SelectionSpecValue().Flavor == "pcs-standard" || s.SelectionSpecValue().Flavor == "pcs-parallel") && !in.PCS.PublisherResolved {
 				e.status = "conflict"
 			} else {
-				e.parts, e.bits = cx16Decode(s, in)
+				e.parts, e.bits = fixture16Decode(s, in)
 			}
 		}
 		p.replay[i.Evidence] = e
@@ -103,8 +103,8 @@ func NewCX16SelectedProfile(s CXSelection, replay []CX16ReplayInput) (Profile, e
 	return p, nil
 }
 
-func cx16Context(s CXSelection, i CX01LINKInput, native []byte) bool {
-	c, f := s.CX01Spec(), i.Evidence.Frame
+func replayContext(s CXSelection, i LINKInput, native []byte) bool {
+	c, f := s.SelectionSpecValue(), i.Evidence.Frame
 	if i.Evidence.Interface != c.Interface || i.Epoch != c.Epoch || i.Direction != c.Direction || i.Scope != c.Scope || i.Bank != c.Bank || i.Endpoint != c.Endpoint || i.Group != c.Group || i.Slot != c.Slot || i.FieldAge < 0 || i.Evidence.Sequence == 0 || i.Evidence.Monotonic < 0 || f.DLC() != 8 || f.RawDLC() != 8 {
 		return false
 	}
@@ -128,49 +128,49 @@ func cx16Context(s CXSelection, i CX01LINKInput, native []byte) bool {
 	return f.ID().Extended() && c.RouteSet && uint8(id>>8) == c.Destination && uint8(id) == c.Source
 }
 
-func cx16Decode(s CXSelection, in CX16ReplayInput) (map[string]CXNativeResult, map[string]CX14SummaryBit) {
-	i := in.PCS.CX01LINKInput
+func fixture16Decode(s CXSelection, in ReplayInput) (map[string]CXNativeResult, map[string]SummaryBit) {
+	i := in.PCS.LINKInput
 	r := make(map[string]CXNativeResult)
-	var bits map[string]CX14SummaryBit
-	switch s.CX01Spec().Flavor {
+	var bits map[string]SummaryBit
+	switch s.SelectionSpecValue().Flavor {
 	case "pcs-standard":
-		r["core"] = CX05DecodePCSStandard(s, in.PCS.CX05PCSInput).CXNativeResult
-		r["gauge"] = CX06DecodePCSGauge(s, in.PCS.CX06PCSInput)
-		r["identity"] = CX06DecodePCSIdentity(s, in.PCS.CX06PCSInput)
-		r["slots"] = CX08DecodePCSSlots(s, in.PCS)
+		r["core"] = DecodePCSStandard(s, in.PCS.PCSStandardPCSInput).CXNativeResult
+		r["gauge"] = DecodePCSGauge(s, in.PCS.PCSIdentityPCSInput)
+		r["identity"] = DecodePCSIdentity(s, in.PCS.PCSIdentityPCSInput)
+		r["slots"] = DecodePCSSlots(s, in.PCS)
 		summary := in.Summary
-		summary.CX05PCSInput = in.PCS.CX05PCSInput
-		decoded := CX14DecodePCSSummaries(s, summary)
+		summary.PCSStandardPCSInput = in.PCS.PCSStandardPCSInput
+		decoded := DecodePCSSummaries(s, summary)
 		r["summary"], bits = decoded.CXNativeResult, decoded.Bits
 	case "pcs-extended19":
-		r["extended"] = CX09DecodePCSExtended(s, i)
+		r["extended"] = DecodePCSExtended(s, i)
 	case "pcs-parallel":
-		r["parallel"] = CX10DecodeParallel(s, i)
-		r["release11"] = CX11DecodeParallel(s, i, in.Parallel)
+		r["parallel"] = ParallelIdentityDecodeParallel(s, i)
+		r["release11"] = ParallelReleaseDecodeParallel(s, i, in.Parallel)
 	case "link":
 		r["link"] = CXDecodeLINKTelemetry(s, i)
-		r["diagnostic"] = CX13DecodeLINKDiagnostics(s, i)
-		r["cells"] = CX12NewLINKCells(s, in.CellCount, in.CellCountValid && in.CellCount >= 1 && in.CellCount <= 16).CX12Decode(i, in.CellGates)
-		r["sensors"] = CX12NewLINKTemperatures(s, in.SensorCount, in.SensorCountValid && in.SensorCount >= 1 && in.SensorCount <= 4).CX12Decode(i, in.SensorGates)
-		r["balance"] = CX12DecodeLINKBalance(s, i, in.CellCount, in.CellCountValid, in.BalanceGate, in.HardwareAgeKnown, in.HardwareAge)
+		r["diagnostic"] = DecodeLINKDiagnostics(s, i)
+		r["cells"] = NewLINKCells(s, in.CellCount, in.CellCountValid && in.CellCount >= 1 && in.CellCount <= 16).DecodeLINKVector(i, in.CellGates)
+		r["sensors"] = NewLINKTemperatures(s, in.SensorCount, in.SensorCountValid && in.SensorCount >= 1 && in.SensorCount <= 4).DecodeLINKVector(i, in.SensorGates)
+		r["balance"] = DecodeLINKBalance(s, i, in.CellCount, in.CellCountValid, in.BalanceGate, in.HardwareAgeKnown, in.HardwareAge)
 		contributors := in.CellContributors
 		if contributors.ConfiguredCount < 1 || contributors.ConfiguredCount > 16 {
 			contributors.CountValid = false
 			contributors.Fixed16Path = false
 		}
-		r["mean"] = CX12DecodeLINKCellMean(s, i, in.MeanGate, contributors, false)
+		r["mean"] = DecodeLINKCellMean(s, i, in.MeanGate, contributors, false)
 		temperature := in.TemperatureSummary
 		if temperature.Contributors.ConfiguredCount < 1 || temperature.Contributors.ConfiguredCount > 4 {
 			temperature.Contributors.CountValid = false
 			temperature.Contributors.Fixed16Path = false
 		}
-		r["temperature"] = CX12DecodeLINKTemperatureSummary(s, i, temperature)
+		r["temperature"] = DecodeLINKTemperatureSummary(s, i, temperature)
 	}
-	r["confirmation"] = CX01ConfirmNativeSelection(s, CX01NativeIndication{Input: i, TopologyAssociated: in.TopologyAssociated})
+	r["confirmation"] = ConfirmNativeSelection(s, SelectionNativeIndication{Input: i, TopologyAssociated: in.TopologyAssociated})
 	return r, bits
 }
 
-func (p *cx16SelectedProfile) Classify(e Evidence) Classification {
+func (p *replaySelectedProfile) Classify(e Evidence) Classification {
 	p.mu.Lock()
 	defer p.mu.Unlock()
 	entry, listed := p.replay[e]
@@ -190,8 +190,8 @@ func (p *cx16SelectedProfile) Classify(e Evidence) Classification {
 			status = "stale"
 		}
 	}
-	r := cx01Result(p.selection, CX01LINKInput{Evidence: e, Epoch: entry.input.Epoch}, status)
-	projection := CX16Projection{Current: r, Native: make(map[string]CXNativeResult), RetainedNative: make(map[string]CXNativeResult), LastGood: make(map[string]CXNativeField), SummaryBits: make(map[string]CX14SummaryBit)}
+	r := selectionResult(p.selection, LINKInput{Evidence: e, Epoch: entry.input.Epoch}, status)
+	projection := ReplayProjection{Current: r, Native: make(map[string]CXNativeResult), RetainedNative: make(map[string]CXNativeResult), LastGood: make(map[string]CXNativeField), SummaryBits: make(map[string]SummaryBit)}
 	if status == "descriptive" {
 		// Only explicit native confirmation/conflict affects identity continuity.
 		if entry.parts["link"].Status == "conflict" || entry.parts["confirmation"].Status == "conflict" {
@@ -207,8 +207,8 @@ func (p *cx16SelectedProfile) Classify(e Evidence) Classification {
 				}
 				projection.Native[prefix] = native
 				if len(part.Fields) > 0 {
-					key := cx16RetentionKey(prefix, e, part)
-					p.retained[key] = CX05RetainAccepted(p.retained[key], part)
+					key := replayRetentionKey(prefix, e, part)
+					p.retained[key] = RetainAccepted(p.retained[key], part)
 				}
 			}
 			for name, bit := range entry.bits {
@@ -232,7 +232,7 @@ func (p *cx16SelectedProfile) Classify(e Evidence) Classification {
 	}
 	input := entry.input
 	input.Evidence = e
-	p.diagnostics = append(p.diagnostics, CX16Diagnostic{Input: input, NativeRecord: append([]byte(nil), entry.nativeRecord...), Status: projection.Current.Status})
+	p.diagnostics = append(p.diagnostics, Diagnostic{Input: input, NativeRecord: append([]byte(nil), entry.nativeRecord...), Status: projection.Current.Status})
 	if len(p.diagnostics) > 16 {
 		p.diagnostics = p.diagnostics[len(p.diagnostics)-16:]
 	}
@@ -240,7 +240,7 @@ func (p *cx16SelectedProfile) Classify(e Evidence) Classification {
 		diagnostic.NativeRecord = append([]byte(nil), diagnostic.NativeRecord...)
 		projection.Diagnostics = append(projection.Diagnostics, diagnostic)
 	}
-	if !listed && !cx16OverlappingGeometry(e.Frame) {
+	if !listed && !replayOverlappingGeometry(e.Frame) {
 		return Classification{}
 	}
 	return Classification{Profile: "growatt.project.selected", Projection: projection}
@@ -249,7 +249,7 @@ func (p *cx16SelectedProfile) Classify(e Evidence) Classification {
 // cx16RetentionKey keys retained extended and gauge PCS values by native family
 // so that families sharing field names never overwrite one another. Slot
 // records without an associated member are kept apart from member-associated ones.
-func cx16RetentionKey(prefix string, e Evidence, part CXNativeResult) string {
+func replayRetentionKey(prefix string, e Evidence, part CXNativeResult) string {
 	if prefix == "slots" && !part.HasMember {
 		return prefix + "/unassociated"
 	}
@@ -271,7 +271,7 @@ func cx16RetentionKey(prefix string, e Evidence, part CXNativeResult) string {
 }
 
 // This is a collision shield, not recognition or a native meaning dictionary.
-func cx16OverlappingGeometry(f canbus.Frame) bool {
+func replayOverlappingGeometry(f canbus.Frame) bool {
 	id := f.ID().Value()
 	if id >= 0x311 && id <= 0x334 || id == 0x37f || id == 0x3f7 || id >= 0x500 && id <= 0x6ef {
 		return true

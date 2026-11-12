@@ -10,17 +10,17 @@ import (
 	"time"
 )
 
-type cx17Event struct {
-	observation CX17Observation
+type providerTestEvent struct {
+	observation Observation
 	done        chan struct{}
 }
-type cx17Fake struct {
-	events  chan cx17Event
+type providerTestFake struct {
+	events  chan providerTestEvent
 	pending chan struct{}
 }
 
-func cx17Source() *cx17Fake { return &cx17Fake{events: make(chan cx17Event)} }
-func (s *cx17Fake) CX17Receive(ctx context.Context) (CX17Observation, error) {
+func providerTestSource() *providerTestFake { return &providerTestFake{events: make(chan providerTestEvent)} }
+func (s *providerTestFake) ProjectProviderReceive(ctx context.Context) (Observation, error) {
 	if s.pending != nil {
 		close(s.pending)
 		s.pending = nil
@@ -30,12 +30,12 @@ func (s *cx17Fake) CX17Receive(ctx context.Context) (CX17Observation, error) {
 		s.pending = e.done
 		return e.observation, nil
 	case <-ctx.Done():
-		return CX17Observation{}, errors.New("synthetic cancellation")
+		return Observation{}, errors.New("synthetic cancellation")
 	}
 }
-func cx17Send(t *testing.T, s *cx17Fake, p *CX17Provider, g uint64, i CX16ReplayInput) {
+func providerTestSend(t *testing.T, s *providerTestFake, p *Provider, g uint64, i ReplayInput) {
 	t.Helper()
-	e := cx17Event{observation: CX17Observation{Generation: g, Input: i}, done: make(chan struct{})}
+	e := providerTestEvent{observation: Observation{Generation: g, Input: i}, done: make(chan struct{})}
 	select {
 	case s.events <- e:
 	case <-time.After(time.Second):
@@ -48,15 +48,15 @@ func cx17Send(t *testing.T, s *cx17Fake, p *CX17Provider, g uint64, i CX16Replay
 	}
 }
 func TestCX17Lifecycle(t *testing.T) {
-	s, i := cx16Fixture(t)
-	p, err := CX17NewPCSProvider(s)
+	s, i := replayTestFixture(t)
+	p, err := NewPCSProvider(s)
 	if err != nil {
 		t.Fatal(err)
 	}
-	if p.CX17Snapshot(time.Second, time.Second).State != "stopped" {
+	if p.ProjectProviderSnapshot(time.Second, time.Second).State != "stopped" {
 		t.Fatal("constructor active")
 	}
-	a := cx17Source()
+	a := providerTestSource()
 	for _, g := range []uint64{0} {
 		if p.Start(a, g) == nil {
 			t.Fatal("zero generation")
@@ -68,60 +68,60 @@ func TestCX17Lifecycle(t *testing.T) {
 	if err = p.Start(a, 1); err != nil {
 		t.Fatal(err)
 	}
-	cx17Send(t, a, p, 1, i)
-	before := p.CX17Snapshot(time.Second, time.Second)
+	providerTestSend(t, a, p, 1, i)
+	before := p.ProjectProviderSnapshot(time.Second, time.Second)
 	if before.Current["core/voltage"].Numerator != 5310 || !before.Promotable {
 		t.Fatal(before)
 	}
 	if p.Start(a, 1) == nil {
 		t.Fatal("reused generation")
 	}
-	b := cx17Source()
+	b := providerTestSource()
 	if err = p.Start(b, 2); err != nil {
 		t.Fatal(err)
 	}
-	if got := p.CX17Snapshot(time.Second, time.Second); got.Promotable || got.State != "awaiting" {
+	if got := p.ProjectProviderSnapshot(time.Second, time.Second); got.Promotable || got.State != "awaiting" {
 		t.Fatal(got)
 	}
-	cx17Send(t, b, p, 1, i)
-	if p.CX17Snapshot(time.Second, time.Second).Rejected != 1 {
+	providerTestSend(t, b, p, 1, i)
+	if p.ProjectProviderSnapshot(time.Second, time.Second).Rejected != 1 {
 		t.Fatal("retired generation")
 	}
-	cx17Send(t, b, p, 2, i)
-	if !p.CX17Snapshot(time.Second, time.Second).Promotable {
+	providerTestSend(t, b, p, 2, i)
+	if !p.ProjectProviderSnapshot(time.Second, time.Second).Promotable {
 		t.Fatal("successor not active")
 	}
 	p.Stop()
 	p.Stop()
-	got := p.CX17Snapshot(time.Second, time.Second)
+	got := p.ProjectProviderSnapshot(time.Second, time.Second)
 	if got.Promotable || len(got.Current) != 0 || len(got.LastGood) == 0 || len(got.Raw) == 0 || got.State != "stopped" {
 		t.Fatal(got)
 	}
 }
 func TestCX17IndependentAgesAndCopies(t *testing.T) {
-	s, i := cx16Fixture(t)
-	p, _ := CX17NewPCSProvider(s)
-	a := cx17Source()
+	s, i := replayTestFixture(t)
+	p, _ := NewPCSProvider(s)
+	a := providerTestSource()
 	p.Start(a, 1)
 	defer p.Stop()
 	i.PCS.FieldAges = map[string]time.Duration{"voltage": 0, "current": time.Second}
-	cx17Send(t, a, p, 1, i)
-	got := p.CX17Snapshot(2*time.Second, time.Second)
+	providerTestSend(t, a, p, 1, i)
+	got := p.ProjectProviderSnapshot(2*time.Second, time.Second)
 	if got.Current["core/voltage"].Status != "accepted" || got.Current["core/current"].Status != "stale" {
 		t.Fatal(got)
 	}
 	got.Current["core/voltage"] = CXNativeField{}
 	got.LastGood["core/voltage"] = CXNativeField{}
 	got.Raw[0].Status = "altered"
-	got = p.CX17Snapshot(2*time.Second, time.Second)
+	got = p.ProjectProviderSnapshot(2*time.Second, time.Second)
 	if got.Current["core/voltage"].Numerator != 5310 || got.LastGood["core/voltage"].Numerator != 5310 || got.Raw[0].Status == "altered" {
 		t.Fatal("alias")
 	}
 	i.PCS.Evidence.Sequence = 2
 	i.PCS.Evidence.Monotonic = 2 * time.Second
 	i.PCS.FieldStates = map[string]string{"voltage": "invalid"}
-	cx17Send(t, a, p, 1, i)
-	got = p.CX17Snapshot(2*time.Second, 2*time.Second)
+	providerTestSend(t, a, p, 1, i)
+	got = p.ProjectProviderSnapshot(2*time.Second, 2*time.Second)
 	if got.Current["core/voltage"].Status != "invalid" || got.LastGood["core/voltage"].Evidence.Sequence != 1 || got.Current["core/current"].Evidence.Sequence != 2 {
 		t.Fatal("partial retention", got)
 	}
@@ -129,12 +129,12 @@ func TestCX17IndependentAgesAndCopies(t *testing.T) {
 func TestCX17IdentityInvalidationNegatives(t *testing.T) {
 	for _, name := range []string{"epoch", "epoch-zero", "role", "profile", "publisher", "bank", "endpoint", "group", "slot", "scope"} {
 		t.Run(name, func(t *testing.T) {
-			s, i := cx16Fixture(t)
-			p, _ := CX17NewPCSProvider(s)
-			a := cx17Source()
+			s, i := replayTestFixture(t)
+			p, _ := NewPCSProvider(s)
+			a := providerTestSource()
 			p.Start(a, 1)
 			defer p.Stop()
-			cx17Send(t, a, p, 1, i)
+			providerTestSend(t, a, p, 1, i)
 			bad := i
 			bad.PCS.Evidence.Sequence = 2
 			switch name {
@@ -145,7 +145,7 @@ func TestCX17IdentityInvalidationNegatives(t *testing.T) {
 			case "role":
 				bad.PCS.Direction = "other"
 			case "profile":
-				c := s.CX01Spec()
+				c := s.SelectionSpecValue()
 				c.Release = "0011"
 				bad.Selection, _ = NewCXSelection(c)
 			case "publisher":
@@ -161,14 +161,14 @@ func TestCX17IdentityInvalidationNegatives(t *testing.T) {
 			case "scope":
 				bad.PCS.Scope = "aggregate"
 			}
-			cx17Send(t, a, p, 1, bad)
-			got := p.CX17Snapshot(time.Second, time.Second)
+			providerTestSend(t, a, p, 1, bad)
+			got := p.ProjectProviderSnapshot(time.Second, time.Second)
 			if got.Promotable || len(got.Current) != 0 || len(got.LastGood) == 0 || got.Raw[len(got.Raw)-1].Input.Evidence.Frame != i.PCS.Evidence.Frame {
 				t.Fatal(got)
 			}
 			i.PCS.Evidence.Sequence = 3
-			cx17Send(t, a, p, 1, i)
-			if p.CX17Snapshot(time.Second, time.Second).Promotable {
+			providerTestSend(t, a, p, 1, i)
+			if p.ProjectProviderSnapshot(time.Second, time.Second).Promotable {
 				t.Fatal("identity auto-recovered")
 			}
 		})
@@ -177,13 +177,13 @@ func TestCX17IdentityInvalidationNegatives(t *testing.T) {
 func TestCX17SequenceAndClockBoundaries(t *testing.T) {
 	for _, name := range []string{"zero", "equal", "lower", "clock", "interface-name", "interface-index"} {
 		t.Run(name, func(t *testing.T) {
-			s, i := cx16Fixture(t)
-			p, _ := CX17NewPCSProvider(s)
-			a := cx17Source()
+			s, i := replayTestFixture(t)
+			p, _ := NewPCSProvider(s)
+			a := providerTestSource()
 			p.Start(a, 1)
 			defer p.Stop()
 			i.PCS.Evidence.Sequence = 2
-			cx17Send(t, a, p, 1, i)
+			providerTestSend(t, a, p, 1, i)
 			bad := i
 			switch name {
 			case "zero":
@@ -195,12 +195,12 @@ func TestCX17SequenceAndClockBoundaries(t *testing.T) {
 				bad.PCS.Evidence.Sequence = 3
 				bad.PCS.Evidence.Monotonic = 0
 			case "interface-name":
-				bad.PCS.Evidence.Interface = cx17Interface("other", 1)
+				bad.PCS.Evidence.Interface = providerTestInterface("other", 1)
 			case "interface-index":
-				bad.PCS.Evidence.Interface = cx17Interface("synthetic", 2)
+				bad.PCS.Evidence.Interface = providerTestInterface("synthetic", 2)
 			}
-			cx17Send(t, a, p, 1, bad)
-			got := p.CX17Snapshot(time.Second, time.Second)
+			providerTestSend(t, a, p, 1, bad)
+			got := p.ProjectProviderSnapshot(time.Second, time.Second)
 			if got.Rejected != 1 || got.LastGood["core/voltage"].Evidence.Sequence != 2 {
 				t.Fatal(got)
 			}
@@ -208,9 +208,9 @@ func TestCX17SequenceAndClockBoundaries(t *testing.T) {
 	}
 }
 func TestCX17BoundsAndConcurrentSnapshots(t *testing.T) {
-	s, i := cx16Fixture(t)
-	p, _ := CX17NewPCSProvider(s)
-	a := cx17Source()
+	s, i := replayTestFixture(t)
+	p, _ := NewPCSProvider(s)
+	a := providerTestSource()
 	p.Start(a, 1)
 	defer p.Stop()
 	var wg sync.WaitGroup
@@ -219,17 +219,17 @@ func TestCX17BoundsAndConcurrentSnapshots(t *testing.T) {
 		go func() {
 			defer wg.Done()
 			for j := 0; j < 300; j++ {
-				snap := p.CX17Snapshot(time.Second, time.Second)
+				snap := p.ProjectProviderSnapshot(time.Second, time.Second)
 				snap.Current["invented"] = CXNativeField{}
 			}
 		}()
 	}
 	for n := 1; n <= 257; n++ {
 		i.PCS.Evidence.Sequence = uint64(n)
-		cx17Send(t, a, p, 1, i)
+		providerTestSend(t, a, p, 1, i)
 	}
 	wg.Wait()
-	got := p.CX17Snapshot(time.Second, time.Second)
+	got := p.ProjectProviderSnapshot(time.Second, time.Second)
 	if len(got.Raw) != 256 || got.EvictedRaw != 1 || got.Raw[0].Input.Evidence.Sequence != 2 || len(got.LastGood) > 256 {
 		t.Fatal("bound", len(got.Raw), got.EvictedRaw)
 	}
@@ -237,21 +237,21 @@ func TestCX17BoundsAndConcurrentSnapshots(t *testing.T) {
 func TestCX17LINKCountsAndValidityNegatives(t *testing.T) {
 	for _, count := range []int{0, 1, 16, 17} {
 		t.Run(fmt.Sprint(count), func(t *testing.T) {
-			s, i := cx16LINK(t, 0x1810, [8]byte{1, 0, 2, 0, 3, 0, 4, 0})
-			p, err := CX17NewLINKProvider(s)
+			s, i := replayTestLINK(t, 0x1810, [8]byte{1, 0, 2, 0, 3, 0, 4, 0})
+			p, err := NewLINKProvider(s)
 			if err != nil {
 				t.Fatal(err)
 			}
-			a := cx17Source()
+			a := providerTestSource()
 			p.Start(a, 1)
 			defer p.Stop()
 			i.CellCount = count
 			i.CellCountValid = true
 			for n := range i.CellGates {
-				i.CellGates[n] = CX12MeasurementGate{Configured: true, Valid: true}
+				i.CellGates[n] = MeasurementGate{Configured: true, Valid: true}
 			}
-			cx17Send(t, a, p, 1, i)
-			got := p.CX17Snapshot(time.Second, time.Second)
+			providerTestSend(t, a, p, 1, i)
+			got := p.ProjectProviderSnapshot(time.Second, time.Second)
 			if (got.Current["cells/cell_1"].Status == "accepted") != (count >= 1 && count <= 16) || got.PhysicalQualified || len(got.Raw) != 1 {
 				t.Fatal(got)
 			}
@@ -259,35 +259,35 @@ func TestCX17LINKCountsAndValidityNegatives(t *testing.T) {
 	}
 }
 
-func cx17Interface(name string, index int) canbus.InterfaceIdentity {
+func providerTestInterface(name string, index int) canbus.InterfaceIdentity {
 	i, _ := canbus.NewInterfaceIdentity(name, index)
 	return i
 }
 
-type cx17LateSource struct {
+type providerTestLateSource struct {
 	entered, canceled, release chan struct{}
 	fail                       bool
 }
 
-func (s *cx17LateSource) CX17Receive(ctx context.Context) (CX17Observation, error) {
+func (s *providerTestLateSource) ProjectProviderReceive(ctx context.Context) (Observation, error) {
 	close(s.entered)
 	<-ctx.Done()
 	close(s.canceled)
 	<-s.release
 	if s.fail {
-		return CX17Observation{}, errors.New("late synthetic failure")
+		return Observation{}, errors.New("late synthetic failure")
 	}
-	return CX17Observation{}, nil
+	return Observation{}, nil
 }
 func TestCX17CancelJoinAndLateCallback(t *testing.T) {
 	for _, fail := range []bool{false, true} {
 		t.Run(fmt.Sprint(fail), func(t *testing.T) {
-			s, i := cx16Fixture(t)
-			p, _ := CX17NewPCSProvider(s)
-			a := &cx17LateSource{entered: make(chan struct{}), canceled: make(chan struct{}), release: make(chan struct{}), fail: fail}
+			s, i := replayTestFixture(t)
+			p, _ := NewPCSProvider(s)
+			a := &providerTestLateSource{entered: make(chan struct{}), canceled: make(chan struct{}), release: make(chan struct{}), fail: fail}
 			p.Start(a, 1)
 			<-a.entered
-			b := cx17Source()
+			b := providerTestSource()
 			finished := make(chan error, 1)
 			go func() { finished <- p.Start(b, 2) }()
 			select {
@@ -295,7 +295,7 @@ func TestCX17CancelJoinAndLateCallback(t *testing.T) {
 			case <-time.After(time.Second):
 				t.Fatal("not canceled")
 			}
-			if got := p.CX17Snapshot(time.Second, time.Second); got.State != "stopped" || got.Promotable {
+			if got := p.ProjectProviderSnapshot(time.Second, time.Second); got.State != "stopped" || got.Promotable {
 				t.Fatal(got)
 			}
 			select {
@@ -312,31 +312,31 @@ func TestCX17CancelJoinAndLateCallback(t *testing.T) {
 			case <-time.After(time.Second):
 				t.Fatal("not joined")
 			}
-			cx17Send(t, b, p, 2, i)
+			providerTestSend(t, b, p, 2, i)
 			defer p.Stop()
-			if got := p.CX17Snapshot(time.Second, time.Second); got.State != "receiving" || !got.Promotable {
+			if got := p.ProjectProviderSnapshot(time.Second, time.Second); got.State != "receiving" || !got.Promotable {
 				t.Fatal("late callback affected successor", got)
 			}
 		})
 	}
 }
 
-type cx17ErrorSource struct{}
+type providerTestErrorSource struct{}
 
-func (cx17ErrorSource) CX17Receive(context.Context) (CX17Observation, error) {
-	return CX17Observation{}, errors.New("synthetic failure")
+func (providerTestErrorSource) ProjectProviderReceive(context.Context) (Observation, error) {
+	return Observation{}, errors.New("synthetic failure")
 }
 func TestCX17ReceiveFailureRetainsHistory(t *testing.T) {
-	s, i := cx16Fixture(t)
-	p, _ := CX17NewPCSProvider(s)
-	a := cx17Source()
+	s, i := replayTestFixture(t)
+	p, _ := NewPCSProvider(s)
+	a := providerTestSource()
 	p.Start(a, 1)
-	cx17Send(t, a, p, 1, i)
-	p.Start(cx17ErrorSource{}, 2)
+	providerTestSend(t, a, p, 1, i)
+	p.Start(providerTestErrorSource{}, 2)
 	defer p.Stop()
 	deadline := time.After(time.Second)
 	for {
-		got := p.CX17Snapshot(time.Second, time.Second)
+		got := p.ProjectProviderSnapshot(time.Second, time.Second)
 		if got.State == "degraded" {
 			if got.Promotable || len(got.LastGood) == 0 || len(got.Raw) == 0 {
 				t.Fatal(got)
@@ -352,23 +352,23 @@ func TestCX17ReceiveFailureRetainsHistory(t *testing.T) {
 	}
 }
 func TestCX17FreshFrameDoesNotRenewSibling(t *testing.T) {
-	s, i := cx16Fixture(t)
+	s, i := replayTestFixture(t)
 	i.PCS.FieldAge = 0
-	p, _ := CX17NewPCSProvider(s)
-	a := cx17Source()
+	p, _ := NewPCSProvider(s)
+	a := providerTestSource()
 	p.Start(a, 1)
 	defer p.Stop()
-	cx17Send(t, a, p, 1, i)
+	providerTestSend(t, a, p, 1, i)
 	i.PCS.Evidence.Sequence = 2
 	i.PCS.Evidence.Monotonic = 3 * time.Second
-	cx16Frame(t, &i, 0x320, false, [8]byte{1, 2, 3, 4, 5, 6, 7, 0})
-	cx17Send(t, a, p, 1, i)
-	got := p.CX17Snapshot(3*time.Second, time.Second)
+	replayTestFrame(t, &i, 0x320, false, [8]byte{1, 2, 3, 4, 5, 6, 7, 0})
+	providerTestSend(t, a, p, 1, i)
+	got := p.ProjectProviderSnapshot(3*time.Second, time.Second)
 	if got.Current["core/voltage"].Status != "stale" || got.Current["identity/product_0"].Status != "accepted" {
 		t.Fatal(got)
 	}
 	for _, now := range []time.Duration{0, time.Second, 2 * time.Second, 2*time.Second + 1} {
-		got = p.CX17Snapshot(now, time.Second)
+		got = p.ProjectProviderSnapshot(now, time.Second)
 		if (got.Current["core/voltage"].Status == "accepted") != (now >= time.Second && now <= 2*time.Second) {
 			t.Fatal("age boundary", now, got.Current["core/voltage"])
 		}
@@ -384,13 +384,13 @@ func TestCX17WireIdentityReuseAndRoleChange(t *testing.T) {
 			if kind == 0x1802 {
 				payload = [8]byte{'Q', 'A', 'A', 'A', '0', '0', '0', '6'}
 			}
-			s, i := cx16LINK(t, kind, payload)
-			p, _ := CX17NewLINKProvider(s)
-			a := cx17Source()
+			s, i := replayTestLINK(t, kind, payload)
+			p, _ := NewLINKProvider(s)
+			a := providerTestSource()
 			p.Start(a, 1)
 			defer p.Stop()
-			cx17Send(t, a, p, 1, i)
-			if got := p.CX17Snapshot(time.Second, time.Second); got.State != "receiving" {
+			providerTestSend(t, a, p, 1, i)
+			if got := p.ProjectProviderSnapshot(time.Second, time.Second); got.State != "receiving" {
 				t.Fatal("first observation", got.State)
 			}
 			if kind == 0x1802 {
@@ -398,10 +398,10 @@ func TestCX17WireIdentityReuseAndRoleChange(t *testing.T) {
 			} else {
 				payload[6] = 7
 			}
-			cx16Frame(t, &i, kind<<16|0xf401, true, payload)
+			replayTestFrame(t, &i, kind<<16|0xf401, true, payload)
 			i.PCS.Evidence.Sequence = 2
-			cx17Send(t, a, p, 1, i)
-			got := p.CX17Snapshot(time.Second, time.Second)
+			providerTestSend(t, a, p, 1, i)
+			got := p.ProjectProviderSnapshot(time.Second, time.Second)
 			if got.State != "conflict" || got.Promotable || len(got.Current) != 0 || len(got.Raw) != 2 {
 				t.Fatal(got)
 			}
@@ -411,11 +411,11 @@ func TestCX17WireIdentityReuseAndRoleChange(t *testing.T) {
 func TestCX17LINKSensorAndGateNegatives(t *testing.T) {
 	for _, name := range []string{"count-zero", "count-one", "count-four", "count-five", "count-invalid", "gate-invalid", "gate-stale", "gate-unconfigured", "age-negative", "age-zero", "age-max", "age-over"} {
 		t.Run(name, func(t *testing.T) {
-			s, i := cx16LINK(t, 0x1830, [8]byte{0x40, 1, 0x41, 1, 0x42, 1, 0x43, 1})
+			s, i := replayTestLINK(t, 0x1830, [8]byte{0x40, 1, 0x41, 1, 0x42, 1, 0x43, 1})
 			i.SensorCount = 4
 			i.SensorCountValid = true
 			for j := range i.SensorGates {
-				i.SensorGates[j] = CX12MeasurementGate{Configured: true, Valid: true}
+				i.SensorGates[j] = MeasurementGate{Configured: true, Valid: true}
 			}
 			accepted := false
 			switch name {
@@ -446,12 +446,12 @@ func TestCX17LINKSensorAndGateNegatives(t *testing.T) {
 			case "age-over":
 				i.SensorGates[0].Age = time.Second + 1
 			}
-			p, _ := CX17NewLINKProvider(s)
-			a := cx17Source()
+			p, _ := NewLINKProvider(s)
+			a := providerTestSource()
 			p.Start(a, 1)
 			defer p.Stop()
-			cx17Send(t, a, p, 1, i)
-			got := p.CX17Snapshot(time.Second, time.Second)
+			providerTestSend(t, a, p, 1, i)
+			got := p.ProjectProviderSnapshot(time.Second, time.Second)
 			if (got.Current["sensors/sensor_1"].Status == "accepted") != accepted || len(got.Raw) != 1 || got.PhysicalQualified {
 				t.Fatal(got)
 			}
@@ -463,34 +463,34 @@ func TestCX17LINKSensorAndGateNegatives(t *testing.T) {
 }
 
 func TestCX17EverySelectionFieldNegative(t *testing.T) {
-	mutations := map[string]func(*CX01SelectionSpec){
-		"interface-name":  func(c *CX01SelectionSpec) { c.Interface = cx17Interface("other", 1) },
-		"interface-index": func(c *CX01SelectionSpec) { c.Interface = cx17Interface("synthetic", 2) },
-		"flavor":          func(c *CX01SelectionSpec) { c.Flavor = "pcs-parallel" },
-		"pcs-flavor":      func(c *CX01SelectionSpec) { c.PCSFlavor = "pcs-extended19" },
-		"project":         func(c *CX01SelectionSpec) { c.ProjectCode = "QAAa" },
-		"release":         func(c *CX01SelectionSpec) { c.Release = "0011" },
-		"choice":          func(c *CX01SelectionSpec) { c.Choice = "legacy19" },
-		"direction":       func(c *CX01SelectionSpec) { c.Direction = "other" },
-		"scope":           func(c *CX01SelectionSpec) { c.Scope = "aggregate" },
-		"bank":            func(c *CX01SelectionSpec) { c.Bank = "other" },
-		"endpoint":        func(c *CX01SelectionSpec) { c.Endpoint = "other" },
-		"group":           func(c *CX01SelectionSpec) { c.Group = "1" },
-		"slot":            func(c *CX01SelectionSpec) { c.Slot = "2" },
-		"route-set":       func(c *CX01SelectionSpec) { c.RouteSet = true },
-		"destination":     func(c *CX01SelectionSpec) { c.Destination = 0xf5 },
-		"source":          func(c *CX01SelectionSpec) { c.Source = 2 },
-		"epoch":           func(c *CX01SelectionSpec) { c.Epoch = 2 },
+	mutations := map[string]func(*SelectionSpec){
+		"interface-name":  func(c *SelectionSpec) { c.Interface = providerTestInterface("other", 1) },
+		"interface-index": func(c *SelectionSpec) { c.Interface = providerTestInterface("synthetic", 2) },
+		"flavor":          func(c *SelectionSpec) { c.Flavor = "pcs-parallel" },
+		"pcs-flavor":      func(c *SelectionSpec) { c.PCSFlavor = "pcs-extended19" },
+		"project":         func(c *SelectionSpec) { c.ProjectCode = "QAAa" },
+		"release":         func(c *SelectionSpec) { c.Release = "0011" },
+		"choice":          func(c *SelectionSpec) { c.Choice = "legacy19" },
+		"direction":       func(c *SelectionSpec) { c.Direction = "other" },
+		"scope":           func(c *SelectionSpec) { c.Scope = "aggregate" },
+		"bank":            func(c *SelectionSpec) { c.Bank = "other" },
+		"endpoint":        func(c *SelectionSpec) { c.Endpoint = "other" },
+		"group":           func(c *SelectionSpec) { c.Group = "1" },
+		"slot":            func(c *SelectionSpec) { c.Slot = "2" },
+		"route-set":       func(c *SelectionSpec) { c.RouteSet = true },
+		"destination":     func(c *SelectionSpec) { c.Destination = 0xf5 },
+		"source":          func(c *SelectionSpec) { c.Source = 2 },
+		"epoch":           func(c *SelectionSpec) { c.Epoch = 2 },
 	}
 	for name, mutate := range mutations {
 		t.Run(name, func(t *testing.T) {
-			s, i := cx16Fixture(t)
-			p, _ := CX17NewPCSProvider(s)
-			a := cx17Source()
+			s, i := replayTestFixture(t)
+			p, _ := NewPCSProvider(s)
+			a := providerTestSource()
 			p.Start(a, 1)
 			defer p.Stop()
-			cx17Send(t, a, p, 1, i)
-			c := s.CX01Spec()
+			providerTestSend(t, a, p, 1, i)
+			c := s.SelectionSpecValue()
 			mutate(&c)
 			var err error
 			i.Selection, err = NewCXSelection(c)
@@ -498,8 +498,8 @@ func TestCX17EverySelectionFieldNegative(t *testing.T) {
 				t.Fatal(err)
 			}
 			i.PCS.Evidence.Sequence = 2
-			cx17Send(t, a, p, 1, i)
-			got := p.CX17Snapshot(time.Second, time.Second)
+			providerTestSend(t, a, p, 1, i)
+			got := p.ProjectProviderSnapshot(time.Second, time.Second)
 			if got.Selection != s || got.Promotable || len(got.Current) != 0 || len(got.LastGood) == 0 || got.Raw[1].Input.Evidence.Frame != i.PCS.Evidence.Frame {
 				t.Fatal(got)
 			}
@@ -507,49 +507,49 @@ func TestCX17EverySelectionFieldNegative(t *testing.T) {
 	}
 }
 func TestCX17ConstructorFailClosed(t *testing.T) {
-	s, i := cx16Fixture(t)
-	if _, err := CX17NewLINKProvider(s); err == nil {
+	s, i := replayTestFixture(t)
+	if _, err := NewLINKProvider(s); err == nil {
 		t.Fatal("PCS used as LINK")
 	}
-	link, _ := cx16LINK(t, 0x1805, [8]byte{})
-	if _, err := CX17NewPCSProvider(link); err == nil {
+	link, _ := replayTestLINK(t, 0x1805, [8]byte{})
+	if _, err := NewPCSProvider(link); err == nil {
 		t.Fatal("LINK used as PCS")
 	}
-	c := s.CX01Spec()
+	c := s.SelectionSpecValue()
 	c.ProjectCode = "QAAa"
 	c.Release = "9011"
 	ambiguous, _ := NewCXSelection(c)
-	if _, err := CX17NewPCSProvider(ambiguous); err == nil {
+	if _, err := NewPCSProvider(ambiguous); err == nil {
 		t.Fatal("ambiguous selection")
 	}
 	// The gateway-state selection has no native group, so its 0x1910 downstream address never reaches the fence.
-	c = s.CX01Spec()
+	c = s.SelectionSpecValue()
 	c.Flavor, c.ProjectCode, c.Release, c.Scope, c.Destination, c.Source = "pcs-extended19", "QCAA", "0001", "aggregate", 0xdf, 0xf2
 	gateway, err := NewCXSelection(c)
-	if err != nil || gateway.CX01Group() != "" {
-		t.Fatal(err, gateway.CX01Group())
+	if err != nil || gateway.SelectionGroup() != "" {
+		t.Fatal(err, gateway.SelectionGroup())
 	}
-	if _, err := CX17NewPCSProvider(gateway); err == nil {
+	if _, err := NewPCSProvider(gateway); err == nil {
 		t.Fatal("gateway-state selection admitted")
 	}
-	p, _ := CX17NewPCSProvider(s)
-	a := cx17Source()
+	p, _ := NewPCSProvider(s)
+	a := providerTestSource()
 	p.Start(a, 1)
 	defer p.Stop()
-	cx17Send(t, a, p, 1, i)
+	providerTestSend(t, a, p, 1, i)
 	if p.Start(nil, 2) == nil || p.Start(a, 0) == nil || p.Start(a, 1) == nil {
 		t.Fatal("invalid replacement")
 	}
-	if !p.CX17Snapshot(time.Second, time.Second).Promotable {
+	if !p.ProjectProviderSnapshot(time.Second, time.Second).Promotable {
 		t.Fatal("failed replacement stopped predecessor")
 	}
 }
 func TestCX17LINKRouteNegative(t *testing.T) {
 	for _, name := range []string{"destination", "source", "ide"} {
 		t.Run(name, func(t *testing.T) {
-			s, i := cx16LINK(t, 0x1805, [8]byte{})
-			p, _ := CX17NewLINKProvider(s)
-			a := cx17Source()
+			s, i := replayTestLINK(t, 0x1805, [8]byte{})
+			p, _ := NewLINKProvider(s)
+			a := providerTestSource()
 			p.Start(a, 1)
 			defer p.Stop()
 			id := uint32(0x1805f401)
@@ -563,9 +563,9 @@ func TestCX17LINKRouteNegative(t *testing.T) {
 				id = 0x313
 				extended = false
 			}
-			cx16Frame(t, &i, id, extended, [8]byte{})
-			cx17Send(t, a, p, 1, i)
-			got := p.CX17Snapshot(time.Second, time.Second)
+			replayTestFrame(t, &i, id, extended, [8]byte{})
+			providerTestSend(t, a, p, 1, i)
+			got := p.ProjectProviderSnapshot(time.Second, time.Second)
 			if got.Promotable || len(got.Current) != 0 || len(got.Raw) != 1 {
 				t.Fatal(got)
 			}
@@ -575,17 +575,17 @@ func TestCX17LINKRouteNegative(t *testing.T) {
 func TestCX17RawRecordBoundsAndDetachedInput(t *testing.T) {
 	for _, size := range []int{0, 72, 73} {
 		t.Run(fmt.Sprint(size), func(t *testing.T) {
-			s, i := cx16Fixture(t)
-			p, _ := CX17NewPCSProvider(s)
-			a := cx17Source()
+			s, i := replayTestFixture(t)
+			p, _ := NewPCSProvider(s)
+			a := providerTestSource()
 			p.Start(a, 1)
 			defer p.Stop()
 			i.PCS.NativeRecord = make([]byte, size)
-			cx17Send(t, a, p, 1, i)
+			providerTestSend(t, a, p, 1, i)
 			if size > 0 {
 				i.PCS.NativeRecord[0] = 9
 			}
-			got := p.CX17Snapshot(time.Second, time.Second)
+			got := p.ProjectProviderSnapshot(time.Second, time.Second)
 			expected := size
 			if expected > 72 {
 				expected = 72
@@ -604,7 +604,7 @@ func TestCX17RawRecordBoundsAndDetachedInput(t *testing.T) {
 			}
 			if size > 0 {
 				got.Raw[0].NativeRecord[0] = 8
-				if p.CX17Snapshot(time.Second, time.Second).Raw[0].NativeRecord[0] != 0 {
+				if p.ProjectProviderSnapshot(time.Second, time.Second).Raw[0].NativeRecord[0] != 0 {
 					t.Fatal("snapshot alias")
 				}
 			}
@@ -612,8 +612,8 @@ func TestCX17RawRecordBoundsAndDetachedInput(t *testing.T) {
 	}
 }
 func TestCX17FieldEvictionAcrossGenerations(t *testing.T) {
-	s, i := cx16Fixture(t)
-	p, _ := CX17NewPCSProvider(s)
+	s, i := replayTestFixture(t)
+	p, _ := NewPCSProvider(s)
 	// Populate the bounded historical dictionary to exercise deterministic eviction
 	// independently of the finite selected protocol dictionary's current size.
 	p.mu.Lock()
@@ -624,11 +624,11 @@ func TestCX17FieldEvictionAcrossGenerations(t *testing.T) {
 		p.snapshot.LastGoodGeneration[key] = 1
 	}
 	p.mu.Unlock()
-	a := cx17Source()
+	a := providerTestSource()
 	p.Start(a, 1)
 	defer p.Stop()
-	cx17Send(t, a, p, 1, i)
-	got := p.CX17Snapshot(time.Second, time.Second)
+	providerTestSend(t, a, p, 1, i)
+	got := p.ProjectProviderSnapshot(time.Second, time.Second)
 	if len(got.LastGood) > 256 || got.EvictedFields == 0 {
 		t.Fatal("unbounded fields")
 	}
@@ -636,106 +636,106 @@ func TestCX17FieldEvictionAcrossGenerations(t *testing.T) {
 		t.Fatal("not oldest eviction")
 	}
 	p.Stop()
-	b := cx17Source()
+	b := providerTestSource()
 	p.Start(b, 2)
-	cx17Send(t, b, p, 2, i)
-	got = p.CX17Snapshot(time.Second, time.Second)
+	providerTestSend(t, b, p, 2, i)
+	got = p.ProjectProviderSnapshot(time.Second, time.Second)
 	if len(p.order) != 256 || got.LastGoodGeneration["core/voltage"] != 2 {
 		t.Fatal("generation retention", got)
 	}
 }
 
 func TestCX17InvalidIdentityFieldDoesNotConflict(t *testing.T) {
-	s, i := cx16Fixture(t)
-	p, _ := CX17NewPCSProvider(s)
-	a := cx17Source()
+	s, i := replayTestFixture(t)
+	p, _ := NewPCSProvider(s)
+	a := providerTestSource()
 	p.Start(a, 1)
 	defer p.Stop()
-	cx16Frame(t, &i, 0x320, false, [8]byte{1, 2, 3, 4, 5, 6, 7, 0})
+	replayTestFrame(t, &i, 0x320, false, [8]byte{1, 2, 3, 4, 5, 6, 7, 0})
 	i.PCS.Evidence.Sequence = 1
-	cx17Send(t, a, p, 1, i)
-	if got := p.CX17Snapshot(time.Second, time.Second); got.Current["identity/product_0"].Status != "accepted" {
+	providerTestSend(t, a, p, 1, i)
+	if got := p.ProjectProviderSnapshot(time.Second, time.Second); got.Current["identity/product_0"].Status != "accepted" {
 		t.Fatal(got)
 	}
 	i.PCS.Evidence.Sequence = 2
-	cx16Frame(t, &i, 0x320, false, [8]byte{9, 2, 3, 4, 5, 6, 7, 0})
+	replayTestFrame(t, &i, 0x320, false, [8]byte{9, 2, 3, 4, 5, 6, 7, 0})
 	i.PCS.FieldStates = map[string]string{"product_0": "invalid"}
-	cx17Send(t, a, p, 1, i)
-	got := p.CX17Snapshot(time.Second, time.Second)
+	providerTestSend(t, a, p, 1, i)
+	got := p.ProjectProviderSnapshot(time.Second, time.Second)
 	if got.State == "conflict" || len(got.Current) == 0 || got.Current["identity/product_0"].Status != "invalid" {
 		t.Fatal("withheld field caused conflict", got)
 	}
 	i.PCS.Evidence.Sequence = 3
-	cx16Frame(t, &i, 0x320, false, [8]byte{1, 2, 3, 4, 5, 6, 7, 0})
+	replayTestFrame(t, &i, 0x320, false, [8]byte{1, 2, 3, 4, 5, 6, 7, 0})
 	i.PCS.FieldStates = nil
-	cx17Send(t, a, p, 1, i)
-	if got = p.CX17Snapshot(time.Second, time.Second); got.State == "conflict" || got.Current["identity/product_0"].Status != "accepted" {
+	providerTestSend(t, a, p, 1, i)
+	if got = p.ProjectProviderSnapshot(time.Second, time.Second); got.State == "conflict" || got.Current["identity/product_0"].Status != "accepted" {
 		t.Fatal("baseline was overwritten by withheld field", got)
 	}
 	i.PCS.Evidence.Sequence = 4
-	cx16Frame(t, &i, 0x320, false, [8]byte{9, 2, 3, 4, 5, 6, 7, 0})
-	cx17Send(t, a, p, 1, i)
-	if got = p.CX17Snapshot(time.Second, time.Second); got.State != "conflict" || len(got.Current) != 0 {
+	replayTestFrame(t, &i, 0x320, false, [8]byte{9, 2, 3, 4, 5, 6, 7, 0})
+	providerTestSend(t, a, p, 1, i)
+	if got = p.ProjectProviderSnapshot(time.Second, time.Second); got.State != "conflict" || len(got.Current) != 0 {
 		t.Fatal("accepted identity change must still conflict", got)
 	}
 }
 
 func TestCX17LINKCountDropDemotesRetainedCells(t *testing.T) {
-	s, i := cx16LINK(t, 0x1811, [8]byte{5, 0, 6, 0, 7, 0, 8, 0})
-	p, _ := CX17NewLINKProvider(s)
-	a := cx17Source()
+	s, i := replayTestLINK(t, 0x1811, [8]byte{5, 0, 6, 0, 7, 0, 8, 0})
+	p, _ := NewLINKProvider(s)
+	a := providerTestSource()
 	p.Start(a, 1)
 	defer p.Stop()
 	i.CellCount, i.CellCountValid = 16, true
 	for n := range i.CellGates {
-		i.CellGates[n] = CX12MeasurementGate{Configured: true, Valid: true}
+		i.CellGates[n] = MeasurementGate{Configured: true, Valid: true}
 	}
-	cx17Send(t, a, p, 1, i)
-	if got := p.CX17Snapshot(time.Second, time.Second); got.Current["cells/cell_5"].Status != "accepted" {
+	providerTestSend(t, a, p, 1, i)
+	if got := p.ProjectProviderSnapshot(time.Second, time.Second); got.Current["cells/cell_5"].Status != "accepted" {
 		t.Fatal(got.Current)
 	}
 	i.PCS.Evidence.Sequence++
 	i.PCS.Evidence.Monotonic += time.Millisecond
-	cx16Frame(t, &i, 0x1810<<16|0xf401, true, [8]byte{1, 0, 2, 0, 3, 0, 4, 0})
+	replayTestFrame(t, &i, 0x1810<<16|0xf401, true, [8]byte{1, 0, 2, 0, 3, 0, 4, 0})
 	i.CellCount = 4
-	cx17Send(t, a, p, 1, i)
-	got := p.CX17Snapshot(time.Second, time.Second)
+	providerTestSend(t, a, p, 1, i)
+	got := p.ProjectProviderSnapshot(time.Second, time.Second)
 	if got.Current["cells/cell_5"].Status != "unconfigured" || got.Current["cells/cell_5"].Unit != "" || got.LastGood["cells/cell_5"].Status != "accepted" {
 		t.Fatal(got.Current["cells/cell_5"], got.LastGood["cells/cell_5"])
 	}
 }
 
 func TestCX17EqualMemberValueDoesNotConflict(t *testing.T) {
-	s, i := cx16Fixture(t)
-	p, _ := CX17NewPCSProvider(s)
-	a := cx17Source()
+	s, i := replayTestFixture(t)
+	p, _ := NewPCSProvider(s)
+	a := providerTestSource()
 	p.Start(a, 1)
 	defer p.Stop()
 	i.PCS.Member = &s
-	cx17Send(t, a, p, 1, i)
-	if got := p.CX17Snapshot(time.Second, time.Second); got.State != "receiving" || len(got.Current) == 0 {
+	providerTestSend(t, a, p, 1, i)
+	if got := p.ProjectProviderSnapshot(time.Second, time.Second); got.State != "receiving" || len(got.Current) == 0 {
 		t.Fatal(got)
 	}
 	other := s
 	changed := i
 	changed.PCS.Member = &other
 	changed.PCS.Evidence.Sequence = 2
-	cx17Send(t, a, p, 1, changed)
-	if got := p.CX17Snapshot(time.Second, time.Second); got.State != "receiving" || len(got.Current) == 0 {
+	providerTestSend(t, a, p, 1, changed)
+	if got := p.ProjectProviderSnapshot(time.Second, time.Second); got.State != "receiving" || len(got.Current) == 0 {
 		t.Fatal("same member value must not conflict", got.State)
 	}
 }
 
 func TestCX17MemberAssociationChangeConflicts(t *testing.T) {
 	for _, first := range []bool{false, true} {
-		s, i := cx16Fixture(t)
-		p, _ := CX17NewPCSProvider(s)
-		a := cx17Source()
+		s, i := replayTestFixture(t)
+		p, _ := NewPCSProvider(s)
+		a := providerTestSource()
 		p.Start(a, 1)
 		if first {
 			i.PCS.Member = &s
 		}
-		cx17Send(t, a, p, 1, i)
+		providerTestSend(t, a, p, 1, i)
 		next := i
 		next.PCS.Evidence.Sequence = 2
 		if first {
@@ -743,8 +743,8 @@ func TestCX17MemberAssociationChangeConflicts(t *testing.T) {
 		} else {
 			next.PCS.Member = &s
 		}
-		cx17Send(t, a, p, 1, next)
-		got := p.CX17Snapshot(time.Second, time.Second)
+		providerTestSend(t, a, p, 1, next)
+		got := p.ProjectProviderSnapshot(time.Second, time.Second)
 		if got.State != "conflict" || got.Promotable || len(got.Current) != 0 {
 			t.Fatal(first, got)
 		}
@@ -753,53 +753,53 @@ func TestCX17MemberAssociationChangeConflicts(t *testing.T) {
 }
 
 func TestCX17ReplacementDTCDemotesOmittedIndex(t *testing.T) {
-	s, pcs := cx08Fixture(t, 0x333, [8]byte{3, 2})
-	word, ok := CX07EncodeDTC(s, 0)
+	s, pcs := slotTestFixture(t, 0x333, [8]byte{3, 2})
+	word, ok := EncodeDTC(s, 0)
 	if !ok {
 		t.Fatal("no member dictionary entry")
 	}
 	pcs.NativeSlot, pcs.PublisherResolved, pcs.Member = 2, true, &s
-	p, err := CX17NewPCSProvider(s)
+	p, err := NewPCSProvider(s)
 	if err != nil {
 		t.Fatal(err)
 	}
-	a := cx17Source()
+	a := providerTestSource()
 	p.Start(a, 1)
 	defer p.Stop()
-	i := CX16ReplayInput{Selection: s, PCS: pcs}
-	cx16Frame(t, &i, 0x333, false, [8]byte{3, 2, byte(word >> 8), byte(word), 0x10, 1})
-	cx17Send(t, a, p, 1, i)
+	i := ReplayInput{Selection: s, PCS: pcs}
+	replayTestFrame(t, &i, 0x333, false, [8]byte{3, 2, byte(word >> 8), byte(word), 0x10, 1})
+	providerTestSend(t, a, p, 1, i)
 	const name = "slots/dtc_a_index"
-	got := p.CX17Snapshot(i.PCS.Evidence.Monotonic, time.Hour)
+	got := p.ProjectProviderSnapshot(i.PCS.Evidence.Monotonic, time.Hour)
 	if got.Current[name].Status != "accepted" {
 		t.Fatal(got.State, got.Current)
 	}
-	cx16Frame(t, &i, 0x333, false, [8]byte{3, 2, 0xff, 0xfe, 0x10, 1})
+	replayTestFrame(t, &i, 0x333, false, [8]byte{3, 2, 0xff, 0xfe, 0x10, 1})
 	i.PCS.Evidence.Sequence++
-	cx17Send(t, a, p, 1, i)
-	got = p.CX17Snapshot(i.PCS.Evidence.Monotonic, time.Hour)
+	providerTestSend(t, a, p, 1, i)
+	got = p.ProjectProviderSnapshot(i.PCS.Evidence.Monotonic, time.Hour)
 	if got.Current[name].Status == "accepted" || got.LastGood[name].Status != "accepted" {
 		t.Fatal(got.Current[name], got.LastGood[name])
 	}
 }
 
 func TestCX17ParallelReplacementDTCDemotesOmittedIndex(t *testing.T) {
-	c := cx11Spec(t)
+	c := parallelReleaseTestSpec(t)
 	c.ProjectCode, c.Release, c.Choice = "QAAa", "9011", "release11"
-	s := cx10Selection(t, c)
-	p, err := CX17NewPCSProvider(s)
+	s := parallelIdentityTestSelection(t, c)
+	p, err := NewPCSProvider(s)
 	if err != nil {
 		t.Fatal(err)
 	}
-	a := cx17Source()
+	a := providerTestSource()
 	p.Start(a, 1)
 	defer p.Stop()
-	send := func(seq uint64, payload [8]byte) CX17Snapshot {
-		in := cx10Input(t, c, 0x523, payload)
+	send := func(seq uint64, payload [8]byte) ProjectProviderSnapshot {
+		in := parallelIdentityTestInput(t, c, 0x523, payload)
 		in.Evidence.Sequence = seq
-		pcs := CX08PCSInput{CX06PCSInput: CX06PCSInput{CX05PCSInput: CX05PCSInput{CX01LINKInput: in, PublisherResolved: true}}}
-		cx17Send(t, a, p, 1, CX16ReplayInput{Selection: s, PCS: pcs})
-		return p.CX17Snapshot(time.Second, time.Hour)
+		pcs := PCSSlotPCSInput{PCSIdentityPCSInput: PCSIdentityPCSInput{PCSStandardPCSInput: PCSStandardPCSInput{LINKInput: in, PublisherResolved: true}}}
+		providerTestSend(t, a, p, 1, ReplayInput{Selection: s, PCS: pcs})
+		return p.ProjectProviderSnapshot(time.Second, time.Hour)
 	}
 	got := send(1, [8]byte{2, 4, 0xa1, 0, 0, 0, 0, 0})
 	const name = "release11/523/dtc_a_index"
@@ -813,25 +813,25 @@ func TestCX17ParallelReplacementDTCDemotesOmittedIndex(t *testing.T) {
 }
 
 func TestCX17NonzeroReservedByteDoesNotConflict(t *testing.T) {
-	s, i := cx16Fixture(t)
-	p, _ := CX17NewPCSProvider(s)
-	a := cx17Source()
+	s, i := replayTestFixture(t)
+	p, _ := NewPCSProvider(s)
+	a := providerTestSource()
 	p.Start(a, 1)
 	defer p.Stop()
-	cx16Frame(t, &i, 0x320, false, [8]byte{1, 2, 3, 4, 5, 6, 7, 0})
+	replayTestFrame(t, &i, 0x320, false, [8]byte{1, 2, 3, 4, 5, 6, 7, 0})
 	i.PCS.Evidence.Sequence = 1
-	cx17Send(t, a, p, 1, i)
+	providerTestSend(t, a, p, 1, i)
 	i.PCS.Evidence.Sequence = 2
-	cx16Frame(t, &i, 0x320, false, [8]byte{1, 2, 3, 4, 5, 6, 7, 9})
-	cx17Send(t, a, p, 1, i)
-	got := p.CX17Snapshot(time.Second, time.Second)
+	replayTestFrame(t, &i, 0x320, false, [8]byte{1, 2, 3, 4, 5, 6, 7, 9})
+	providerTestSend(t, a, p, 1, i)
+	got := p.ProjectProviderSnapshot(time.Second, time.Second)
 	if got.State == "conflict" || len(got.Current) == 0 || got.Current["identity/product_0"].Status != "accepted" {
 		t.Fatal("reserved byte must not fence identity", got)
 	}
 	i.PCS.Evidence.Sequence = 3
-	cx16Frame(t, &i, 0x320, false, [8]byte{9, 2, 3, 4, 5, 6, 7, 9})
-	cx17Send(t, a, p, 1, i)
-	if got = p.CX17Snapshot(time.Second, time.Second); got.State != "conflict" {
+	replayTestFrame(t, &i, 0x320, false, [8]byte{9, 2, 3, 4, 5, 6, 7, 9})
+	providerTestSend(t, a, p, 1, i)
+	if got = p.ProjectProviderSnapshot(time.Second, time.Second); got.State != "conflict" {
 		t.Fatal("identity change must still conflict", got)
 	}
 }
@@ -839,21 +839,21 @@ func TestCX17NonzeroReservedByteDoesNotConflict(t *testing.T) {
 // Catches: LINK record kinds that share a field name (0x1806 cell indexes, 0x1808 temperature indexes)
 // collapsing into one retention key, so the later record overwrote the earlier record's evidence.
 func TestCX17InterleavedLINKKindsKeepIndependentIndexes(t *testing.T) {
-	s, i := cx16LINK(t, 0x1806, [8]byte{1, 0, 2, 7, 0, 3, 0, 4})
-	p, _ := CX17NewLINKProvider(s)
-	a := cx17Source()
+	s, i := replayTestLINK(t, 0x1806, [8]byte{1, 0, 2, 7, 0, 3, 0, 4})
+	p, _ := NewLINKProvider(s)
+	a := providerTestSource()
 	p.Start(a, 1)
 	defer p.Stop()
-	cx17Send(t, a, p, 1, i)
-	cells := p.CX17Snapshot(time.Second, time.Second)
+	providerTestSend(t, a, p, 1, i)
+	cells := p.ProjectProviderSnapshot(time.Second, time.Second)
 	if cells.Current["link/1806/minimum_index"].Numerator != 7 {
 		t.Fatalf("cell minimum index: %#v", cells.Current["link/1806/minimum_index"])
 	}
 	i.PCS.Evidence.Sequence++
 	i.PCS.Evidence.Monotonic += time.Millisecond
-	cx16Frame(t, &i, 0x1808<<16|0xf401, true, [8]byte{9, 1, 3, 2, 0, 0, 0, 0})
-	cx17Send(t, a, p, 1, i)
-	got := p.CX17Snapshot(time.Second, time.Second)
+	replayTestFrame(t, &i, 0x1808<<16|0xf401, true, [8]byte{9, 1, 3, 2, 0, 0, 0, 0})
+	providerTestSend(t, a, p, 1, i)
+	got := p.ProjectProviderSnapshot(time.Second, time.Second)
 	if got.Current["link/1808/minimum_index"].Numerator != 3 || got.Current["link/1806/minimum_index"].Numerator != 7 {
 		t.Fatalf("indexes collided: cells %#v temperatures %#v", got.Current["link/1806/minimum_index"], got.Current["link/1808/minimum_index"])
 	}
@@ -865,29 +865,29 @@ func TestCX17InterleavedLINKKindsKeepIndependentIndexes(t *testing.T) {
 // Catches: the native slot or group association changing under identical wire bytes within one generation,
 // which would decode the same record into another slot's or group's current and last-good fields.
 func TestCX17NativeAssociationChangeConflicts(t *testing.T) {
-	cases := map[string]func(pcs *CX08PCSInput){
-		"slot":           func(pcs *CX08PCSInput) { pcs.NativeSlot = 3 },
-		"group":          func(pcs *CX08PCSInput) { pcs.NativeGroup = 2 },
-		"slot validity":  func(pcs *CX08PCSInput) { pcs.SlotValid = false },
-		"group validity": func(pcs *CX08PCSInput) { pcs.GroupValid = false },
+	cases := map[string]func(pcs *PCSSlotPCSInput){
+		"slot":           func(pcs *PCSSlotPCSInput) { pcs.NativeSlot = 3 },
+		"group":          func(pcs *PCSSlotPCSInput) { pcs.NativeGroup = 2 },
+		"slot validity":  func(pcs *PCSSlotPCSInput) { pcs.SlotValid = false },
+		"group validity": func(pcs *PCSSlotPCSInput) { pcs.GroupValid = false },
 	}
 	for name, change := range cases {
 		t.Run(name, func(t *testing.T) {
-			s, i := cx16Fixture(t)
+			s, i := replayTestFixture(t)
 			i.PCS.SlotValid, i.PCS.NativeSlot, i.PCS.GroupValid, i.PCS.NativeGroup = true, 2, true, 1
-			p, _ := CX17NewPCSProvider(s)
-			a := cx17Source()
+			p, _ := NewPCSProvider(s)
+			a := providerTestSource()
 			p.Start(a, 1)
 			defer p.Stop()
-			cx17Send(t, a, p, 1, i)
-			if got := p.CX17Snapshot(time.Second, time.Second); got.State == "conflict" {
+			providerTestSend(t, a, p, 1, i)
+			if got := p.ProjectProviderSnapshot(time.Second, time.Second); got.State == "conflict" {
 				t.Fatalf("first observation conflicted: %#v", got)
 			}
 			next := i
 			next.PCS.Evidence.Sequence = 2
 			change(&next.PCS)
-			cx17Send(t, a, p, 1, next)
-			got := p.CX17Snapshot(time.Second, time.Second)
+			providerTestSend(t, a, p, 1, next)
+			got := p.ProjectProviderSnapshot(time.Second, time.Second)
 			if got.State != "conflict" || got.Promotable || len(got.Current) != 0 {
 				t.Fatal(got.State, got.Promotable, len(got.Current))
 			}
@@ -901,27 +901,27 @@ func TestCX17NativeAssociationChangeConflicts(t *testing.T) {
 func TestCX17AggregateExtendedIdentityChangeConflicts(t *testing.T) {
 	for _, kind := range []uint32{0x1900, 0x1910} {
 		t.Run(fmt.Sprintf("%x", kind), func(t *testing.T) {
-			s, i := cx16Fixture(t)
-			c := s.CX01Spec()
+			s, i := replayTestFixture(t)
+			c := s.SelectionSpecValue()
 			c.Flavor, c.Scope, c.Destination, c.Source = "pcs-extended19", "aggregate", 0xdf, 0xf2
 			c.Bank, c.Endpoint, c.Group, c.Slot, c.RouteSet = "bank-a", "endpoint-a", "group-a", "slot-a", true
-			s = cx16Reselect(t, &i, c)
+			s = replayTestReselect(t, &i, c)
 			payload := [8]byte{0x34, 0x12, 2, 6, 0, 0, 0, 0}
-			cx16Frame(t, &i, kind<<16|0xdf<<8|0xf2, true, payload)
-			p, _ := CX17NewPCSProvider(s)
-			a := cx17Source()
+			replayTestFrame(t, &i, kind<<16|0xdf<<8|0xf2, true, payload)
+			p, _ := NewPCSProvider(s)
+			a := providerTestSource()
 			p.Start(a, 1)
 			defer p.Stop()
-			cx17Send(t, a, p, 1, i)
+			providerTestSend(t, a, p, 1, i)
 			key := fmt.Sprintf("extended/%04x/product", kind)
-			if got := p.CX17Snapshot(time.Second, time.Second); got.Current[key].Numerator != 0x1234 || got.Current[key].Status != "accepted" {
+			if got := p.ProjectProviderSnapshot(time.Second, time.Second); got.Current[key].Numerator != 0x1234 || got.Current[key].Status != "accepted" {
 				t.Fatalf("identity record not accepted: %#v", got.Current[key])
 			}
 			payload[0] = 0x35
-			cx16Frame(t, &i, kind<<16|0xdf<<8|0xf2, true, payload)
+			replayTestFrame(t, &i, kind<<16|0xdf<<8|0xf2, true, payload)
 			i.PCS.Evidence.Sequence = 2
-			cx17Send(t, a, p, 1, i)
-			got := p.CX17Snapshot(time.Second, time.Second)
+			providerTestSend(t, a, p, 1, i)
+			got := p.ProjectProviderSnapshot(time.Second, time.Second)
 			if got.State != "conflict" || got.Promotable || len(got.Current) != 0 {
 				t.Fatal(got.State, got.Promotable, len(got.Current))
 			}
@@ -933,28 +933,28 @@ func TestCX17AggregateExtendedIdentityChangeConflicts(t *testing.T) {
 // change, so a different role_flags value is retained raw (latest value) and the generation keeps receiving.
 func TestCX17OpaqueRoleFlagsDoNotConflict(t *testing.T) {
 	payload := [8]byte{0, 0x01, 16, 4, 0, 0, 0, 0}
-	s, i := cx16LINK(t, 0x1800, payload)
-	p, _ := CX17NewLINKProvider(s)
-	a := cx17Source()
+	s, i := replayTestLINK(t, 0x1800, payload)
+	p, _ := NewLINKProvider(s)
+	a := providerTestSource()
 	if err := p.Start(a, 1); err != nil {
 		t.Fatal(err)
 	}
 	defer p.Stop()
-	cx17Send(t, a, p, 1, i)
+	providerTestSend(t, a, p, 1, i)
 	payload[1] = 0x81
-	cx16Frame(t, &i, 0x1800<<16|0xf401, true, payload)
+	replayTestFrame(t, &i, 0x1800<<16|0xf401, true, payload)
 	i.PCS.Evidence.Sequence = 2
-	cx17Send(t, a, p, 1, i)
-	got := p.CX17Snapshot(time.Second, time.Second)
+	providerTestSend(t, a, p, 1, i)
+	got := p.ProjectProviderSnapshot(time.Second, time.Second)
 	f := got.Current["link/1800/role_flags"]
 	if got.State != "receiving" || f.Status != "raw" || f.Numerator != 0x81 || f.Unit != "" || f.Meaning != "" {
 		t.Fatal(got.State, f)
 	}
 	// A real identity change still fences after opaque flag changes.
-	cx16Frame(t, &i, 0x1802<<16|0xf401, true, [8]byte{'Q', 'A', 'A', 'A', '0', '0', '0', '6'})
+	replayTestFrame(t, &i, 0x1802<<16|0xf401, true, [8]byte{'Q', 'A', 'A', 'A', '0', '0', '0', '6'})
 	i.PCS.Evidence.Sequence = 3
-	cx17Send(t, a, p, 1, i)
-	if got = p.CX17Snapshot(time.Second, time.Second); got.State != "receiving" {
+	providerTestSend(t, a, p, 1, i)
+	if got = p.ProjectProviderSnapshot(time.Second, time.Second); got.State != "receiving" {
 		t.Fatal("matching identity conflicted", got.State)
 	}
 }
@@ -964,29 +964,29 @@ func TestCX17OpaqueRoleFlagsDoNotConflict(t *testing.T) {
 func TestCX17PCSFamilyChangeConflicts(t *testing.T) {
 	for _, release := range []string{"0011", "0006"} {
 		t.Run(release, func(t *testing.T) {
-			s, i := cx16Fixture(t)
-			c := s.CX01Spec()
+			s, i := replayTestFixture(t)
+			c := s.SelectionSpecValue()
 			c.Release = release
-			s = cx16Reselect(t, &i, c)
-			p, err := CX17NewPCSProvider(s)
+			s = replayTestReselect(t, &i, c)
+			p, err := NewPCSProvider(s)
 			if err != nil {
 				t.Fatal(err)
 			}
-			a := cx17Source()
+			a := providerTestSource()
 			if err := p.Start(a, 1); err != nil {
 				t.Fatal(err)
 			}
 			defer p.Stop()
-			cx16Frame(t, &i, 0x321, false, [8]byte{0, 'A', 'B', 'C', 'D', 0, 1, 2})
-			cx17Send(t, a, p, 1, i)
+			replayTestFrame(t, &i, 0x321, false, [8]byte{0, 'A', 'B', 'C', 'D', 0, 1, 2})
+			providerTestSend(t, a, p, 1, i)
 			want := map[string]string{"0011": "accepted", "0006": "raw"}[release]
-			if got := p.CX17Snapshot(time.Second, time.Second); got.State != "receiving" || got.Current["identity/family"].Status != want {
+			if got := p.ProjectProviderSnapshot(time.Second, time.Second); got.State != "receiving" || got.Current["identity/family"].Status != want {
 				t.Fatal(got.State, got.Current["identity/family"])
 			}
 			i.PCS.Evidence.Sequence = 2
-			cx16Frame(t, &i, 0x321, false, [8]byte{0, 'A', 'B', 'C', 'E', 0, 1, 2})
-			cx17Send(t, a, p, 1, i)
-			got := p.CX17Snapshot(time.Second, time.Second)
+			replayTestFrame(t, &i, 0x321, false, [8]byte{0, 'A', 'B', 'C', 'E', 0, 1, 2})
+			providerTestSend(t, a, p, 1, i)
+			got := p.ProjectProviderSnapshot(time.Second, time.Second)
 			if release == "0011" && (got.State != "conflict" || got.Promotable || len(got.Current) != 0 || got.LastGood["identity/family"].Numerator != 0x41424344) {
 				t.Fatal("accepted family change", got.State, got.Promotable, got.LastGood["identity/family"])
 			}
@@ -1002,40 +1002,40 @@ func TestCX17PCSFamilyChangeConflicts(t *testing.T) {
 func TestCX17ExtendedRoleChangeConflicts(t *testing.T) {
 	for _, kind := range []uint32{0x1903, 0x1913} {
 		t.Run(fmt.Sprintf("%x", kind), func(t *testing.T) {
-			s, i := cx16Fixture(t)
-			c := s.CX01Spec()
+			s, i := replayTestFixture(t)
+			c := s.SelectionSpecValue()
 			c.Flavor, c.Bank, c.Endpoint, c.Group, c.Slot, c.RouteSet = "pcs-extended19", "bank-a", "endpoint-a", "group-a", "slot-a", true
 			c.Destination, c.Source = 0xf2, 2
 			if kind == 0x1913 {
 				c.Scope, c.Destination, c.Source = "aggregate", 0xdf, 0xf2
 			}
-			s = cx16Reselect(t, &i, c)
+			s = replayTestReselect(t, &i, c)
 			route := uint32(c.Destination)<<8 | uint32(c.Source)
 			payload := [8]byte{1, 0, 2, 0, 3, 4, 5, 1}
-			cx16Frame(t, &i, kind<<16|route, true, payload)
-			p, _ := CX17NewPCSProvider(s)
-			a := cx17Source()
+			replayTestFrame(t, &i, kind<<16|route, true, payload)
+			p, _ := NewPCSProvider(s)
+			a := providerTestSource()
 			if err := p.Start(a, 1); err != nil {
 				t.Fatal(err)
 			}
 			defer p.Stop()
-			cx17Send(t, a, p, 1, i)
+			providerTestSend(t, a, p, 1, i)
 			key := fmt.Sprintf("extended/%04x/role", kind)
-			if got := p.CX17Snapshot(time.Second, time.Second); got.State != "receiving" || got.Current[key].Status != "accepted" || got.Current[key].Numerator != 1 {
+			if got := p.ProjectProviderSnapshot(time.Second, time.Second); got.State != "receiving" || got.Current[key].Status != "accepted" || got.Current[key].Numerator != 1 {
 				t.Fatal(got.State, got.Current[key])
 			}
 			payload[6] = 6
-			cx16Frame(t, &i, kind<<16|route, true, payload)
+			replayTestFrame(t, &i, kind<<16|route, true, payload)
 			i.PCS.Evidence.Sequence = 2
-			cx17Send(t, a, p, 1, i)
-			if got := p.CX17Snapshot(time.Second, time.Second); got.State != "receiving" {
+			providerTestSend(t, a, p, 1, i)
+			if got := p.ProjectProviderSnapshot(time.Second, time.Second); got.State != "receiving" {
 				t.Fatal("state change fenced", got.State)
 			}
 			payload[7] = 2
-			cx16Frame(t, &i, kind<<16|route, true, payload)
+			replayTestFrame(t, &i, kind<<16|route, true, payload)
 			i.PCS.Evidence.Sequence = 3
-			cx17Send(t, a, p, 1, i)
-			got := p.CX17Snapshot(time.Second, time.Second)
+			providerTestSend(t, a, p, 1, i)
+			got := p.ProjectProviderSnapshot(time.Second, time.Second)
 			if got.State != "conflict" || got.Promotable || len(got.Current) != 0 || got.LastGood[key].Numerator != 1 {
 				t.Fatal(got.State, got.Promotable, len(got.Current), got.LastGood[key])
 			}
@@ -1052,24 +1052,24 @@ func TestCX17LINKSerialReplacementConflicts(t *testing.T) {
 	}
 	for _, name := range []string{"same", "different", "new-generation"} {
 		t.Run(name, func(t *testing.T) {
-			s, i := cx16LINK(t, 0x1802, [8]byte{'Q', 'A', 'A', 'A', '0', '0', '0', '6'})
-			p, _ := CX17NewLINKProvider(s)
-			a := cx17Source()
+			s, i := replayTestLINK(t, 0x1802, [8]byte{'Q', 'A', 'A', 'A', '0', '0', '0', '6'})
+			p, _ := NewLINKProvider(s)
+			a := providerTestSource()
 			if err := p.Start(a, 1); err != nil {
 				t.Fatal(err)
 			}
 			defer p.Stop()
 			generation := uint64(1)
-			cx17Send(t, a, p, generation, i)
+			providerTestSend(t, a, p, generation, i)
 			feed := func(frames [][8]byte) {
 				for _, payload := range frames {
 					i.PCS.Evidence.Sequence++
-					cx16Frame(t, &i, 0x18fb<<16|0xf401, true, payload)
-					cx17Send(t, a, p, generation, i)
+					replayTestFrame(t, &i, 0x18fb<<16|0xf401, true, payload)
+					providerTestSend(t, a, p, generation, i)
 				}
 			}
 			feed(serial(1))
-			if got := p.CX17Snapshot(time.Second, time.Second); got.State != "receiving" {
+			if got := p.ProjectProviderSnapshot(time.Second, time.Second); got.State != "receiving" {
 				t.Fatal("first serial", got.State)
 			}
 			next := serial(1)
@@ -1077,7 +1077,7 @@ func TestCX17LINKSerialReplacementConflicts(t *testing.T) {
 				next = serial(9)
 			}
 			if name == "new-generation" {
-				b := cx17Source()
+				b := providerTestSource()
 				generation = 2
 				if err := p.Start(b, generation); err != nil {
 					t.Fatal(err)
@@ -1085,11 +1085,11 @@ func TestCX17LINKSerialReplacementConflicts(t *testing.T) {
 				a = b
 				// Sequences above the predecessor's keep a retained predecessor assembly from rejecting them as stale.
 				i.PCS.Evidence.Sequence = 10
-				cx16Frame(t, &i, 0x1802<<16|0xf401, true, [8]byte{'Q', 'A', 'A', 'A', '0', '0', '0', '6'})
-				cx17Send(t, a, p, generation, i)
+				replayTestFrame(t, &i, 0x1802<<16|0xf401, true, [8]byte{'Q', 'A', 'A', 'A', '0', '0', '0', '6'})
+				providerTestSend(t, a, p, generation, i)
 			}
 			feed(next)
-			got := p.CX17Snapshot(time.Second, time.Second)
+			got := p.ProjectProviderSnapshot(time.Second, time.Second)
 			if (got.State == "conflict") != (name == "different") || (name == "different" && (got.Promotable || len(got.Current) != 0)) {
 				t.Fatal(name, got.State, got.Promotable, len(got.Current))
 			}
@@ -1103,19 +1103,19 @@ func TestCX17LINKSerialReplacementConflicts(t *testing.T) {
 func TestCX17BalanceEnablesDemotedWhenWithheld(t *testing.T) {
 	for _, name := range []string{"gate-invalid", "hardware-age-unknown", "count-smaller", "count-invalid", "unchanged"} {
 		t.Run(name, func(t *testing.T) {
-			s, i := cx16LINK(t, 0x1801, [8]byte{0x0f, 0, 1, 2, 3, 4, 6, 0})
+			s, i := replayTestLINK(t, 0x1801, [8]byte{0x0f, 0, 1, 2, 3, 4, 6, 0})
 			i.CellCount, i.CellCountValid = 4, true
-			i.BalanceGate = CX12MeasurementGate{Configured: true, Valid: true}
+			i.BalanceGate = MeasurementGate{Configured: true, Valid: true}
 			i.HardwareAgeKnown = true
-			p, _ := CX17NewLINKProvider(s)
-			a := cx17Source()
+			p, _ := NewLINKProvider(s)
+			a := providerTestSource()
 			if err := p.Start(a, 1); err != nil {
 				t.Fatal(err)
 			}
 			defer p.Stop()
-			cx17Send(t, a, p, 1, i)
+			providerTestSend(t, a, p, 1, i)
 			now := i.PCS.Evidence.Monotonic
-			if got := p.CX17Snapshot(now, time.Second); got.Current["balance/enable_3"].Status != "accepted" || !got.Promotable {
+			if got := p.ProjectProviderSnapshot(now, time.Second); got.Current["balance/enable_3"].Status != "accepted" || !got.Promotable {
 				t.Fatal(got.State, got.Current["balance/enable_3"])
 			}
 			i.PCS.Evidence.Sequence = 2
@@ -1129,8 +1129,8 @@ func TestCX17BalanceEnablesDemotedWhenWithheld(t *testing.T) {
 			case "count-invalid":
 				i.CellCountValid = false
 			}
-			cx17Send(t, a, p, 1, i)
-			got := p.CX17Snapshot(now, time.Second)
+			providerTestSend(t, a, p, 1, i)
+			got := p.ProjectProviderSnapshot(now, time.Second)
 			want := map[string]string{"gate-invalid": "absent", "hardware-age-unknown": "absent", "count-smaller": "unconfigured", "count-invalid": "absent", "unchanged": "accepted"}[name]
 			for _, slot := range []int{3, 4} {
 				key := fmt.Sprintf("balance/enable_%d", slot)
@@ -1158,26 +1158,26 @@ func TestCX17PCSStandardSerialReplacementConflicts(t *testing.T) {
 	}
 	for _, name := range []string{"same", "different", "slot-change", "interrupted", "new-generation"} {
 		t.Run(name, func(t *testing.T) {
-			s, i := cx16Fixture(t)
+			s, i := replayTestFixture(t)
 			i.PCS.SerialSlotValid, i.PCS.SerialSlot = true, 1
-			p, _ := CX17NewPCSProvider(s)
-			a := cx17Source()
+			p, _ := NewPCSProvider(s)
+			a := providerTestSource()
 			if err := p.Start(a, 1); err != nil {
 				t.Fatal(err)
 			}
 			defer p.Stop()
 			generation := uint64(1)
-			cx17Send(t, a, p, generation, i)
+			providerTestSend(t, a, p, generation, i)
 			feed := func(frames [][8]byte) {
 				for _, payload := range frames {
 					i.PCS.Evidence.Sequence++
 					i.PCS.Evidence.Monotonic += time.Millisecond
-					cx16Frame(t, &i, 0x324, false, payload)
-					cx17Send(t, a, p, generation, i)
+					replayTestFrame(t, &i, 0x324, false, payload)
+					providerTestSend(t, a, p, generation, i)
 				}
 			}
 			feed(serial(1, 1))
-			if got := p.CX17Snapshot(i.PCS.Evidence.Monotonic, time.Hour); got.State != "receiving" || !got.Promotable {
+			if got := p.ProjectProviderSnapshot(i.PCS.Evidence.Monotonic, time.Hour); got.State != "receiving" || !got.Promotable {
 				t.Fatal("first serial", got.State, got.Promotable)
 			}
 			next := serial(1, 1)
@@ -1192,18 +1192,18 @@ func TestCX17PCSStandardSerialReplacementConflicts(t *testing.T) {
 				next = [][8]byte{next[0], next[2]}
 			}
 			if name == "new-generation" {
-				b := cx17Source()
+				b := providerTestSource()
 				generation = 2
 				if err := p.Start(b, generation); err != nil {
 					t.Fatal(err)
 				}
 				a = b
 				i.PCS.Evidence.Sequence = 10
-				cx16Frame(t, &i, 0x313, false, [8]byte{0x14, 0xbe, 0xff, 0xf6, 0, 10, 50, 0xe4})
-				cx17Send(t, a, p, generation, i)
+				replayTestFrame(t, &i, 0x313, false, [8]byte{0x14, 0xbe, 0xff, 0xf6, 0, 10, 50, 0xe4})
+				providerTestSend(t, a, p, generation, i)
 			}
 			feed(next)
-			got := p.CX17Snapshot(i.PCS.Evidence.Monotonic, time.Hour)
+			got := p.ProjectProviderSnapshot(i.PCS.Evidence.Monotonic, time.Hour)
 			conflict := name == "different" || name == "slot-change"
 			if (got.State == "conflict") != conflict || (conflict && (got.Promotable || len(got.Current) != 0)) {
 				t.Fatal(name, got.State, got.Promotable, len(got.Current))
@@ -1222,13 +1222,13 @@ func TestCX17ParallelSerialReplacementConflicts(t *testing.T) {
 	}
 	for _, name := range []string{"same", "different", "other-module", "reordered", "new-generation"} {
 		t.Run(name, func(t *testing.T) {
-			c := cx10Spec(t)
-			s := cx10Selection(t, c)
-			p, err := CX17NewPCSProvider(s)
+			c := parallelIdentityTestSpec(t)
+			s := parallelIdentityTestSelection(t, c)
+			p, err := NewPCSProvider(s)
 			if err != nil {
 				t.Fatal(err)
 			}
-			a := cx17Source()
+			a := providerTestSource()
 			if err := p.Start(a, 1); err != nil {
 				t.Fatal(err)
 			}
@@ -1237,15 +1237,15 @@ func TestCX17ParallelSerialReplacementConflicts(t *testing.T) {
 			feed := func(frames [][8]byte) {
 				for _, payload := range frames {
 					sequence++
-					in := cx10Input(t, c, 0x6c3, payload)
+					in := parallelIdentityTestInput(t, c, 0x6c3, payload)
 					in.Evidence.Sequence, in.Evidence.Monotonic = sequence, time.Duration(sequence)*time.Millisecond
-					pcs := CX08PCSInput{CX06PCSInput: CX06PCSInput{CX05PCSInput: CX05PCSInput{CX01LINKInput: in, PublisherResolved: true}}}
-					cx17Send(t, a, p, generation, CX16ReplayInput{Selection: s, PCS: pcs})
+					pcs := PCSSlotPCSInput{PCSIdentityPCSInput: PCSIdentityPCSInput{PCSStandardPCSInput: PCSStandardPCSInput{LINKInput: in, PublisherResolved: true}}}
+					providerTestSend(t, a, p, generation, ReplayInput{Selection: s, PCS: pcs})
 				}
 			}
 			feed([][8]byte{{1, 2, 3, 4, 5, 6, 7, 8}})
 			feed(serial(2, 1))
-			if got := p.CX17Snapshot(time.Second, time.Hour); got.State != "receiving" {
+			if got := p.ProjectProviderSnapshot(time.Second, time.Hour); got.State != "receiving" {
 				t.Fatal("first serial", got.State)
 			}
 			next := serial(2, 1)
@@ -1259,7 +1259,7 @@ func TestCX17ParallelSerialReplacementConflicts(t *testing.T) {
 				next = [][8]byte{next[0], next[2], next[1]}
 			}
 			if name == "new-generation" {
-				b := cx17Source()
+				b := providerTestSource()
 				generation = 2
 				if err := p.Start(b, generation); err != nil {
 					t.Fatal(err)
@@ -1267,7 +1267,7 @@ func TestCX17ParallelSerialReplacementConflicts(t *testing.T) {
 				a = b
 			}
 			feed(next)
-			got := p.CX17Snapshot(time.Second, time.Hour)
+			got := p.ProjectProviderSnapshot(time.Second, time.Hour)
 			if (got.State == "conflict") != (name == "different") || (name == "different" && (got.Promotable || len(got.Current) != 0)) {
 				t.Fatal(name, got.State, got.Promotable, len(got.Current))
 			}
@@ -1280,31 +1280,31 @@ func TestCX17ParallelSerialReplacementConflicts(t *testing.T) {
 func TestCX17CellCountChangeDemotesBalanceEnables(t *testing.T) {
 	for _, name := range []string{"count-smaller", "count-invalid", "unchanged"} {
 		t.Run(name, func(t *testing.T) {
-			s, i := cx16LINK(t, 0x1801, [8]byte{0xff, 0xff, 1, 2, 3, 4, 6, 0})
+			s, i := replayTestLINK(t, 0x1801, [8]byte{0xff, 0xff, 1, 2, 3, 4, 6, 0})
 			i.CellCount, i.CellCountValid = 16, true
-			i.BalanceGate = CX12MeasurementGate{Configured: true, Valid: true}
+			i.BalanceGate = MeasurementGate{Configured: true, Valid: true}
 			i.HardwareAgeKnown = true
-			p, _ := CX17NewLINKProvider(s)
-			a := cx17Source()
+			p, _ := NewLINKProvider(s)
+			a := providerTestSource()
 			if err := p.Start(a, 1); err != nil {
 				t.Fatal(err)
 			}
 			defer p.Stop()
-			cx17Send(t, a, p, 1, i)
+			providerTestSend(t, a, p, 1, i)
 			now := i.PCS.Evidence.Monotonic
-			if got := p.CX17Snapshot(now, time.Second); got.Current["balance/enable_16"].Status != "accepted" {
+			if got := p.ProjectProviderSnapshot(now, time.Second); got.Current["balance/enable_16"].Status != "accepted" {
 				t.Fatal(got.State, got.Current["balance/enable_16"])
 			}
 			i.PCS.Evidence.Sequence = 2
-			cx16Frame(t, &i, 0x1806<<16|0xf401, true, [8]byte{1, 0, 2, 7, 0, 3, 0, 4})
+			replayTestFrame(t, &i, 0x1806<<16|0xf401, true, [8]byte{1, 0, 2, 7, 0, 3, 0, 4})
 			switch name {
 			case "count-smaller":
 				i.CellCount = 4
 			case "count-invalid":
 				i.CellCountValid = false
 			}
-			cx17Send(t, a, p, 1, i)
-			got := p.CX17Snapshot(now, time.Second)
+			providerTestSend(t, a, p, 1, i)
+			got := p.ProjectProviderSnapshot(now, time.Second)
 			if got.State != "receiving" {
 				t.Fatal(got.State)
 			}
@@ -1333,10 +1333,10 @@ func TestCX17SerialSlotAssociationChangeConflicts(t *testing.T) {
 	telemetry := [8]byte{0x14, 0xbe, 0xff, 0xf6, 0, 10, 50, 0xe4}
 	for _, name := range []string{"slot-after-serial", "validity-cleared", "validity-set", "unchanged"} {
 		t.Run(name, func(t *testing.T) {
-			s, i := cx16Fixture(t)
+			s, i := replayTestFixture(t)
 			i.PCS.SerialSlotValid, i.PCS.SerialSlot = name != "validity-set", 1
-			p, _ := CX17NewPCSProvider(s)
-			a := cx17Source()
+			p, _ := NewPCSProvider(s)
+			a := providerTestSource()
 			if err := p.Start(a, 1); err != nil {
 				t.Fatal(err)
 			}
@@ -1344,8 +1344,8 @@ func TestCX17SerialSlotAssociationChangeConflicts(t *testing.T) {
 			send := func(id uint32, payload [8]byte) {
 				i.PCS.Evidence.Sequence++
 				i.PCS.Evidence.Monotonic += time.Millisecond
-				cx16Frame(t, &i, id, false, payload)
-				cx17Send(t, a, p, 1, i)
+				replayTestFrame(t, &i, id, false, payload)
+				providerTestSend(t, a, p, 1, i)
 			}
 			send(0x313, telemetry)
 			if name != "validity-set" {
@@ -1353,7 +1353,7 @@ func TestCX17SerialSlotAssociationChangeConflicts(t *testing.T) {
 					send(0x324, payload)
 				}
 			}
-			if got := p.CX17Snapshot(i.PCS.Evidence.Monotonic, time.Hour); got.State != "receiving" || !got.Promotable {
+			if got := p.ProjectProviderSnapshot(i.PCS.Evidence.Monotonic, time.Hour); got.State != "receiving" || !got.Promotable {
 				t.Fatal("baseline", got.State, got.Promotable)
 			}
 			switch name {
@@ -1365,7 +1365,7 @@ func TestCX17SerialSlotAssociationChangeConflicts(t *testing.T) {
 				i.PCS.SerialSlotValid = true
 			}
 			send(0x313, telemetry)
-			got := p.CX17Snapshot(i.PCS.Evidence.Monotonic, time.Hour)
+			got := p.ProjectProviderSnapshot(i.PCS.Evidence.Monotonic, time.Hour)
 			conflict := name != "unchanged"
 			if (got.State == "conflict") != conflict || got.Promotable == conflict || (conflict && len(got.Current) != 0) {
 				t.Fatal(name, got.State, got.Promotable, len(got.Current))
@@ -1386,9 +1386,9 @@ func TestCX17LINKSerialWithoutIdentityRecordConflicts(t *testing.T) {
 	}
 	for _, name := range []string{"same", "different"} {
 		t.Run(name, func(t *testing.T) {
-			s, i := cx16LINK(t, 0x18fb, serial(1)[0])
-			p, _ := CX17NewLINKProvider(s)
-			a := cx17Source()
+			s, i := replayTestLINK(t, 0x18fb, serial(1)[0])
+			p, _ := NewLINKProvider(s)
+			a := providerTestSource()
 			if err := p.Start(a, 1); err != nil {
 				t.Fatal(err)
 			}
@@ -1397,12 +1397,12 @@ func TestCX17LINKSerialWithoutIdentityRecordConflicts(t *testing.T) {
 			feed := func(frames [][8]byte) {
 				for _, payload := range frames {
 					i.PCS.Evidence.Sequence++
-					cx16Frame(t, &i, 0x18fb<<16|0xf401, true, payload)
-					cx17Send(t, a, p, 1, i)
+					replayTestFrame(t, &i, 0x18fb<<16|0xf401, true, payload)
+					providerTestSend(t, a, p, 1, i)
 				}
 			}
 			feed(serial(1))
-			if got := p.CX17Snapshot(time.Second, time.Second); got.State != "receiving" {
+			if got := p.ProjectProviderSnapshot(time.Second, time.Second); got.State != "receiving" {
 				t.Fatal("first serial", got.State)
 			}
 			next := serial(1)
@@ -1410,7 +1410,7 @@ func TestCX17LINKSerialWithoutIdentityRecordConflicts(t *testing.T) {
 				next = serial(9)
 			}
 			feed(next)
-			got := p.CX17Snapshot(time.Second, time.Second)
+			got := p.ProjectProviderSnapshot(time.Second, time.Second)
 			if (got.State == "conflict") != (name == "different") || (name == "different" && (got.Promotable || len(got.Current) != 0)) {
 				t.Fatal(name, got.State, got.Promotable, len(got.Current))
 			}
@@ -1422,18 +1422,18 @@ func TestCX17LINKSerialWithoutIdentityRecordConflicts(t *testing.T) {
 // native association and serial slot baselines, so the following valid observation carrying its correct
 // associations permanently conflicted the generation. The malformed raw record is still retained.
 func TestCX17MalformedFirstObservationDoesNotSetBaseline(t *testing.T) {
-	cases := map[string]func(s *CXSelection, pcs *CX08PCSInput){
-		"member": func(s *CXSelection, pcs *CX08PCSInput) { pcs.Member = s },
-		"association": func(_ *CXSelection, pcs *CX08PCSInput) {
+	cases := map[string]func(s *CXSelection, pcs *PCSSlotPCSInput){
+		"member": func(s *CXSelection, pcs *PCSSlotPCSInput) { pcs.Member = s },
+		"association": func(_ *CXSelection, pcs *PCSSlotPCSInput) {
 			pcs.SlotValid, pcs.NativeSlot, pcs.GroupValid, pcs.NativeGroup = true, 3, true, 2
 		},
-		"serial-slot": func(_ *CXSelection, pcs *CX08PCSInput) { pcs.SerialSlotValid, pcs.SerialSlot = true, 5 },
+		"serial-slot": func(_ *CXSelection, pcs *PCSSlotPCSInput) { pcs.SerialSlotValid, pcs.SerialSlot = true, 5 },
 	}
 	for name, poison := range cases {
 		t.Run(name, func(t *testing.T) {
-			s, i := cx16Fixture(t)
-			p, _ := CX17NewPCSProvider(s)
-			a := cx17Source()
+			s, i := replayTestFixture(t)
+			p, _ := NewPCSProvider(s)
+			a := providerTestSource()
 			if err := p.Start(a, 1); err != nil {
 				t.Fatal(err)
 			}
@@ -1441,14 +1441,14 @@ func TestCX17MalformedFirstObservationDoesNotSetBaseline(t *testing.T) {
 			bad := i
 			bad.PCS.FieldAge = -time.Second
 			poison(&s, &bad.PCS)
-			cx17Send(t, a, p, 1, bad)
-			if got := p.CX17Snapshot(time.Second, time.Second); got.State == "conflict" || len(got.Raw) != 1 || got.Raw[0].Status != "invalid" || len(got.Current) != 0 {
+			providerTestSend(t, a, p, 1, bad)
+			if got := p.ProjectProviderSnapshot(time.Second, time.Second); got.State == "conflict" || len(got.Raw) != 1 || got.Raw[0].Status != "invalid" || len(got.Current) != 0 {
 				t.Fatal("malformed first", got.State, got.Raw, len(got.Current))
 			}
 			for sequence := uint64(2); sequence <= 3; sequence++ {
 				i.PCS.Evidence.Sequence = sequence
-				cx17Send(t, a, p, 1, i)
-				if got := p.CX17Snapshot(time.Second, time.Second); got.State != "receiving" || !got.Promotable || got.Current["core/voltage"].Evidence.Sequence != sequence {
+				providerTestSend(t, a, p, 1, i)
+				if got := p.ProjectProviderSnapshot(time.Second, time.Second); got.State != "receiving" || !got.Promotable || got.Current["core/voltage"].Evidence.Sequence != sequence {
 					t.Fatal("valid after malformed", sequence, got.State, got.Promotable)
 				}
 			}
@@ -1476,28 +1476,28 @@ func TestCX17PCSFamilyOmittedTransitionConflicts(t *testing.T) {
 	}
 	for _, tc := range cases {
 		t.Run(tc.name, func(t *testing.T) {
-			s, i := cx16Fixture(t)
-			c := s.CX01Spec()
+			s, i := replayTestFixture(t)
+			c := s.SelectionSpecValue()
 			c.Release = tc.release
-			s = cx16Reselect(t, &i, c)
-			p, err := CX17NewPCSProvider(s)
+			s = replayTestReselect(t, &i, c)
+			p, err := NewPCSProvider(s)
 			if err != nil {
 				t.Fatal(err)
 			}
-			a := cx17Source()
+			a := providerTestSource()
 			if err := p.Start(a, 1); err != nil {
 				t.Fatal(err)
 			}
 			defer p.Stop()
-			cx16Frame(t, &i, 0x321, false, tc.first)
-			cx17Send(t, a, p, 1, i)
-			if got := p.CX17Snapshot(time.Second, time.Second); got.State != "receiving" || got.Current[tc.firstStatusName].Status != "accepted" {
+			replayTestFrame(t, &i, 0x321, false, tc.first)
+			providerTestSend(t, a, p, 1, i)
+			if got := p.ProjectProviderSnapshot(time.Second, time.Second); got.State != "receiving" || got.Current[tc.firstStatusName].Status != "accepted" {
 				t.Fatal("first", got.State, got.Current[tc.firstStatusName])
 			}
 			i.PCS.Evidence.Sequence = 2
-			cx16Frame(t, &i, 0x321, false, tc.second)
-			cx17Send(t, a, p, 1, i)
-			got := p.CX17Snapshot(time.Second, time.Second)
+			replayTestFrame(t, &i, 0x321, false, tc.second)
+			providerTestSend(t, a, p, 1, i)
+			got := p.ProjectProviderSnapshot(time.Second, time.Second)
 			if (got.State == "conflict") != tc.conflict || (tc.conflict && (got.Promotable || len(got.Current) != 0 || got.LastGood[tc.firstStatusName].Status != "accepted")) {
 				t.Fatal(tc.name, got.State, got.Promotable, len(got.Current), got.LastGood[tc.firstStatusName])
 			}
@@ -1514,19 +1514,19 @@ func TestCX17PCSFamilyOmittedTransitionConflicts(t *testing.T) {
 func TestCX17RejectedLINKObservationDoesNotReconcile(t *testing.T) {
 	for _, name := range []string{"wrong-route-smaller", "wrong-route-invalid", "malformed-smaller", "malformed-invalid", "admitted-smaller"} {
 		t.Run(name, func(t *testing.T) {
-			s, i := cx16LINK(t, 0x1801, [8]byte{0xff, 0xff, 1, 2, 3, 4, 6, 0})
+			s, i := replayTestLINK(t, 0x1801, [8]byte{0xff, 0xff, 1, 2, 3, 4, 6, 0})
 			i.CellCount, i.CellCountValid = 16, true
 			i.SensorCount, i.SensorCountValid = 4, true
-			i.BalanceGate = CX12MeasurementGate{Configured: true, Valid: true}
+			i.BalanceGate = MeasurementGate{Configured: true, Valid: true}
 			i.HardwareAgeKnown = true
 			for n := range i.CellGates {
-				i.CellGates[n] = CX12MeasurementGate{Configured: true, Valid: true}
+				i.CellGates[n] = MeasurementGate{Configured: true, Valid: true}
 			}
 			for n := range i.SensorGates {
-				i.SensorGates[n] = CX12MeasurementGate{Configured: true, Valid: true}
+				i.SensorGates[n] = MeasurementGate{Configured: true, Valid: true}
 			}
-			p, _ := CX17NewLINKProvider(s)
-			a := cx17Source()
+			p, _ := NewLINKProvider(s)
+			a := providerTestSource()
 			if err := p.Start(a, 1); err != nil {
 				t.Fatal(err)
 			}
@@ -1534,15 +1534,15 @@ func TestCX17RejectedLINKObservationDoesNotReconcile(t *testing.T) {
 			send := func(id uint32, payload [8]byte) {
 				i.PCS.Evidence.Sequence++
 				i.PCS.Evidence.Monotonic += time.Millisecond
-				cx16Frame(t, &i, id, true, payload)
-				cx17Send(t, a, p, 1, i)
+				replayTestFrame(t, &i, id, true, payload)
+				providerTestSend(t, a, p, 1, i)
 			}
 			i.PCS.Evidence.Sequence = 0
 			send(0x1801<<16|0xf401, [8]byte{0xff, 0xff, 1, 2, 3, 4, 6, 0})
 			send(0x1811<<16|0xf401, [8]byte{5, 0, 6, 0, 7, 0, 8, 0})
 			send(0x1830<<16|0xf401, [8]byte{0x40, 1, 0x41, 1, 0x42, 1, 0x43, 1})
 			keys := []string{"cells/cell_5", "cells/cell_8", "sensors/sensor_2", "sensors/sensor_4", "balance/enable_3", "balance/enable_16"}
-			got := p.CX17Snapshot(i.PCS.Evidence.Monotonic, time.Hour)
+			got := p.ProjectProviderSnapshot(i.PCS.Evidence.Monotonic, time.Hour)
 			for _, key := range keys {
 				if got.State != "receiving" || got.Current[key].Status != "accepted" {
 					t.Fatal("accepted cycle", key, got.State, got.Current[key])
@@ -1562,7 +1562,7 @@ func TestCX17RejectedLINKObservationDoesNotReconcile(t *testing.T) {
 				i.CellCount, i.SensorCount = 2, 1
 			}
 			send(id, [8]byte{1, 0, 2, 0, 3, 0, 4, 0})
-			got = p.CX17Snapshot(i.PCS.Evidence.Monotonic, time.Hour)
+			got = p.ProjectProviderSnapshot(i.PCS.Evidence.Monotonic, time.Hour)
 			admitted := name == "admitted-smaller"
 			if last := got.Raw[len(got.Raw)-1]; got.State != "receiving" || (last.Status == "invalid") == admitted {
 				t.Fatal("raw", got.State, last.Status)
@@ -1581,15 +1581,15 @@ func TestCX17RejectedLINKObservationDoesNotReconcile(t *testing.T) {
 // member or native association conflicting the generation before admission rejects it, so rejected evidence
 // cleared the current fields and a later valid observation could never recover.
 func TestCX17MalformedObservationWithChangedAssociationDoesNotConflict(t *testing.T) {
-	s, i := cx16Fixture(t)
-	p, _ := CX17NewPCSProvider(s)
-	a := cx17Source()
+	s, i := replayTestFixture(t)
+	p, _ := NewPCSProvider(s)
+	a := providerTestSource()
 	if err := p.Start(a, 1); err != nil {
 		t.Fatal(err)
 	}
 	defer p.Stop()
-	cx17Send(t, a, p, 1, i)
-	baseline := p.CX17Snapshot(time.Second, time.Second)
+	providerTestSend(t, a, p, 1, i)
+	baseline := p.ProjectProviderSnapshot(time.Second, time.Second)
 	if baseline.State == "conflict" || len(baseline.Current) == 0 {
 		t.Fatalf("baseline not established: %s %d", baseline.State, len(baseline.Current))
 	}
@@ -1598,15 +1598,15 @@ func TestCX17MalformedObservationWithChangedAssociationDoesNotConflict(t *testin
 	bad.PCS.FieldAge = -time.Second
 	bad.PCS.Member = &s
 	bad.PCS.SlotValid, bad.PCS.NativeSlot = true, 9
-	cx17Send(t, a, p, 1, bad)
-	got := p.CX17Snapshot(time.Second, time.Second)
+	providerTestSend(t, a, p, 1, bad)
+	got := p.ProjectProviderSnapshot(time.Second, time.Second)
 	if got.State == "conflict" || len(got.Current) != len(baseline.Current) || got.Raw[len(got.Raw)-1].Status != "invalid" {
 		t.Fatalf("rejected evidence changed the generation: state %s current %d raw %s", got.State, len(got.Current), got.Raw[len(got.Raw)-1].Status)
 	}
 	good := i
 	good.PCS.Evidence.Sequence = 3
-	cx17Send(t, a, p, 1, good)
-	after := p.CX17Snapshot(time.Second, time.Second)
+	providerTestSend(t, a, p, 1, good)
+	after := p.ProjectProviderSnapshot(time.Second, time.Second)
 	if after.State == "conflict" || len(after.Current) == 0 {
 		t.Fatalf("valid observation after a rejected one did not keep receiving: %s %d", after.State, len(after.Current))
 	}
@@ -1618,23 +1618,23 @@ func TestCX17MalformedObservationWithChangedAssociationDoesNotConflict(t *testin
 func TestCX17IndexBoundsAssociationChangeConflicts(t *testing.T) {
 	for _, name := range []string{"scope", "minimum-raised", "maximum-lowered", "unchanged"} {
 		t.Run(name, func(t *testing.T) {
-			s, i := cx16Fixture(t)
+			s, i := replayTestFixture(t)
 			i.PCS.IndexValid, i.PCS.IndexScope, i.PCS.IndexMinimum, i.PCS.IndexMaximum = true, "local", 0, 15
-			cx16Frame(t, &i, 0x319, false, [8]byte{0, 0x0c, 0, 0x0b, 0, 12, 3, 0})
-			p, _ := CX17NewPCSProvider(s)
-			a := cx17Source()
+			replayTestFrame(t, &i, 0x319, false, [8]byte{0, 0x0c, 0, 0x0b, 0, 12, 3, 0})
+			p, _ := NewPCSProvider(s)
+			a := providerTestSource()
 			if err := p.Start(a, 1); err != nil {
 				t.Fatal(err)
 			}
 			defer p.Stop()
-			cx17Send(t, a, p, 1, i)
+			providerTestSend(t, a, p, 1, i)
 			now := i.PCS.Evidence.Monotonic
-			if got := p.CX17Snapshot(now, time.Second); got.Current["core/maximum_index"].Status != "accepted" || got.Current["core/maximum_index"].Numerator != 12 {
+			if got := p.ProjectProviderSnapshot(now, time.Second); got.Current["core/maximum_index"].Status != "accepted" || got.Current["core/maximum_index"].Numerator != 12 {
 				t.Fatal(got.State, got.Current["core/maximum_index"])
 			}
 			next := i
 			next.PCS.Evidence.Sequence = 2
-			cx16Frame(t, &next, 0x314, false, [8]byte{0x27, 0x10, 0, 0, 0, 0, 0, 0})
+			replayTestFrame(t, &next, 0x314, false, [8]byte{0x27, 0x10, 0, 0, 0, 0, 0, 0})
 			switch name {
 			case "scope":
 				next.PCS.IndexScope = "aggregate"
@@ -1643,8 +1643,8 @@ func TestCX17IndexBoundsAssociationChangeConflicts(t *testing.T) {
 			case "maximum-lowered":
 				next.PCS.IndexMaximum = 8
 			}
-			cx17Send(t, a, p, 1, next)
-			got := p.CX17Snapshot(now, time.Second)
+			providerTestSend(t, a, p, 1, next)
+			got := p.ProjectProviderSnapshot(now, time.Second)
 			if name == "unchanged" {
 				if got.State != "receiving" || !got.Promotable || got.Current["core/maximum_index"].Status != "accepted" {
 					t.Fatal(got.State, got.Promotable, got.Current["core/maximum_index"])
@@ -1659,14 +1659,14 @@ func TestCX17IndexBoundsAssociationChangeConflicts(t *testing.T) {
 }
 
 // cx17GroupFixture is the default PCS-standard fixture moved to another project release.
-func cx17GroupFixture(t *testing.T, release, group string) (CXSelection, CX16ReplayInput) {
+func providerTestGroupFixture(t *testing.T, release, group string) (CXSelection, ReplayInput) {
 	t.Helper()
-	s, i := cx16Fixture(t)
-	c := s.CX01Spec()
+	s, i := replayTestFixture(t)
+	c := s.SelectionSpecValue()
 	c.Release = release
 	s, err := NewCXSelection(c)
-	if err != nil || s.CX01Group() != group {
-		t.Fatal(err, s.CX01Group())
+	if err != nil || s.SelectionGroup() != group {
+		t.Fatal(err, s.SelectionGroup())
 	}
 	i.Selection = s
 	return s, i
@@ -1678,18 +1678,18 @@ func cx17GroupFixture(t *testing.T, release, group string) (CXSelection, CX16Rep
 func TestCX17PCSGaugeCountChangeDemotesEarlyCells(t *testing.T) {
 	for _, name := range []string{"count-smaller", "count-invalid", "count-zero", "unchanged"} {
 		t.Run(name, func(t *testing.T) {
-			s, i := cx17GroupFixture(t, "0005", "L1")
+			s, i := providerTestGroupFixture(t, "0005", "L1")
 			i.PCS.CountValid, i.PCS.Count = true, 8
-			cx16Frame(t, &i, 0x316, false, [8]byte{0x0c, 0x80, 0x0c, 0x81, 0x0c, 0x82, 0x0c, 0x83})
-			p, _ := CX17NewPCSProvider(s)
-			a := cx17Source()
+			replayTestFrame(t, &i, 0x316, false, [8]byte{0x0c, 0x80, 0x0c, 0x81, 0x0c, 0x82, 0x0c, 0x83})
+			p, _ := NewPCSProvider(s)
+			a := providerTestSource()
 			if err := p.Start(a, 1); err != nil {
 				t.Fatal(err)
 			}
 			defer p.Stop()
-			cx17Send(t, a, p, 1, i)
+			providerTestSend(t, a, p, 1, i)
 			now := i.PCS.Evidence.Monotonic
-			before := p.CX17Snapshot(now, time.Second)
+			before := p.ProjectProviderSnapshot(now, time.Second)
 			for pos := 5; pos <= 8; pos++ {
 				if f := before.Current[fmt.Sprintf("gauge/316/cell_%d", pos)]; f.Status != "accepted" {
 					t.Fatal(pos, before.State, f)
@@ -1697,7 +1697,7 @@ func TestCX17PCSGaugeCountChangeDemotesEarlyCells(t *testing.T) {
 			}
 			next := i
 			next.PCS.Evidence.Sequence = 2
-			cx16Frame(t, &next, 0x314, false, [8]byte{0x27, 0x10, 0, 0, 0, 0, 0, 0})
+			replayTestFrame(t, &next, 0x314, false, [8]byte{0x27, 0x10, 0, 0, 0, 0, 0, 0})
 			switch name {
 			case "count-smaller":
 				next.PCS.Count = 6
@@ -1706,8 +1706,8 @@ func TestCX17PCSGaugeCountChangeDemotesEarlyCells(t *testing.T) {
 			case "count-zero":
 				next.PCS.Count = 0
 			}
-			cx17Send(t, a, p, 1, next)
-			got := p.CX17Snapshot(now, time.Second)
+			providerTestSend(t, a, p, 1, next)
+			got := p.ProjectProviderSnapshot(now, time.Second)
 			if got.State != "receiving" {
 				t.Fatal(got.State)
 			}
@@ -1734,22 +1734,22 @@ func TestCX17PCSGaugeCountChangeDemotesEarlyCells(t *testing.T) {
 func TestCX17Release11TemperatureCountChangeDemotes(t *testing.T) {
 	for _, name := range []string{"count-invalid", "count-zero", "count-smaller"} {
 		t.Run(name, func(t *testing.T) {
-			s, i := cx17GroupFixture(t, "0011", "L8")
+			s, i := providerTestGroupFixture(t, "0011", "L8")
 			i.PCS.CountValid, i.PCS.Count = true, 8
-			p, _ := CX17NewPCSProvider(s)
-			a := cx17Source()
+			p, _ := NewPCSProvider(s)
+			a := providerTestSource()
 			if err := p.Start(a, 1); err != nil {
 				t.Fatal(err)
 			}
 			defer p.Stop()
-			cx17Send(t, a, p, 1, i)
+			providerTestSend(t, a, p, 1, i)
 			now := i.PCS.Evidence.Monotonic
-			if got := p.CX17Snapshot(now, time.Second); got.Current["core/temperature"].Status != "accepted" {
+			if got := p.ProjectProviderSnapshot(now, time.Second); got.Current["core/temperature"].Status != "accepted" {
 				t.Fatal(got.State, got.Current["core/temperature"])
 			}
 			next := i
 			next.PCS.Evidence.Sequence = 2
-			cx16Frame(t, &next, 0x314, false, [8]byte{0x27, 0x10, 0, 0, 0, 0, 0, 0})
+			replayTestFrame(t, &next, 0x314, false, [8]byte{0x27, 0x10, 0, 0, 0, 0, 0, 0})
 			want := "accepted"
 			switch name {
 			case "count-invalid":
@@ -1759,8 +1759,8 @@ func TestCX17Release11TemperatureCountChangeDemotes(t *testing.T) {
 			case "count-smaller":
 				next.PCS.Count = 1
 			}
-			cx17Send(t, a, p, 1, next)
-			got := p.CX17Snapshot(now, time.Second)
+			providerTestSend(t, a, p, 1, next)
+			got := p.ProjectProviderSnapshot(now, time.Second)
 			f := got.Current["core/temperature"]
 			if got.State != "receiving" || f.Status != want || (want != "accepted" && (f.Unit != "" || f.Meaning != "")) || got.LastGood["core/temperature"].Status != "accepted" {
 				t.Fatal(got.State, f, got.LastGood["core/temperature"])
@@ -1772,19 +1772,19 @@ func TestCX17Release11TemperatureCountChangeDemotes(t *testing.T) {
 // Catches: a gauge or temperature count reconciliation on a group whose decoder has no count gate. The default
 // layout keeps its accepted core temperature when an admitted record carries an invalid count.
 func TestCX17CountReconciliationOnlyForCountGatedGroups(t *testing.T) {
-	s, i := cx16Fixture(t)
-	p, _ := CX17NewPCSProvider(s)
-	a := cx17Source()
+	s, i := replayTestFixture(t)
+	p, _ := NewPCSProvider(s)
+	a := providerTestSource()
 	if err := p.Start(a, 1); err != nil {
 		t.Fatal(err)
 	}
 	defer p.Stop()
-	cx17Send(t, a, p, 1, i)
+	providerTestSend(t, a, p, 1, i)
 	next := i
 	next.PCS.Evidence.Sequence = 2
-	cx16Frame(t, &next, 0x314, false, [8]byte{0x27, 0x10, 0, 0, 0, 0, 0, 0})
-	cx17Send(t, a, p, 1, next)
-	got := p.CX17Snapshot(i.PCS.Evidence.Monotonic, time.Second)
+	replayTestFrame(t, &next, 0x314, false, [8]byte{0x27, 0x10, 0, 0, 0, 0, 0, 0})
+	providerTestSend(t, a, p, 1, next)
+	got := p.ProjectProviderSnapshot(i.PCS.Evidence.Monotonic, time.Second)
 	if got.State != "receiving" || got.Current["core/temperature"].Status != "accepted" {
 		t.Fatal(got.State, got.Current["core/temperature"])
 	}

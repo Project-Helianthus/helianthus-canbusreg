@@ -2992,22 +2992,22 @@
     "Bits": [
       "ebusgateway/cmd/gateway/eebus_runtime_config.go"
     ],
-    "CX01ConfirmNativeSelection": [
+    "ConfirmNativeSelection": [
       "ebusgateway/cmd/gateway/growatt_project_conformance_test.go"
     ],
-    "CX01Group": [
+    "SelectionGroup": [
       "ebusgateway/growatt_project_config.go"
     ],
-    "CX01LINKInput": [
+    "LINKInput": [
       "ebusgateway/cmd/gateway/growatt_link_runtime_test.go",
       "ebusgateway/cmd/gateway/growatt_pcs_runtime_test.go",
       "ebusgateway/cmd/gateway/growatt_project_cli.go",
       "ebusgateway/cmd/gateway/growatt_project_provider_test.go"
     ],
-    "CX01NativeIndication": [
+    "SelectionNativeIndication": [
       "ebusgateway/cmd/gateway/growatt_project_conformance_test.go"
     ],
-    "CX01SelectionSpec": [
+    "SelectionSpec": [
       "ebusgateway/cmd/gateway/growatt_link_runtime_test.go",
       "ebusgateway/cmd/gateway/growatt_pcs_runtime_test.go",
       "ebusgateway/cmd/gateway/growatt_project_cli.go",
@@ -3017,7 +3017,7 @@
       "ebusgateway/growatt_project_config.go",
       "ebusgateway/growatt_project_config_test.go"
     ],
-    "CX01Spec": [
+    "SelectionSpecValue": [
       "ebusgateway/cmd/gateway/growatt_link_runtime_test.go",
       "ebusgateway/cmd/gateway/growatt_pcs_runtime_test.go",
       "ebusgateway/cmd/gateway/growatt_project_cli.go",
@@ -3028,15 +3028,15 @@
       "ebusgateway/cmd/gateway/growatt_project_provider_test.go",
       "ebusgateway/growatt_project_config_test.go"
     ],
-    "CX12MeasurementGate": [
+    "MeasurementGate": [
       "ebusgateway/cmd/gateway/growatt_link_runtime_test.go",
       "ebusgateway/cmd/gateway/growatt_project_cli.go",
       "ebusgateway/cmd/gateway/growatt_project_conformance_test.go"
     ],
-    "CX12VectorSnapshot": [
+    "VectorSnapshot": [
       "ebusgateway/cmd/gateway/growatt_link_runtime.go"
     ],
-    "CX16ReplayInput": [
+    "ReplayInput": [
       "ebusgateway/cmd/gateway/growatt_link_runtime.go",
       "ebusgateway/cmd/gateway/growatt_link_runtime_test.go",
       "ebusgateway/cmd/gateway/growatt_pcs_runtime_test.go",
@@ -3046,19 +3046,19 @@
       "ebusgateway/cmd/gateway/growatt_project_provider.go",
       "ebusgateway/cmd/gateway/growatt_project_provider_test.go"
     ],
-    "CX17NewLINKProvider": [
+    "NewLINKProvider": [
       "ebusgateway/cmd/gateway/growatt_project_provider.go"
     ],
-    "CX17NewPCSProvider": [
+    "NewPCSProvider": [
       "ebusgateway/cmd/gateway/growatt_project_provider.go"
     ],
-    "CX17Observation": [
+    "Observation": [
       "ebusgateway/cmd/gateway/growatt_project_provider.go"
     ],
-    "CX17Provider": [
+    "Provider": [
       "ebusgateway/cmd/gateway/growatt_project_provider.go"
     ],
-    "CX17Snapshot": [
+    "ProjectProviderSnapshot": [
       "ebusgateway/cmd/gateway/growatt_link_runtime.go",
       "ebusgateway/cmd/gateway/growatt_pcs_runtime.go",
       "ebusgateway/cmd/gateway/growatt_pcs_runtime_test.go",

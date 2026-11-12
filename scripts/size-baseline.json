@@ -15,31 +15,31 @@
     },
     {
       "path": "growatt_pcs_extended.go",
-      "symbol": "CX09DecodePCSExtended",
+      "symbol": "DecodePCSExtended",
       "metric": "function_lines",
       "value": 157
     },
     {
       "path": "growatt_pcs_parallel_release11.go",
-      "symbol": "CX11DecodeParallel",
+      "symbol": "ParallelReleaseDecodeParallel",
       "metric": "function_lines",
       "value": 199
     },
     {
       "path": "growatt_pcs_standard.go",
-      "symbol": "CX05DecodePCSStandard",
+      "symbol": "DecodePCSStandard",
       "metric": "function_lines",
       "value": 164
     },
     {
       "path": "growatt_pcs_summaries.go",
-      "symbol": "CX14DecodePCSSummaries",
+      "symbol": "DecodePCSSummaries",
       "metric": "function_lines",
       "value": 170
     },
     {
       "path": "growatt_project_provider.go",
-      "symbol": "(*CX17Provider).cx17Apply",
+      "symbol": "(*Provider).projectProviderApply",
       "metric": "function_lines",
       "value": 183
     },

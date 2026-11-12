@@ -18,14 +18,14 @@ func TestCX15RawRetentionAndLastKnownGood(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	s, c, i := cx15Fixture(t, 8, "link", "module-to-coordinator", "coordinator", 0x1800)
+	s, c, i := capabilityTestFixture(t, 8, "link", "module-to-coordinator", "coordinator", 0x1800)
 	if len(store.LastKnownGood()) != 0 || len(store.RawSnapshot()) != 0 {
 		t.Fatal("initial absent state")
 	}
 	if !store.Observe(s, c, i).Admitted {
 		t.Fatal("valid raw zero-safe record")
 	}
-	sibling := cx15Input(t, s, c, 0x1850, [8]byte{})
+	sibling := capabilityTestInput(t, s, c, 0x1850, [8]byte{})
 	sibling.Evidence.Sequence = 2
 	if !store.Observe(s, c, sibling).Admitted {
 		t.Fatal("zero sibling")
@@ -95,7 +95,7 @@ func TestCX15RetentionBoundsAndConcurrency(t *testing.T) {
 		}
 	}
 	store, _ := NewCX15OpaqueStore(2)
-	s, c, i := cx15Fixture(t, 8, "link", "module-to-coordinator", "coordinator", 0x1800)
+	s, c, i := capabilityTestFixture(t, 8, "link", "module-to-coordinator", "coordinator", 0x1800)
 	var wg sync.WaitGroup
 	for worker := 0; worker < 8; worker++ {
 		wg.Add(1)
@@ -107,8 +107,8 @@ func TestCX15RetentionBoundsAndConcurrency(t *testing.T) {
 				store.Observe(s, c, ii)
 				store.RawSnapshot()
 				store.LastKnownGood()
-				key := CX15CapabilityKey{s, c, uint32(n*10 + k)}
-				if err := store.AssertCapability(key, CX15Observed); err != nil {
+				key := CapabilityKey{s, c, uint32(n*10 + k)}
+				if err := store.AssertCapability(key, ReceiverCapabilityObserved); err != nil {
 					t.Error(err)
 				}
 				store.Capability(key)
@@ -120,7 +120,7 @@ func TestCX15RetentionBoundsAndConcurrency(t *testing.T) {
 		t.Fatal("retention overflow")
 	}
 	for _, pid := range []uint32{0x1802, 0x1803, 0x1804} {
-		ii := cx15Input(t, s, c, pid, [8]byte{})
+		ii := capabilityTestInput(t, s, c, pid, [8]byte{})
 		store.Observe(s, c, ii)
 	}
 	if len(store.LastKnownGood()) != 2 {
@@ -129,17 +129,17 @@ func TestCX15RetentionBoundsAndConcurrency(t *testing.T) {
 }
 
 func TestCX15CapabilityEveryKeyFieldIndependent(t *testing.T) {
-	s, c, _ := cx15Fixture(t, 8, "link", "module-to-coordinator", "coordinator", 0x1800)
-	base := CX15CapabilityKey{s, c, 0x1800}
+	s, c, _ := capabilityTestFixture(t, 8, "link", "module-to-coordinator", "coordinator", 0x1800)
+	base := CapabilityKey{s, c, 0x1800}
 	// Each named field mutation catches a production equality that omits that
 	// field from the capability key. No input/output inference is permitted.
-	cases := map[string]func(*CX15CapabilityKey){
-		"PID":              func(k *CX15CapabilityKey) { k.PID++ },
-		"selection.group":  func(k *CX15CapabilityKey) { k.Selection.group = "L7" },
-		"selection.layout": func(k *CX15CapabilityKey) { k.Selection.layout = "B" },
-		"selection.grade":  func(k *CX15CapabilityKey) { k.Selection.grade = "Unknown" },
-		"interface.name":   func(k *CX15CapabilityKey) { k.Selection.spec.Interface, _ = canbus.NewInterfaceIdentity("other", 1) },
-		"interface.index": func(k *CX15CapabilityKey) {
+	cases := map[string]func(*CapabilityKey){
+		"PID":              func(k *CapabilityKey) { k.PID++ },
+		"selection.group":  func(k *CapabilityKey) { k.Selection.group = "L7" },
+		"selection.layout": func(k *CapabilityKey) { k.Selection.layout = "B" },
+		"selection.grade":  func(k *CapabilityKey) { k.Selection.grade = "Unknown" },
+		"interface.name":   func(k *CapabilityKey) { k.Selection.spec.Interface, _ = canbus.NewInterfaceIdentity("other", 1) },
+		"interface.index": func(k *CapabilityKey) {
 			k.Selection.spec.Interface, _ = canbus.NewInterfaceIdentity("synthetic", 2)
 		},
 	}
@@ -152,19 +152,21 @@ func TestCX15CapabilityEveryKeyFieldIndependent(t *testing.T) {
 			continue
 		}
 		name := field.Name
-		cases["selection."+name] = func(k *CX15CapabilityKey) {
-			cx15MutateField(t, reflect.ValueOf(&k.Selection.spec).Elem().FieldByName(name))
+		cases["selection."+name] = func(k *CapabilityKey) {
+			capabilityTestMutateField(t, reflect.ValueOf(&k.Selection.spec).Elem().FieldByName(name))
 		}
 	}
 	contextType := reflect.TypeOf(c)
 	for n := 0; n < contextType.NumField(); n++ {
 		name := contextType.Field(n).Name
-		cases["context."+name] = func(k *CX15CapabilityKey) { cx15MutateField(t, reflect.ValueOf(&k.Context).Elem().FieldByName(name)) }
+		cases["context."+name] = func(k *CapabilityKey) {
+			capabilityTestMutateField(t, reflect.ValueOf(&k.Context).Elem().FieldByName(name))
+		}
 	}
 	for name, mutate := range cases {
 		t.Run(name, func(t *testing.T) {
 			store, _ := NewCX15OpaqueStore(4)
-			for _, state := range []CX15CapabilityState{CX15Unknown, CX15Observed, CX15Qualified, CX15Unsupported} {
+			for _, state := range []CapabilityState{ReceiverCapabilityUnknown, ReceiverCapabilityObserved, ReceiverCapabilityQualified, ReceiverCapabilityUnsupported} {
 				if err := store.AssertCapability(base, state); err != nil {
 					t.Fatal(err)
 				}
@@ -172,18 +174,18 @@ func TestCX15CapabilityEveryKeyFieldIndependent(t *testing.T) {
 					t.Fatal(state)
 				}
 			}
-			if err := store.AssertCapability(base, CX15Qualified); err != nil {
+			if err := store.AssertCapability(base, ReceiverCapabilityQualified); err != nil {
 				t.Fatal(err)
 			}
 			other := base
 			mutate(&other)
-			if other == base || store.Capability(other) != CX15Unknown {
+			if other == base || store.Capability(other) != ReceiverCapabilityUnknown {
 				t.Fatal("identity key collapsed", name)
 			}
-			if err := store.AssertCapability(other, CX15Unsupported); err != nil {
+			if err := store.AssertCapability(other, ReceiverCapabilityUnsupported); err != nil {
 				t.Fatal(err)
 			}
-			if store.Capability(base) != CX15Qualified || store.Capability(other) != CX15Unsupported {
+			if store.Capability(base) != ReceiverCapabilityQualified || store.Capability(other) != ReceiverCapabilityUnsupported {
 				t.Fatal("capability crossed key", name)
 			}
 			if store.AssertCapability(base, "invented") == nil {
@@ -192,7 +194,7 @@ func TestCX15CapabilityEveryKeyFieldIndependent(t *testing.T) {
 		})
 	}
 }
-func cx15MutateField(t *testing.T, v reflect.Value) {
+func capabilityTestMutateField(t *testing.T, v reflect.Value) {
 	t.Helper()
 	switch v.Kind() {
 	case reflect.String:
@@ -207,7 +209,7 @@ func cx15MutateField(t *testing.T, v reflect.Value) {
 }
 
 func TestCX15AdmissionEveryEvidenceField(t *testing.T) {
-	s, c, i := cx15Fixture(t, 8, "link", "module-to-coordinator", "coordinator", 0x1800)
+	s, c, i := capabilityTestFixture(t, 8, "link", "module-to-coordinator", "coordinator", 0x1800)
 	for _, field := range []string{"interface-name", "interface-index", "epoch", "direction", "scope", "bank", "endpoint", "group", "slot", "destination", "source", "IDE", "DLC", "raw-DLC", "age", "sequence", "monotonic"} {
 		t.Run(field, func(t *testing.T) {
 			ii := i
@@ -237,8 +239,8 @@ func TestCX15AdmissionEveryEvidenceField(t *testing.T) {
 				} else {
 					spec.Source++
 				}
-				ss := cx01Select(t, spec)
-				ii = cx15Input(t, ss, c, 0x1800, i.Evidence.Frame.Bytes())
+				ss := selectionTestSelect(t, spec)
+				ii = capabilityTestInput(t, ss, c, 0x1800, i.Evidence.Frame.Bytes())
 			case "IDE":
 				id, _ := canbus.NewStandardID(0x301)
 				p := i.Evidence.Frame.Bytes()
@@ -265,7 +267,7 @@ func TestCX15AdmissionEveryEvidenceField(t *testing.T) {
 			case "monotonic":
 				ii.Evidence.Monotonic = -1
 			}
-			r := CX15ClassifyReceiver(s, c, ii)
+			r := ClassifyReceiver(s, c, ii)
 			if r.Admitted || r.Input != ii || r.Raw != ii.Evidence.Frame.Bytes() {
 				t.Fatal("evidence gate omitted", r)
 			}
@@ -280,12 +282,12 @@ func TestCX15MONRequiresIndependentAssociationAndNoDecoder(t *testing.T) {
 			system := (uint32(0x188abcde) & 0xffffff00) | bcu
 			module := (uint32(0x188abcde) & 0xff0fff00) | (bmu << 20) | bcu
 			for _, idValue := range []uint32{system, module} {
-				s, c, i := cx15Fixture(t, 8, "link", "service-to-module", "module", 0x188a)
+				s, c, i := capabilityTestFixture(t, 8, "link", "service-to-module", "module", 0x188a)
 				id, _ := canbus.NewExtendedID(idValue)
 				p := [8]byte{0x30, 0x75, 0x90, 1, 0xff, 0, 0x80, 1}
 				i.Evidence.Frame, _ = canbus.NewFrame(id, p[:])
 				c.Profile = "mon"
-				r := CX15ClassifyReceiver(s, c, i)
+				r := ClassifyReceiver(s, c, i)
 				if r.Admitted || r.Class != "U" || r.Grade != "Unknown" || r.Raw != p {
 					t.Fatal("MON inferred from native identity/shared PID", r)
 				}
@@ -293,9 +295,9 @@ func TestCX15MONRequiresIndependentAssociationAndNoDecoder(t *testing.T) {
 		}
 	}
 	for _, family := range []uint32{0x0400, 0x0800, 0x1000, 0x1400} {
-		t.Run(cx15PIDName(family), func(t *testing.T) {
-			s, c, i := cx15Fixture(t, 8, "link", "service-to-module", "module", family)
-			if CX15ClassifyReceiver(s, c, i).Admitted {
+		t.Run(receiverCapabilityPIDName(family), func(t *testing.T) {
+			s, c, i := capabilityTestFixture(t, 8, "link", "service-to-module", "module", family)
+			if ClassifyReceiver(s, c, i).Admitted {
 				t.Fatal("MON decoder selected")
 			}
 		})
@@ -329,12 +331,12 @@ func TestCX15ReceiveOnlySurface(t *testing.T) {
 
 func TestCX15ExplicitUnsupportedCannotOverrideRawRetention(t *testing.T) {
 	store, _ := NewCX15OpaqueStore(4)
-	s, c, i := cx15Fixture(t, 8, "link", "module-to-coordinator", "coordinator", 0x1800)
-	key := CX15CapabilityKey{s, c, 0x1800}
-	if !store.Observe(s, c, i).Admitted || store.Capability(key) != CX15Observed {
+	s, c, i := capabilityTestFixture(t, 8, "link", "module-to-coordinator", "coordinator", 0x1800)
+	key := CapabilityKey{s, c, 0x1800}
+	if !store.Observe(s, c, i).Admitted || store.Capability(key) != ReceiverCapabilityObserved {
 		t.Fatal("observation missing")
 	}
-	if err := store.AssertCapability(key, CX15Unsupported); err != nil {
+	if err := store.AssertCapability(key, ReceiverCapabilityUnsupported); err != nil {
 		t.Fatal(err)
 	}
 	i.Evidence.Sequence++
@@ -346,28 +348,28 @@ func TestCX15ExplicitUnsupportedCannotOverrideRawRetention(t *testing.T) {
 	}
 	// An external qualified assertion cannot override an absent table entry.
 	key.PID = 0x1801
-	if err := store.AssertCapability(key, CX15Qualified); err != nil {
+	if err := store.AssertCapability(key, ReceiverCapabilityQualified); err != nil {
 		t.Fatal(err)
 	}
-	ii := cx15Input(t, s, c, 0x1801, [8]byte{})
+	ii := capabilityTestInput(t, s, c, 0x1801, [8]byte{})
 	if store.Observe(s, c, ii).Admitted {
 		t.Fatal("qualification manufactured a receiver")
 	}
-	var zero CX15OpaqueStore
-	if zero.Observe(s, c, i).Admitted || zero.AssertCapability(key, CX15Observed) == nil {
+	var zero OpaqueStore
+	if zero.Observe(s, c, i).Admitted || zero.AssertCapability(key, ReceiverCapabilityObserved) == nil {
 		t.Fatal("zero store admitted without a bound")
 	}
 }
 
 func TestCX15DirectStatusPreservesPeriodicAlarmEvidence(t *testing.T) {
 	store, _ := NewCX15OpaqueStore(4)
-	s, c, _ := cx15Fixture(t, 8, "pcs-standard", "bms-to-controller", "controller", 0x3f7)
-	periodic := cx15Input(t, s, c, 0x3f7, [8]byte{1, 2, 0, 0, 0, 1, 7, 8})
+	s, c, _ := capabilityTestFixture(t, 8, "pcs-standard", "bms-to-controller", "controller", 0x3f7)
+	periodic := capabilityTestInput(t, s, c, 0x3f7, [8]byte{1, 2, 0, 0, 0, 1, 7, 8})
 	if !store.Observe(s, c, periodic).Admitted {
 		t.Fatal("periodic")
 	}
 	c.Form = "direct"
-	direct := cx15Input(t, s, c, 0x3f7, [8]byte{1, 2})
+	direct := capabilityTestInput(t, s, c, 0x3f7, [8]byte{1, 2})
 	direct.Evidence.Sequence = 2
 	if !store.Observe(s, c, direct).Admitted {
 		t.Fatal("direct")
@@ -379,26 +381,26 @@ func TestCX15DirectStatusPreservesPeriodicAlarmEvidence(t *testing.T) {
 }
 
 func TestCX15ParallelZeroTailAndOpaqueCountBoundaries(t *testing.T) {
-	s, c, i := cx15Fixture(t, 8, "pcs-parallel", "controller-to-participant", "participant", 0x6f0)
+	s, c, i := capabilityTestFixture(t, 8, "pcs-parallel", "controller-to-participant", "participant", 0x6f0)
 	c.Session = "parallel"
-	if !CX15ClassifyReceiver(s, c, i).Admitted {
+	if !ClassifyReceiver(s, c, i).Admitted {
 		t.Fatal("zero tail")
 	}
 	for at := 2; at < 8; at++ {
 		p := i.Evidence.Frame.Bytes()
 		p[at] = 1
-		ii := cx15Input(t, s, c, 0x6f0, p)
-		if r := CX15ClassifyReceiver(s, c, ii); r.Admitted || r.Status != "invalid" || r.Raw != p {
+		ii := capabilityTestInput(t, s, c, 0x6f0, p)
+		if r := ClassifyReceiver(s, c, ii); r.Admitted || r.Status != "invalid" || r.Raw != p {
 			t.Fatal("6F0 nonzero tail interpreted", at, r)
 		}
 	}
-	s, c, _ = cx15Fixture(t, 8, "pcs-parallel", "participant-to-coordinator", "coordinator", 0x6ff)
+	s, c, _ = capabilityTestFixture(t, 8, "pcs-parallel", "participant-to-coordinator", "coordinator", 0x6ff)
 	c.Session = "parallel"
 	for _, count := range []byte{0, 1, 254, 255} {
 		for _, peer := range []uint16{0, 1, 65534, 65535} {
 			p := [8]byte{count, 9, byte(peer >> 8), byte(peer), 10, 11, 12, 13}
-			ii := cx15Input(t, s, c, 0x6ff, p)
-			r := CX15ClassifyReceiver(s, c, ii)
+			ii := capabilityTestInput(t, s, c, 0x6ff, p)
+			r := ClassifyReceiver(s, c, ii)
 			if !r.Admitted || r.Raw != p || r.Input != ii || r.PhysicalQualified {
 				t.Fatal("raw count/peer was changed", r)
 			}

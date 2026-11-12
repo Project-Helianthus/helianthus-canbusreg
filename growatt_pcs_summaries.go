@@ -14,32 +14,32 @@ import (
 // epoch. Nil state is unknown. LocalSummaryQualified independently admits the
 // QAAA0006 summary contract; it never marks hardware physically qualified.
 // FieldStates and FieldAges use bit keys such as A/12 and B4/2.
-type CX14PCSInput struct {
-	CX05PCSInput
+type PCSSummaryPCSInput struct {
+	PCSStandardPCSInput
 	LocalSummaryQualified                     bool
 	ControlActive, Condition131, Condition132 *bool
 	StateCode                                 *uint8
 }
 
-// CX14SummaryBit contains bounded numeric OR alternatives, never an active fault
+// SummaryBit contains bounded numeric OR alternatives, never an active fault
 // set. ConditionalAlternatives require missing control-state evidence. Neither
 // list identifies a unique cause, even when it contains only one index.
-type CX14SummaryBit struct {
+type SummaryBit struct {
 	Field                                 CXNativeField
 	Alternatives, ConditionalAlternatives []int
 }
-type CX14PCSResult struct {
+type PCSSummaryPCSResult struct {
 	CXNativeResult
-	Bits        map[string]CX14SummaryBit
+	Bits        map[string]SummaryBit
 	Diagnostics []byte
 }
 
-// CX14DecodePCSSummaries is receive-only and stateless. Clear summary bits say
+// DecodePCSSummaries is receive-only and stateless. Clear summary bits say
 // nothing about independent current/retained diagnostics. Unknown, unassigned
 // and status-only bits remain visible; no all-clear conclusion is produced.
-func CX14DecodePCSSummaries(s CXSelection, i CX14PCSInput) CX14PCSResult {
-	r := CX14PCSResult{CXNativeResult: cx01Result(s, i.CX01LINKInput, "invalid"), Bits: make(map[string]CX14SummaryBit), Diagnostics: append([]byte(nil), i.NativeRecord...)}
-	c := s.CX01Spec()
+func DecodePCSSummaries(s CXSelection, i PCSSummaryPCSInput) PCSSummaryPCSResult {
+	r := PCSSummaryPCSResult{CXNativeResult: selectionResult(s, i.LINKInput, "invalid"), Bits: make(map[string]SummaryBit), Diagnostics: append([]byte(nil), i.NativeRecord...)}
+	c := s.SelectionSpecValue()
 	f := i.Evidence.Frame
 	if len(i.NativeRecord) != 0 {
 		d, e := canbus.DecodeSocketCANRecord(i.NativeRecord)
@@ -67,8 +67,8 @@ func CX14DecodePCSSummaries(s CXSelection, i CX14PCSInput) CX14PCSResult {
 		r.Status = "unsupported"
 		return r
 	}
-	modern := s.CX01Group() == "L8" && c.Scope == "local"
-	legacy := c.ProjectCode == "QAAA" && c.Release == "0006" && c.Scope == "local" && s.CX01Group() == "L2" && i.LocalSummaryQualified
+	modern := s.SelectionGroup() == "L8" && c.Scope == "local"
+	legacy := c.ProjectCode == "QAAA" && c.Release == "0006" && c.Scope == "local" && s.SelectionGroup() == "L2" && i.LocalSummaryQualified
 	supported := modern || legacy
 	mappings := map[string]map[int][]int{
 		"A":  {1: {9}, 2: {7}, 3: {3}, 4: {1, 62}, 5: {24}, 6: {23, 49, 88, 97}, 7: {21, 24}, 10: {5}, 11: {87, 90, 128, 133}, 12: {40, 41}, 13: {15}, 14: {34}, 15: {13}},
@@ -105,7 +105,7 @@ func CX14DecodePCSSummaries(s CXSelection, i CX14PCSInput) CX14PCSResult {
 		for bit := 0; bit < w.width; bit++ {
 			key := fmt.Sprintf("%s/%d", w.name, bit)
 			field := CXNativeField{Numerator: int64((w.value >> bit) & 1), Denominator: 1, Grade: "Unknown", Status: "raw", Raw: r.Raw, Evidence: i.Evidence, Epoch: i.Epoch, Scope: i.Scope, Bank: i.Bank, Endpoint: i.Endpoint, Group: i.Group, Slot: i.Slot, Age: i.FieldAge}
-			b := CX14SummaryBit{Field: field}
+			b := SummaryBit{Field: field}
 			if supported && field.Numerator == 1 {
 				b.Alternatives = append([]int(nil), mappings[w.name][bit]...)
 				grade := "Proven"

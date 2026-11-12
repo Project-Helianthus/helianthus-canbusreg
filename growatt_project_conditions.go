@@ -8,11 +8,11 @@ import "fmt"
 // A label annotates a received selected index, never activation, severity,
 // diagnosis, operating limits or physical qualification. No predicates are
 // evaluated from unreceived state or configurable thresholds.
-func CX13LabelCondition(member CXSelection, index CXNativeField) CXNativeField {
+func LabelCondition(member CXSelection, index CXNativeField) CXNativeField {
 	r := index
 	r.Meaning, r.Grade, r.Status = "", "Unknown", "unsupported"
 	r.PhysicalQualified = false
-	count, modern := cx07Dictionary(member)
+	count, modern := dictionary(member)
 	if count == 0 || index.Numerator < 0 || index.Numerator >= int64(count) {
 		return r
 	}
@@ -20,8 +20,8 @@ func CX13LabelCondition(member CXSelection, index CXNativeField) CXNativeField {
 		r.Status = "invalid"
 		return r
 	}
-	c := member.CX01Spec()
-	i := CX01LINKInput{Evidence: index.Evidence, Epoch: index.Epoch, Direction: c.Direction, Scope: index.Scope, Bank: index.Bank, Endpoint: index.Endpoint, Group: index.Group, Slot: index.Slot, FieldAge: index.Age}
+	c := member.SelectionSpecValue()
+	i := LINKInput{Evidence: index.Evidence, Epoch: index.Epoch, Direction: c.Direction, Scope: index.Scope, Bank: index.Bank, Endpoint: index.Endpoint, Group: index.Group, Slot: index.Slot, FieldAge: index.Age}
 	// Re-admit the exact native index field, including raw bytes and metadata.
 	// Caller-changed indices, retained bits and stale fields cannot acquire names.
 	offsets := []int{0, 2}
@@ -32,7 +32,7 @@ func CX13LabelCondition(member CXSelection, index CXNativeField) CXNativeField {
 	}
 	matched := false
 	for _, offset := range offsets {
-		decoded := CX07DecodeDTC(member, i, offset)
+		decoded := DecodeDTC(member, i, offset)
 		if f, ok := decoded.Fields["numeric_index"]; ok && f == index {
 			matched = true
 		}

@@ -7,10 +7,10 @@ import (
 	"github.com/Project-Helianthus/helianthus-canbus"
 )
 
-// CX01SelectionSpec is an explicit caller assertion, never inferred from traffic.
+// SelectionSpec is an explicit caller assertion, never inferred from traffic.
 // Native rules: https://github.com/Project-Helianthus/helianthus-docs-canbus/blob/main/protocols/growatt/growatt-low-voltage-bms-can-pcs-protocol-v1.md
 // Sections: PCS feature availability by version; Same-identity variants and native-contract selection.
-type CX01SelectionSpec struct {
+type SelectionSpec struct {
 	Interface                                                         canbus.InterfaceIdentity
 	Flavor, PCSFlavor, ProjectCode, Release, Choice, Direction, Scope string
 	Bank, Endpoint, Group, Slot                                       string
@@ -20,13 +20,13 @@ type CX01SelectionSpec struct {
 }
 
 type CXSelection struct {
-	spec                 CX01SelectionSpec
+	spec                 SelectionSpec
 	group, layout, grade string
 }
 
-func NewCXSelection(spec CX01SelectionSpec) (CXSelection, error) {
+func NewCXSelection(spec SelectionSpec) (CXSelection, error) {
 	s := CXSelection{spec: spec, grade: "Unknown"}
-	if spec.Interface.Name() == "" || spec.Interface.Index() <= 0 || len(spec.ProjectCode) != 4 || len(spec.Release) != 4 || !cx01ASCII([]byte(spec.ProjectCode+spec.Release)) {
+	if spec.Interface.Name() == "" || spec.Interface.Index() <= 0 || len(spec.ProjectCode) != 4 || len(spec.Release) != 4 || !selectionASCII([]byte(spec.ProjectCode+spec.Release)) {
 		return s, fmt.Errorf("invalid explicit identity")
 	}
 	for _, b := range []byte(spec.Release) {
@@ -112,11 +112,11 @@ func NewCXSelection(spec CX01SelectionSpec) (CXSelection, error) {
 	}
 	return s, nil
 }
-func (s CXSelection) CX01Spec() CX01SelectionSpec { return s.spec }
-func (s CXSelection) CX01Group() string           { return s.group }
-func (s CXSelection) CX01Layout() string          { return s.layout }
-func (s CXSelection) CX01Grade() string           { return s.grade }
-func cx01ASCII(p []byte) bool {
+func (s CXSelection) SelectionSpecValue() SelectionSpec { return s.spec }
+func (s CXSelection) SelectionGroup() string            { return s.group }
+func (s CXSelection) SelectionLayout() string           { return s.layout }
+func (s CXSelection) SelectionGrade() string            { return s.grade }
+func selectionASCII(p []byte) bool {
 	for _, b := range p {
 		if b < 0x21 || b > 0x7e {
 			return false
@@ -151,16 +151,16 @@ type CXNativeResult struct {
 	HasMember bool
 }
 
-// CX01NativeIndication requires a caller-supplied topology association for PCS
+// SelectionNativeIndication requires a caller-supplied topology association for PCS
 // evidence. Timing, matching identifiers and ordinary LINK frames supply none.
-type CX01NativeIndication struct {
-	Input              CX01LINKInput
+type SelectionNativeIndication struct {
+	Input              LINKInput
 	TopologyAssociated bool
 }
 
-func CX01ConfirmNativeSelection(s CXSelection, indication CX01NativeIndication) CXNativeResult {
+func ConfirmNativeSelection(s CXSelection, indication SelectionNativeIndication) CXNativeResult {
 	i := indication.Input
-	r := cx01Result(s, i, "unsupported")
+	r := selectionResult(s, i, "unsupported")
 	c := s.spec
 	if i.Evidence.Interface != c.Interface || i.Epoch != c.Epoch || i.Scope != c.Scope || i.Bank != c.Bank || i.Endpoint != c.Endpoint || i.Group != c.Group || i.Slot != c.Slot {
 		r.Status = "invalid"
@@ -177,11 +177,11 @@ func CX01ConfirmNativeSelection(s CXSelection, indication CX01NativeIndication) 
 	if f.ID().Extended() {
 		switch family {
 		case 0x1853, 0x1861:
-			if cx01LINKAdmission(s, i) {
+			if lINKAdmission(s, i) {
 				contract = "release11"
 			}
 		case 0x1869:
-			if cx01LINKReportAdmission(s, i) {
+			if lINKReportAdmission(s, i) {
 				contract = "release11"
 			}
 		}
@@ -213,8 +213,8 @@ func CX01ConfirmNativeSelection(s CXSelection, indication CX01NativeIndication) 
 	return r
 }
 
-// CX01FeatureGrade reports a candidate contract gate, never qualification.
-func (s CXSelection) CX01FeatureGrade(feature string) string {
+// SelectionFeatureGrade reports a candidate contract gate, never qualification.
+func (s CXSelection) SelectionFeatureGrade(feature string) string {
 	switch feature {
 	case "three-word-pcs-gauge":
 		if s.group == "L2" {

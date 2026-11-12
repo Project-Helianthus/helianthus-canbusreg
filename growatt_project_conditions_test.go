@@ -6,7 +6,7 @@ import (
 	"testing"
 )
 
-var cx13Names = map[int]string{
+var diagnosticTestNames = map[int]string{
 	0: "Cell overvoltage — condition 0", 1: "Cell overvoltage — condition 1",
 	2: "Cell undervoltage — condition 2", 3: "Cell undervoltage — condition 3",
 	4: "Cell-voltage spread high — condition 4", 5: "Cell-voltage spread high — condition 5",
@@ -30,7 +30,7 @@ var cx13Names = map[int]string{
 	131: "Adjacent member state mismatch", 133: "Startup integrity check B failed", 134: "Measurement status flag set", 135: "Pack/port voltage difference with hardware status",
 }
 
-func cx13ModernOnly(index int) bool {
+func diagnosticTestModernOnly(index int) bool {
 	switch index {
 	case 31, 35, 91, 93, 102, 103, 128, 131, 133, 134, 135:
 		return true
@@ -38,18 +38,18 @@ func cx13ModernOnly(index int) bool {
 	return false
 }
 
-func cx13Index(t *testing.T, s CXSelection, index int) CXNativeField {
+func diagnosticTestIndex(t *testing.T, s CXSelection, index int) CXNativeField {
 	t.Helper()
-	word, ok := CX07EncodeDTC(s, index)
+	word, ok := EncodeDTC(s, index)
 	if !ok {
 		t.Fatal(index)
 	}
 	var p [8]byte
 	binary.LittleEndian.PutUint16(p[:2], word)
-	i := cx01Input(t, s.CX01Spec(), 0x1853, p)
+	i := selectionTestInput(t, s.SelectionSpecValue(), 0x1853, p)
 	i.FieldAge = 17
 	i.Evidence.RawRecord[15] = 71
-	r := CX07DecodeDTC(s, i, 0)
+	r := DecodeDTC(s, i, 0)
 	f, ok := r.Fields["numeric_index"]
 	if !ok {
 		t.Fatal(r)
@@ -59,17 +59,17 @@ func cx13Index(t *testing.T, s CXSelection, index int) CXNativeField {
 
 func TestCX13AllConditionNamesAndOpaqueIndices(t *testing.T) {
 	for _, modern := range []bool{false, true} {
-		s := cx07Member(t, modern)
+		s := dtcTestMember(t, modern)
 		count := 134
 		if modern {
 			count = 136
 		}
 		for index := 0; index < count; index++ {
 			t.Run(fmt.Sprintf("modern%v/index%d", modern, index), func(t *testing.T) {
-				f := cx13Index(t, s, index)
-				r := CX13LabelCondition(s, f)
-				want, named := cx13Names[index]
-				named = named && (modern || !cx13ModernOnly(index))
+				f := diagnosticTestIndex(t, s, index)
+				r := LabelCondition(s, f)
+				want, named := diagnosticTestNames[index]
+				named = named && (modern || !diagnosticTestModernOnly(index))
 				if !named {
 					if r.Status != "unsupported" || r.Meaning != "" || r.Raw != f.Raw || r.Evidence != f.Evidence {
 						t.Fatal(r)
@@ -91,34 +91,34 @@ func TestCX13AllConditionNamesAndOpaqueIndices(t *testing.T) {
 }
 
 func TestCX13EachLabelHypothesisNegatives(t *testing.T) {
-	for index := range cx13Names {
+	for index := range diagnosticTestNames {
 		for _, modern := range []bool{false, true} {
 			if !modern && index >= 134 {
 				continue
 			}
-			s := cx07Member(t, modern)
-			f := cx13Index(t, s, index)
+			s := dtcTestMember(t, modern)
+			f := diagnosticTestIndex(t, s, index)
 			for _, gate := range []string{"wrong-selector", "wrong-release", "legacy-choice", "out-of-range", "unnamed", "stale", "invalid", "absent", "conflict", "unsupported", "physical-qualified", "raw", "unit", "denominator", "evidence", "age", "epoch", "scope", "bank", "endpoint", "group", "slot", "numerator", "meaning", "grade"} {
 				t.Run(fmt.Sprintf("label%d/modern%v/%s", index, modern, gate), func(t *testing.T) {
 					selected := s
 					input := f
-					c := s.CX01Spec()
+					c := s.SelectionSpecValue()
 					switch gate {
 					case "wrong-selector":
 						c.ProjectCode = "qAAa"
-						selected = cx01Select(t, c)
+						selected = selectionTestSelect(t, c)
 					case "wrong-release":
 						c.Release = "9012"
-						selected = cx01Select(t, c)
+						selected = selectionTestSelect(t, c)
 					case "legacy-choice":
 						c.ProjectCode = "QAAa"
 						c.Release = "9011"
 						c.Choice = "legacy19"
-						selected = cx01Select(t, c)
+						selected = selectionTestSelect(t, c)
 					case "out-of-range":
 						input.Numerator = 136
 					case "unnamed":
-						input = cx13Index(t, s, 10)
+						input = diagnosticTestIndex(t, s, 10)
 					case "stale", "invalid", "absent", "conflict", "unsupported":
 						input.Status = gate
 					case "physical-qualified":
@@ -152,7 +152,7 @@ func TestCX13EachLabelHypothesisNegatives(t *testing.T) {
 					case "grade":
 						input.Grade = "Unknown"
 					}
-					r := CX13LabelCondition(selected, input)
+					r := LabelCondition(selected, input)
 					if r.Meaning != "" || r.Status == "accepted" || r.Raw != input.Raw || r.Evidence != input.Evidence {
 						t.Fatal(r)
 					}
@@ -165,15 +165,15 @@ func TestCX13EachLabelHypothesisNegatives(t *testing.T) {
 func TestCX13ConditionPCSParity(t *testing.T) {
 	for _, modern := range []bool{false, true} {
 		for _, flavor := range []string{"pcs-standard", "pcs-parallel"} {
-			for index, want := range cx13Names {
-				if !modern && (cx13ModernOnly(index) || index >= 134) {
+			for index, want := range diagnosticTestNames {
+				if !modern && (diagnosticTestModernOnly(index) || index >= 134) {
 					continue
 				}
-				c := cx07Member(t, modern).CX01Spec()
+				c := dtcTestMember(t, modern).SelectionSpecValue()
 				c.Flavor = flavor
 				c.Direction = "bms-to-pcs"
-				s := cx01Select(t, c)
-				word, _ := CX07EncodeDTC(s, index)
+				s := selectionTestSelect(t, c)
+				word, _ := EncodeDTC(s, index)
 				var p [8]byte
 				offset := 2
 				idValue := uint32(0x333)
@@ -182,10 +182,10 @@ func TestCX13ConditionPCSParity(t *testing.T) {
 					idValue = 0x520
 				}
 				binary.BigEndian.PutUint16(p[offset:offset+2], word)
-				i := cx01Input(t, c, 0x1853, p)
-				i.Evidence.Frame = cx13Standard(t, idValue, p)
-				f := CX07DecodeDTC(s, i, offset).Fields["numeric_index"]
-				r := CX13LabelCondition(s, f)
+				i := selectionTestInput(t, c, 0x1853, p)
+				i.Evidence.Frame = diagnosticTestStandard(t, idValue, p)
+				f := DecodeDTC(s, i, offset).Fields["numeric_index"]
+				r := LabelCondition(s, f)
 				if r.Status != "accepted" || r.Meaning != want {
 					t.Fatal(flavor, index, r)
 				}

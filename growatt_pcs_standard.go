@@ -10,7 +10,7 @@ import (
 // Native contract: https://github.com/Project-Helianthus/helianthus-docs-canbus/blob/main/protocols/growatt/growatt-low-voltage-bms-can-pcs-protocol-v1.md
 // Sections: 311…314: limits, summary and capacity; Measurement conversions;
 // 319, 322, 330: extrema and location. All results remain candidates.
-// CX05PCSInput supplies explicit source and validity assertions, never inferred
+// PCSStandardPCSInput supplies explicit source and validity assertions, never inferred
 // from nominal bitrate, plausible bytes or matching standard identifiers.
 // NativeRecord, when supplied, is checked against Evidence.Frame; malformed and
 // FD records are copied into Diagnostics without producing fields.

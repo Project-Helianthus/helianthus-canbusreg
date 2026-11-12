@@ -309,7 +309,7 @@ func TestGrowattBMSProviderErrorTexts(t *testing.T) {
 			if tc.err == nil {
 				t.Fatal("expected error")
 			}
-			if got := tc.err.Error(); got == "O08 requires "+tc.suffix || got != "Growatt BMS provider requires "+tc.suffix {
+			if got := tc.err.Error(); got == "O08 requires "+tc.suffix || got != "growatt BMS provider requires "+tc.suffix {
 				t.Fatalf("unexpected error: %q", got)
 			}
 		})

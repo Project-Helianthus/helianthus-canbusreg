@@ -51,11 +51,11 @@ type GrowattBMSProvider struct {
 
 func NewGrowattBMSProvider(bmsInterface canbus.InterfaceIdentity, bmsRevision string) (*GrowattBMSProvider, error) {
 	if bmsRevision != BMSRevisionV104 {
-		return nil, errors.New("Growatt BMS provider requires explicit V1.04 selection")
+		return nil, errors.New("growatt BMS provider requires explicit V1.04 selection")
 	}
 	bmsReplay, bmsOK := NewGrowattLowVoltageBMSV104QualificationReplay(bmsInterface)
 	if !bmsOK {
-		return nil, errors.New("Growatt BMS provider requires a valid interface")
+		return nil, errors.New("growatt BMS provider requires a valid interface")
 	}
 	return &GrowattBMSProvider{bmsInterface: bmsInterface, bmsReplay: bmsReplay, bmsSnapshot: GrowattBMSSnapshot{State: "stopped"}}, nil
 }
@@ -69,7 +69,7 @@ func (bmsP *GrowattBMSProvider) Start(bmsSource BMSReceiveSource, bmsGeneration 
 	bmsInvalid := bmsSource == nil || bmsGeneration == 0 || bmsGeneration <= bmsP.bmsSnapshot.Generation
 	bmsP.bmsMu.Unlock()
 	if bmsInvalid {
-		return errors.New("Growatt BMS provider requires a source and a successor generation")
+		return errors.New("growatt BMS provider requires a source and a successor generation")
 	}
 	bmsP.bmsStop()
 	bmsP.bmsMu.Lock()

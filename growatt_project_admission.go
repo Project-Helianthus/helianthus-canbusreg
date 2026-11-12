@@ -42,6 +42,10 @@ type Diagnostic struct {
 }
 
 // ReplayProjection separates current, retained and last-known-good candidate evidence from diagnostics and physical qualification.
+// Callers must check Current.Status == "descriptive" and each current native
+// result and field status before using current values. RetainedNative and LastGood
+// are historical values, including when Current reports rejection; their presence
+// does not establish acceptance of the current evidence or physical qualification.
 type ReplayProjection struct {
 	Current           CXNativeResult
 	Native            map[string]CXNativeResult
@@ -173,7 +177,13 @@ func fixture16Decode(s CXSelection, in ReplayInput) (map[string]CXNativeResult, 
 	return r, bits
 }
 
-// Classify classifies only admitted evidence for this profile; rejection produces no usable projection.
+// Classify returns current candidate results or rejection diagnostics, potentially
+// with retained historical values. Callers must check Current.Status == "descriptive"
+// and the current native result and field statuses before using current values;
+// RetainedNative and LastGood do not establish acceptance of the current evidence.
+// Unlisted evidence with overlapping frame geometry returns a diagnostic
+// classification that participates in Registry's collision rule, suppressing an
+// overlapping profile's fallback. Other unlisted evidence returns an empty classification.
 func (p *replaySelectedProfile) Classify(e Evidence) Classification {
 	p.mu.Lock()
 	defer p.mu.Unlock()

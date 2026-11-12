@@ -19,6 +19,7 @@ type LINKIdentitySnapshot struct {
 	Fields                       map[string]CXNativeField
 	PhysicalQualified            bool
 }
+// LINKIdentityAssembler serializes identity assembly for one explicit selection; conflicts require a new assembler.
 type LINKIdentityAssembler struct {
 	mu            sync.Mutex
 	selection     CXSelection
@@ -31,9 +32,11 @@ type LINKIdentityAssembler struct {
 	lastMonotonic time.Duration
 }
 
+// NewLINKIdentityAssembler creates an empty assembler bound to the supplied selection.
 func NewLINKIdentityAssembler(s CXSelection) *LINKIdentityAssembler {
 	return &LINKIdentityAssembler{selection: s, snapshot: LINKIdentitySnapshot{Selection: s, Grade: "Unknown", Status: "absent", Fields: make(map[string]CXNativeField)}}
 }
+// SnapshotLINKIdentity returns a synchronized snapshot with a detached field map.
 func (a *LINKIdentityAssembler) SnapshotLINKIdentity() LINKIdentitySnapshot {
 	a.mu.Lock()
 	defer a.mu.Unlock()
@@ -54,6 +57,7 @@ func (a *LINKIdentityAssembler) selectionInvalidate() {
 	a.evidence = [3]Evidence{}
 }
 
+// DecodeLINKIdentity validates identity continuity and retains independent last-known-good fields.
 // Decode validates identity continuity and retains independent last-known-good fields.
 // A conflict is sticky: a changed route role, identity, serial or newer epoch
 // needs a new selection/assembler. Obsolete evidence is reported stale instead.

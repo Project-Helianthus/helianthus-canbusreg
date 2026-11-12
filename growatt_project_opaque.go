@@ -5,15 +5,21 @@ import (
 	"sync"
 )
 
+// CapabilityState records independent receiver capability evidence, separate from physical qualification.
 type CapabilityState string
 
 const (
+	// ReceiverCapabilityUnknown denotes missing capability evidence.
 	ReceiverCapabilityUnknown     CapabilityState = "unknown"
+	// ReceiverCapabilityObserved denotes an admitted observation without a qualification assertion.
 	ReceiverCapabilityObserved    CapabilityState = "observed"
+	// ReceiverCapabilityQualified denotes an external capability assertion, not physical qualification.
 	ReceiverCapabilityQualified   CapabilityState = "qualified"
+	// ReceiverCapabilityUnsupported denotes an explicit capability denial.
 	ReceiverCapabilityUnsupported CapabilityState = "unsupported"
 )
 
+// CapabilityKey includes the receiver identity and direction for capability assertions.
 // Capability keys include the receiver identity and direction. A caller's
 // independent qualification assertion is never physical qualification.
 type CapabilityKey struct {
@@ -42,6 +48,7 @@ type OpaqueStore struct {
 	capabilities []receiverCapabilityCapability
 }
 
+// NewCX15OpaqueStore creates a synchronized journal with a retention bound of 1..256; other bounds return an error.
 func NewCX15OpaqueStore(limit int) (*OpaqueStore, error) {
 	if limit < 1 || limit > 256 {
 		return nil, fmt.Errorf("raw retention bound must be 1..256")
@@ -49,6 +56,7 @@ func NewCX15OpaqueStore(limit int) (*OpaqueStore, error) {
 	return &OpaqueStore{limit: limit}, nil
 }
 
+// Capability returns the recorded state under lock, or unknown when no assertion exists.
 func (s *OpaqueStore) Capability(key CapabilityKey) CapabilityState {
 	s.mu.Lock()
 	defer s.mu.Unlock()
@@ -91,6 +99,7 @@ func receiverCapabilitySameStream(a receiverCapabilityRetained, selection CXSele
 	return a.selection == selection && a.result.Context.Direction == r.Context.Direction && a.result.Context.Role == r.Context.Role && a.result.Context.Profile == r.Context.Profile && a.result.Context.Form == r.Context.Form && a.result.Input.Evidence.Frame.ID() == r.Input.Evidence.Frame.ID()
 }
 
+// Observe journals classification under lock; unsupported or stale observations cannot replace last-known-good evidence.
 func (s *OpaqueStore) Observe(selection CXSelection, c ReceiverContext, i LINKInput) ReceiverResult {
 	s.mu.Lock()
 	defer s.mu.Unlock()
@@ -155,11 +164,13 @@ func (s *OpaqueStore) Observe(selection CXSelection, c ReceiverContext, i LINKIn
 	}
 	return r
 }
+// RawSnapshot returns a copied journal slice under lock.
 func (s *OpaqueStore) RawSnapshot() []ReceiverResult {
 	s.mu.Lock()
 	defer s.mu.Unlock()
 	return append([]ReceiverResult(nil), s.journal...)
 }
+// LastKnownGood returns a copied slice of independently admitted retained results under lock.
 func (s *OpaqueStore) LastKnownGood() []ReceiverResult {
 	s.mu.Lock()
 	defer s.mu.Unlock()

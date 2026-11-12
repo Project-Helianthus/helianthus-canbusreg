@@ -5,7 +5,9 @@ package canbusreg
 type GreeVRFMapProfile uint8
 
 const (
+	// GreeVRFMapM94 selects the M94 offline state-map family.
 	GreeVRFMapM94 GreeVRFMapProfile = iota + 1
+	// GreeVRFMapM115 selects the M115 offline state-map family.
 	GreeVRFMapM115
 )
 
@@ -25,6 +27,7 @@ type GreeVRFMapDecoder struct {
 	productID uint16
 }
 
+// NewGreeVRFMapDecoder binds an offline map family and cleanup product identifier; neither admits a device.
 func NewGreeVRFMapDecoder(profile GreeVRFMapProfile, productID uint16) GreeVRFMapDecoder {
 	return GreeVRFMapDecoder{profile: profile, productID: productID}
 }

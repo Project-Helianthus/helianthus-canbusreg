@@ -5,6 +5,7 @@ import (
 	"fmt"
 )
 
+// DecodeLINKDiagnostics decodes admitted diagnostic evidence without inferring a unique fault cause.
 // Native contract: https://github.com/Project-Helianthus/helianthus-docs-canbus/blob/main/protocols/growatt/growatt-low-voltage-bms-can-link-protocol-v1.md
 // Sections: Faults and additional status; Release-11 field and behavior gates.
 // This is a stateless receive-only projection. Current bits, selected words,

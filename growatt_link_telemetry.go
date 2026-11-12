@@ -6,6 +6,7 @@ import (
 	"time"
 )
 
+// LINKInput associates native evidence with explicit topology, epoch and field age.
 // LINK native contract: https://github.com/Project-Helianthus/helianthus-docs-canbus/blob/main/protocols/growatt/growatt-low-voltage-bms-can-link-protocol-v1.md
 // Sections: Identify the peer before interpreting version-dependent fields;
 // Identity and ordinary module telemetry; Serial number and date announcements.
@@ -43,6 +44,7 @@ func lINKCoordinatorAdmission(s CXSelection, i LINKInput) bool {
 	c := s.spec
 	return lINKFrameAdmission(s, i) && c.Direction == "coordinator-to-module" && c.Scope == "aggregate" && c.Source == 0xf4 && (c.Destination == 0xf5 || c.Destination == 0xdf)
 }
+// CXDecodeLINKTelemetry decodes admitted LINK telemetry while retaining raw evidence and candidate grades.
 func CXDecodeLINKTelemetry(s CXSelection, i LINKInput) CXNativeResult {
 	r := selectionResult(s, i, "unsupported")
 	if !lINKAdmission(s, i) && !lINKDateAdmission(s, i) && !lINKCoordinatorAdmission(s, i) {

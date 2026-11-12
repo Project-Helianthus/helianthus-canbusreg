@@ -19,11 +19,13 @@ type SelectionSpec struct {
 	Epoch                                                             uint64
 }
 
+// CXSelection holds a validated caller assertion and its candidate contract group, layout and grade.
 type CXSelection struct {
 	spec                 SelectionSpec
 	group, layout, grade string
 }
 
+// NewCXSelection validates explicit identity and context; unsupported combinations remain Unknown rather than being inferred from traffic.
 func NewCXSelection(spec SelectionSpec) (CXSelection, error) {
 	s := CXSelection{spec: spec, grade: "Unknown"}
 	if spec.Interface.Name() == "" || spec.Interface.Index() <= 0 || len(spec.ProjectCode) != 4 || len(spec.Release) != 4 || !selectionASCII([]byte(spec.ProjectCode+spec.Release)) {
@@ -112,9 +114,13 @@ func NewCXSelection(spec SelectionSpec) (CXSelection, error) {
 	}
 	return s, nil
 }
+// SelectionSpecValue returns the caller assertion by value.
 func (s CXSelection) SelectionSpecValue() SelectionSpec { return s.spec }
+// SelectionGroup returns the selected contract group, or empty when unresolved.
 func (s CXSelection) SelectionGroup() string            { return s.group }
+// SelectionLayout returns the selected layout code, or empty when unresolved.
 func (s CXSelection) SelectionLayout() string           { return s.layout }
+// SelectionGrade returns Proven, Hypothesis or Unknown for the contract selection, never physical qualification.
 func (s CXSelection) SelectionGrade() string            { return s.grade }
 func selectionASCII(p []byte) bool {
 	for _, b := range p {
@@ -137,6 +143,7 @@ type CXNativeField struct {
 	Age                                time.Duration
 	PhysicalQualified                  bool
 }
+// CXNativeResult retains native evidence and per-field candidate results separately from physical qualification.
 type CXNativeResult struct {
 	Selection         CXSelection
 	Evidence          Evidence
@@ -158,6 +165,7 @@ type SelectionNativeIndication struct {
 	TopologyAssociated bool
 }
 
+// ConfirmNativeSelection checks associated evidence against an explicit choice; it cannot choose a contract from traffic.
 func ConfirmNativeSelection(s CXSelection, indication SelectionNativeIndication) CXNativeResult {
 	i := indication.Input
 	r := selectionResult(s, i, "unsupported")

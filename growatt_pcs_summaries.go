@@ -7,6 +7,7 @@ import (
 	"github.com/Project-Helianthus/helianthus-canbus"
 )
 
+// PCSSummaryPCSInput supplies independently validated local summary context.
 // Native contracts, section PCS summary bits and their diagnostic sources:
 // https://github.com/Project-Helianthus/helianthus-docs-canbus/blob/main/protocols/growatt/growatt-low-voltage-bms-can-pcs-protocol-v1.md
 // https://github.com/Project-Helianthus/helianthus-docs-canbus/blob/main/protocols/growatt/growatt-low-voltage-bms-can-link-protocol-v1.md
@@ -28,6 +29,7 @@ type SummaryBit struct {
 	Field                                 CXNativeField
 	Alternatives, ConditionalAlternatives []int
 }
+// PCSSummaryPCSResult retains candidate summary bits, alternative causes and diagnostic bytes without asserting an all-clear state.
 type PCSSummaryPCSResult struct {
 	CXNativeResult
 	Bits        map[string]SummaryBit

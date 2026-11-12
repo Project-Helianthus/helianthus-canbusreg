@@ -8,6 +8,7 @@ import (
 	"github.com/Project-Helianthus/helianthus-canbus"
 )
 
+// BMSRevisionV104 is the explicit revision selector accepted by the BMS provider.
 const BMSRevisionV104 = "V1.04"
 
 // BMSObservation binds value-owned native evidence to the caller's source generation.
@@ -49,6 +50,7 @@ type GrowattBMSProvider struct {
 	bmsDone        chan struct{}
 }
 
+// NewGrowattBMSProvider creates a stopped provider; unsupported revisions or invalid interfaces return an error.
 func NewGrowattBMSProvider(bmsInterface canbus.InterfaceIdentity, bmsRevision string) (*GrowattBMSProvider, error) {
 	if bmsRevision != BMSRevisionV104 {
 		return nil, errors.New("growatt BMS provider requires explicit V1.04 selection")
@@ -156,6 +158,7 @@ func (bmsP *GrowattBMSProvider) bmsApply(bmsObservation BMSObservation) {
 	bmsP.bmsSnapshot.State = "receiving"
 }
 
+// Snapshot returns a synchronized copy with a detached projection.
 func (bmsP *GrowattBMSProvider) Snapshot() GrowattBMSSnapshot {
 	bmsP.bmsMu.Lock()
 	defer bmsP.bmsMu.Unlock()

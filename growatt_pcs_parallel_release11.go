@@ -6,6 +6,7 @@ import (
 	"strconv"
 )
 
+// ParallelContext supplies independent context for parallel candidate interpretations.
 // Native contract: https://github.com/Project-Helianthus/helianthus-docs-canbus/blob/main/protocols/growatt/growatt-low-voltage-bms-can-pcs-protocol-v1.md
 // Sections: Common release-11 PCS contract; Standard parallel / clustering profile.
 // Sources are explicit, independently attributed candidate values, never inferred

@@ -2,6 +2,7 @@ package canbusreg
 
 import "fmt"
 
+// LabelCondition returns a candidate condition label using the selected native dictionary.
 // Native condition-name contracts, Defined condition names:
 // https://github.com/Project-Helianthus/helianthus-docs-canbus/blob/main/protocols/growatt/growatt-low-voltage-bms-can-link-protocol-v1.md
 // https://github.com/Project-Helianthus/helianthus-docs-canbus/blob/main/protocols/growatt/growatt-low-voltage-bms-can-pcs-protocol-v1.md

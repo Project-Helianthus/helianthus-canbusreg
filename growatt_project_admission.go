@@ -8,6 +8,7 @@ import (
 	"github.com/Project-Helianthus/helianthus-canbus"
 )
 
+// ReplayInput associates finite native evidence with explicit selection and validity gates.
 // Admission contracts, Profile selection / Data validity and consumer obligations:
 // https://github.com/Project-Helianthus/helianthus-docs-canbus/blob/main/protocols/growatt/growatt-low-voltage-bms-can-pcs-protocol-v1.md
 // Transport, addressing and data validity:
@@ -33,12 +34,14 @@ type ReplayInput struct {
 	TemperatureSummary               SummaryGates
 }
 
+// Diagnostic retains the associated input, native record and rejection or descriptive status.
 type Diagnostic struct {
 	Input        LINKInput
 	NativeRecord []byte
 	Status       string
 }
 
+// ReplayProjection separates current, retained and last-known-good candidate evidence from diagnostics and physical qualification.
 type ReplayProjection struct {
 	Current           CXNativeResult
 	Native            map[string]CXNativeResult
@@ -170,6 +173,7 @@ func fixture16Decode(s CXSelection, in ReplayInput) (map[string]CXNativeResult, 
 	return r, bits
 }
 
+// Classify classifies only admitted evidence for this profile; rejection produces no usable projection.
 func (p *replaySelectedProfile) Classify(e Evidence) Classification {
 	p.mu.Lock()
 	defer p.mu.Unlock()

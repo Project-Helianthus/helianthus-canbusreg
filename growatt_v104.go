@@ -86,6 +86,7 @@ func GrowattLowVoltageBMSV104() Profile {
 	return &growattLowVoltageBMSV104{windows: make(map[canbus.InterfaceIdentity]growattV104Window)}
 }
 
+// Classify classifies only admitted evidence for this profile; rejection produces no usable projection.
 func (p *growattLowVoltageBMSV104) Classify(e Evidence) Classification {
 	if e.Interface.Name() == "" || e.Interface.Index() <= 0 {
 		return Classification{}

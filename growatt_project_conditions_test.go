@@ -38,7 +38,7 @@ func diagnosticTestModernOnly(index int) bool {
 	return false
 }
 
-func diagnosticTestIndex(t *testing.T, s CXSelection, index int) CXNativeField {
+func diagnosticTestIndex(t *testing.T, s Selection, index int) NativeField {
 	t.Helper()
 	word, ok := EncodeDTC(s, index)
 	if !ok {

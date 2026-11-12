@@ -10,7 +10,7 @@ import (
 	"github.com/Project-Helianthus/helianthus-canbus"
 )
 
-func summaryTestFixture(t *testing.T, id uint32, p [8]byte, legacy bool) (CXSelection, PCSSummaryPCSInput) {
+func summaryTestFixture(t *testing.T, id uint32, p [8]byte, legacy bool) (Selection, PCSSummaryPCSInput) {
 	t.Helper()
 	s, i := standardTestFixture(t, id, p)
 	if !legacy {
@@ -277,7 +277,7 @@ func TestCX14WrongProfilesAndHypothesisScopeNegatives(t *testing.T) {
 					i.LocalSummaryQualified = false
 				}
 				var err error
-				s, err = NewCXSelection(c)
+				s, err = NewSelection(c)
 				if err != nil {
 					t.Fatal(err)
 				}
@@ -366,7 +366,7 @@ func TestCX14PartialRetentionAndClearIndependentFault(t *testing.T) {
 			if r.Bits["A/4"].Field.Status == "accepted" || len(r.Bits["A/4"].Alternatives) > 0 || r.Bits["A/1"].Field.Status != "accepted" {
 				t.Fatal(r)
 			}
-			retained := RetainAccepted(previous.CXNativeResult, r.CXNativeResult)
+			retained := RetainAccepted(previous.NativeResult, r.NativeResult)
 			if retained.Fields["A/4"] != previous.Fields["A/4"] || retained.Fields["A/1"].Evidence != next.Evidence {
 				t.Fatal(retained)
 			}
@@ -388,7 +388,7 @@ func TestCX14ParallelLocalAndExplicitAmbiguity(t *testing.T) {
 				c.Release = "9011"
 				c.Flavor = flavor
 				c.Choice = choice
-				s, err := NewCXSelection(c)
+				s, err := NewSelection(c)
 				if err != nil {
 					t.Fatal(err)
 				}
@@ -430,7 +430,7 @@ func TestCX14ClearedSummaryReplacesRetainedSetBit(t *testing.T) {
 	if b.Field.Status != "accepted" || b.Field.Numerator != 0 || len(b.Alternatives) != 0 || b.Field.Meaning != "summary bit clear; independent diagnostics not inferred" {
 		t.Fatal(b)
 	}
-	retained := RetainAccepted(previous.CXNativeResult, r.CXNativeResult)
+	retained := RetainAccepted(previous.NativeResult, r.NativeResult)
 	if retained.Fields["A/4"].Numerator != 0 || retained.Fields["A/4"].Evidence != clear.Evidence {
 		t.Fatal(retained.Fields["A/4"])
 	}
@@ -450,7 +450,7 @@ func TestCX14LegacyA0ClearReplacesRetainedState5(t *testing.T) {
 	if f := r.Fields["A/0"]; f.Status != "accepted" || f.Numerator != 0 || f.Grade != "Proven" {
 		t.Fatal(f)
 	}
-	retained := RetainAccepted(previous.CXNativeResult, r.CXNativeResult)
+	retained := RetainAccepted(previous.NativeResult, r.NativeResult)
 	if f := retained.Fields["A/0"]; f.Numerator != 0 || f.Evidence != clear.Evidence {
 		t.Fatal(f)
 	}
@@ -471,7 +471,7 @@ func TestCX14ClearedIndependentStatusReplacesRetainedSetBit(t *testing.T) {
 			if f := r.Fields[key]; f.Status != "accepted" || f.Numerator != 0 || f.Grade != "Proven" {
 				t.Fatal(f)
 			}
-			retained := RetainAccepted(previous.CXNativeResult, r.CXNativeResult)
+			retained := RetainAccepted(previous.NativeResult, r.NativeResult)
 			if f := retained.Fields[key]; f.Numerator != 0 || f.Evidence != clear.Evidence {
 				t.Fatal(f)
 			}

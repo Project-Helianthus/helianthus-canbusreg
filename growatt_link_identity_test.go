@@ -10,7 +10,7 @@ func TestCX01IdentityAssemblyAndConflict(t *testing.T) {
 	spec := selectionTestSpec(t, "QAAA", "0006")
 	a := NewLINKIdentityAssembler(selectionTestSelect(t, spec))
 	seq := uint64(0)
-	feed := func(kind uint32, p [8]byte) CXNativeResult {
+	feed := func(kind uint32, p [8]byte) NativeResult {
 		seq++
 		i := selectionTestInput(t, spec, kind, p)
 		i.Evidence.Sequence = seq
@@ -26,7 +26,7 @@ func TestCX01IdentityAssemblyAndConflict(t *testing.T) {
 	if !snap.HasSerial || snap.Serial[15] != 16 {
 		t.Fatal(snap)
 	}
-	snap.Fields["fake"] = CXNativeField{}
+	snap.Fields["fake"] = NativeField{}
 	snap.Serial[0] = 99
 	if a.SnapshotLINKIdentity().Serial[0] != 1 {
 		t.Fatal("alias")
@@ -60,7 +60,7 @@ func TestCX01SerialNegativeVectors(t *testing.T) {
 			}
 			a := NewLINKIdentityAssembler(selectionTestSelect(t, spec))
 			seq := uint64(0)
-			feed := func(k uint32, p [8]byte) CXNativeResult {
+			feed := func(k uint32, p [8]byte) NativeResult {
 				seq++
 				i := selectionTestInput(t, spec, k, p)
 				i.Evidence.Sequence = seq
@@ -282,7 +282,7 @@ func TestCX01UnrelatedTrafficKeepsSerialAssembly(t *testing.T) {
 	spec := selectionTestSpec(t, "QAAA", "0006")
 	a := NewLINKIdentityAssembler(selectionTestSelect(t, spec))
 	seq := uint64(0)
-	feed := func(kind uint32, p [8]byte) CXNativeResult {
+	feed := func(kind uint32, p [8]byte) NativeResult {
 		seq++
 		i := selectionTestInput(t, spec, kind, p)
 		i.Evidence.Sequence = seq
@@ -319,7 +319,7 @@ func TestCX01SerialChangeConflicts(t *testing.T) {
 	spec := selectionTestSpec(t, "QAAA", "0006")
 	a := NewLINKIdentityAssembler(selectionTestSelect(t, spec))
 	seq := uint64(0)
-	feed := func(kind uint32, p [8]byte) CXNativeResult {
+	feed := func(kind uint32, p [8]byte) NativeResult {
 		seq++
 		i := selectionTestInput(t, spec, kind, p)
 		i.Evidence.Sequence = seq
@@ -333,7 +333,7 @@ func TestCX01SerialChangeConflicts(t *testing.T) {
 	if len(a.SnapshotLINKIdentity().Fields) == 0 {
 		t.Fatal("setup")
 	}
-	var last CXNativeResult
+	var last NativeResult
 	for _, p := range [][8]byte{{15, 9, 2, 3, 4, 5, 6, 7}, {47, 8, 9, 10, 11, 12, 13, 14}, {79, 15, 16, 0, 0, 0, 0, 0}} {
 		last = feed(0x18fb, p)
 	}
@@ -367,7 +367,7 @@ func TestCX01FlagsByteChangeRetainsState(t *testing.T) {
 	spec := selectionTestSpec(t, "QAAA", "0006")
 	a := NewLINKIdentityAssembler(selectionTestSelect(t, spec))
 	seq := uint64(0)
-	feed := func(kind uint32, p [8]byte) CXNativeResult {
+	feed := func(kind uint32, p [8]byte) NativeResult {
 		seq++
 		i := selectionTestInput(t, spec, kind, p)
 		i.Evidence.Sequence = seq

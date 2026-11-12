@@ -10,14 +10,14 @@ import (
 // Sections: Standard parallel / clustering profile; Addressed families
 // 50X…68X, 6CX, 6DX; Coordinator summaries 590, 690, 6A0, 6B0, 6E0.
 // Candidate decoding never establishes physical qualification or inventory.
-func parallelIdentityAdmission(s CXSelection, i LINKInput) bool {
+func parallelIdentityAdmission(s Selection, i LINKInput) bool {
 	c := s.SelectionSpecValue()
 	f := i.Evidence.Frame
 	g, e := strconv.ParseUint(c.Group, 10, 8)
 	return e == nil && g < 8 && c.Group == strconv.FormatUint(g, 10) && c.Flavor == "pcs-parallel" && s.SelectionGroup() != "" && c.Direction == "bms-to-pcs" && !f.ID().Extended() && f.DLC() == 8 && f.RawDLC() == 8 && i.Evidence.Interface == c.Interface && i.Epoch == c.Epoch && i.Direction == c.Direction && i.Scope == c.Scope && i.Bank == c.Bank && i.Endpoint == c.Endpoint && i.Group == c.Group && i.Slot == c.Slot && i.FieldAge >= 0
 }
 
-func parallelIdentityFamily(s CXSelection, id uint32) (uint32, bool) {
+func parallelIdentityFamily(s Selection, id uint32) (uint32, bool) {
 	c := s.SelectionSpecValue()
 	g, _ := strconv.ParseUint(c.Group, 10, 8)
 	if id == 0x37f || id == 0x3f7 {
@@ -47,7 +47,7 @@ func parallelIdentityFamily(s CXSelection, id uint32) (uint32, bool) {
 }
 
 // ParallelIdentityDecodeParallel decodes admitted parallel telemetry using the explicit selection, retaining unknown fields as raw evidence.
-func ParallelIdentityDecodeParallel(s CXSelection, i LINKInput) CXNativeResult {
+func ParallelIdentityDecodeParallel(s Selection, i LINKInput) NativeResult {
 	r := selectionResult(s, i, "unsupported")
 	if !parallelIdentityAdmission(s, i) {
 		r.Status = "invalid"
@@ -63,7 +63,7 @@ func ParallelIdentityDecodeParallel(s CXSelection, i LINKInput) CXNativeResult {
 		if grade != "Proven" && grade != "Hypothesis" || status == "raw" {
 			grade = "Unknown"
 		}
-		r.Fields[name] = CXNativeField{Numerator: n, Denominator: 1, Unit: unit, Meaning: meaning, Grade: grade, Status: status, Raw: p, Evidence: i.Evidence, Epoch: i.Epoch, Scope: i.Scope, Bank: i.Bank, Endpoint: i.Endpoint, Group: i.Group, Slot: i.Slot, Age: i.FieldAge}
+		r.Fields[name] = NativeField{Numerator: n, Denominator: 1, Unit: unit, Meaning: meaning, Grade: grade, Status: status, Raw: p, Evidence: i.Evidence, Epoch: i.Epoch, Scope: i.Scope, Bank: i.Bank, Endpoint: i.Endpoint, Group: i.Group, Slot: i.Slot, Age: i.FieldAge}
 	}
 	b := func(name string, at int) { add(name, int64(p[at]), "", name, "accepted") }
 	w := func(name string, at int) {

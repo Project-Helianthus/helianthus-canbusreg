@@ -37,10 +37,10 @@ type ProjectProviderRaw struct {
 
 // ProjectProviderSnapshot separates current candidate fields, historical evidence and provider lifecycle state.
 type ProjectProviderSnapshot struct {
-	Selection                                             CXSelection
+	Selection                                             Selection
 	State                                                 string
 	Generation                                            uint64
-	Current, LastGood                                     map[string]CXNativeField
+	Current, LastGood                                     map[string]NativeField
 	LastGoodGeneration                                    map[string]uint64
 	Raw                                                   []ProjectProviderRaw
 	Rejected, EvictedRaw, EvictedFields, TruncatedRecords uint64
@@ -57,7 +57,7 @@ type ProjectProviderSnapshot struct {
 type Provider struct {
 	lifecycle         sync.Mutex
 	mu                sync.Mutex
-	selection         CXSelection
+	selection         Selection
 	snapshot          ProjectProviderSnapshot
 	running, conflict bool
 	sequence          uint64
@@ -66,7 +66,7 @@ type Provider struct {
 	done              chan struct{}
 	order             []string
 	identity          map[string]int64
-	member            CXSelection
+	member            Selection
 	hasMember, seen   bool
 	association       projectProviderAssociation
 	// assembler is the single LINK identity assembly of the active generation; it retains the completed serial so
@@ -86,7 +86,7 @@ type Provider struct {
 	modules [16]*ParallelIdentityAssembler
 }
 
-// cx17Association is the native slot, group and extrema index association supplied with a PCS record. It is part of
+// projectProviderAssociation is the native slot, group and extrema index association supplied with a PCS record. It is part of
 // the identity fence like the member: the same wire bytes decode into another slot's or group's fields, or into
 // indexes accepted under another scope or other inclusive bounds, when it changes.
 type projectProviderAssociation struct {
@@ -96,7 +96,7 @@ type projectProviderAssociation struct {
 	indexMinimum, indexMaximum             uint16
 }
 
-// cx17LINKSerial is the provider's bounded 0x18fb serial assembly: one pending in-order fragment sequence and the
+// projectProviderLINKSerial is the provider's bounded 0x18fb serial assembly: one pending in-order fragment sequence and the
 // completed serial retained for the generation.
 type projectProviderLINKSerial struct {
 	assembling, has bool
@@ -105,9 +105,9 @@ type projectProviderLINKSerial struct {
 	serial          [16]byte
 }
 
-// cx17Consume feeds one admitted descriptive LINK record. Another admitted record kind, or a malformed or reordered
+// projectProviderConsume feeds one admitted descriptive LINK record. Another admitted record kind, or a malformed or reordered
 // fragment, only discards the pending assembly. A completed serial that differs from the retained one is a conflict.
-func (a *projectProviderLINKSerial) projectProviderConsume(s CXSelection, i LINKInput) bool {
+func (a *projectProviderLINKSerial) projectProviderConsume(s Selection, i LINKInput) bool {
 	if !lINKAdmission(s, i) {
 		return false
 	}
@@ -146,7 +146,7 @@ func (a *projectProviderLINKSerial) projectProviderConsume(s CXSelection, i LINK
 
 // NewPCSProvider validates an explicit PCS selection and creates a stopped provider
 // with fixed bounds of 256 entries for each field dictionary and raw history.
-func NewPCSProvider(s CXSelection) (*Provider, error) {
+func NewPCSProvider(s Selection) (*Provider, error) {
 	if s.SelectionSpecValue().Flavor == "link" {
 		return nil, errors.New("PCS selection required")
 	}
@@ -155,18 +155,18 @@ func NewPCSProvider(s CXSelection) (*Provider, error) {
 
 // NewLINKProvider validates an explicit LINK selection and creates a stopped provider
 // with fixed bounds of 256 entries for each field dictionary and raw history.
-func NewLINKProvider(s CXSelection) (*Provider, error) {
+func NewLINKProvider(s Selection) (*Provider, error) {
 	if s.SelectionSpecValue().Flavor != "link" {
 		return nil, errors.New("LINK selection required")
 	}
 	return projectProviderNew(s)
 }
-func projectProviderNew(s CXSelection) (*Provider, error) {
-	v, err := NewCXSelection(s.SelectionSpecValue())
+func projectProviderNew(s Selection) (*Provider, error) {
+	v, err := NewSelection(s.SelectionSpecValue())
 	if err != nil || v != s || s.SelectionGroup() == "" {
 		return nil, errors.New("explicit supported selection required")
 	}
-	return &Provider{selection: s, snapshot: ProjectProviderSnapshot{Selection: s, State: "stopped", Current: make(map[string]CXNativeField), LastGood: make(map[string]CXNativeField), LastGoodGeneration: make(map[string]uint64)}}, nil
+	return &Provider{selection: s, snapshot: ProjectProviderSnapshot{Selection: s, State: "stopped", Current: make(map[string]NativeField), LastGood: make(map[string]NativeField), LastGoodGeneration: make(map[string]uint64)}}, nil
 }
 
 // Start joins the predecessor and starts receiving with a strictly increasing positive generation; invalid sources or generations return an error.
@@ -187,7 +187,7 @@ func (p *Provider) Start(source ReceiveSource, generation uint64) error {
 	p.running = true
 	p.conflict = false
 	p.identity = make(map[string]int64)
-	p.member, p.hasMember, p.seen = CXSelection{}, false, false
+	p.member, p.hasMember, p.seen = Selection{}, false, false
 	p.assembler, p.linkSerial = nil, projectProviderLINKSerial{}
 	if p.selection.SelectionSpecValue().Flavor == "link" {
 		p.assembler = NewLINKIdentityAssembler(p.selection)
@@ -211,7 +211,7 @@ func (p *Provider) Stop() { p.lifecycle.Lock(); defer p.lifecycle.Unlock(); p.pr
 func (p *Provider) projectProviderWithhold(state string) {
 	p.snapshot.State = state
 	p.snapshot.Promotable = false
-	p.snapshot.Current = make(map[string]CXNativeField)
+	p.snapshot.Current = make(map[string]NativeField)
 }
 func (p *Provider) projectProviderStop() {
 	p.mu.Lock()
@@ -246,7 +246,7 @@ func (p *Provider) projectProviderReceive(ctx context.Context, source ReceiveSou
 	}
 }
 
-// cx17ExtendedKind normalizes the coordinator's aggregate 0x1910..0x1919 records to the 0x1900..0x1909 kinds the
+// projectProviderExtendedKind normalizes the coordinator's aggregate 0x1910..0x1919 records to the 0x1900..0x1909 kinds the
 // decoder interprets them as, so identity fields fence identically on both routes. Gateway-state 0x1910 keeps its kind.
 func projectProviderExtendedKind(c SelectionSpec, kind uint32) uint32 {
 	if kind >= 0x1910 && kind <= 0x1919 && c.Scope == "aggregate" && c.Destination == 0xdf && c.Source == 0xf2 {
@@ -255,9 +255,9 @@ func projectProviderExtendedKind(c SelectionSpec, kind uint32) uint32 {
 	return kind
 }
 
-// cx17IdentityKey names the fence entry of a decoded identity or role field. Opaque fields, such as the LINK 0x1800
+// projectProviderIdentityKey names the fence entry of a decoded identity or role field. Opaque fields, such as the LINK 0x1800
 // flags byte whose unspecified bits cannot establish a role change, are never fenced; withheld fields carry no value.
-func projectProviderIdentityKey(c SelectionSpec, prefix string, id uint32, name string, f CXNativeField) (string, bool) {
+func projectProviderIdentityKey(c SelectionSpec, prefix string, id uint32, name string, f NativeField) (string, bool) {
 	if projectProviderWithheld(f.Status) {
 		return "", false
 	}
@@ -330,7 +330,7 @@ func (p *Provider) projectProviderApply(o Observation) {
 	// within a generation would reinterpret member-, slot- or serial-derived fields. The baseline is taken from the
 	// first admitted observation only, so a malformed observation cannot fix the generation's associations.
 	hasMember := in.PCS.Member != nil
-	var member CXSelection
+	var member Selection
 	if hasMember {
 		member = *in.PCS.Member
 	}
@@ -343,7 +343,7 @@ func (p *Provider) projectProviderApply(o Observation) {
 		p.projectProviderRaw(o, "conflict")
 		return
 	}
-	profile, err := NewCX16SelectedProfile(p.selection, []ReplayInput{in})
+	profile, err := NewSelectedProfile(p.selection, []ReplayInput{in})
 	if err != nil {
 		p.snapshot.Rejected++
 		p.projectProviderRaw(o, "invalid")
@@ -406,7 +406,7 @@ func (p *Provider) projectProviderApply(o Observation) {
 		return
 	}
 	p.projectProviderRaw(o, projection.Current.Status)
-	fields := make(map[string]CXNativeField)
+	fields := make(map[string]NativeField)
 	for prefix, part := range projection.Native {
 		key := replayRetentionKey(prefix, e, part)
 		for name, f := range part.Fields {
@@ -493,7 +493,7 @@ func (p *Provider) projectProviderApply(o Observation) {
 	p.snapshot.State = "receiving"
 }
 
-// cx17SerialConflict feeds a descriptive PCS record to the generation's serial assemblies. A completed PCS-standard
+// projectProviderSerialConflict feeds a descriptive PCS record to the generation's serial assemblies. A completed PCS-standard
 // 0x324 serial, or a completed PCS-parallel 0x6C0 serial of one module, that differs from the one retained earlier
 // in this generation (including a changed native serial slot) is a conflict. Interrupted or reordered fragment
 // sequences only discard the pending assembly.
@@ -528,7 +528,7 @@ func (p *Provider) projectProviderSerialConflict(in ReplayInput) bool {
 	return a.DecodeParallelIdentity(i).Status == "conflict" && completing && before.HasSerial
 }
 
-// cx17Withheld reports field states that carry no value for identity comparison.
+// projectProviderWithheld reports field states that carry no value for identity comparison.
 func projectProviderWithheld(status string) bool {
 	switch status {
 	case "absent", "invalid", "unsupported", "stale", "conflict", "unassigned":
@@ -537,18 +537,18 @@ func projectProviderWithheld(status string) bool {
 	return false
 }
 
-// cx17Reconcile demotes retained current vector fields that the latest count
+// projectProviderReconcile demotes retained current vector fields that the latest count
 // no longer configures. Historical last-good values are left untouched.
-func (p *Provider) projectProviderReconcile(prefix string, max, count int, valid bool, fresh map[string]CXNativeField) {
+func (p *Provider) projectProviderReconcile(prefix string, max, count int, valid bool, fresh map[string]NativeField) {
 	valid = valid && count >= 1 && count <= max
 	for index := 1; index <= max; index++ {
 		p.projectProviderDemote(fmt.Sprintf("%s%d", prefix, index), valid && index <= count, valid, fresh)
 	}
 }
 
-// cx17Demote marks one retained current field that the latest admitted count no longer configures: unconfigured for
+// projectProviderDemote marks one retained current field that the latest admitted count no longer configures: unconfigured for
 // a valid count, absent for an invalid one. A field decoded fresh in this observation keeps its own status.
-func (p *Provider) projectProviderDemote(name string, configured, valid bool, fresh map[string]CXNativeField) {
+func (p *Provider) projectProviderDemote(name string, configured, valid bool, fresh map[string]NativeField) {
 	if _, ok := fresh[name]; ok {
 		return
 	}
@@ -574,8 +574,8 @@ func (p *Provider) ProjectProviderSnapshot(now, maxAge time.Duration) ProjectPro
 	p.mu.Lock()
 	defer p.mu.Unlock()
 	s := p.snapshot
-	s.Current = make(map[string]CXNativeField)
-	s.LastGood = make(map[string]CXNativeField)
+	s.Current = make(map[string]NativeField)
+	s.LastGood = make(map[string]NativeField)
 	s.LastGoodGeneration = make(map[string]uint64)
 	for name, f := range p.snapshot.Current {
 		aged, valid := lINKVectorAge(f, now)

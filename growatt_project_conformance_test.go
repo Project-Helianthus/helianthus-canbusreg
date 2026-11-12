@@ -51,7 +51,7 @@ func TestCX16FiniteSelectorConformance(t *testing.T) {
 						allowed = true
 					}
 				}
-				p, err := NewCX16SelectedProfile(s, []ReplayInput{i})
+				p, err := NewSelectedProfile(s, []ReplayInput{i})
 				if !allowed {
 					if err == nil {
 						t.Fatal("unlisted flavor/identity admitted")
@@ -162,12 +162,12 @@ func TestCX16NoSelectionFromOfflineClassificationOrPartialIdentity(t *testing.T)
 	}
 	c := s.SelectionSpecValue()
 	c.ProjectCode, c.Release = "QAAa", "9011"
-	unresolved, err := NewCXSelection(c)
+	unresolved, err := NewSelection(c)
 	if err != nil {
 		t.Fatal(err)
 	}
 	replayTestFrame(t, &i, 0x320, false, [8]byte{1, 2, 3})
-	if _, err := NewCX16SelectedProfile(unresolved, []ReplayInput{i}); err == nil {
+	if _, err := NewSelectedProfile(unresolved, []ReplayInput{i}); err == nil {
 		t.Fatal("partial identity selected ambiguous contract")
 	}
 }
@@ -189,7 +189,7 @@ func TestCX16SlotBankAndMemberDictionary(t *testing.T) {
 				m.ProjectCode = "QAAa"
 				m.Release = "9011"
 				m.Choice = "legacy19"
-				member, _ = NewCXSelection(m)
+				member, _ = NewSelection(m)
 			}
 			i.PCS.Member = &member
 			if key == "slot" {
@@ -296,7 +296,7 @@ func TestCX16InvalidContributorsWithholdMeanOnly(t *testing.T) {
 			f := snapshot.Fields[1]
 			switch key {
 			case "selection":
-				snapshot.Selection = CXSelection{}
+				snapshot.Selection = Selection{}
 			case "kind":
 				snapshot.Kind = "temperatures"
 			case "count":
@@ -498,7 +498,7 @@ func TestCX16ImmutableSelectionAndNativeRecordBound(t *testing.T) {
 			case "grade":
 				forged.grade = "Unknown"
 			}
-			if _, err := NewCX16SelectedProfile(forged, []ReplayInput{i}); err == nil {
+			if _, err := NewSelectedProfile(forged, []ReplayInput{i}); err == nil {
 				t.Fatal("forged selection accepted")
 			}
 		})
@@ -506,7 +506,7 @@ func TestCX16ImmutableSelectionAndNativeRecordBound(t *testing.T) {
 	for _, n := range []int{72, 73} {
 		t.Run(fmt.Sprint(n), func(t *testing.T) {
 			i.PCS.NativeRecord = make([]byte, n)
-			p, err := NewCX16SelectedProfile(s, []ReplayInput{i})
+			p, err := NewSelectedProfile(s, []ReplayInput{i})
 			if n == 73 {
 				if err == nil {
 					t.Fatal("unbounded native record")

@@ -9,27 +9,28 @@ explicit source interface. It retains raw evidence, never derives a protocol
 revision from firmware, and does not alter the separately selected V1.04
 profile.
 
-The bounded `O08GrowattProvider` wraps the existing caller-selected V1.04
-qualification replay. `O08NewGrowattProvider(interfaceIdentity, O08RevisionV104)`
-requires an exact interface name/index and an explicit revision; other revision
-selections are rejected. It does not infer a revision from firmware or change
+The bounded `GrowattBMSProvider` wraps the existing caller-selected V1.04
+qualification replay. Its constructor
+`NewGrowattBMSProvider(interfaceIdentity, BMSRevisionV104)` requires an exact
+interface name/index and an explicit revision; other revision selections are
+rejected. It does not infer a revision from firmware or change
 the common-field projection or native admission rules. The native contract
 remains owned by [helianthus-docs-canbus](https://github.com/Project-Helianthus/helianthus-docs-canbus).
 
-Inject an `O08ReceiveSource` implementing
-`O08Receive(context.Context) (O08Observation, error)` and call
-`O08Start(source, generation)`. Each observation supplies value-owned `Evidence`
+Inject a `BMSReceiveSource` implementing
+`Receive(context.Context) (BMSObservation, error)` and call
+`Start(source, generation)`. Each observation supplies value-owned `Evidence`
 and the same positive source generation. Generations must increase across
 starts, and observation sequences must strictly increase within a generation
 (the first sequence may be zero). Wrong-interface, wrong-generation and repeated
 or older-sequence observations are discarded before replay and raw publication.
 The provider never opens or configures an interface and exposes no send or probe
-method. The source must return promptly on context cancellation. `O08Stop()`
+method. The source must return promptly on context cancellation. `Stop()`
 fences publication, cancels and joins the receiver; replacement starts also join
 the predecessor before creating a fresh replay. A source that ignores cancellation
 can prevent stop or replacement from completing.
 
-`O08Snapshot()` returns detached status, the latest accepted source-local raw
+`Snapshot()` returns detached status, the latest accepted source-local raw
 observation and at most one last accepted V1.04 tuple. Raw and projection
 generations identify historical data across restarts. `stopped` means no active
 source; `awaiting` means a complete tuple has not been accepted by the current

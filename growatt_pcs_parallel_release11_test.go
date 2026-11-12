@@ -12,10 +12,10 @@ func parallelReleaseTestSpec(t *testing.T) SelectionSpec {
 	c.ProjectCode, c.Release, c.Slot = "QAAA", "0011", "2"
 	return c
 }
-func parallelReleaseTestSource(c SelectionSpec, n int64) *CXNativeField {
-	return &CXNativeField{Numerator: n, Denominator: 1, Status: "accepted", Grade: "Proven", Evidence: Evidence{Interface: c.Interface}, Epoch: c.Epoch, Scope: c.Scope, Bank: c.Bank, Endpoint: c.Endpoint, Group: c.Group, Slot: c.Slot}
+func parallelReleaseTestSource(c SelectionSpec, n int64) *NativeField {
+	return &NativeField{Numerator: n, Denominator: 1, Status: "accepted", Grade: "Proven", Evidence: Evidence{Interface: c.Interface}, Epoch: c.Epoch, Scope: c.Scope, Bank: c.Bank, Endpoint: c.Endpoint, Group: c.Group, Slot: c.Slot}
 }
-func parallelReleaseTestDecode(t *testing.T, c SelectionSpec, id uint32, p [8]byte, x ParallelContext) CXNativeResult {
+func parallelReleaseTestDecode(t *testing.T, c SelectionSpec, id uint32, p [8]byte, x ParallelContext) NativeResult {
 	t.Helper()
 	i := parallelIdentityTestInput(t, c, id, p)
 	r := ParallelReleaseDecodeParallel(parallelIdentityTestSelection(t, c), i, x)
@@ -29,7 +29,7 @@ func parallelReleaseTestDecode(t *testing.T, c SelectionSpec, id uint32, p [8]by
 	}
 	return r
 }
-func parallelReleaseTestWant(t *testing.T, r CXNativeResult, k string, n, d int64, status, grade string) {
+func parallelReleaseTestWant(t *testing.T, r NativeResult, k string, n, d int64, status, grade string) {
 	t.Helper()
 	f, ok := r.Fields[k]
 	if !ok || f.Numerator != n || f.Denominator != d || f.Status != status || f.Grade != grade {

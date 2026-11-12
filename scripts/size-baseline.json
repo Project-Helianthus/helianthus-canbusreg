@@ -9,7 +9,7 @@
     },
     {
       "path": "growatt_link_telemetry.go",
-      "symbol": "CXDecodeLINKTelemetry",
+      "symbol": "DecodeLINKTelemetry",
       "metric": "function_lines",
       "value": 222
     },

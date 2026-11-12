@@ -8,7 +8,7 @@ import (
 	"github.com/Project-Helianthus/helianthus-canbus"
 )
 
-func dtcTestMember(t *testing.T, modern bool) CXSelection {
+func dtcTestMember(t *testing.T, modern bool) Selection {
 	t.Helper()
 	spec := selectionTestSpec(t, "QAAA", "0011")
 	spec.Group, spec.Slot = "group-a", "slot-a"
@@ -264,7 +264,7 @@ func TestCX07AdmissionIdentityFields(t *testing.T) {
 				spec.Direction = "coordinator-to-module"
 			}
 			if field == "route-set" {
-				selected, err := NewCXSelection(spec)
+				selected, err := NewSelection(spec)
 				if err == nil {
 					t.Fatal("route flag admitted")
 				}

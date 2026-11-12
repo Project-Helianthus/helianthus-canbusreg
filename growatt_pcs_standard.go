@@ -37,14 +37,14 @@ type PCSStandardPCSInput struct {
 
 // PCSStandardPCSResult retains candidate fields and a copy of the supplied diagnostic record.
 type PCSStandardPCSResult struct {
-	CXNativeResult
+	NativeResult
 	Diagnostics []byte
 }
 
 // DecodePCSStandard is a pure receive-only decoder. It retains native evidence
 // and does not aggregate publishers, maintain a cache or qualify hardware.
-func DecodePCSStandard(s CXSelection, i PCSStandardPCSInput) PCSStandardPCSResult {
-	r := PCSStandardPCSResult{CXNativeResult: selectionResult(s, i.LINKInput, "invalid"), Diagnostics: append([]byte(nil), i.NativeRecord...)}
+func DecodePCSStandard(s Selection, i PCSStandardPCSInput) PCSStandardPCSResult {
+	r := PCSStandardPCSResult{NativeResult: selectionResult(s, i.LINKInput, "invalid"), Diagnostics: append([]byte(nil), i.NativeRecord...)}
 	c := s.SelectionSpecValue()
 	f := i.Evidence.Frame
 	if len(i.NativeRecord) != 0 {
@@ -98,7 +98,7 @@ func DecodePCSStandard(s CXSelection, i PCSStandardPCSInput) PCSStandardPCSResul
 		if status != "accepted" {
 			unit, meaning = "", ""
 		}
-		r.Fields[name] = CXNativeField{Numerator: n, Denominator: d, Unit: unit, Meaning: meaning, Grade: grade, Status: status, Raw: p, Evidence: i.Evidence, Epoch: i.Epoch, Scope: i.Scope, Bank: i.Bank, Endpoint: i.Endpoint, Group: i.Group, Slot: i.Slot, Age: age}
+		r.Fields[name] = NativeField{Numerator: n, Denominator: d, Unit: unit, Meaning: meaning, Grade: grade, Status: status, Raw: p, Evidence: i.Evidence, Epoch: i.Epoch, Scope: i.Scope, Bank: i.Bank, Endpoint: i.Endpoint, Group: i.Group, Slot: i.Slot, Age: age}
 	}
 	invalid := func(name string, gate bool) {
 		if gate {
@@ -212,9 +212,9 @@ func DecodePCSStandard(s CXSelection, i PCSStandardPCSInput) PCSStandardPCSResul
 // original ages. Rejected updates and identity changes (including a change of
 // reporting-member dictionary) cannot refresh them;
 // a valid empty observation supersedes the retained value.
-func RetainAccepted(previous, update CXNativeResult) CXNativeResult {
+func RetainAccepted(previous, update NativeResult) NativeResult {
 	out := update
-	out.Fields = make(map[string]CXNativeField)
+	out.Fields = make(map[string]NativeField)
 	if previous.Selection == update.Selection && previous.HasMember == update.HasMember && previous.Member == update.Member {
 		for name, f := range previous.Fields {
 			if f.Status == "accepted" || f.Status == "empty" {

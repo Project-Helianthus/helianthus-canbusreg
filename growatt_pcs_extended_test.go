@@ -17,9 +17,9 @@ func extendedTestSpec(t *testing.T) SelectionSpec {
 	}
 	return SelectionSpec{Interface: bus, Flavor: "pcs-extended19", ProjectCode: "QAAA", Release: "0006", Direction: "bms-to-pcs", Scope: "local", Bank: "bank-a", Endpoint: "endpoint-a", Group: "group-a", Slot: "slot-a", RouteSet: true, Destination: 0xf2, Source: 2, Epoch: 1}
 }
-func extendedTestSelect(t *testing.T, c SelectionSpec) CXSelection {
+func extendedTestSelect(t *testing.T, c SelectionSpec) Selection {
 	t.Helper()
-	s, e := NewCXSelection(c)
+	s, e := NewSelection(c)
 	if e != nil {
 		t.Fatal(e)
 	}
@@ -37,7 +37,7 @@ func extendedTestInput(t *testing.T, c SelectionSpec, kind uint32, p [8]byte) LI
 	}
 	return LINKInput{Evidence: Evidence{Interface: c.Interface, Frame: f, Sequence: 7, Monotonic: time.Second}, Epoch: c.Epoch, Direction: c.Direction, Scope: c.Scope, Bank: c.Bank, Endpoint: c.Endpoint, Group: c.Group, Slot: c.Slot, FieldAge: time.Millisecond}
 }
-func extendedTestWithheld(t *testing.T, r CXNativeResult, p [8]byte) {
+func extendedTestWithheld(t *testing.T, r NativeResult, p [8]byte) {
 	t.Helper()
 	if r.Raw != p || r.PhysicalQualified {
 		t.Fatal(r)
@@ -472,7 +472,7 @@ func TestCX09RetainedPartialAndStale(t *testing.T) {
 	if r.Fields["padding_6"].Status != "invalid" || snap["1904/full_capacity"].Numerator != 40 || snap["1904/padding_6"].Numerator != 0 {
 		t.Fatal(r, snap)
 	}
-	snap["1904/full_capacity"] = CXNativeField{}
+	snap["1904/full_capacity"] = NativeField{}
 	if d.SnapshotPCSExtended()["1904/full_capacity"].Numerator != 40 {
 		t.Fatal("snapshot aliased")
 	}

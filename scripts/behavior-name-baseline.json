@@ -1519,11 +1519,6 @@
     },
     {
       "path": "growatt_project_admission.go",
-      "symbol": "NewCX16SelectedProfile",
-      "category": "identifier"
-    },
-    {
-      "path": "growatt_project_admission.go",
       "symbol": "replayContext",
       "category": "identifier"
     },
@@ -2055,11 +2050,6 @@
     {
       "path": "growatt_project_opaque.go",
       "symbol": "ReceiverCapabilityUnsupported",
-      "category": "identifier"
-    },
-    {
-      "path": "growatt_project_opaque.go",
-      "symbol": "NewCX15OpaqueStore",
       "category": "identifier"
     },
     {

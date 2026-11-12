@@ -266,7 +266,7 @@ func TestCX15LegacyFreshnessIsNotSeconds(t *testing.T) {
 	}
 }
 
-func capabilityTestFixture(t *testing.T, group int, profile, direction, role string, pid uint32) (CXSelection, ReceiverContext, LINKInput) {
+func capabilityTestFixture(t *testing.T, group int, profile, direction, role string, pid uint32) (Selection, ReceiverContext, LINKInput) {
 	t.Helper()
 	tokens := []string{"QAAA0002", "QAAA0005", "QAAA0006", "QAAA0007", "QAAA0010", "QAAB0004", "QAAB0002", "QAAB0006", "QAAA0011"}
 	token := tokens[group]
@@ -307,7 +307,7 @@ func capabilityTestFixture(t *testing.T, group int, profile, direction, role str
 	i := capabilityTestInput(t, s, c, pid, payload)
 	return s, c, i
 }
-func capabilityTestInput(t *testing.T, s CXSelection, c ReceiverContext, pid uint32, p [8]byte) LINKInput {
+func capabilityTestInput(t *testing.T, s Selection, c ReceiverContext, pid uint32, p [8]byte) LINKInput {
 	t.Helper()
 	var id canbus.Identifier
 	var err error

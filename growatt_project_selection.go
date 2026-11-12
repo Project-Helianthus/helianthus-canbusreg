@@ -19,15 +19,15 @@ type SelectionSpec struct {
 	Epoch                                                             uint64
 }
 
-// CXSelection holds a validated caller assertion and its candidate contract group, layout and grade.
-type CXSelection struct {
+// Selection holds a validated caller assertion and its candidate contract group, layout and grade.
+type Selection struct {
 	spec                 SelectionSpec
 	group, layout, grade string
 }
 
-// NewCXSelection validates explicit identity and context; unsupported combinations remain Unknown rather than being inferred from traffic.
-func NewCXSelection(spec SelectionSpec) (CXSelection, error) {
-	s := CXSelection{spec: spec, grade: "Unknown"}
+// NewSelection validates explicit identity and context; unsupported combinations remain Unknown rather than being inferred from traffic.
+func NewSelection(spec SelectionSpec) (Selection, error) {
+	s := Selection{spec: spec, grade: "Unknown"}
 	if spec.Interface.Name() == "" || spec.Interface.Index() <= 0 || len(spec.ProjectCode) != 4 || len(spec.Release) != 4 || !selectionASCII([]byte(spec.ProjectCode+spec.Release)) {
 		return s, fmt.Errorf("invalid explicit identity")
 	}
@@ -116,16 +116,16 @@ func NewCXSelection(spec SelectionSpec) (CXSelection, error) {
 }
 
 // SelectionSpecValue returns the caller assertion by value.
-func (s CXSelection) SelectionSpecValue() SelectionSpec { return s.spec }
+func (s Selection) SelectionSpecValue() SelectionSpec { return s.spec }
 
 // SelectionGroup returns the selected contract group, or empty when unresolved.
-func (s CXSelection) SelectionGroup() string { return s.group }
+func (s Selection) SelectionGroup() string { return s.group }
 
 // SelectionLayout returns the selected layout code, or empty when unresolved.
-func (s CXSelection) SelectionLayout() string { return s.layout }
+func (s Selection) SelectionLayout() string { return s.layout }
 
 // SelectionGrade returns Proven, Hypothesis or Unknown for the contract selection, never physical qualification.
-func (s CXSelection) SelectionGrade() string { return s.grade }
+func (s Selection) SelectionGrade() string { return s.grade }
 func selectionASCII(p []byte) bool {
 	for _, b := range p {
 		if b < 0x21 || b > 0x7e {
@@ -135,9 +135,9 @@ func selectionASCII(p []byte) bool {
 	return true
 }
 
-// CXNativeField separates candidate protocol meaning from physical qualification.
+// NativeField separates candidate protocol meaning from physical qualification.
 // Raw and Evidence are value copies; unknown units remain empty.
-type CXNativeField struct {
+type NativeField struct {
 	Numerator, Denominator             int64
 	Unit, Meaning, Grade, Status       string
 	Raw                                [8]byte
@@ -148,18 +148,18 @@ type CXNativeField struct {
 	PhysicalQualified                  bool
 }
 
-// CXNativeResult retains native evidence and per-field candidate results separately from physical qualification.
-type CXNativeResult struct {
-	Selection         CXSelection
+// NativeResult retains native evidence and per-field candidate results separately from physical qualification.
+type NativeResult struct {
+	Selection         Selection
 	Evidence          Evidence
 	Raw               [8]byte
 	Epoch             uint64
 	Status            string
-	Fields            map[string]CXNativeField
+	Fields            map[string]NativeField
 	PhysicalQualified bool
 	// Member records the reporting-member dictionary selection used to decode
 	// member-dependent fields; HasMember is false when none was supplied.
-	Member    CXSelection
+	Member    Selection
 	HasMember bool
 }
 
@@ -171,7 +171,7 @@ type SelectionNativeIndication struct {
 }
 
 // ConfirmNativeSelection checks associated evidence against an explicit choice; it cannot choose a contract from traffic.
-func ConfirmNativeSelection(s CXSelection, indication SelectionNativeIndication) CXNativeResult {
+func ConfirmNativeSelection(s Selection, indication SelectionNativeIndication) NativeResult {
 	i := indication.Input
 	r := selectionResult(s, i, "unsupported")
 	c := s.spec
@@ -227,7 +227,7 @@ func ConfirmNativeSelection(s CXSelection, indication SelectionNativeIndication)
 }
 
 // SelectionFeatureGrade reports a candidate contract gate, never qualification.
-func (s CXSelection) SelectionFeatureGrade(feature string) string {
+func (s Selection) SelectionFeatureGrade(feature string) string {
 	switch feature {
 	case "three-word-pcs-gauge":
 		if s.group == "L2" {

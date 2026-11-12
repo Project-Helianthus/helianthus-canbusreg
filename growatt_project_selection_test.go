@@ -13,9 +13,9 @@ func selectionTestSpec(t *testing.T, code, release string) SelectionSpec {
 	}
 	return SelectionSpec{Interface: bus, Flavor: "link", PCSFlavor: "pcs-standard", ProjectCode: code, Release: release, Direction: "module-to-coordinator", Scope: "local", Bank: "bank-a", Endpoint: "endpoint-a", RouteSet: true, Destination: 0xf4, Source: 2, Epoch: 1}
 }
-func selectionTestSelect(t *testing.T, spec SelectionSpec) CXSelection {
+func selectionTestSelect(t *testing.T, spec SelectionSpec) Selection {
 	t.Helper()
-	s, e := NewCXSelection(spec)
+	s, e := NewSelection(spec)
 	if e != nil {
 		t.Fatal(e)
 	}
@@ -54,7 +54,7 @@ func TestCX01HypothesisSelectorNegatives(t *testing.T) {
 						spec.Direction = "coordinator-to-module"
 					}
 					s := selectionTestSelect(t, spec)
-					r := CXDecodeLINKTelemetry(s, selectionTestInput(t, spec, 0x180b, [8]byte{1, 2, 3, 4, 5, 6, 7, 8}))
+					r := DecodeLINKTelemetry(s, selectionTestInput(t, spec, 0x180b, [8]byte{1, 2, 3, 4, 5, 6, 7, 8}))
 					if s.SelectionGroup() != "" || len(r.Fields) != 0 || r.Raw != [8]byte{1, 2, 3, 4, 5, 6, 7, 8} || r.Fields["full_capacity"].Status == "accepted" {
 						t.Fatalf("admitted %#v", r)
 					}
@@ -209,7 +209,7 @@ func TestCX01InvalidSelection(t *testing.T) {
 			case "route":
 				s.RouteSet = false
 			}
-			if _, e := NewCXSelection(s); e == nil {
+			if _, e := NewSelection(s); e == nil {
 				t.Fatal("invalid selection")
 			}
 		})

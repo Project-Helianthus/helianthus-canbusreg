@@ -9,7 +9,7 @@ import (
 // Native contract: https://github.com/Project-Helianthus/helianthus-docs-canbus/blob/main/protocols/growatt/growatt-low-voltage-bms-can-pcs-protocol-v1.md
 // Sections: 320, 321, 323: identity and configuration;
 // 324, 325: serial fragments and placeholder; Opaque fields.
-func DecodePCSIdentity(s CXSelection, i PCSIdentityPCSInput) CXNativeResult {
+func DecodePCSIdentity(s Selection, i PCSIdentityPCSInput) NativeResult {
 	r := selectionResult(s, i.LINKInput, pCSIdentityAdmit(s, i))
 	if r.Status != "decoded" {
 		return r
@@ -86,8 +86,8 @@ func DecodePCSIdentity(s CXSelection, i PCSIdentityPCSInput) CXNativeResult {
 type PCSIdentitySerialResult struct {
 	Status            string
 	Serial            [16]byte
-	Record            CXNativeResult
-	Fragments         [3]CXNativeResult
+	Record            NativeResult
+	Fragments         [3]NativeResult
 	PhysicalQualified bool
 }
 
@@ -95,17 +95,17 @@ type PCSIdentitySerialResult struct {
 // The caller owns serialization of Consume calls; no bus operations occur.
 type PCSIdentitySerialAssembler struct {
 	active    bool
-	selection CXSelection
+	selection Selection
 	slot      uint8
 	next      byte
 	serial    [16]byte
-	fragments [3]CXNativeResult
+	fragments [3]NativeResult
 }
 
 func (a *PCSIdentitySerialAssembler) clear() { *a = PCSIdentitySerialAssembler{} }
 
 // Consume assembles ordered identity fragments, clearing pending assembly on rejected input; callers must serialize access.
-func (a *PCSIdentitySerialAssembler) Consume(s CXSelection, i PCSIdentityPCSInput) PCSIdentitySerialResult {
+func (a *PCSIdentitySerialAssembler) Consume(s Selection, i PCSIdentityPCSInput) PCSIdentitySerialResult {
 	record := DecodePCSIdentity(s, i)
 	out := PCSIdentitySerialResult{Status: "rejected", Record: record}
 	p := record.Raw
@@ -116,7 +116,7 @@ func (a *PCSIdentitySerialAssembler) Consume(s CXSelection, i PCSIdentityPCSInpu
 		return out
 	}
 	fragment := record
-	fragment.Fields = make(map[string]CXNativeField)
+	fragment.Fields = make(map[string]NativeField)
 	pCSIdentityAdd(&fragment, i, "serial_fragment", int64(p[0]), 1, "", "ordered identity fragment", "Proven", true)
 	if fragment.Fields["serial_fragment"].Status != "accepted" {
 		a.clear()

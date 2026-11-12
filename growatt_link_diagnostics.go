@@ -10,7 +10,7 @@ import (
 // Sections: Faults and additional status; Release-11 field and behavior gates.
 // This is a stateless receive-only projection. Current bits, selected words,
 // member state and coordinator state remain separate observations.
-func DecodeLINKDiagnostics(s CXSelection, i LINKInput) CXNativeResult {
+func DecodeLINKDiagnostics(s Selection, i LINKInput) NativeResult {
 	r := selectionResult(s, i, "invalid")
 	if i.Evidence.Sequence == 0 || i.Evidence.Monotonic < 0 {
 		return r
@@ -30,7 +30,7 @@ func DecodeLINKDiagnostics(s CXSelection, i LINKInput) CXNativeResult {
 		// the returned result still carries the original coordinator selection.
 		c := s.SelectionSpecValue()
 		c.Direction = "module-to-coordinator"
-		member, err := NewCXSelection(c)
+		member, err := NewSelection(c)
 		if err != nil {
 			return r
 		}
@@ -41,7 +41,7 @@ func DecodeLINKDiagnostics(s CXSelection, i LINKInput) CXNativeResult {
 	}
 	p := r.Raw
 	add := func(name string, n int64, meaning, grade, status, unit string) {
-		r.Fields[name] = CXNativeField{Numerator: n, Denominator: 1, Unit: unit, Meaning: meaning, Grade: grade, Status: status, Raw: p, Evidence: i.Evidence, Epoch: i.Epoch, Scope: i.Scope, Bank: i.Bank, Endpoint: i.Endpoint, Group: i.Group, Slot: i.Slot, Age: i.FieldAge}
+		r.Fields[name] = NativeField{Numerator: n, Denominator: 1, Unit: unit, Meaning: meaning, Grade: grade, Status: status, Raw: p, Evidence: i.Evidence, Epoch: i.Epoch, Scope: i.Scope, Bank: i.Bank, Endpoint: i.Endpoint, Group: i.Group, Slot: i.Slot, Age: i.FieldAge}
 	}
 	raw := func(name string, n byte) { add(name, int64(n), "", "Unknown", "raw", "") }
 	zero := func(at int) {

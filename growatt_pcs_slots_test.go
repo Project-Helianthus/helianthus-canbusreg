@@ -7,12 +7,12 @@ import (
 	"time"
 )
 
-func slotTestFixture(t *testing.T, pid uint32, p [8]byte) (CXSelection, PCSSlotPCSInput) {
+func slotTestFixture(t *testing.T, pid uint32, p [8]byte) (Selection, PCSSlotPCSInput) {
 	t.Helper()
 	s, i := identityTestFixture(t, "QAAA0011", pid, p)
 	return s, PCSSlotPCSInput{PCSIdentityPCSInput: i, SlotValid: true, NativeSlot: p[0], GroupValid: true, NativeGroup: p[0]}
 }
-func slotTestWant(t *testing.T, r CXNativeResult, name, status string, n, d int64, unit string) {
+func slotTestWant(t *testing.T, r NativeResult, name, status string, n, d int64, unit string) {
 	t.Helper()
 	f, ok := r.Fields[name]
 	if !ok || f.Status != status || f.Numerator != n || f.Denominator != d || f.Unit != unit || f.PhysicalQualified || r.PhysicalQualified {
@@ -78,7 +78,7 @@ func TestCX08MemberDictionary(t *testing.T) {
 	i.Member = &s
 	r := DecodePCSSlots(s, i)
 	slotTestWant(t, r, "dtc_a_index", "accepted", 0, 1, "")
-	wrong, _ := NewCXSelection(func() SelectionSpec {
+	wrong, _ := NewSelection(func() SelectionSpec {
 		c := s.SelectionSpecValue()
 		c.ProjectCode = "QAAa"
 		c.Release = "9011"
@@ -267,7 +267,7 @@ func TestCX08MemberAssociationKeys(t *testing.T) {
 			case "slot":
 				c.Slot = "other"
 			}
-			member, err := NewCXSelection(c)
+			member, err := NewSelection(c)
 			if err != nil {
 				t.Fatal(err)
 			}

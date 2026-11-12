@@ -2,6 +2,19 @@
 
 ## Unreleased
 
+- Rename the remaining work-item-prefixed exported identifiers to behavior names:
+  `CXSelection` to `Selection`, `NewCXSelection` to `NewSelection`,
+  `CXNativeField` to `NativeField`, `CXNativeResult` to `NativeResult`,
+  `CXDecodeLINKTelemetry` to `DecodeLINKTelemetry`, `NewCX15OpaqueStore` to
+  `NewOpaqueStore` and `NewCX16SelectedProfile` to `NewSelectedProfile`. The
+  embedded `NativeResult` field of the decoded result types follows the type
+  name. `python3 scripts/rename_provider_names.py` reproduces the rename. No
+  alias, forwarding declaration or migration is provided; consumers adopt the new
+  names when they pin this revision. Wire values, error texts, native evidence,
+  candidate grades, admission and partial last-known-good behavior are
+  unchanged. This artifact-changing class M change requires renewed release
+  evidence before the final bill of materials freeze.
+
 - Document root package ownership and exported API contracts, including candidate
   grades, fail-closed admission, lifecycle and retained evidence. Declaration
   comments are artifact-changing and require renewed release evidence before

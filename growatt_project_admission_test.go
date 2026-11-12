@@ -9,13 +9,13 @@ import (
 	"github.com/Project-Helianthus/helianthus-canbus"
 )
 
-func replayTestFixture(t *testing.T) (CXSelection, ReplayInput) {
+func replayTestFixture(t *testing.T) (Selection, ReplayInput) {
 	t.Helper()
 	iface, err := canbus.NewInterfaceIdentity("synthetic", 1)
 	if err != nil {
 		t.Fatal(err)
 	}
-	s, err := NewCXSelection(SelectionSpec{Interface: iface, Flavor: "pcs-standard", ProjectCode: "QAAA", Release: "0006", Direction: "bms-to-pcs", Scope: "local", Bank: "standard", Endpoint: "pack", Group: "0", Slot: "1", Epoch: 1})
+	s, err := NewSelection(SelectionSpec{Interface: iface, Flavor: "pcs-standard", ProjectCode: "QAAA", Release: "0006", Direction: "bms-to-pcs", Scope: "local", Bank: "standard", Endpoint: "pack", Group: "0", Slot: "1", Epoch: 1})
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -25,9 +25,9 @@ func replayTestFixture(t *testing.T) (CXSelection, ReplayInput) {
 	return s, ReplayInput{Selection: s, PCS: PCSSlotPCSInput{PCSIdentityPCSInput: PCSIdentityPCSInput{PCSStandardPCSInput: PCSStandardPCSInput{LINKInput: i, PublisherResolved: true, MeasurementValid: true, TemperatureValid: true}}}}
 }
 
-func replayTestProfile(t *testing.T, s CXSelection, inputs ...ReplayInput) Profile {
+func replayTestProfile(t *testing.T, s Selection, inputs ...ReplayInput) Profile {
 	t.Helper()
-	p, err := NewCX16SelectedProfile(s, inputs)
+	p, err := NewSelectedProfile(s, inputs)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -74,9 +74,9 @@ func replayTestFrame(t *testing.T, i *ReplayInput, id uint32, extended bool, pay
 	}
 }
 
-func replayTestReselect(t *testing.T, i *ReplayInput, spec SelectionSpec) CXSelection {
+func replayTestReselect(t *testing.T, i *ReplayInput, spec SelectionSpec) Selection {
 	t.Helper()
-	s, err := NewCXSelection(spec)
+	s, err := NewSelection(spec)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -87,7 +87,7 @@ func replayTestReselect(t *testing.T, i *ReplayInput, spec SelectionSpec) CXSele
 	return s
 }
 
-func replayTestLINK(t *testing.T, kind uint32, payload [8]byte) (CXSelection, ReplayInput) {
+func replayTestLINK(t *testing.T, kind uint32, payload [8]byte) (Selection, ReplayInput) {
 	t.Helper()
 	s, i := replayTestFixture(t)
 	c := s.SelectionSpecValue()
@@ -136,7 +136,7 @@ func TestCX16EverySelectionFieldNegative(t *testing.T) {
 			c := s.SelectionSpecValue()
 			mutate(&c)
 			var err error
-			i.Selection, err = NewCXSelection(c)
+			i.Selection, err = NewSelection(c)
 			if err != nil {
 				t.Fatal(err)
 			}
@@ -338,23 +338,23 @@ func TestCX16BoundsAndAmbiguousSelection(t *testing.T) {
 				replay[j] = i
 				replay[j].PCS.Evidence.Sequence = uint64(j + 1)
 			}
-			_, err := NewCX16SelectedProfile(s, replay)
+			_, err := NewSelectedProfile(s, replay)
 			if (err == nil) != (n >= 1 && n <= 128) {
 				t.Fatalf("bound %d: %v", n, err)
 			}
 		})
 	}
-	if _, err := NewCX16SelectedProfile(s, []ReplayInput{i, i}); err == nil {
+	if _, err := NewSelectedProfile(s, []ReplayInput{i, i}); err == nil {
 		t.Fatal("duplicate evidence admitted")
 	}
 	for _, identity := range []string{"QAAa9011", "qAAA0006", "Qaaa0006", "QAAA0000", "QAAA9999"} {
 		c := s.SelectionSpecValue()
 		c.ProjectCode, c.Release = identity[:4], identity[4:]
-		selected, err := NewCXSelection(c)
+		selected, err := NewSelection(c)
 		if err != nil {
 			t.Fatal(err)
 		}
-		if _, err = NewCX16SelectedProfile(selected, []ReplayInput{i}); err == nil {
+		if _, err = NewSelectedProfile(selected, []ReplayInput{i}); err == nil {
 			t.Fatalf("unresolved selector %s admitted", identity)
 		}
 	}
@@ -367,7 +367,7 @@ func TestCX16BoundedDetachedDiagnosticsAndConcurrency(t *testing.T) {
 	i.PCS.NativeRecord[0] = 9
 	first := replayTestClassify(t, p, i.PCS.Evidence)
 	first.Diagnostics[0].NativeRecord[0] = 8
-	first.Current.Fields["invented"] = CXNativeField{Status: "accepted"}
+	first.Current.Fields["invented"] = NativeField{Status: "accepted"}
 	var wg sync.WaitGroup
 	for n := 0; n < 24; n++ {
 		wg.Add(1)
@@ -396,7 +396,7 @@ func TestCX16EveryProjectAndReleaseCharacterNegative(t *testing.T) {
 					c.Release = string(text)
 				}
 				var err error
-				i.Selection, err = NewCXSelection(c)
+				i.Selection, err = NewSelection(c)
 				if err != nil {
 					t.Fatal(err)
 				}

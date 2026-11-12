@@ -9,14 +9,14 @@ import (
 	"github.com/Project-Helianthus/helianthus-canbus"
 )
 
-func standardTestFixture(t *testing.T, id uint32, p [8]byte) (CXSelection, PCSStandardPCSInput) {
+func standardTestFixture(t *testing.T, id uint32, p [8]byte) (Selection, PCSStandardPCSInput) {
 	t.Helper()
 	iface, err := canbus.NewInterfaceIdentity("synthetic", 1)
 	if err != nil {
 		t.Fatal(err)
 	}
 	spec := SelectionSpec{Interface: iface, Flavor: "pcs-standard", ProjectCode: "QAAA", Release: "0006", Direction: "bms-to-pcs", Scope: "local", Bank: "standard", Endpoint: "pack", Group: "group", Slot: "slot", Epoch: 1}
-	s, err := NewCXSelection(spec)
+	s, err := NewSelection(spec)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -53,11 +53,11 @@ func TestCX05CoreArithmetic(t *testing.T) {
 	}
 }
 
-func standardTestReselect(t *testing.T, s CXSelection, i PCSStandardPCSInput, change func(*SelectionSpec)) (CXSelection, PCSStandardPCSInput) {
+func standardTestReselect(t *testing.T, s Selection, i PCSStandardPCSInput, change func(*SelectionSpec)) (Selection, PCSStandardPCSInput) {
 	t.Helper()
 	c := s.SelectionSpecValue()
 	change(&c)
-	next, err := NewCXSelection(c)
+	next, err := NewSelection(c)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -501,7 +501,7 @@ func TestCX05ExtremaAndLocationHypothesis(t *testing.T) {
 
 func TestCX05PartialStatesAndLastKnownGood(t *testing.T) {
 	s, i := standardTestFixture(t, 0x313, [8]byte{0x14, 0xbe, 0xff, 0xf6, 0xff, 0xf6, 40, 60})
-	previous := DecodePCSStandard(s, i).CXNativeResult
+	previous := DecodePCSStandard(s, i).NativeResult
 	for _, state := range []string{"absent", "invalid", "unsupported", "stale", "conflict", "unassigned", "unrecognized"} {
 		t.Run(state, func(t *testing.T) {
 			i.FieldStates = map[string]string{"temperature": state}
@@ -510,11 +510,11 @@ func TestCX05PartialStatesAndLastKnownGood(t *testing.T) {
 			if r.Fields["temperature"].Status == "accepted" || r.Fields["voltage"].Status != "accepted" || r.Fields["voltage"].Age != 2*time.Second {
 				t.Fatal(r)
 			}
-			merged := RetainAccepted(previous, r.CXNativeResult)
+			merged := RetainAccepted(previous, r.NativeResult)
 			if merged.Fields["temperature"] != previous.Fields["temperature"] || merged.Fields["voltage"].Age != 2*time.Second {
 				t.Fatal("retention/age")
 			}
-			r.Fields["voltage"] = CXNativeField{}
+			r.Fields["voltage"] = NativeField{}
 			if previous.Fields["voltage"].Numerator != 5310 {
 				t.Fatal("alias")
 			}
@@ -564,11 +564,11 @@ func TestCX05PartialStatesAndLastKnownGood(t *testing.T) {
 			case "source":
 				c.Source++
 			}
-			next, err := NewCXSelection(c)
+			next, err := NewSelection(c)
 			if err != nil {
 				t.Fatal(err)
 			}
-			update := CXNativeResult{Selection: next, Fields: map[string]CXNativeField{}}
+			update := NativeResult{Selection: next, Fields: map[string]NativeField{}}
 			if len(RetainAccepted(previous, update).Fields) != 0 {
 				t.Fatal("cross-key retention")
 			}
@@ -683,7 +683,7 @@ func TestCX05RetentionKeepsCellAndTemperatureIndicesApart(t *testing.T) {
 	cell := DecodePCSStandard(s, i)
 	_, i2 := standardTestFixture(t, 0x322, [8]byte{0, 0, 0, 0, 5, 4, 0, 0})
 	temp := DecodePCSStandard(s, i2)
-	merged := RetainAccepted(cell.CXNativeResult, temp.CXNativeResult)
+	merged := RetainAccepted(cell.NativeResult, temp.NativeResult)
 	if merged.Fields["maximum_index"].Numerator != 6 || merged.Fields["minimum_index"].Numerator != 7 || merged.Fields["maximum_temperature_index"].Numerator != 5 || merged.Fields["minimum_temperature_index"].Numerator != 4 {
 		t.Fatal(merged.Fields)
 	}

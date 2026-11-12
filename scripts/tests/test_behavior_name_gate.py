@@ -4,6 +4,7 @@ import json
 from pathlib import Path
 import tempfile
 import unittest
+from unittest import mock
 
 SPEC = importlib.util.spec_from_file_location(
     "behavior_guard", Path(__file__).resolve().parents[1] / "check_behavior_names.py")
@@ -174,6 +175,59 @@ func Generic[XY92 any]() {}
         self.source("package modbus; func (")
         with self.assertRaises(Exception):
             self.check()
+
+
+RENAME_SPEC = importlib.util.spec_from_file_location(
+    "rename_provider_names", Path(__file__).resolve().parents[1] / "rename_provider_names.py")
+RENAME = importlib.util.module_from_spec(RENAME_SPEC)
+RENAME_SPEC.loader.exec_module(RENAME)
+
+
+class RenameScriptTests(unittest.TestCase):
+    def renames(self):
+        return mock.patch.dict(RENAME.RENAMES, {"XY01Old": "Plain", "XY02Old": "XY03New"}, clear=True)
+
+    def test_identifiers_and_comment_citations_rename_literals_do_not(self):
+        source = ('// XY01Old opens the doc comment.\n'
+                  '/* cites XY02Old */\n'
+                  'func XY01Old(v XY02Old) { _ = XY01OldX; _ = x.XY01Old\n'
+                  '_ = "XY01Old"; _ = `XY02Old`; _ = \'X\' }\n')
+        with self.renames():
+            self.assertEqual(RENAME.rewrite(source), (
+                '// Plain opens the doc comment.\n'
+                '/* cites XY03New */\n'
+                'func Plain(v XY03New) { _ = XY01OldX; _ = x.Plain\n'
+                '_ = "XY01Old"; _ = `XY02Old`; _ = \'X\' }\n'))
+
+    def test_colliding_metadata_list_keys_merge_in_either_order(self):
+        with self.renames():
+            for value in ({"Plain": ["b", "a"], "XY01Old": ["c", "a"]},
+                          {"XY01Old": ["c", "a"], "Plain": ["b", "a"]}):
+                self.assertEqual(RENAME.metadata({"lexical": value}),
+                                 {"lexical": {"Plain": ["a", "b", "c"]}})
+            self.assertEqual(RENAME.metadata({"XY01Old": ["a"], "Other": ["b"]}),
+                             {"Plain": ["a"], "Other": ["b"]})
+            for value in ({"Plain": "a", "XY01Old": ["b"]},
+                          {"Plain": ["a"], "XY01Old": {"b": 1}}):
+                with self.assertRaises(SystemExit):
+                    RENAME.metadata(value)
+
+    def test_baseline_drops_only_entries_renamed_to_unflagged_symbols(self):
+        original = [
+            {"path": "a.go", "symbol": "XY01Old", "category": "identifier"},
+            {"path": "b_test.go", "symbol": "XY01Old", "category": "test"},
+            {"path": "a.go", "symbol": "XY02Old", "category": "identifier"},
+            {"path": "c.go", "symbol": "XY04Kept", "category": "identifier"},
+            {"path": "a.go", "symbol": "Stale", "category": "identifier"},
+            {"path": "XY01Old.go", "symbol": "XY01Old.go", "category": "filename"},
+        ]
+        with self.renames():
+            updated = RENAME.metadata(original)
+        self.assertEqual(RENAME.prune_baseline(original, updated), [
+            {"path": "a.go", "symbol": "XY03New", "category": "identifier"},
+            {"path": "c.go", "symbol": "XY04Kept", "category": "identifier"},
+            {"path": "a.go", "symbol": "Stale", "category": "identifier"},
+        ])
 
 
 if __name__ == "__main__":

@@ -17,36 +17,36 @@ type LINKInput struct {
 	FieldAge                                      time.Duration
 }
 
-func selectionResult(s CXSelection, i LINKInput, status string) CXNativeResult {
-	return CXNativeResult{Selection: s, Evidence: i.Evidence, Raw: i.Evidence.Frame.Bytes(), Epoch: i.Epoch, Status: status, Fields: make(map[string]CXNativeField)}
+func selectionResult(s Selection, i LINKInput, status string) NativeResult {
+	return NativeResult{Selection: s, Evidence: i.Evidence, Raw: i.Evidence.Frame.Bytes(), Epoch: i.Epoch, Status: status, Fields: make(map[string]NativeField)}
 }
-func lINKFrameAdmission(s CXSelection, i LINKInput) bool {
+func lINKFrameAdmission(s Selection, i LINKInput) bool {
 	f := i.Evidence.Frame
 	c := s.spec
 	id := f.ID().Value()
 	return c.Flavor == "link" && c.RouteSet && f.ID().Extended() && f.DLC() == 8 && f.RawDLC() == 8 && id>>24 == 0x18 && uint8(id>>8) == c.Destination && uint8(id) == c.Source && i.Evidence.Interface == c.Interface && i.Epoch == c.Epoch && i.Direction == c.Direction && i.Scope == c.Scope && i.Bank == c.Bank && i.Endpoint == c.Endpoint && i.Group == c.Group && i.Slot == c.Slot && i.FieldAge >= 0
 }
-func lINKAdmission(s CXSelection, i LINKInput) bool {
+func lINKAdmission(s Selection, i LINKInput) bool {
 	c := s.spec
 	return lINKFrameAdmission(s, i) && c.Direction == "module-to-coordinator" && c.Destination == 0xf4 && c.Source != 0xff && c.Source != 0xf4 && c.Scope == "local"
 }
 
-// cx01LINKReportAdmission admits module reports addressed to the F5 route.
-func lINKReportAdmission(s CXSelection, i LINKInput) bool {
+// lINKReportAdmission admits module reports addressed to the F5 route.
+func lINKReportAdmission(s Selection, i LINKInput) bool {
 	c := s.spec
 	return lINKFrameAdmission(s, i) && c.Direction == "module-to-coordinator" && c.Destination == 0xf5 && c.Source != 0xff && c.Source != 0xf4 && c.Scope == "local"
 }
-func lINKDateAdmission(s CXSelection, i LINKInput) bool {
+func lINKDateAdmission(s Selection, i LINKInput) bool {
 	c := s.spec
 	return lINKFrameAdmission(s, i) && c.Direction == "module-to-coordinator" && c.Destination == 0xf5 && c.Source != 0xff && c.Source != 0xf4 && c.Scope == "local" && i.Evidence.Frame.ID().Value()>>16 == 0x1809
 }
-func lINKCoordinatorAdmission(s CXSelection, i LINKInput) bool {
+func lINKCoordinatorAdmission(s Selection, i LINKInput) bool {
 	c := s.spec
 	return lINKFrameAdmission(s, i) && c.Direction == "coordinator-to-module" && c.Scope == "aggregate" && c.Source == 0xf4 && (c.Destination == 0xf5 || c.Destination == 0xdf)
 }
 
-// CXDecodeLINKTelemetry decodes admitted LINK telemetry while retaining raw evidence and candidate grades.
-func CXDecodeLINKTelemetry(s CXSelection, i LINKInput) CXNativeResult {
+// DecodeLINKTelemetry decodes admitted LINK telemetry while retaining raw evidence and candidate grades.
+func DecodeLINKTelemetry(s Selection, i LINKInput) NativeResult {
 	r := selectionResult(s, i, "unsupported")
 	if !lINKAdmission(s, i) && !lINKDateAdmission(s, i) && !lINKCoordinatorAdmission(s, i) {
 		r.Status = "invalid"
@@ -54,7 +54,7 @@ func CXDecodeLINKTelemetry(s CXSelection, i LINKInput) CXNativeResult {
 	}
 	p := r.Raw
 	add := func(name string, n int64, d int64, unit, meaning, grade, status string) {
-		r.Fields[name] = CXNativeField{Numerator: n, Denominator: d, Unit: unit, Meaning: meaning, Grade: grade, Status: status, Raw: p, Evidence: i.Evidence, Epoch: i.Epoch, Scope: i.Scope, Bank: i.Bank, Endpoint: i.Endpoint, Group: i.Group, Slot: i.Slot, Age: i.FieldAge}
+		r.Fields[name] = NativeField{Numerator: n, Denominator: d, Unit: unit, Meaning: meaning, Grade: grade, Status: status, Raw: p, Evidence: i.Evidence, Epoch: i.Epoch, Scope: i.Scope, Bank: i.Bank, Endpoint: i.Endpoint, Group: i.Group, Slot: i.Slot, Age: i.FieldAge}
 	}
 	raw := func(name string, n uint64) { add(name, int64(n), 1, "", "", "Unknown", "raw") }
 	le := func(at int) uint64 { return uint64(binary.LittleEndian.Uint16(p[at : at+2])) }

@@ -12,14 +12,14 @@ import (
 // Sources are explicit, independently attributed candidate values, never inferred
 // from another byte or defaulted to zero. Nil means absent. No source is updated.
 type ParallelContext struct {
-	SOHTenths, SOCTenths, Permission, State *CXNativeField
-	CategoryFirst, CategorySecond, PackCode *CXNativeField
+	SOHTenths, SOCTenths, Permission, State *NativeField
+	CategoryFirst, CategorySecond, PackCode *NativeField
 	// CellSumValid is independent evidence that the cell-sum word is a valid
 	// measurement (value 1). Zero diagnostic counters alone do not establish it.
-	CellSumValid *CXNativeField
+	CellSumValid *NativeField
 }
 
-func sourceValue(s CXSelection, f *CXNativeField, maximum int64) (int64, bool) {
+func sourceValue(s Selection, f *NativeField, maximum int64) (int64, bool) {
 	c := s.SelectionSpecValue()
 	if f == nil {
 		return 0, false
@@ -30,7 +30,7 @@ func sourceValue(s CXSelection, f *CXNativeField, maximum int64) (int64, bool) {
 // ParallelReleaseDecodeParallel is a pure receiver decoder. Context validates derived wire
 // codes without constructing traffic or turning substituted codes into fresh
 // measurements. Candidate protocol grades never establish qualification.
-func ParallelReleaseDecodeParallel(s CXSelection, i LINKInput, x ParallelContext) CXNativeResult {
+func ParallelReleaseDecodeParallel(s Selection, i LINKInput, x ParallelContext) NativeResult {
 	r := selectionResult(s, i, "unsupported")
 	if !parallelIdentityAdmission(s, i) {
 		r.Status = "invalid"
@@ -57,7 +57,7 @@ func ParallelReleaseDecodeParallel(s CXSelection, i LINKInput, x ParallelContext
 		}
 	}
 	add := func(name string, n, d int64, unit, meaning, grade, status string) {
-		r.Fields[name] = CXNativeField{Numerator: n, Denominator: d, Unit: unit, Meaning: meaning, Grade: grade, Status: status, Raw: p, Evidence: i.Evidence, Epoch: i.Epoch, Scope: i.Scope, Bank: i.Bank, Endpoint: i.Endpoint, Group: i.Group, Slot: i.Slot, Age: i.FieldAge}
+		r.Fields[name] = NativeField{Numerator: n, Denominator: d, Unit: unit, Meaning: meaning, Grade: grade, Status: status, Raw: p, Evidence: i.Evidence, Epoch: i.Epoch, Scope: i.Scope, Bank: i.Bank, Endpoint: i.Endpoint, Group: i.Group, Slot: i.Slot, Age: i.FieldAge}
 	}
 	raw := func(name string, n int64) { add(name, n, 1, "", "", "Unknown", "raw") }
 	proven := func(name string, n int64) { add(name, n, 1, "", name, "Proven", "accepted") }

@@ -16,7 +16,7 @@ import (
 // SerialSlotValid associates the explicit native slot with Selection.Slot.
 // ThresholdStateKnown with AlternativeEligible=false selects the supplied normal
 // threshold path; an unknown state or eligible alternative remains raw.
-// FieldStates and FieldAges retain the per-field withholding semantics of CX05.
+// FieldStates and FieldAges retain the per-field withholding semantics of PCSStandardPCSInput.
 type PCSIdentityPCSInput struct {
 	PCSStandardPCSInput
 	ZeroIntegration, FailedPrecheck          bool
@@ -25,7 +25,7 @@ type PCSIdentityPCSInput struct {
 	SerialSlot                               uint8
 }
 
-func pCSIdentityAdmit(s CXSelection, i PCSIdentityPCSInput) string {
+func pCSIdentityAdmit(s Selection, i PCSIdentityPCSInput) string {
 	c := s.SelectionSpecValue()
 	f := i.Evidence.Frame
 	if c.Interface.Name() == "" || c.Interface.Index() <= 0 || c.Epoch == 0 || c.Bank == "" || c.Endpoint == "" || (c.Scope != "local" && c.Scope != "aggregate") || (c.Flavor != "pcs-standard" && c.Flavor != "pcs-parallel") || c.Direction != "bms-to-pcs" || i.Evidence.Interface != c.Interface || i.Epoch != c.Epoch || i.Direction != c.Direction || i.Scope != c.Scope || i.Bank != c.Bank || i.Endpoint != c.Endpoint || i.Group != c.Group || i.Slot != c.Slot || i.FieldAge < 0 || f.ID().Extended() || f.DLC() != 8 || f.RawDLC() != 8 {
@@ -48,7 +48,7 @@ func pCSIdentityAdmit(s CXSelection, i PCSIdentityPCSInput) string {
 	}
 	return "decoded"
 }
-func pCSIdentityAdd(r *CXNativeResult, i PCSIdentityPCSInput, name string, n, d int64, unit, meaning, grade string, gate bool) {
+func pCSIdentityAdd(r *NativeResult, i PCSIdentityPCSInput, name string, n, d int64, unit, meaning, grade string, gate bool) {
 	status := "raw"
 	if gate {
 		status = "accepted"
@@ -73,11 +73,11 @@ func pCSIdentityAdd(r *CXNativeResult, i PCSIdentityPCSInput, name string, n, d 
 	if status != "accepted" {
 		unit, meaning = "", ""
 	}
-	r.Fields[name] = CXNativeField{Numerator: n, Denominator: d, Unit: unit, Meaning: meaning, Grade: grade, Status: status, Raw: r.Raw, Evidence: i.Evidence, Epoch: i.Epoch, Scope: i.Scope, Bank: i.Bank, Endpoint: i.Endpoint, Group: i.Group, Slot: i.Slot, Age: age}
+	r.Fields[name] = NativeField{Numerator: n, Denominator: d, Unit: unit, Meaning: meaning, Grade: grade, Status: status, Raw: r.Raw, Evidence: i.Evidence, Epoch: i.Epoch, Scope: i.Scope, Bank: i.Bank, Endpoint: i.Endpoint, Group: i.Group, Slot: i.Slot, Age: age}
 }
 
 // DecodePCSGauge consumes supplied frames only; it performs no I/O.
-func DecodePCSGauge(s CXSelection, i PCSIdentityPCSInput) CXNativeResult {
+func DecodePCSGauge(s Selection, i PCSIdentityPCSInput) NativeResult {
 	r := selectionResult(s, i.LINKInput, pCSIdentityAdmit(s, i))
 	if r.Status != "decoded" {
 		return r

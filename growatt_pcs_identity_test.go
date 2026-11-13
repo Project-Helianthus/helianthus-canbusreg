@@ -205,7 +205,7 @@ func TestCX06SerialIdentityKey(t *testing.T) {
 			case "scope":
 				c.Scope = "aggregate"
 			case "bank":
-				c.Bank = "other"
+				c.Bank = "parallel"
 			case "endpoint":
 				c.Endpoint = "other"
 			case "group":

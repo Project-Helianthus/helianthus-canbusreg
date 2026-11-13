@@ -475,7 +475,7 @@ func TestCX17EverySelectionFieldNegative(t *testing.T) {
 		"choice":          func(c *SelectionSpec) { c.Choice = "legacy19" },
 		"direction":       func(c *SelectionSpec) { c.Direction = "other" },
 		"scope":           func(c *SelectionSpec) { c.Scope = "aggregate" },
-		"bank":            func(c *SelectionSpec) { c.Bank = "other" },
+		"bank":            func(c *SelectionSpec) { c.Bank = "parallel" },
 		"endpoint":        func(c *SelectionSpec) { c.Endpoint = "other" },
 		"group":           func(c *SelectionSpec) { c.Group = "1" },
 		"slot":            func(c *SelectionSpec) { c.Slot = "2" },
@@ -904,7 +904,7 @@ func TestCX17AggregateExtendedIdentityChangeConflicts(t *testing.T) {
 			s, i := replayTestFixture(t)
 			c := s.SelectionSpecValue()
 			c.Flavor, c.Scope, c.Destination, c.Source = "pcs-extended19", "aggregate", 0xdf, 0xf2
-			c.Bank, c.Endpoint, c.Group, c.Slot, c.RouteSet = "bank-a", "endpoint-a", "group-a", "slot-a", true
+			c.Bank, c.Endpoint, c.Group, c.Slot, c.RouteSet = "ordinary", "endpoint-a", "group-a", "slot-a", true
 			s = replayTestReselect(t, &i, c)
 			payload := [8]byte{0x34, 0x12, 2, 6, 0, 0, 0, 0}
 			replayTestFrame(t, &i, kind<<16|0xdf<<8|0xf2, true, payload)
@@ -1004,7 +1004,7 @@ func TestCX17ExtendedRoleChangeConflicts(t *testing.T) {
 		t.Run(fmt.Sprintf("%x", kind), func(t *testing.T) {
 			s, i := replayTestFixture(t)
 			c := s.SelectionSpecValue()
-			c.Flavor, c.Bank, c.Endpoint, c.Group, c.Slot, c.RouteSet = "pcs-extended19", "bank-a", "endpoint-a", "group-a", "slot-a", true
+			c.Flavor, c.Bank, c.Endpoint, c.Group, c.Slot, c.RouteSet = "pcs-extended19", "ordinary", "endpoint-a", "group-a", "slot-a", true
 			c.Destination, c.Source = 0xf2, 2
 			if kind == 0x1913 {
 				c.Scope, c.Destination, c.Source = "aggregate", 0xdf, 0xf2

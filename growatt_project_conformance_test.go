@@ -180,6 +180,10 @@ func TestCX16SlotBankAndMemberDictionary(t *testing.T) {
 			c.Release = "0011"
 			if key == "bank" {
 				c.Bank = "unlisted"
+				if _, err := NewSelection(c); err == nil || err.Error() != "explicit bank ordinary or parallel required" {
+					t.Fatalf("unlisted bank admitted: %v", err)
+				}
+				return
 			}
 			s = replayTestReselect(t, &i, c)
 			i.PCS.SlotValid, i.PCS.NativeSlot, i.PCS.GroupValid, i.PCS.NativeGroup = true, 1, true, 0

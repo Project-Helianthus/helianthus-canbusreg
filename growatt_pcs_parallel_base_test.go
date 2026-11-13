@@ -13,7 +13,7 @@ func parallelIdentityTestSpec(t *testing.T) SelectionSpec {
 	if err != nil {
 		t.Fatal(err)
 	}
-	return SelectionSpec{Interface: bus, Flavor: "pcs-parallel", ProjectCode: "QAAB", Release: "0004", Direction: "bms-to-pcs", Scope: "local", Bank: "bank", Endpoint: "endpoint", Group: "3", Epoch: 1}
+	return SelectionSpec{Interface: bus, Flavor: "pcs-parallel", ProjectCode: "QAAB", Release: "0004", Direction: "bms-to-pcs", Scope: "local", Bank: "parallel", Endpoint: "endpoint", Group: "3", Epoch: 1}
 }
 func parallelIdentityTestSelection(t *testing.T, c SelectionSpec) Selection {
 	t.Helper()

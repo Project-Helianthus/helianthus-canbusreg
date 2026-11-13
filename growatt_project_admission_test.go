@@ -15,13 +15,13 @@ func replayTestFixture(t *testing.T) (Selection, ReplayInput) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	s, err := NewSelection(SelectionSpec{Interface: iface, Flavor: "pcs-standard", ProjectCode: "QAAA", Release: "0006", Direction: "bms-to-pcs", Scope: "local", Bank: "standard", Endpoint: "pack", Group: "0", Slot: "1", Epoch: 1})
+	s, err := NewSelection(SelectionSpec{Interface: iface, Flavor: "pcs-standard", ProjectCode: "QAAA", Release: "0006", Direction: "bms-to-pcs", Scope: "local", Bank: "ordinary", Endpoint: "pack", Group: "0", Slot: "1", Epoch: 1})
 	if err != nil {
 		t.Fatal(err)
 	}
 	id, _ := canbus.NewStandardID(0x313)
 	f, _ := canbus.NewFrame(id, []byte{0x14, 0xbe, 0xff, 0xf6, 0, 10, 50, 0xe4})
-	i := LINKInput{Evidence: Evidence{Frame: f, Interface: iface, Sequence: 1, Monotonic: time.Second}, Epoch: 1, Direction: "bms-to-pcs", Scope: "local", Bank: "standard", Endpoint: "pack", Group: "0", Slot: "1", FieldAge: time.Second}
+	i := LINKInput{Evidence: Evidence{Frame: f, Interface: iface, Sequence: 1, Monotonic: time.Second}, Epoch: 1, Direction: "bms-to-pcs", Scope: "local", Bank: "ordinary", Endpoint: "pack", Group: "0", Slot: "1", FieldAge: time.Second}
 	return s, ReplayInput{Selection: s, PCS: PCSSlotPCSInput{PCSIdentityPCSInput: PCSIdentityPCSInput{PCSStandardPCSInput: PCSStandardPCSInput{LINKInput: i, PublisherResolved: true, MeasurementValid: true, TemperatureValid: true}}}}
 }
 

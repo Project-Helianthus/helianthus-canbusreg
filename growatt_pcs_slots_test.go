@@ -32,18 +32,15 @@ func TestCX08SlotArithmetic(t *testing.T) {
 	if byte(44) != byte(300%256) {
 		t.Fatal("synthetic SOC collision")
 	}
-	for _, bank := range []string{"standard", "parallel", "other"} {
+	for _, bank := range []string{"ordinary", "parallel"} {
 		s2, j := s, i
 		s2, j.PCSStandardPCSInput = standardTestReselect(t, s, j.PCSStandardPCSInput, func(c *SelectionSpec) { c.Bank = bank })
 		r = DecodePCSSlots(s2, j)
-		status, n, d, unit := "accepted", int64(0), int64(10), "A"
+		n := int64(0)
 		if bank == "parallel" {
 			n = -6000
 		}
-		if bank == "other" {
-			status, n, d, unit = "raw", 4000, 1, ""
-		}
-		slotTestWant(t, r, "current", status, n, d, unit)
+		slotTestWant(t, r, "current", "accepted", n, 10, "A")
 	}
 	i.Bank = ""
 	if r = DecodePCSSlots(s, i); r.Status != "invalid" || r.Raw != i.Evidence.Frame.Bytes() {
@@ -259,7 +256,7 @@ func TestCX08MemberAssociationKeys(t *testing.T) {
 			case "scope":
 				c.Scope = "aggregate"
 			case "bank":
-				c.Bank = "other"
+				c.Bank = "parallel"
 			case "endpoint":
 				c.Endpoint = "other"
 			case "group":

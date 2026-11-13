@@ -15,7 +15,7 @@ func extendedTestSpec(t *testing.T) SelectionSpec {
 	if err != nil {
 		t.Fatal(err)
 	}
-	return SelectionSpec{Interface: bus, Flavor: "pcs-extended19", ProjectCode: "QAAA", Release: "0006", Direction: "bms-to-pcs", Scope: "local", Bank: "bank-a", Endpoint: "endpoint-a", Group: "group-a", Slot: "slot-a", RouteSet: true, Destination: 0xf2, Source: 2, Epoch: 1}
+	return SelectionSpec{Interface: bus, Flavor: "pcs-extended19", ProjectCode: "QAAA", Release: "0006", Direction: "bms-to-pcs", Scope: "local", Bank: "ordinary", Endpoint: "endpoint-a", Group: "group-a", Slot: "slot-a", RouteSet: true, Destination: 0xf2, Source: 2, Epoch: 1}
 }
 func extendedTestSelect(t *testing.T, c SelectionSpec) Selection {
 	t.Helper()

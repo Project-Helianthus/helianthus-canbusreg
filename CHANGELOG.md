@@ -2,6 +2,17 @@
 
 ## Unreleased
 
+- The release-11 slot-current decoder of `DecodePCSSlots` applies the
+  non-parallel offset for Bank `ordinary`, the value the gateway's PCS
+  configuration asserts for non-parallel profiles. Before this change it
+  required `standard`, so the ordinary-bank slot current stayed raw.
+  `NewSelection` accepts only the banks `ordinary` and `parallel` and rejects
+  every other value with `explicit bank ordinary or parallel required`; no
+  alias for `standard` is provided. The gateway already asserts these two
+  values and adopts the fix by re-pinning this revision. This artifact-changing
+  change requires renewed release evidence before the final bill of materials
+  freeze; no physical qualification is claimed.
+
 - Rename the remaining work-item-prefixed exported identifiers to behavior names:
   `CXSelection` to `Selection`, `NewCXSelection` to `NewSelection`,
   `CXNativeField` to `NativeField`, `CXNativeResult` to `NativeResult`,

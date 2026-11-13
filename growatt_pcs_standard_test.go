@@ -15,7 +15,7 @@ func standardTestFixture(t *testing.T, id uint32, p [8]byte) (Selection, PCSStan
 	if err != nil {
 		t.Fatal(err)
 	}
-	spec := SelectionSpec{Interface: iface, Flavor: "pcs-standard", ProjectCode: "QAAA", Release: "0006", Direction: "bms-to-pcs", Scope: "local", Bank: "standard", Endpoint: "pack", Group: "group", Slot: "slot", Epoch: 1}
+	spec := SelectionSpec{Interface: iface, Flavor: "pcs-standard", ProjectCode: "QAAA", Release: "0006", Direction: "bms-to-pcs", Scope: "local", Bank: "ordinary", Endpoint: "pack", Group: "group", Slot: "slot", Epoch: 1}
 	s, err := NewSelection(spec)
 	if err != nil {
 		t.Fatal(err)
@@ -546,7 +546,7 @@ func TestCX05PartialStatesAndLastKnownGood(t *testing.T) {
 			case "scope":
 				c.Scope = "aggregate"
 			case "bank":
-				c.Bank = "other"
+				c.Bank = "parallel"
 			case "endpoint":
 				c.Endpoint = "other"
 			case "group":

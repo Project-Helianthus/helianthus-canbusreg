@@ -22,8 +22,9 @@ func release11(s Selection) bool {
 }
 
 // DecodePCSSlots consumes supplied evidence without bus I/O or caching.
-// The ordinary and parallel current offsets require Bank="standard" or
-// Bank="parallel" respectively; neither is inferred from current plausibility.
+// The non-parallel and parallel current offsets require Bank="ordinary" (the
+// bank the protocol page calls standard) or Bank="parallel" respectively;
+// neither is inferred from current plausibility.
 func DecodePCSSlots(s Selection, i PCSSlotPCSInput) NativeResult {
 	r := selectionResult(s, i.LINKInput, pCSIdentityAdmit(s, i.PCSIdentityPCSInput))
 	if i.Member != nil {
@@ -48,7 +49,7 @@ func DecodePCSSlots(s Selection, i PCSSlotPCSInput) NativeResult {
 		n, d, unit := be(3), int64(1), ""
 		bank := false
 		switch s.SelectionSpecValue().Bank {
-		case "standard":
+		case "ordinary":
 			n -= 4000
 			bank = true
 		case "parallel":

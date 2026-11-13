@@ -10,6 +10,9 @@ import (
 // SelectionSpec is an explicit caller assertion, never inferred from traffic.
 // Native rules: https://github.com/Project-Helianthus/helianthus-docs-canbus/blob/main/protocols/growatt/growatt-low-voltage-bms-can-pcs-protocol-v1.md
 // Sections: PCS feature availability by version; Same-identity variants and native-contract selection.
+// Bank is "ordinary" or "parallel", asserted by configuration because the PCS
+// frames carry no bank selector; "ordinary" is the bank the protocol page calls
+// standard.
 type SelectionSpec struct {
 	Interface                                                         canbus.InterfaceIdentity
 	Flavor, PCSFlavor, ProjectCode, Release, Choice, Direction, Scope string
@@ -44,6 +47,9 @@ func NewSelection(spec SelectionSpec) (Selection, error) {
 	}
 	if spec.Bank == "" || spec.Endpoint == "" || spec.Epoch == 0 {
 		return s, fmt.Errorf("explicit bank, endpoint and epoch required")
+	}
+	if spec.Bank != "ordinary" && spec.Bank != "parallel" {
+		return s, fmt.Errorf("explicit bank ordinary or parallel required")
 	}
 	flavor := spec.Flavor
 	if flavor == "link" {

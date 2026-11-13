@@ -11,7 +11,7 @@ func selectionTestSpec(t *testing.T, code, release string) SelectionSpec {
 	if err != nil {
 		t.Fatal(err)
 	}
-	return SelectionSpec{Interface: bus, Flavor: "link", PCSFlavor: "pcs-standard", ProjectCode: code, Release: release, Direction: "module-to-coordinator", Scope: "local", Bank: "bank-a", Endpoint: "endpoint-a", RouteSet: true, Destination: 0xf4, Source: 2, Epoch: 1}
+	return SelectionSpec{Interface: bus, Flavor: "link", PCSFlavor: "pcs-standard", ProjectCode: code, Release: release, Direction: "module-to-coordinator", Scope: "local", Bank: "ordinary", Endpoint: "endpoint-a", RouteSet: true, Destination: 0xf4, Source: 2, Epoch: 1}
 }
 func selectionTestSelect(t *testing.T, spec SelectionSpec) Selection {
 	t.Helper()

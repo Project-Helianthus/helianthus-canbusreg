@@ -2,6 +2,21 @@
 
 ## Unreleased
 
+- The selected-profile replay and the PCS provider keep the extrema of the
+  location-qualified standard record `330` under the retention key `core/330`,
+  so its `maximum_index`, `minimum_index`, `maximum_cell` and `minimum_cell`
+  appear as `core/330/<field>`. Before this change they shared the key `core`
+  with the same names from `319`, and whichever record arrived later
+  overwrote the other's retained values where a selection accepts both. The
+  `319` extrema and every other core field keep their `core/<field>` names.
+  The gateway adopts the new `330` names by re-pinning this revision; no
+  alias or migration step is provided.
+- `DecodePCSExtended` decodes the gateway-state `state` field of `1910` on
+  route `ff`/`f4` only for the gateway selection. Other extended selections
+  that reach the record keep `state` raw with an `Unknown` grade, as they
+  already kept `downstream_address`. Admitted fields of the receive-only
+  candidate are unchanged; no physical qualification is claimed.
+
 - `NewSelection` refuses a PCS flavor asserted with the bank it does not pair
   with and returns `ErrSelectionBankPairing`: `pcs-standard` pairs with
   `ordinary` and `pcs-parallel` with `parallel`, as the

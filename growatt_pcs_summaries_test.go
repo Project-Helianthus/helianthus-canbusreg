@@ -386,12 +386,13 @@ func TestCX14ParallelLocalAndExplicitAmbiguity(t *testing.T) {
 				c := s.SelectionSpecValue()
 				c.ProjectCode = "QAAa"
 				c.Release = "9011"
-				c.Flavor = flavor
+				bankPairTestFlavor(&c, flavor)
 				c.Choice = choice
 				s, err := NewSelection(c)
 				if err != nil {
 					t.Fatal(err)
 				}
+				i.Bank = c.Bank
 				b := DecodePCSSummaries(s, i).Bits["A/4"]
 				if (len(b.Alternatives) > 0) != (choice == "release11") {
 					t.Fatal(b)

@@ -2,6 +2,28 @@
 
 ## Unreleased
 
+- `NewSelection` refuses a PCS flavor asserted with the bank it does not pair
+  with and returns `ErrSelectionBankPairing`: `pcs-standard` pairs with
+  `ordinary` and `pcs-parallel` with `parallel`, as the
+  [topology context values](https://github.com/Project-Helianthus/helianthus-docs-canbus/blob/main/protocols/growatt/growatt-low-voltage-bms-can-common-projection-v1.md#topology-context-values)
+  state. Before this change a standard PCS selection with the parallel bank
+  decoded the documented `326` frame with the parallel offset as a large
+  negative slot current. `pcs-extended19` and LINK selections keep accepting
+  either bank, because the table names no pairing for them. Endpoint, group
+  and slot values are accepted as before; closing those vocabularies waits for
+  a gateway change.
+- The common projection gains `Scope`. `NewGrowattLowVoltageBMSCommonProjector`
+  projects `unknown`; the new `NewGrowattLowVoltageBMSCommonProjectorFromSelection`
+  projects `aggregate` for a selection with scope `aggregate` and `member` for
+  scope `local`, so a hub-aggregated pack count is never presented as a
+  single-BMS count. Frame decoding, raw evidence and admission are unchanged.
+- The gateway's configuration already asserts paired values. The gateway adopts
+  both changes by re-pinning this revision; its selection tests that vary the
+  flavor or the bank alone through `NewSelection` move to paired values in the
+  same re-pin. No alias or migration step is provided. This artifact-changing
+  change requires renewed release evidence before the final bill of materials
+  freeze; no physical qualification is claimed.
+
 - The release-11 slot-current decoder of `DecodePCSSlots` applies the
   non-parallel offset for Bank `ordinary`, the value the gateway's PCS
   configuration asserts for non-parallel profiles. Before this change it

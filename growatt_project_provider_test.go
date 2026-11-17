@@ -468,21 +468,21 @@ func TestCX17EverySelectionFieldNegative(t *testing.T) {
 	mutations := map[string]func(*SelectionSpec){
 		"interface-name":  func(c *SelectionSpec) { c.Interface = providerTestInterface("other", 1) },
 		"interface-index": func(c *SelectionSpec) { c.Interface = providerTestInterface("synthetic", 2) },
-		"flavor":          func(c *SelectionSpec) { c.Flavor = "pcs-parallel" },
+		"flavor":          func(c *SelectionSpec) { bankPairTestFlavor(c, "pcs-parallel") },
 		"pcs-flavor":      func(c *SelectionSpec) { c.PCSFlavor = "pcs-extended19" },
 		"project":         func(c *SelectionSpec) { c.ProjectCode = "QAAa" },
 		"release":         func(c *SelectionSpec) { c.Release = "0011" },
 		"choice":          func(c *SelectionSpec) { c.Choice = "legacy19" },
 		"direction":       func(c *SelectionSpec) { c.Direction = "other" },
 		"scope":           func(c *SelectionSpec) { c.Scope = "aggregate" },
-		"bank":            func(c *SelectionSpec) { c.Bank = "parallel" },
-		"endpoint":        func(c *SelectionSpec) { c.Endpoint = "other" },
-		"group":           func(c *SelectionSpec) { c.Group = "1" },
-		"slot":            func(c *SelectionSpec) { c.Slot = "2" },
-		"route-set":       func(c *SelectionSpec) { c.RouteSet = true },
-		"destination":     func(c *SelectionSpec) { c.Destination = 0xf5 },
-		"source":          func(c *SelectionSpec) { c.Source = 2 },
-		"epoch":           func(c *SelectionSpec) { c.Epoch = 2 },
+		// The bank cannot vary alone: NewSelection refuses an unpaired PCS bank.
+		"endpoint":    func(c *SelectionSpec) { c.Endpoint = "other" },
+		"group":       func(c *SelectionSpec) { c.Group = "1" },
+		"slot":        func(c *SelectionSpec) { c.Slot = "2" },
+		"route-set":   func(c *SelectionSpec) { c.RouteSet = true },
+		"destination": func(c *SelectionSpec) { c.Destination = 0xf5 },
+		"source":      func(c *SelectionSpec) { c.Source = 2 },
+		"epoch":       func(c *SelectionSpec) { c.Epoch = 2 },
 	}
 	for name, mutate := range mutations {
 		t.Run(name, func(t *testing.T) {

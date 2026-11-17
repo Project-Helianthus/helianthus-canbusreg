@@ -32,12 +32,12 @@ func TestCX08SlotArithmetic(t *testing.T) {
 	if byte(44) != byte(300%256) {
 		t.Fatal("synthetic SOC collision")
 	}
-	for _, bank := range []string{"ordinary", "parallel"} {
+	for _, flavor := range []string{"pcs-standard", "pcs-parallel"} {
 		s2, j := s, i
-		s2, j.PCSStandardPCSInput = standardTestReselect(t, s, j.PCSStandardPCSInput, func(c *SelectionSpec) { c.Bank = bank })
+		s2, j.PCSStandardPCSInput = standardTestReselect(t, s, j.PCSStandardPCSInput, func(c *SelectionSpec) { bankPairTestFlavor(c, flavor) })
 		r = DecodePCSSlots(s2, j)
 		n := int64(0)
-		if bank == "parallel" {
+		if flavor == "pcs-parallel" {
 			n = -6000
 		}
 		slotTestWant(t, r, "current", "accepted", n, 10, "A")
@@ -47,7 +47,7 @@ func TestCX08SlotArithmetic(t *testing.T) {
 		t.Fatal(r)
 	}
 	s, i = slotTestFixture(t, 0x326, [8]byte{2, 0, 0, 0x27, 0x10})
-	s, i.PCSStandardPCSInput = standardTestReselect(t, s, i.PCSStandardPCSInput, func(c *SelectionSpec) { c.Bank = "parallel" })
+	s, i.PCSStandardPCSInput = standardTestReselect(t, s, i.PCSStandardPCSInput, func(c *SelectionSpec) { bankPairTestFlavor(c, "pcs-parallel") })
 	slotTestWant(t, DecodePCSSlots(s, i), "current", "accepted", 0, 10, "A")
 }
 func TestCX08SlotsAndIndependentFields(t *testing.T) {
@@ -252,11 +252,13 @@ func TestCX08MemberAssociationKeys(t *testing.T) {
 			case "direction":
 				c.Direction = "pcs-to-bms"
 			case "flavor":
-				c.Flavor = "pcs-parallel"
+				bankPairTestFlavor(&c, "pcs-parallel")
 			case "scope":
 				c.Scope = "aggregate"
 			case "bank":
 				c.Bank = "parallel"
+				bankPairTestRefused(t, c)
+				return
 			case "endpoint":
 				c.Endpoint = "other"
 			case "group":

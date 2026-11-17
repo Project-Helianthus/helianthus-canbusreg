@@ -45,6 +45,9 @@ func TestSelectionAcceptsOnlyTheOrdinaryAndParallelBanks(t *testing.T) {
 		bank, want := v.bank, v.want
 		c := s.SelectionSpecValue()
 		c.Bank = bank
+		if bank == "parallel" {
+			c.Flavor = "pcs-parallel"
+		}
 		_, err := NewSelection(c)
 		if want == "" && err != nil {
 			t.Fatalf("bank %q rejected: %v", bank, err)

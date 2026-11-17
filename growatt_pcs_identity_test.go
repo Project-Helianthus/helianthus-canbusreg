@@ -91,9 +91,9 @@ func TestCX06PlaceholderNegativeVectors(t *testing.T) {
 		}
 	}
 	s, i := identityTestFixture(t, "QAAB0004", 0x315, [8]byte{})
-	s, i.PCSStandardPCSInput = standardTestReselect(t, s, i.PCSStandardPCSInput, func(c *SelectionSpec) { c.Flavor = "pcs-parallel" })
+	s, i.PCSStandardPCSInput = standardTestReselect(t, s, i.PCSStandardPCSInput, func(c *SelectionSpec) { bankPairTestFlavor(c, "pcs-parallel") })
 	identityTestWant(t, DecodePCSGauge(s, i), "placeholder", "accepted", 0, 1, "")
-	s, i.PCSStandardPCSInput = standardTestReselect(t, s, i.PCSStandardPCSInput, func(c *SelectionSpec) { c.Flavor = "pcs-standard" })
+	s, i.PCSStandardPCSInput = standardTestReselect(t, s, i.PCSStandardPCSInput, func(c *SelectionSpec) { bankPairTestFlavor(c, "pcs-standard") })
 	if DecodePCSGauge(s, i).Fields["placeholder"].Status == "accepted" {
 		t.Fatal("flavor")
 	}
@@ -195,7 +195,7 @@ func TestCX06SerialIdentityKey(t *testing.T) {
 			case "interface_index":
 				c.Interface, _ = canbus.NewInterfaceIdentity("synthetic", 2)
 			case "flavor":
-				c.Flavor = "pcs-parallel"
+				bankPairTestFlavor(&c, "pcs-parallel")
 			case "project":
 				c.ProjectCode = "QAAa"
 			case "release":
@@ -206,6 +206,8 @@ func TestCX06SerialIdentityKey(t *testing.T) {
 				c.Scope = "aggregate"
 			case "bank":
 				c.Bank = "parallel"
+				bankPairTestRefused(t, c)
+				return
 			case "endpoint":
 				c.Endpoint = "other"
 			case "group":

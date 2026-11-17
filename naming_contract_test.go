@@ -131,6 +131,8 @@ func TestNamingRetentionIdentityCollisionAxes(t *testing.T) {
 					c.Scope = "aggregate"
 				case "bank":
 					c.Bank = "parallel"
+					bankPairTestRefused(t, c)
+					return
 				case "endpoint":
 					c.Endpoint = "other"
 				case "group":

@@ -326,7 +326,7 @@ func TestCX11SelectorNegatives(t *testing.T) {
 			case "release":
 				c.Release = "0010"
 			case "flavor":
-				c.Flavor = "pcs-standard"
+				bankPairTestFlavor(&c, "pcs-standard")
 			case "direction":
 				c.Direction = "pcs-to-bms"
 			case "choice-missing":

@@ -26,6 +26,7 @@
     "gree_vrf_replay_test.go",
     "growatt_common_projection.go",
     "growatt_common_projection_test.go",
+    "growatt_common_projection_scope_test.go",
     "growatt_link_balance.go",
     "growatt_link_balance_test.go",
     "growatt_link_cells.go",
@@ -73,6 +74,7 @@
     "growatt_project_provider_test.go",
     "growatt_project_selection.go",
     "growatt_project_selection_test.go",
+    "growatt_project_selection_vocabulary_test.go",
     "growatt_v104.go",
     "growatt_v104_replay.go",
     "growatt_v104_replay_test.go",
@@ -2974,6 +2976,22 @@
       ]
     },
     {
+      "identity": "growatt_common_projection.go:go_field:GrowattLowVoltageBMSCommonProjection:Scope",
+      "owning_file": "growatt_common_projection.go",
+      "kind": "go_field",
+      "current_name": "Scope",
+      "target": "Scope",
+      "status": "unchanged",
+      "role_decomposition": "unresolved",
+      "evidence": [
+        "growatt_common_projection.go"
+      ],
+      "value_class": "unresolved",
+      "unit_metadata": "unresolved; see source",
+      "open_question": "Which relation of the common model carries this publisher scope (unknown, aggregate or member)? The semantic contract owner decides; the projection keeps unknown until a selection asserts the scope.",
+      "consumer_files": []
+    },
+    {
       "identity": "growatt_common_projection.go:go_field:GrowattLowVoltageBMSCommonProjection:Status",
       "owning_file": "growatt_common_projection.go",
       "kind": "go_field",
@@ -3389,6 +3407,22 @@
       "kind": "go_function",
       "current_name": "NewGrowattLowVoltageBMSCommonProjector",
       "target": "NewGrowattLowVoltageBMSCommonProjector",
+      "status": "unchanged",
+      "role_decomposition": "unresolved",
+      "evidence": [
+        "growatt_common_projection.go"
+      ],
+      "value_class": "unresolved",
+      "unit_metadata": "unresolved; see source",
+      "open_question": "Review identity, role, vocabulary, value class and units against the owning source and native public contract.",
+      "consumer_files": []
+    },
+    {
+      "identity": "growatt_common_projection.go:go_function:package_or_receiver:NewGrowattLowVoltageBMSCommonProjectorFromSelection",
+      "owning_file": "growatt_common_projection.go",
+      "kind": "go_function",
+      "current_name": "NewGrowattLowVoltageBMSCommonProjectorFromSelection",
+      "target": "NewGrowattLowVoltageBMSCommonProjectorFromSelection",
       "status": "unchanged",
       "role_decomposition": "unresolved",
       "evidence": [
@@ -62775,6 +62809,22 @@
       "role_decomposition": "unresolved",
       "evidence": [
         "growatt_project_provider.go"
+      ],
+      "value_class": "unresolved",
+      "unit_metadata": "unresolved; see source",
+      "open_question": "Review identity, role, vocabulary, value class and units against the owning source and native public contract.",
+      "consumer_files": []
+    },
+    {
+      "identity": "growatt_project_selection.go:go_constant_or_variable:package:ErrSelectionBankPairing",
+      "owning_file": "growatt_project_selection.go",
+      "kind": "go_constant_or_variable",
+      "current_name": "ErrSelectionBankPairing",
+      "target": "ErrSelectionBankPairing",
+      "status": "unchanged",
+      "role_decomposition": "unresolved",
+      "evidence": [
+        "growatt_project_selection.go"
       ],
       "value_class": "unresolved",
       "unit_metadata": "unresolved; see source",

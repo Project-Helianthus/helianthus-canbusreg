@@ -141,7 +141,7 @@ func TestCX07ByteOrderAndIndependentSiblings(t *testing.T) {
 	for _, flavor := range []string{"link", "pcs-standard", "pcs-parallel"} {
 		s := dtcTestMember(t, true)
 		spec := s.SelectionSpecValue()
-		spec.Flavor = flavor
+		bankPairTestFlavor(&spec, flavor)
 		if flavor != "link" {
 			spec.Direction = "bms-to-pcs"
 		}
@@ -426,7 +426,7 @@ func TestCX07WordLocationsAndValidSiblingRetention(t *testing.T) {
 func TestCX07PCSAdmissionBoundaries(t *testing.T) {
 	for _, flavor := range []string{"pcs-standard", "pcs-parallel"} {
 		spec := dtcTestMember(t, true).SelectionSpecValue()
-		spec.Flavor = flavor
+		bankPairTestFlavor(&spec, flavor)
 		spec.Direction = "bms-to-pcs"
 		s := selectionTestSelect(t, spec)
 		p := [8]byte{3, 0xe8, 0xff, 0xff}

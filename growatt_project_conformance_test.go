@@ -30,7 +30,8 @@ func TestCX16FiniteSelectorConformance(t *testing.T) {
 			t.Run(row.Identity+"/"+row.Choice+"/"+flavor, func(t *testing.T) {
 				s, i := replayTestFixture(t)
 				c := s.SelectionSpecValue()
-				c.ProjectCode, c.Release, c.Choice, c.Flavor = row.Identity[:4], row.Identity[4:], row.Choice, flavor
+				c.ProjectCode, c.Release, c.Choice = row.Identity[:4], row.Identity[4:], row.Choice
+				bankPairTestFlavor(&c, flavor)
 				id, extended := uint32(0x313), false
 				if flavor == "pcs-parallel" {
 					id = 0x610

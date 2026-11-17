@@ -1,6 +1,7 @@
 package canbusreg
 
 import (
+	"errors"
 	"fmt"
 	"time"
 
@@ -12,7 +13,10 @@ import (
 // Sections: PCS feature availability by version; Same-identity variants and native-contract selection.
 // Bank is "ordinary" or "parallel", asserted by configuration because the PCS
 // frames carry no bank selector; "ordinary" is the bank the protocol page calls
-// standard.
+// standard. The PCS flavor and the bank are asserted together: "pcs-standard"
+// pairs with "ordinary" and "pcs-parallel" with "parallel".
+// Topology context values: https://github.com/Project-Helianthus/helianthus-docs-canbus/blob/main/protocols/growatt/growatt-low-voltage-bms-can-common-projection-v1.md
+// Section: Topology Context Values.
 type SelectionSpec struct {
 	Interface                                                         canbus.InterfaceIdentity
 	Flavor, PCSFlavor, ProjectCode, Release, Choice, Direction, Scope string
@@ -28,7 +32,14 @@ type Selection struct {
 	group, layout, grade string
 }
 
+// ErrSelectionBankPairing reports a PCS flavor asserted with the bank it does
+// not pair with. The selection is refused so that no bank-dependent field, such
+// as the 326 slot-current offset, is decoded under a context conflict.
+var ErrSelectionBankPairing = errors.New("PCS flavor and bank do not pair")
+
 // NewSelection validates explicit identity and context; unsupported combinations remain Unknown rather than being inferred from traffic.
+// A pcs-standard or pcs-parallel flavor asserted with the other bank returns
+// ErrSelectionBankPairing.
 func NewSelection(spec SelectionSpec) (Selection, error) {
 	s := Selection{spec: spec, grade: "Unknown"}
 	if spec.Interface.Name() == "" || spec.Interface.Index() <= 0 || len(spec.ProjectCode) != 4 || len(spec.Release) != 4 || !selectionASCII([]byte(spec.ProjectCode+spec.Release)) {
@@ -50,6 +61,9 @@ func NewSelection(spec SelectionSpec) (Selection, error) {
 	}
 	if spec.Bank != "ordinary" && spec.Bank != "parallel" {
 		return s, fmt.Errorf("explicit bank ordinary or parallel required")
+	}
+	if (spec.Flavor == "pcs-standard" && spec.Bank != "ordinary") || (spec.Flavor == "pcs-parallel" && spec.Bank != "parallel") {
+		return s, ErrSelectionBankPairing
 	}
 	flavor := spec.Flavor
 	if flavor == "link" {

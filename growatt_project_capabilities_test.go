@@ -273,7 +273,7 @@ func capabilityTestFixture(t *testing.T, group int, profile, direction, role str
 	spec := selectionTestSpec(t, token[:4], token[4:])
 	spec.Group = "synthetic-group"
 	spec.Slot = "synthetic-slot"
-	spec.Flavor = profile
+	bankPairTestFlavor(&spec, profile)
 	if profile != "link" {
 		spec.Direction = "bms-to-pcs"
 	}

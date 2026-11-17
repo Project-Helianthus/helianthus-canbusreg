@@ -103,7 +103,7 @@ func TestCX01FlavorMatrix(t *testing.T) {
 			if (selectionTestSelect(t, spec).SelectionGroup() != "") != want {
 				t.Fatalf("%s%s %s", v.code, v.release, flavor)
 			}
-			spec.Flavor = flavor
+			bankPairTestFlavor(&spec, flavor)
 			spec.Direction = "bms-to-pcs"
 			if (selectionTestSelect(t, spec).SelectionGroup() != "") != want {
 				t.Fatal("PCS selector parity")

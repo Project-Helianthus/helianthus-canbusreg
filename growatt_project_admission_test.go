@@ -114,7 +114,7 @@ func TestCX16EverySelectionFieldNegative(t *testing.T) {
 	mutations := map[string]func(*SelectionSpec){
 		"interface-name":  func(c *SelectionSpec) { c.Interface, _ = canbus.NewInterfaceIdentity("other", 1) },
 		"interface-index": func(c *SelectionSpec) { c.Interface, _ = canbus.NewInterfaceIdentity("synthetic", 2) },
-		"flavor":          func(c *SelectionSpec) { c.Flavor = "pcs-parallel" },
+		"flavor":          func(c *SelectionSpec) { bankPairTestFlavor(c, "pcs-parallel") },
 		"pcs-flavor":      func(c *SelectionSpec) { c.PCSFlavor = "pcs-extended19" },
 		"project-case":    func(c *SelectionSpec) { c.ProjectCode = "QAAa" },
 		"release":         func(c *SelectionSpec) { c.Release = "0011" },
@@ -135,6 +135,10 @@ func TestCX16EverySelectionFieldNegative(t *testing.T) {
 			s, i := replayTestFixture(t)
 			c := s.SelectionSpecValue()
 			mutate(&c)
+			if name == "bank" {
+				bankPairTestRefused(t, c)
+				return
+			}
 			var err error
 			i.Selection, err = NewSelection(c)
 			if err != nil {

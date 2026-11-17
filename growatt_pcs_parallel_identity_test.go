@@ -71,7 +71,7 @@ func TestCX10IdentityKeyIsolationNegatives(t *testing.T) {
 				i.Slot = "2"
 			case "profile":
 				cc := c
-				cc.Flavor = "pcs-standard"
+				bankPairTestFlavor(&cc, "pcs-standard")
 				a = NewParallelIdentityAssembler(parallelIdentityTestSelection(t, cc), 2)
 			case "project-code":
 				cc := c

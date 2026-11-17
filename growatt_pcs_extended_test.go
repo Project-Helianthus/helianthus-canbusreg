@@ -170,7 +170,7 @@ func TestCX09LegacyFeatureExclusions(t *testing.T) {
 				c := extendedTestSpec(t)
 				c.ProjectCode = identity[:4]
 				c.Release = identity[4:]
-				c.Flavor = flavor
+				bankPairTestFlavor(&c, flavor)
 				if identity == "QAAa9011" {
 					c.Choice = "release11"
 				}

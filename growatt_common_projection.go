@@ -8,14 +8,21 @@ import (
 
 // GrowattLowVoltageBMSCommonProjection is the caller-selected, receive-only
 // field projection defined by
-// https://github.com/Project-Helianthus/helianthus-docs-canbus/blob/7acf59e37f511f0b0cc305c80b093a7da232edec/protocols/growatt/growatt-low-voltage-bms-can-common-projection-v1.md.
+// https://github.com/Project-Helianthus/helianthus-docs-canbus/blob/main/protocols/growatt/growatt-low-voltage-bms-can-common-projection-v1.md.
 // It is not a protocol-revision profile and does not derive one from firmware.
+//
+// Scope is the publisher scope of every value in the projection. It is
+// "unknown" unless the projector was selected with an explicit selection
+// scope: "aggregate" for a stack, gateway or parallel-group summary and
+// "member" for one reporting BMS. No frame carries a scope selector, so a pack
+// count under "unknown" or "aggregate" is never a single-BMS count.
 type GrowattLowVoltageBMSCommonProjection struct {
 	Interface    canbus.InterfaceIdentity
 	RawEvidence  Evidence
 	Limits       *GrowattLowVoltageBMSCommonLimits
 	Status       *GrowattLowVoltageBMSCommonStatus
 	Measurements *GrowattLowVoltageBMSCommonMeasurements
+	Scope        string
 }
 
 // GrowattLowVoltageBMSCommonLimits contains only the shared 0x311 limits.
@@ -49,6 +56,7 @@ type GrowattLowVoltageBMSCommonMeasurements struct {
 // turn two caller-selected interpretations into a generic match collision.
 type GrowattLowVoltageBMSCommonProjector struct {
 	source canbus.InterfaceIdentity
+	scope  string
 }
 
 // NewGrowattLowVoltageBMSCommonProjector selects the common projection for one
@@ -58,7 +66,30 @@ func NewGrowattLowVoltageBMSCommonProjector(source canbus.InterfaceIdentity) (*G
 	if source.Name() == "" || source.Index() <= 0 {
 		return nil, false
 	}
-	return &GrowattLowVoltageBMSCommonProjector{source: source}, true
+	return &GrowattLowVoltageBMSCommonProjector{source: source, scope: "unknown"}, true
+}
+
+// NewGrowattLowVoltageBMSCommonProjectorFromSelection selects the common
+// projection for the interface of a validated selection and carries its
+// asserted scope: selection scope "aggregate" projects as "aggregate" and
+// "local" as "member". A selection without either scope is rejected.
+func NewGrowattLowVoltageBMSCommonProjectorFromSelection(s Selection) (*GrowattLowVoltageBMSCommonProjector, bool) {
+	c := s.SelectionSpecValue()
+	scope := ""
+	switch c.Scope {
+	case "aggregate":
+		scope = "aggregate"
+	case "local":
+		scope = "member"
+	default:
+		return nil, false
+	}
+	p, ok := NewGrowattLowVoltageBMSCommonProjector(c.Interface)
+	if !ok {
+		return nil, false
+	}
+	p.scope = scope
+	return p, true
 }
 
 // Apply retains one source-local raw observation. A valid shared frame exposes
@@ -72,6 +103,7 @@ func (p *GrowattLowVoltageBMSCommonProjector) Apply(evidence Evidence) (GrowattL
 	projection := GrowattLowVoltageBMSCommonProjection{
 		Interface:   evidence.Interface,
 		RawEvidence: evidence,
+		Scope:       p.scope,
 	}
 	if !growattCommonGeometry(evidence.Frame) {
 		return projection, true

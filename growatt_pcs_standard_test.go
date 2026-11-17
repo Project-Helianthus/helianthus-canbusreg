@@ -215,7 +215,7 @@ func TestCX05StatusHypothesisNegatives(t *testing.T) {
 		{"raw-state-aggregate", "raw_state", 3, func(c *SelectionSpec) { c.Scope = "aggregate" }},
 		{"fault-wrong-project", "fault_hint", 4, func(c *SelectionSpec) { c.ProjectCode = "QAAB" }},
 		{"sleep-wrong-case", "sleep_hint", 0x10, func(c *SelectionSpec) { c.ProjectCode = "qAAA" }},
-		{"discharge-wrong-flavor", "discharge_hint", 0x20, func(c *SelectionSpec) { c.Flavor = "pcs-parallel" }},
+		{"discharge-wrong-flavor", "discharge_hint", 0x20, func(c *SelectionSpec) { bankPairTestFlavor(c, "pcs-parallel") }},
 		{"charge-wrong-endpoint", "charge_hint", 0x40, nil},
 		{"force-wrong-release", "force_hint", 0x400, func(c *SelectionSpec) { c.Release = "0007" }},
 	}
@@ -547,6 +547,8 @@ func TestCX05PartialStatesAndLastKnownGood(t *testing.T) {
 				c.Scope = "aggregate"
 			case "bank":
 				c.Bank = "parallel"
+				bankPairTestRefused(t, c)
+				return
 			case "endpoint":
 				c.Endpoint = "other"
 			case "group":

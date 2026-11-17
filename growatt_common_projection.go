@@ -141,3 +141,45 @@ func growattCommonSameInterface(left, right canbus.InterfaceIdentity) bool {
 func growattCommonGeometry(frame canbus.Frame) bool {
 	return !frame.ID().Extended() && frame.DLC() == 8 && frame.RawDLC() == 8
 }
+
+// GrowattEnergyCoverage reports which storage quantities the common projection
+// and the V1.04 projection set. The results are "common" and "v104". Each
+// maps a quantity name to "supported" or "unsupported". Voltage, current,
+// state of charge, the state-of-health value and the charge and discharge
+// limits are supported on both. Remaining energy, usable capacity, nominal
+// capacity and charge capacity in ampere-hours are unsupported on both. The
+// state-of-health valid bit and maximum cell temperature are supported only
+// on the V1.04 result. The report reads no frame and does not change admission.
+func GrowattEnergyCoverage() map[string]map[string]string {
+	common := map[string]string{
+		"voltage":                      "supported",
+		"current":                      "supported",
+		"soc":                          "supported",
+		"soh_value":                    "supported",
+		"charge_voltage_limit":         "supported",
+		"charge_current_limit":         "supported",
+		"discharge_current_limit":      "supported",
+		"remaining_energy":             "unsupported",
+		"usable_capacity":              "unsupported",
+		"nominal_capacity":             "unsupported",
+		"charge_capacity_ampere_hours": "unsupported",
+		"soh_valid":                    "unsupported",
+		"maximum_cell_temperature":     "unsupported",
+	}
+	revision := map[string]string{
+		"voltage":                      "supported",
+		"current":                      "supported",
+		"soc":                          "supported",
+		"soh_value":                    "supported",
+		"charge_voltage_limit":         "supported",
+		"charge_current_limit":         "supported",
+		"discharge_current_limit":      "supported",
+		"remaining_energy":             "unsupported",
+		"usable_capacity":              "unsupported",
+		"nominal_capacity":             "unsupported",
+		"charge_capacity_ampere_hours": "unsupported",
+		"soh_valid":                    "supported",
+		"maximum_cell_temperature":     "supported",
+	}
+	return map[string]map[string]string{"common": common, "v104": revision}
+}

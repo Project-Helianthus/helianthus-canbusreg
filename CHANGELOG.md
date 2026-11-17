@@ -2,6 +2,16 @@
 
 ## Unreleased
 
+- `GrowattEnergyCoverage` states which storage quantities the common projection
+  and the V1.04 projection set. Voltage, current, state of charge, the
+  state-of-health value, and the charge-voltage, charge-current and
+  discharge-current limits are supported on both. Remaining energy, usable
+  capacity, nominal capacity and charge capacity in ampere-hours stay
+  unsupported on both, because neither projection decodes them. The
+  state-of-health valid bit and maximum cell temperature are supported only
+  on the V1.04 projection. Frame decoding, scope, raw evidence and admission
+  are unchanged. No physical qualification is claimed.
+
 - The selected-profile replay and the PCS provider keep the extrema of the
   location-qualified standard record `330` under the retention key `core/330`,
   so its `maximum_index`, `minimum_index`, `maximum_cell` and `minimum_cell`

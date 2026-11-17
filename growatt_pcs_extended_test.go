@@ -534,7 +534,7 @@ func TestCX09GatewayBoundIsNotUniversalAndUpstreamStaysRaw(t *testing.T) {
 	c.Source = 0xf4
 	p := [8]byte{1, 2, 0, 0, 0, 0, 0, 9}
 	r := DecodePCSExtended(extendedTestSelect(t, c), extendedTestInput(t, c, 0x1910, p))
-	if r.Fields["downstream_address"].Status != "raw" || r.Fields["downstream_address"].Numerator != 9 || r.Fields["state"].Status != "accepted" {
+	if r.Fields["downstream_address"].Status != "raw" || r.Fields["downstream_address"].Numerator != 9 || r.Fields["state"].Status != "raw" || r.Fields["state"].Numerator != 1 {
 		t.Fatal(r)
 	}
 	c.ProjectCode = "QCAA"
@@ -605,6 +605,41 @@ func TestCX09EndpointSourceRangeAndCellVoltageUnits(t *testing.T) {
 	for _, n := range []string{"maximum_voltage", "minimum_voltage"} {
 		if f := r.Fields[n]; f.Status != "raw" || f.Unit != "" || f.Meaning != "" {
 			t.Fatal(n, f)
+		}
+	}
+}
+
+// Only the gateway selection decodes the gateway-state field of 0x1910 on route
+// ff/f4. Every other extended selection that reaches the record keeps it raw.
+// Mutations: the gateway project code (QCAA to QAAA/QAAB), the gateway release
+// (0001 to 0002) and the scope (local and aggregate) each leave state undecoded.
+func TestPCSExtendedGatewayStateOnlyForGatewaySelection(t *testing.T) {
+	p := [8]byte{3, 2, 0, 0, 0, 0, 0, 4}
+	for _, scope := range []string{"local", "aggregate"} {
+		for _, identity := range []string{"QCAA0001", "QAAA0005", "QAAA0006", "QAAA0007", "QAAA0009", "QAAB0002", "QAAB0003", "QAAB0004", "QCAA0002"} {
+			t.Run(scope+"/"+identity, func(t *testing.T) {
+				c := extendedTestSpec(t)
+				c.ProjectCode, c.Release, c.Scope = identity[:4], identity[4:], scope
+				c.Destination, c.Source = 0xff, 0xf4
+				r := DecodePCSExtended(extendedTestSelect(t, c), extendedTestInput(t, c, 0x1910, p))
+				state := r.Fields["state"]
+				if identity == "QCAA0001" {
+					if r.Status != "accepted" || state.Status != "accepted" || state.Numerator != 3 || state.Meaning != "state" || r.Fields["downstream_address"].Status != "accepted" {
+						t.Fatal(r)
+					}
+					return
+				}
+				extendedTestWithheld(t, r, p)
+				if identity == "QCAA0002" {
+					if r.Status == "accepted" || len(r.Fields) != 0 {
+						t.Fatal(r)
+					}
+					return
+				}
+				if r.Status != "accepted" || state.Status != "raw" || state.Numerator != 3 || state.Grade != "Unknown" || r.Fields["downstream_address"].Status != "raw" || r.Fields["downstream_address"].Numerator != 4 {
+					t.Fatal(r)
+				}
+			})
 		}
 	}
 }

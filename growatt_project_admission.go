@@ -263,9 +263,15 @@ func (p *replaySelectedProfile) Classify(e Evidence) Classification {
 // replayRetentionKey keys retained extended and gauge PCS values by native family
 // so that families sharing field names never overwrite one another. Slot
 // records without an associated member are kept apart from member-associated ones.
+// The core extrema records 319 and 330 share field names while 330 pairs each index
+// with a location byte, so the location-qualified record keeps its own key and
+// neither record overwrites the other's extrema.
 func replayRetentionKey(prefix string, e Evidence, part NativeResult) string {
 	if prefix == "slots" && !part.HasMember {
 		return prefix + "/unassociated"
+	}
+	if prefix == "core" && !e.Frame.ID().Extended() && e.Frame.ID().Value() == 0x330 {
+		return fmt.Sprintf("%s/%03x", prefix, e.Frame.ID().Value())
 	}
 	if prefix == "parallel" || prefix == "release11" {
 		return fmt.Sprintf("%s/%03x", prefix, e.Frame.ID().Value())

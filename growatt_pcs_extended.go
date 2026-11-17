@@ -68,19 +68,20 @@ func DecodePCSExtended(s Selection, i LINKInput) NativeResult {
 	}
 	localUnits := c.ProjectCode == "QAAA" && c.Release == "0006" && c.Scope == "local"
 	if gatewayState {
-		known("state", int64(p[0]))
+		// Only the gateway selection decodes gateway state; any other selection keeps the record raw.
+		raw("state", int64(p[0]))
 		raw("flag", int64(p[1]))
 		for at := 2; at <= 6; at++ {
 			padding(at)
 		}
 		raw("downstream_address", int64(p[7]))
 		if gateway {
+			known("state", int64(p[0]))
 			known("downstream_address", int64(p[7]))
 		}
 		if gateway && (p[7] < 1 || p[7] > 8) {
 			v := r.Fields["downstream_address"]
-			v.Status = "invalid"
-			v.Meaning = ""
+			v.Status, v.Meaning = "invalid", ""
 			r.Fields["downstream_address"] = v
 		}
 		r.Status = "accepted"
@@ -96,8 +97,7 @@ func DecodePCSExtended(s Selection, i LINKInput) NativeResult {
 		}
 		if c.Scope == "aggregate" && le(0) == 65535 {
 			v := r.Fields["product"]
-			v.Status = "invalid"
-			v.Meaning = ""
+			v.Status, v.Meaning = "invalid", ""
 			r.Fields["product"] = v
 		}
 	case 0x1901:

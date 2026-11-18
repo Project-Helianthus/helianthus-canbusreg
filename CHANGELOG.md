@@ -2,6 +2,19 @@
 
 ## Unreleased
 
+- `GreeVRFProvider` is the receive-only lifecycle for the Gree VRF candidate
+  profile, with the same contract as the receive-only Growatt providers. It
+  starts with a receive source and a strictly increasing generation, fences
+  each observation by generation, interface, sequence and monotonic time,
+  applies the existing candidate classifier and the explicitly selected
+  offline map, and stops by canceling and joining its receive loop. A
+  superseded generation cannot publish, and a successor generation never
+  continues predecessor map state. `Snapshot` returns detached opaque state
+  cells per native unit key with the receive time and the last admitted
+  native evidence, bounded to `GreeVRFProviderMaxUnits` entries, with the
+  admitted, rejected, unsupported and evicted counts. The provider holds no
+  command encoder and no transmit path. No physical qualification is claimed.
+
 - `GrowattEnergyCoverage` states which storage quantities the common projection
   and the V1.04 projection set. Voltage, current, state of charge, the
   state-of-health value, and the charge-voltage, charge-current and

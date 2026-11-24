@@ -15,7 +15,7 @@ func extendedTestSpec(t *testing.T) SelectionSpec {
 	if err != nil {
 		t.Fatal(err)
 	}
-	return SelectionSpec{Interface: bus, Flavor: "pcs-extended19", ProjectCode: "QAAA", Release: "0006", Direction: "bms-to-pcs", Scope: "local", Bank: "ordinary", Endpoint: "endpoint-a", Group: "group-a", Slot: "slot-a", RouteSet: true, Destination: 0xf2, Source: 2, Epoch: 1}
+	return SelectionSpec{Interface: bus, Flavor: "pcs-extended19", ProjectCode: "QAAA", Release: "0006", Direction: "bms-to-pcs", Scope: "local", Bank: "ordinary", Endpoint: "coordinator", Group: "0", Slot: "1", RouteSet: true, Destination: 0xf2, Source: 2, Epoch: 1}
 }
 func extendedTestSelect(t *testing.T, c SelectionSpec) Selection {
 	t.Helper()
@@ -361,13 +361,20 @@ func TestCX09RawIndependentValidityAndFaultBlocks(t *testing.T) {
 	}
 	for _, kind := range []uint32{0x1907, 0x1908} {
 		r := DecodePCSExtended(s, extendedTestInput(t, c, kind, p))
-		if len(r.Fields) != 8 {
+		if len(r.Fields) != 72 {
 			t.Fatal(r)
 		}
 		for at := 0; at < 8; at++ {
 			name := fmt.Sprintf("current_fault_%d", int(kind-0x1907)*8+at)
 			if r.Fields[name].Numerator != int64(p[at]) {
 				t.Fatal(r)
+			}
+			for bit := 0; bit < 8; bit++ {
+				key := fmt.Sprintf("current_fault_bit_%d", (int(kind-0x1907)*8+at)*8+bit)
+				f := r.Fields[key]
+				if f.Status != "raw" || f.Meaning != "" || f.Numerator != int64(p[at]>>bit&1) || f.Raw != p {
+					t.Fatal(key, f)
+				}
 			}
 		}
 	}

@@ -42,11 +42,17 @@ func LabelCondition(member Selection, index NativeField) NativeField {
 		r.Status = "invalid"
 		return r
 	}
-	n := int(index.Numerator)
+	if name := growattConditionName(int(index.Numerator), modern); name != "" {
+		r.Meaning, r.Grade, r.Status = name, "Hypothesis", "accepted"
+	}
+	return r
+}
+
+func growattConditionName(n int, modern bool) string {
 	switch n {
 	case 31, 35, 91, 93, 102, 103, 128, 131, 133, 134, 135:
 		if !modern {
-			return r
+			return ""
 		}
 	}
 	name := ""
@@ -122,8 +128,28 @@ func LabelCondition(member Selection, index NativeField) NativeField {
 	case 135:
 		name = "Pack/port voltage difference with hardware status"
 	}
-	if name != "" {
-		r.Meaning, r.Grade, r.Status = name, "Hypothesis", "accepted"
+	return name
+}
+
+func growattSelectedConditionName(s Selection, index int) string {
+	count, modern := dictionary(s)
+	if index >= count {
+		return ""
 	}
-	return r
+	return growattConditionName(index, modern)
+}
+
+func growattFaultBits(r *NativeResult, field NativeField, prefix string, byteOffset int, value byte) {
+	for bit := 0; bit < 8; bit++ {
+		f := field
+		f.Numerator, f.Denominator = int64(value>>bit&1), 1
+		index := 8*byteOffset + bit
+		f.Meaning = growattSelectedConditionName(r.Selection, index)
+		if f.Meaning == "" {
+			f.Status, f.Grade = "raw", "Unknown"
+		} else {
+			f.Status, f.Grade = "accepted", "Hypothesis"
+		}
+		r.Fields[fmt.Sprintf("%s%d", prefix, index)] = f
+	}
 }

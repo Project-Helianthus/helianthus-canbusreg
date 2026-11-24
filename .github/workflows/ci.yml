@@ -34,6 +34,8 @@ jobs:
           python-version: '3.x'
       - run: GOWORK=off go test ./...
       - run: GOWORK=off go vet ./...
+      - run: python3 scripts/validate_growatt_bms_can_storage_mapping.py
+      - run: python3 scripts/test_validate_growatt_bms_can_storage_mapping.py
       - run: python3 -m unittest discover -s scripts/tests -p driver_imports_test.py -v
         env:
           GOWORK: 'off'

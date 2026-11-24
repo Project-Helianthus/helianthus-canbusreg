@@ -1,0 +1,37 @@
+{
+  "family_id": "growatt-bms-can-v104",
+  "name": "Growatt low-voltage BMS CAN V1.04",
+  "native_owner": "Project-Helianthus/helianthus-canbusreg",
+  "semantic_pack": "helianthus.pack.storage@1.1.0",
+  "state": "qualified",
+  "composition": "not_composed",
+  "reason": "declared_by_specification",
+  "evidence": [
+    {
+      "owner": "Project-Helianthus/helianthus-docs-canbus@3dca48a82a693e4767d1a8e82579f4f245bc2603",
+      "kind": "specification",
+      "locator": "protocols/growatt/low-voltage-bms-can-v104.md",
+      "statement": "This page is the specification the growatt-bms-can-v104 family is declared from."
+    },
+    {
+      "owner": "Project-Helianthus/helianthus-canbusreg@f5b8cbf",
+      "kind": "native_evidence",
+      "locator": "growatt_v104_replay.go",
+      "statement": "V1.04 observations replay-qualified offline (canbusreg #17); receive-only"
+    },
+    {
+      "owner": "Project-Helianthus/helianthus-canbusreg@f5b8cbf",
+      "kind": "native_evidence",
+      "locator": "growatt_common_projection.go",
+      "statement": "caller-selected receive-only common projection exposes only fields shared by V1.04 and V1.08 (canbusreg #19); revision-local fields stay raw evidence"
+    },
+    {
+      "owner": "Project-Helianthus/helianthus-docs-semantic@30f5e5c",
+      "kind": "semantic_contract",
+      "locator": "compatibility/donor-ledger.md",
+      "statement": "storage/BMS CAN V1.04 row is an offline candidate only, physical qualification false, no control route"
+    }
+  ],
+  "composition_verified": false,
+  "verification": "not_tested_on_hardware"
+}

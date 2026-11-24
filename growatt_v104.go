@@ -214,7 +214,7 @@ func growattV104ListedFrame(frame canbus.Frame) bool {
 }
 
 func growattV104Geometry(frame canbus.Frame) bool {
-	return !frame.ID().Extended() && frame.DLC() == 8 && frame.RawDLC() == 8
+	return !frame.ID().Extended() && frame.PayloadLength() == 8
 }
 
 func growattV104Valid(frame canbus.Frame) bool {

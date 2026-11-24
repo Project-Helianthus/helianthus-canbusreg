@@ -23,7 +23,15 @@ type BMSReceiveSource interface {
 	Receive(context.Context) (BMSObservation, error)
 }
 
-// GrowattBMSSnapshot retains at most one raw observation and one accepted tuple.
+// GrowattBMSObservedReport records the generation of a retained native report.
+type GrowattBMSObservedReport struct {
+	Generation uint64
+	Report     GrowattBMSReport
+}
+
+// GrowattBMSSnapshot retains the latest raw observation, the last complete V1.04
+// tuple and the last valid report of each observed identifier. ProjectionCurrent
+// distinguishes a currently complete tuple from historical last-known-good data.
 // A historical projection's generation can differ from the current source generation.
 type GrowattBMSSnapshot struct {
 	State                string
@@ -32,16 +40,20 @@ type GrowattBMSSnapshot struct {
 	HasRaw               bool
 	RawGeneration        uint64
 	ProjectionGeneration uint64
+	ProjectionCurrent    bool
 	Projection           *GrowattLowVoltageBMSV104Projection
+	Profile              string
+	Reports              map[uint32]GrowattBMSObservedReport
 }
 
-// GrowattBMSProvider wraps only the explicitly selected V1.04 replay.
+// GrowattBMSProvider publishes reports of the explicitly selected revision.
 // Construct it with NewGrowattBMSProvider; its zero value is not usable.
 type GrowattBMSProvider struct {
 	bmsLifecycle   sync.Mutex
 	bmsMu          sync.Mutex
 	bmsInterface   canbus.InterfaceIdentity
 	bmsReplay      *GrowattLowVoltageBMSV104QualificationReplay
+	bmsProfile     Profile
 	bmsSnapshot    GrowattBMSSnapshot
 	bmsRunning     bool
 	bmsSequence    uint64
@@ -52,14 +64,12 @@ type GrowattBMSProvider struct {
 
 // NewGrowattBMSProvider creates a stopped provider; unsupported revisions or invalid interfaces return an error.
 func NewGrowattBMSProvider(bmsInterface canbus.InterfaceIdentity, bmsRevision string) (*GrowattBMSProvider, error) {
-	if bmsRevision != BMSRevisionV104 {
-		return nil, errors.New("growatt BMS provider requires explicit V1.04 selection")
+	profile, err := NewGrowattBMSProfile(bmsInterface, bmsRevision)
+	if err != nil {
+		return nil, err
 	}
-	bmsReplay, bmsOK := NewGrowattLowVoltageBMSV104QualificationReplay(bmsInterface)
-	if !bmsOK {
-		return nil, errors.New("growatt BMS provider requires a valid interface")
-	}
-	return &GrowattBMSProvider{bmsInterface: bmsInterface, bmsReplay: bmsReplay, bmsSnapshot: GrowattBMSSnapshot{State: "stopped"}}, nil
+	name, _ := growattBMSRevisionProfile(bmsRevision)
+	return &GrowattBMSProvider{bmsInterface: bmsInterface, bmsProfile: profile, bmsSnapshot: GrowattBMSSnapshot{State: "stopped", Profile: name, Reports: make(map[uint32]GrowattBMSObservedReport)}}, nil
 }
 
 // Start cancels and joins any predecessor before installing a fresh replay.
@@ -75,12 +85,15 @@ func (bmsP *GrowattBMSProvider) Start(bmsSource BMSReceiveSource, bmsGeneration 
 	}
 	bmsP.bmsStop()
 	bmsP.bmsMu.Lock()
-	bmsP.bmsReplay, _ = NewGrowattLowVoltageBMSV104QualificationReplay(bmsP.bmsInterface)
+	if bmsP.bmsSnapshot.Profile == growattLowVoltageBMSV104Profile {
+		bmsP.bmsReplay, _ = NewGrowattLowVoltageBMSV104QualificationReplay(bmsP.bmsInterface)
+	}
 	bmsCtx, bmsCancel := context.WithCancel(context.Background())
 	bmsDone := make(chan struct{})
 	bmsP.bmsCancel, bmsP.bmsDone = bmsCancel, bmsDone
 	bmsP.bmsRunning = true
 	bmsP.bmsSequence, bmsP.bmsHasSequence = 0, false
+	bmsP.bmsSnapshot.ProjectionCurrent = false
 	bmsP.bmsSnapshot.Generation = bmsGeneration
 	bmsP.bmsSnapshot.State = "awaiting"
 	bmsP.bmsMu.Unlock()
@@ -100,6 +113,7 @@ func (bmsP *GrowattBMSProvider) bmsStop() {
 	bmsP.bmsMu.Lock()
 	bmsP.bmsRunning = false
 	bmsP.bmsSnapshot.State = "stopped"
+	bmsP.bmsSnapshot.ProjectionCurrent = false
 	bmsCancel, bmsDone := bmsP.bmsCancel, bmsP.bmsDone
 	bmsP.bmsMu.Unlock()
 	if bmsCancel != nil {
@@ -117,6 +131,7 @@ func (bmsP *GrowattBMSProvider) bmsReceive(bmsCtx context.Context, bmsSource BMS
 			if bmsP.bmsRunning && bmsP.bmsSnapshot.Generation == bmsGeneration {
 				bmsP.bmsRunning = false
 				bmsP.bmsSnapshot.State = "degraded"
+				bmsP.bmsSnapshot.ProjectionCurrent = false
 			}
 			bmsP.bmsMu.Unlock()
 			return
@@ -148,14 +163,20 @@ func (bmsP *GrowattBMSProvider) bmsApply(bmsObservation BMSObservation) {
 	// Evidence and Frame own fixed-width arrays; assignment copies all raw bytes.
 	bmsP.bmsSnapshot.Raw, bmsP.bmsSnapshot.HasRaw = bmsEvidence, true
 	bmsP.bmsSnapshot.RawGeneration = bmsObservation.Generation
-	bmsProjection, bmsOK := bmsP.bmsReplay.Apply(bmsEvidence)
-	if !bmsOK {
-		bmsP.bmsSnapshot.State = "awaiting"
-		return
+	bmsP.bmsSnapshot.State = "awaiting"
+	bmsP.bmsSnapshot.ProjectionCurrent = false
+	if bmsP.bmsReplay != nil {
+		if projection, ok := bmsP.bmsReplay.Apply(bmsEvidence); ok {
+			bmsP.bmsSnapshot.Projection = &projection
+			bmsP.bmsSnapshot.ProjectionCurrent = true
+			bmsP.bmsSnapshot.ProjectionGeneration = bmsObservation.Generation
+			bmsP.bmsSnapshot.State = "receiving"
+		}
 	}
-	bmsP.bmsSnapshot.Projection = &bmsProjection
-	bmsP.bmsSnapshot.ProjectionGeneration = bmsObservation.Generation
-	bmsP.bmsSnapshot.State = "receiving"
+	if report, ok := bmsP.bmsProfile.Classify(bmsEvidence).Projection.(GrowattBMSReport); ok {
+		bmsP.bmsSnapshot.Reports[bmsEvidence.Frame.ID().Value()] = GrowattBMSObservedReport{Generation: bmsObservation.Generation, Report: report}
+		bmsP.bmsSnapshot.State = "receiving"
+	}
 }
 
 // Snapshot returns a synchronized copy with a detached projection.
@@ -166,6 +187,16 @@ func (bmsP *GrowattBMSProvider) Snapshot() GrowattBMSSnapshot {
 	if bmsSnapshot.Projection != nil {
 		bmsProjection := *bmsSnapshot.Projection
 		bmsSnapshot.Projection = &bmsProjection
+	}
+	bmsSnapshot.Reports = make(map[uint32]GrowattBMSObservedReport, len(bmsP.bmsSnapshot.Reports))
+	for id, observed := range bmsP.bmsSnapshot.Reports {
+		fields := make(growattReportFields, len(observed.Report.Fields))
+		for name, field := range observed.Report.Fields {
+			field.Raw = append([]byte(nil), field.Raw...)
+			fields[name] = field
+		}
+		observed.Report.Fields = fields
+		bmsSnapshot.Reports[id] = observed
 	}
 	return bmsSnapshot
 }

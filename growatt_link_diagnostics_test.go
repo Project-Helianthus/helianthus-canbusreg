@@ -55,7 +55,7 @@ func TestCX13FaultBlocks(t *testing.T) {
 						if b == bit {
 							want = 1
 						}
-						if f.Numerator != want || f.Denominator != 1 || f.Meaning != "current fault bit" || f.Raw != p || f.Evidence != i.Evidence || f.PhysicalQualified {
+						if f.Numerator != want || f.Denominator != 1 || f.Raw != p || f.Evidence != i.Evidence || f.PhysicalQualified {
 							t.Fatal(b, f)
 						}
 					}
@@ -125,7 +125,7 @@ func TestCX13MonitorCoordinatorAndByteSeven(t *testing.T) {
 				if route == "coordinator" {
 					c.Direction = "coordinator-to-module"
 					c.Scope = "aggregate"
-					c.Source = 0xf4
+					c.Source, c.Endpoint = 0xf4, "F4"
 					c.Destination = 0xdf
 					kind = 0x1869
 				}

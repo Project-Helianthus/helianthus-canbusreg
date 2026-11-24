@@ -1,0 +1,3079 @@
+{
+  "contract": "helianthus.semantic.mapping.growatt-bms-can.storage/v1",
+  "mapping_id": "storage.mapping.growatt.can.low_voltage",
+  "pack": {
+    "id": "helianthus.pack.storage",
+    "version": "1.1.0"
+  },
+  "status": "accepted_source_specific_read_only_mapping_gate",
+  "native_contract": {
+    "family": "low_voltage_bms_can",
+    "selection": "caller_selects_one_profile",
+    "profiles_do_not_select_each_other": true,
+    "admission": "fail_closed",
+    "partial_last_known_good": true,
+    "qualification": {
+      "physical_qualified": false,
+      "mapping_qualified": true,
+      "outbound_allowed": false
+    }
+  },
+  "identity": {
+    "asset_id": {
+      "source": "gateway_configured_semantic_asset_id",
+      "required": true,
+      "non_secret": true,
+      "forbidden_derivations": [
+        "interface",
+        "profile",
+        "vendor",
+        "version"
+      ]
+    },
+    "source_id": {
+      "source": "gateway_configured_semantic_source_id",
+      "required": true,
+      "non_secret": true,
+      "distinct_from": "asset_id",
+      "forbidden_derivations": [
+        "interface",
+        "profile",
+        "vendor",
+        "version"
+      ]
+    },
+    "native_identity_evidence": [
+      "manufacturer_bytes",
+      "hardware_version_byte",
+      "software_version_byte"
+    ],
+    "failure": "missing_or_invalid_asset_or_source_identity_fails_closed",
+    "binding_id": {
+      "source": "gateway_domain_separated_asset_source_profile_binding",
+      "required": true,
+      "non_secret": true,
+      "stable_inputs": [
+        "asset_id",
+        "source_id",
+        "profile"
+      ]
+    },
+    "resources": {
+      "pack": {
+        "dimension": "storage.dimension.pack",
+        "source": "gateway_allocated_resource_id",
+        "required": true
+      }
+    }
+  },
+  "graph": {
+    "resources": [
+      {
+        "kind": "resource.battery_pack",
+        "anchor_class": "equipment",
+        "anchor_basis": "operator_slot",
+        "anchor_source": "operator_label",
+        "identification_scheme": "none_listed",
+        "parent_kind": null,
+        "evidence": [
+          "catalog_subject:storage.dimension.pack",
+          "future_native_token:none_until_the_native_owner_documents_a_stable_pack_token",
+          "native_owner_token_stability:unknown_until_the_native_owner_states_it",
+          "identification_scheme:none_listed_for_family"
+        ]
+      }
+    ],
+    "relations": [],
+    "relayed": [],
+    "joins": [
+      {
+        "kind": "resource.battery_pack",
+        "observations": [
+          "read_directly_on_can",
+          "seen_through_another_path"
+        ],
+        "basis": "operator_declaration",
+        "native_tokens": "not_exposed"
+      }
+    ],
+    "aggregates": [],
+    "selectors": [
+      {
+        "selector": "profile",
+        "classification": "provenance",
+        "evidence": [
+          "native_contract:profile",
+          "graph:6.3:selector_is_provenance_until_native_owner_states_otherwise"
+        ]
+      },
+      {
+        "selector": "interface",
+        "classification": "provenance",
+        "evidence": [
+          "native_contract:interface",
+          "graph:6.3:an_interface_name_is_never_an_anchor"
+        ]
+      }
+    ]
+  },
+  "unstated_relations": [
+    {
+      "definition": "storage.relation.battery_pack",
+      "from_kind": "resource.battery",
+      "to_kind": "resource.battery_pack",
+      "outcome": "unknown_not_absent",
+      "withheld_by": "unsupported:repeated_pack_identity"
+    },
+    {
+      "definition": "storage.relation.module_cell",
+      "from_kind": "resource.battery_module",
+      "to_kind": "resource.battery_cell",
+      "outcome": "unknown_not_absent",
+      "withheld_by": "unsupported:pack_module_cell_string_topology"
+    },
+    {
+      "definition": "storage.relation.pack_interface",
+      "from_kind": "resource.battery_pack",
+      "to_kind": "resource.storage_interface",
+      "outcome": "unknown_not_absent",
+      "withheld_by": "unsupported:charge_discharge_limits"
+    },
+    {
+      "definition": "storage.relation.pack_module",
+      "from_kind": "resource.battery_pack",
+      "to_kind": "resource.battery_module",
+      "outcome": "unknown_not_absent",
+      "withheld_by": "unsupported:pack_module_cell_string_topology"
+    },
+    {
+      "definition": "storage.relation.pack_string",
+      "from_kind": "resource.battery_pack",
+      "to_kind": "resource.battery_string",
+      "outcome": "unknown_not_absent",
+      "withheld_by": "unsupported:pack_module_cell_string_topology"
+    },
+    {
+      "definition": "storage.relation.system_battery",
+      "from_kind": "resource.storage_system",
+      "to_kind": "resource.battery",
+      "outcome": "unknown_not_absent",
+      "withheld_by": "configuration:no_storage_system_declared_by_this_gate"
+    }
+  ],
+  "lifecycle": {
+    "required_observation_evidence": [
+      "observation_id",
+      "profile",
+      "interface",
+      "identifier",
+      "payload",
+      "receipt_monotonic",
+      "source_epoch"
+    ],
+    "admission": "fail_closed",
+    "partial_last_known_good": "retained_until_identity_or_admission_fails",
+    "qualification": "mapping_qualified_and_physical_unqualified",
+    "outbound_allowed": false
+  },
+  "unsupported": [
+    "repeated_pack_identity",
+    "pack_module_cell_string_topology",
+    "charge_discharge_limits"
+  ],
+  "package_e_elements": [
+    {
+      "concern": "voltage_limit",
+      "element": "storage.limit.charge_voltage",
+      "dimension": "interface"
+    },
+    {
+      "concern": "current_limit",
+      "element": "storage.limit.charge_current",
+      "dimension": "interface"
+    },
+    {
+      "concern": "current_limit",
+      "element": "storage.limit.discharge_current",
+      "dimension": "interface"
+    },
+    {
+      "concern": "cycle_count",
+      "element": "storage.state.cycle_count",
+      "dimension": "pack"
+    },
+    {
+      "concern": "per_cell_voltage",
+      "element": "storage.measurement.cell_voltage",
+      "dimension": "cell"
+    },
+    {
+      "concern": "chemistry",
+      "element": "storage.attribute.chemistry",
+      "dimension": "pack"
+    },
+    {
+      "concern": "insulation_resistance",
+      "element": "storage.measurement.insulation_resistance",
+      "dimension": "pack"
+    }
+  ],
+  "profiles": [
+    {
+      "id": "v1_04",
+      "selector": "growatt.bms.low_voltage.can.v1_04",
+      "fields": [
+        {
+          "source": "charge_voltage_limit",
+          "frame": "0x311",
+          "native_unit": "V",
+          "element": "storage.limit.charge_voltage",
+          "dimension": "interface",
+          "qualifiers": [],
+          "conversion": {
+            "native_unit": "V",
+            "canonical_unit": "unit.volt",
+            "factor": {
+              "coefficient": "1",
+              "exponent10": 0
+            },
+            "offset": {
+              "coefficient": "0",
+              "exponent10": 0
+            },
+            "rule": "identity"
+          },
+          "disposition": "waiting",
+          "grade": "Proven",
+          "subject_kind": null,
+          "measurement_point": null,
+          "loss": [],
+          "emitted": false,
+          "package_e": "voltage_limit",
+          "reason": null
+        },
+        {
+          "source": "charge_current_limit",
+          "frame": "0x311",
+          "native_unit": "A",
+          "element": "storage.limit.charge_current",
+          "dimension": "interface",
+          "qualifiers": [],
+          "conversion": {
+            "native_unit": "A",
+            "canonical_unit": "unit.ampere",
+            "factor": {
+              "coefficient": "1",
+              "exponent10": 0
+            },
+            "offset": {
+              "coefficient": "0",
+              "exponent10": 0
+            },
+            "rule": "identity"
+          },
+          "disposition": "waiting",
+          "grade": "Proven",
+          "subject_kind": null,
+          "measurement_point": null,
+          "loss": [],
+          "emitted": false,
+          "package_e": "current_limit",
+          "reason": null
+        },
+        {
+          "source": "discharge_current_limit",
+          "frame": "0x311",
+          "native_unit": "A",
+          "element": "storage.limit.discharge_current",
+          "dimension": "interface",
+          "qualifiers": [],
+          "conversion": {
+            "native_unit": "A",
+            "canonical_unit": "unit.ampere",
+            "factor": {
+              "coefficient": "1",
+              "exponent10": 0
+            },
+            "offset": {
+              "coefficient": "0",
+              "exponent10": 0
+            },
+            "rule": "identity"
+          },
+          "disposition": "waiting",
+          "grade": "Proven",
+          "subject_kind": null,
+          "measurement_point": null,
+          "loss": [],
+          "emitted": false,
+          "package_e": "current_limit",
+          "reason": null
+        },
+        {
+          "source": "pack_voltage",
+          "frame": "0x313",
+          "native_unit": "V",
+          "element": "storage.pack.voltage",
+          "dimension": "pack",
+          "qualifiers": [],
+          "conversion": {
+            "native_unit": "V",
+            "canonical_unit": "unit.volt",
+            "factor": {
+              "coefficient": "1",
+              "exponent10": 0
+            },
+            "offset": {
+              "coefficient": "0",
+              "exponent10": 0
+            },
+            "rule": "identity"
+          },
+          "disposition": "mapped",
+          "grade": "Proven",
+          "subject_kind": "resource.battery_pack",
+          "measurement_point": "pack_terminals",
+          "loss": [],
+          "emitted": true,
+          "package_e": null,
+          "reason": null
+        },
+        {
+          "source": "pack_current",
+          "frame": "0x313",
+          "native_unit": "A",
+          "element": "storage.pack.current",
+          "dimension": "pack",
+          "qualifiers": [],
+          "conversion": {
+            "native_unit": "A",
+            "canonical_unit": "unit.ampere",
+            "factor": {
+              "coefficient": "1",
+              "exponent10": 0
+            },
+            "offset": {
+              "coefficient": "0",
+              "exponent10": 0
+            },
+            "rule": "identity"
+          },
+          "disposition": "mapped",
+          "grade": "Proven",
+          "subject_kind": "resource.battery_pack",
+          "measurement_point": "pack_terminals",
+          "loss": [
+            {
+              "kind": "provenance",
+              "reversible": true
+            }
+          ],
+          "emitted": true,
+          "package_e": null,
+          "reason": null
+        },
+        {
+          "source": "maximum_cell_temperature",
+          "frame": "0x313",
+          "native_unit": "degC",
+          "element": "storage.temperature.cell",
+          "dimension": "cell",
+          "qualifiers": [],
+          "conversion": {
+            "native_unit": "degC",
+            "canonical_unit": "unit.kelvin",
+            "factor": {
+              "coefficient": "1",
+              "exponent10": 0
+            },
+            "offset": {
+              "coefficient": "27315",
+              "exponent10": -2
+            },
+            "rule": "celsius_plus_273_15"
+          },
+          "disposition": "mapped",
+          "grade": "Hypothesis",
+          "subject_kind": "resource.battery_cell",
+          "measurement_point": "cell_as_reported",
+          "loss": [
+            {
+              "kind": "unit",
+              "reversible": true
+            }
+          ],
+          "emitted": false,
+          "package_e": null,
+          "reason": null
+        },
+        {
+          "source": "state_of_charge",
+          "frame": "0x313",
+          "native_unit": "%",
+          "element": "storage.state.soc",
+          "dimension": "pack",
+          "qualifiers": [],
+          "conversion": {
+            "native_unit": "%",
+            "canonical_unit": "unit.ratio",
+            "factor": {
+              "coefficient": "1",
+              "exponent10": -2
+            },
+            "offset": {
+              "coefficient": "0",
+              "exponent10": 0
+            },
+            "rule": "percent_over_100"
+          },
+          "disposition": "mapped",
+          "grade": "Proven",
+          "subject_kind": "resource.battery_pack",
+          "measurement_point": "pack_as_a_whole",
+          "loss": [
+            {
+              "kind": "unit",
+              "reversible": true
+            }
+          ],
+          "emitted": true,
+          "package_e": null,
+          "reason": null
+        },
+        {
+          "source": "state_of_health",
+          "frame": "0x313",
+          "native_unit": "%",
+          "element": "storage.state.soh",
+          "dimension": "pack",
+          "qualifiers": [],
+          "conversion": {
+            "native_unit": "%",
+            "canonical_unit": "unit.ratio",
+            "factor": {
+              "coefficient": "1",
+              "exponent10": -2
+            },
+            "offset": {
+              "coefficient": "0",
+              "exponent10": 0
+            },
+            "rule": "percent_over_100"
+          },
+          "disposition": "mapped",
+          "grade": "Proven",
+          "subject_kind": "resource.battery_pack",
+          "measurement_point": "pack_as_a_whole",
+          "loss": [
+            {
+              "kind": "unit",
+              "reversible": true
+            }
+          ],
+          "emitted": true,
+          "package_e": null,
+          "reason": null
+        },
+        {
+          "source": "remaining_capacity",
+          "frame": "0x314",
+          "native_unit": "Ah",
+          "element": null,
+          "dimension": "pack",
+          "qualifiers": [],
+          "conversion": {
+            "native_unit": "Ah",
+            "canonical_unit": "unit.ampere_hour",
+            "factor": {
+              "coefficient": "1",
+              "exponent10": 0
+            },
+            "offset": {
+              "coefficient": "0",
+              "exponent10": 0
+            },
+            "rule": "ampere_hour_unchanged"
+          },
+          "disposition": "not_admitted",
+          "grade": "Proven",
+          "subject_kind": null,
+          "measurement_point": null,
+          "loss": [],
+          "emitted": false,
+          "package_e": null,
+          "reason": "ampere_hour_estimate_is_not_a_pack_element"
+        },
+        {
+          "source": "full_charge_capacity",
+          "frame": "0x314",
+          "native_unit": "Ah",
+          "element": null,
+          "dimension": "pack",
+          "qualifiers": [],
+          "conversion": {
+            "native_unit": "Ah",
+            "canonical_unit": "unit.ampere_hour",
+            "factor": {
+              "coefficient": "1",
+              "exponent10": 0
+            },
+            "offset": {
+              "coefficient": "0",
+              "exponent10": 0
+            },
+            "rule": "ampere_hour_unchanged"
+          },
+          "disposition": "not_admitted",
+          "grade": "Proven",
+          "subject_kind": null,
+          "measurement_point": null,
+          "loss": [],
+          "emitted": false,
+          "package_e": null,
+          "reason": "ampere_hour_estimate_is_not_a_pack_element"
+        },
+        {
+          "source": "cell_voltage_spread",
+          "frame": "0x314",
+          "native_unit": "mV",
+          "element": null,
+          "dimension": "cell",
+          "qualifiers": [],
+          "conversion": {
+            "native_unit": "mV",
+            "canonical_unit": "unit.volt",
+            "factor": {
+              "coefficient": "1",
+              "exponent10": -3
+            },
+            "offset": {
+              "coefficient": "0",
+              "exponent10": 0
+            },
+            "rule": "millivolt_to_volt"
+          },
+          "disposition": "not_admitted",
+          "grade": "Proven",
+          "subject_kind": null,
+          "measurement_point": null,
+          "loss": [
+            {
+              "kind": "unit",
+              "reversible": true
+            }
+          ],
+          "emitted": false,
+          "package_e": null,
+          "reason": "spread_is_not_a_cell_voltage"
+        },
+        {
+          "source": "cycle_count",
+          "frame": "0x314",
+          "native_unit": "cycles",
+          "element": "storage.state.cycle_count",
+          "dimension": "pack",
+          "qualifiers": [],
+          "conversion": {
+            "native_unit": "cycles",
+            "canonical_unit": null,
+            "factor": {
+              "coefficient": "1",
+              "exponent10": 0
+            },
+            "offset": {
+              "coefficient": "0",
+              "exponent10": 0
+            },
+            "rule": "count_unchanged"
+          },
+          "disposition": "waiting",
+          "grade": "Proven",
+          "subject_kind": null,
+          "measurement_point": null,
+          "loss": [],
+          "emitted": false,
+          "package_e": "cycle_count",
+          "reason": null
+        },
+        {
+          "source": "cell_voltage",
+          "frame": "0x315",
+          "native_unit": "mV",
+          "element": "storage.measurement.cell_voltage",
+          "dimension": "cell",
+          "qualifiers": [
+            {
+              "name": "slot",
+              "role": "cell_index"
+            }
+          ],
+          "conversion": {
+            "native_unit": "mV",
+            "canonical_unit": "unit.volt",
+            "factor": {
+              "coefficient": "1",
+              "exponent10": -3
+            },
+            "offset": {
+              "coefficient": "0",
+              "exponent10": 0
+            },
+            "rule": "millivolt_to_volt"
+          },
+          "disposition": "waiting",
+          "grade": "Proven",
+          "subject_kind": null,
+          "measurement_point": null,
+          "loss": [
+            {
+              "kind": "unit",
+              "reversible": true
+            }
+          ],
+          "emitted": false,
+          "package_e": "per_cell_voltage",
+          "reason": null
+        },
+        {
+          "source": "maximum_cell_voltage",
+          "frame": "0x319",
+          "native_unit": "mV",
+          "element": "storage.cell.voltage_maximum",
+          "dimension": "cell",
+          "qualifiers": [],
+          "conversion": {
+            "native_unit": "mV",
+            "canonical_unit": "unit.volt",
+            "factor": {
+              "coefficient": "1",
+              "exponent10": -3
+            },
+            "offset": {
+              "coefficient": "0",
+              "exponent10": 0
+            },
+            "rule": "millivolt_to_volt"
+          },
+          "disposition": "mapped",
+          "grade": "Proven",
+          "subject_kind": "resource.battery_cell",
+          "measurement_point": "cell_extremum",
+          "loss": [
+            {
+              "kind": "unit",
+              "reversible": true
+            }
+          ],
+          "emitted": false,
+          "package_e": null,
+          "reason": null
+        },
+        {
+          "source": "minimum_cell_voltage",
+          "frame": "0x319",
+          "native_unit": "mV",
+          "element": "storage.cell.voltage_minimum",
+          "dimension": "cell",
+          "qualifiers": [],
+          "conversion": {
+            "native_unit": "mV",
+            "canonical_unit": "unit.volt",
+            "factor": {
+              "coefficient": "1",
+              "exponent10": -3
+            },
+            "offset": {
+              "coefficient": "0",
+              "exponent10": 0
+            },
+            "rule": "millivolt_to_volt"
+          },
+          "disposition": "mapped",
+          "grade": "Proven",
+          "subject_kind": "resource.battery_cell",
+          "measurement_point": "cell_extremum",
+          "loss": [
+            {
+              "kind": "unit",
+              "reversible": true
+            }
+          ],
+          "emitted": false,
+          "package_e": null,
+          "reason": null
+        },
+        {
+          "source": "chemistry",
+          "frame": "0x319",
+          "native_unit": "code",
+          "element": "storage.attribute.chemistry",
+          "dimension": "pack",
+          "qualifiers": [],
+          "conversion": null,
+          "disposition": "waiting",
+          "grade": "Proven",
+          "subject_kind": null,
+          "measurement_point": null,
+          "loss": [],
+          "emitted": false,
+          "package_e": "chemistry",
+          "reason": null
+        }
+      ]
+    },
+    {
+      "id": "pcs_standard",
+      "selector": "growatt.bms.low_voltage.can.pcs.standard",
+      "fields": [
+        {
+          "source": "charge_voltage_limit",
+          "frame": "0x311",
+          "native_unit": "V",
+          "element": "storage.limit.charge_voltage",
+          "dimension": "interface",
+          "qualifiers": [],
+          "conversion": {
+            "native_unit": "V",
+            "canonical_unit": "unit.volt",
+            "factor": {
+              "coefficient": "1",
+              "exponent10": 0
+            },
+            "offset": {
+              "coefficient": "0",
+              "exponent10": 0
+            },
+            "rule": "identity"
+          },
+          "disposition": "waiting",
+          "grade": "Proven",
+          "subject_kind": null,
+          "measurement_point": null,
+          "loss": [],
+          "emitted": false,
+          "package_e": "voltage_limit",
+          "reason": null
+        },
+        {
+          "source": "charge_current_limit",
+          "frame": "0x311",
+          "native_unit": "A",
+          "element": "storage.limit.charge_current",
+          "dimension": "interface",
+          "qualifiers": [],
+          "conversion": {
+            "native_unit": "A",
+            "canonical_unit": "unit.ampere",
+            "factor": {
+              "coefficient": "1",
+              "exponent10": 0
+            },
+            "offset": {
+              "coefficient": "0",
+              "exponent10": 0
+            },
+            "rule": "identity"
+          },
+          "disposition": "waiting",
+          "grade": "Hypothesis",
+          "subject_kind": null,
+          "measurement_point": null,
+          "loss": [],
+          "emitted": false,
+          "package_e": "current_limit",
+          "reason": null
+        },
+        {
+          "source": "discharge_current_limit",
+          "frame": "0x311",
+          "native_unit": "A",
+          "element": "storage.limit.discharge_current",
+          "dimension": "interface",
+          "qualifiers": [],
+          "conversion": {
+            "native_unit": "A",
+            "canonical_unit": "unit.ampere",
+            "factor": {
+              "coefficient": "1",
+              "exponent10": 0
+            },
+            "offset": {
+              "coefficient": "0",
+              "exponent10": 0
+            },
+            "rule": "identity"
+          },
+          "disposition": "waiting",
+          "grade": "Hypothesis",
+          "subject_kind": null,
+          "measurement_point": null,
+          "loss": [],
+          "emitted": false,
+          "package_e": "current_limit",
+          "reason": null
+        },
+        {
+          "source": "pack_voltage",
+          "frame": "0x313",
+          "native_unit": "V",
+          "element": "storage.pack.voltage",
+          "dimension": "pack",
+          "qualifiers": [],
+          "conversion": {
+            "native_unit": "V",
+            "canonical_unit": "unit.volt",
+            "factor": {
+              "coefficient": "1",
+              "exponent10": 0
+            },
+            "offset": {
+              "coefficient": "0",
+              "exponent10": 0
+            },
+            "rule": "identity"
+          },
+          "disposition": "mapped",
+          "grade": "Proven",
+          "subject_kind": "resource.battery_pack",
+          "measurement_point": "pack_terminals",
+          "loss": [],
+          "emitted": true,
+          "package_e": null,
+          "reason": null
+        },
+        {
+          "source": "output_port_voltage",
+          "frame": "0x313",
+          "native_unit": "V",
+          "element": null,
+          "dimension": "pack",
+          "qualifiers": [],
+          "conversion": {
+            "native_unit": "V",
+            "canonical_unit": "unit.volt",
+            "factor": {
+              "coefficient": "1",
+              "exponent10": 0
+            },
+            "offset": {
+              "coefficient": "0",
+              "exponent10": 0
+            },
+            "rule": "identity"
+          },
+          "disposition": "not_admitted",
+          "grade": "Proven",
+          "subject_kind": null,
+          "measurement_point": null,
+          "loss": [],
+          "emitted": false,
+          "package_e": null,
+          "reason": "output_port_is_not_pack_voltage"
+        },
+        {
+          "source": "pack_current",
+          "frame": "0x313",
+          "native_unit": "A",
+          "element": "storage.pack.current",
+          "dimension": "pack",
+          "qualifiers": [],
+          "conversion": {
+            "native_unit": "A",
+            "canonical_unit": "unit.ampere",
+            "factor": {
+              "coefficient": "1",
+              "exponent10": 0
+            },
+            "offset": {
+              "coefficient": "0",
+              "exponent10": 0
+            },
+            "rule": "identity"
+          },
+          "disposition": "mapped",
+          "grade": "Proven",
+          "subject_kind": "resource.battery_pack",
+          "measurement_point": "pack_terminals",
+          "loss": [
+            {
+              "kind": "provenance",
+              "reversible": true
+            }
+          ],
+          "emitted": true,
+          "package_e": null,
+          "reason": null
+        },
+        {
+          "source": "reported_temperature",
+          "frame": "0x313",
+          "native_unit": "degC",
+          "element": "storage.temperature.cell",
+          "dimension": "cell",
+          "qualifiers": [],
+          "conversion": {
+            "native_unit": "degC",
+            "canonical_unit": "unit.kelvin",
+            "factor": {
+              "coefficient": "1",
+              "exponent10": 0
+            },
+            "offset": {
+              "coefficient": "27315",
+              "exponent10": -2
+            },
+            "rule": "celsius_plus_273_15"
+          },
+          "disposition": "mapped",
+          "grade": "Hypothesis",
+          "subject_kind": "resource.battery_cell",
+          "measurement_point": "cell_as_reported",
+          "loss": [
+            {
+              "kind": "unit",
+              "reversible": true
+            }
+          ],
+          "emitted": false,
+          "package_e": null,
+          "reason": null
+        },
+        {
+          "source": "state_of_charge",
+          "frame": "0x313",
+          "native_unit": "%",
+          "element": "storage.state.soc",
+          "dimension": "pack",
+          "qualifiers": [],
+          "conversion": {
+            "native_unit": "%",
+            "canonical_unit": "unit.ratio",
+            "factor": {
+              "coefficient": "1",
+              "exponent10": -2
+            },
+            "offset": {
+              "coefficient": "0",
+              "exponent10": 0
+            },
+            "rule": "percent_over_100"
+          },
+          "disposition": "mapped",
+          "grade": "Proven",
+          "subject_kind": "resource.battery_pack",
+          "measurement_point": "pack_as_a_whole",
+          "loss": [
+            {
+              "kind": "unit",
+              "reversible": true
+            }
+          ],
+          "emitted": true,
+          "package_e": null,
+          "reason": null
+        },
+        {
+          "source": "state_of_health",
+          "frame": "0x313",
+          "native_unit": "%",
+          "element": "storage.state.soh",
+          "dimension": "pack",
+          "qualifiers": [],
+          "conversion": {
+            "native_unit": "%",
+            "canonical_unit": "unit.ratio",
+            "factor": {
+              "coefficient": "1",
+              "exponent10": -2
+            },
+            "offset": {
+              "coefficient": "0",
+              "exponent10": 0
+            },
+            "rule": "percent_over_100"
+          },
+          "disposition": "mapped",
+          "grade": "Proven",
+          "subject_kind": "resource.battery_pack",
+          "measurement_point": "pack_as_a_whole",
+          "loss": [
+            {
+              "kind": "unit",
+              "reversible": true
+            }
+          ],
+          "emitted": true,
+          "package_e": null,
+          "reason": null
+        },
+        {
+          "source": "remaining_capacity",
+          "frame": "0x314",
+          "native_unit": "Ah",
+          "element": null,
+          "dimension": "pack",
+          "qualifiers": [],
+          "conversion": {
+            "native_unit": "Ah",
+            "canonical_unit": "unit.ampere_hour",
+            "factor": {
+              "coefficient": "1",
+              "exponent10": 0
+            },
+            "offset": {
+              "coefficient": "0",
+              "exponent10": 0
+            },
+            "rule": "ampere_hour_unchanged"
+          },
+          "disposition": "not_admitted",
+          "grade": "Proven",
+          "subject_kind": null,
+          "measurement_point": null,
+          "loss": [],
+          "emitted": false,
+          "package_e": null,
+          "reason": "ampere_hour_estimate_is_not_a_pack_element"
+        },
+        {
+          "source": "full_charge_capacity",
+          "frame": "0x314",
+          "native_unit": "Ah",
+          "element": null,
+          "dimension": "pack",
+          "qualifiers": [],
+          "conversion": {
+            "native_unit": "Ah",
+            "canonical_unit": "unit.ampere_hour",
+            "factor": {
+              "coefficient": "1",
+              "exponent10": 0
+            },
+            "offset": {
+              "coefficient": "0",
+              "exponent10": 0
+            },
+            "rule": "ampere_hour_unchanged"
+          },
+          "disposition": "not_admitted",
+          "grade": "Proven",
+          "subject_kind": null,
+          "measurement_point": null,
+          "loss": [],
+          "emitted": false,
+          "package_e": null,
+          "reason": "ampere_hour_estimate_is_not_a_pack_element"
+        },
+        {
+          "source": "cell_voltage_spread",
+          "frame": "0x314",
+          "native_unit": "mV",
+          "element": null,
+          "dimension": "cell",
+          "qualifiers": [],
+          "conversion": {
+            "native_unit": "mV",
+            "canonical_unit": "unit.volt",
+            "factor": {
+              "coefficient": "1",
+              "exponent10": -3
+            },
+            "offset": {
+              "coefficient": "0",
+              "exponent10": 0
+            },
+            "rule": "millivolt_to_volt"
+          },
+          "disposition": "not_admitted",
+          "grade": "Proven",
+          "subject_kind": null,
+          "measurement_point": null,
+          "loss": [
+            {
+              "kind": "unit",
+              "reversible": true
+            }
+          ],
+          "emitted": false,
+          "package_e": null,
+          "reason": "spread_is_not_a_cell_voltage"
+        },
+        {
+          "source": "cycle_count",
+          "frame": "0x314",
+          "native_unit": "cycles",
+          "element": "storage.state.cycle_count",
+          "dimension": "pack",
+          "qualifiers": [],
+          "conversion": {
+            "native_unit": "cycles",
+            "canonical_unit": null,
+            "factor": {
+              "coefficient": "1",
+              "exponent10": 0
+            },
+            "offset": {
+              "coefficient": "0",
+              "exponent10": 0
+            },
+            "rule": "count_unchanged"
+          },
+          "disposition": "waiting",
+          "grade": "Proven",
+          "subject_kind": null,
+          "measurement_point": null,
+          "loss": [],
+          "emitted": false,
+          "package_e": "cycle_count",
+          "reason": null
+        },
+        {
+          "source": "maximum_cell_voltage",
+          "frame": "0x319",
+          "native_unit": "mV",
+          "element": "storage.cell.voltage_maximum",
+          "dimension": "cell",
+          "qualifiers": [],
+          "conversion": {
+            "native_unit": "mV",
+            "canonical_unit": "unit.volt",
+            "factor": {
+              "coefficient": "1",
+              "exponent10": -3
+            },
+            "offset": {
+              "coefficient": "0",
+              "exponent10": 0
+            },
+            "rule": "millivolt_to_volt"
+          },
+          "disposition": "mapped",
+          "grade": "Proven",
+          "subject_kind": "resource.battery_cell",
+          "measurement_point": "cell_extremum",
+          "loss": [
+            {
+              "kind": "unit",
+              "reversible": true
+            }
+          ],
+          "emitted": false,
+          "package_e": null,
+          "reason": null
+        },
+        {
+          "source": "minimum_cell_voltage",
+          "frame": "0x319",
+          "native_unit": "mV",
+          "element": "storage.cell.voltage_minimum",
+          "dimension": "cell",
+          "qualifiers": [],
+          "conversion": {
+            "native_unit": "mV",
+            "canonical_unit": "unit.volt",
+            "factor": {
+              "coefficient": "1",
+              "exponent10": -3
+            },
+            "offset": {
+              "coefficient": "0",
+              "exponent10": 0
+            },
+            "rule": "millivolt_to_volt"
+          },
+          "disposition": "mapped",
+          "grade": "Proven",
+          "subject_kind": "resource.battery_cell",
+          "measurement_point": "cell_extremum",
+          "loss": [
+            {
+              "kind": "unit",
+              "reversible": true
+            }
+          ],
+          "emitted": false,
+          "package_e": null,
+          "reason": null
+        },
+        {
+          "source": "temperature_maximum",
+          "frame": "0x322",
+          "native_unit": "degC",
+          "element": "storage.temperature.cell",
+          "dimension": "cell",
+          "qualifiers": [],
+          "conversion": {
+            "native_unit": "degC",
+            "canonical_unit": "unit.kelvin",
+            "factor": {
+              "coefficient": "1",
+              "exponent10": 0
+            },
+            "offset": {
+              "coefficient": "27315",
+              "exponent10": -2
+            },
+            "rule": "celsius_plus_273_15"
+          },
+          "disposition": "mapped",
+          "grade": "Hypothesis",
+          "subject_kind": "resource.battery_cell",
+          "measurement_point": "cell_as_reported",
+          "loss": [
+            {
+              "kind": "unit",
+              "reversible": true
+            }
+          ],
+          "emitted": false,
+          "package_e": null,
+          "reason": null
+        },
+        {
+          "source": "temperature_minimum",
+          "frame": "0x322",
+          "native_unit": "degC",
+          "element": "storage.temperature.cell",
+          "dimension": "cell",
+          "qualifiers": [],
+          "conversion": {
+            "native_unit": "degC",
+            "canonical_unit": "unit.kelvin",
+            "factor": {
+              "coefficient": "1",
+              "exponent10": 0
+            },
+            "offset": {
+              "coefficient": "27315",
+              "exponent10": -2
+            },
+            "rule": "celsius_plus_273_15"
+          },
+          "disposition": "mapped",
+          "grade": "Hypothesis",
+          "subject_kind": "resource.battery_cell",
+          "measurement_point": "cell_as_reported",
+          "loss": [
+            {
+              "kind": "unit",
+              "reversible": true
+            }
+          ],
+          "emitted": false,
+          "package_e": null,
+          "reason": null
+        }
+      ]
+    },
+    {
+      "id": "pcs_extended",
+      "selector": "growatt.bms.low_voltage.can.pcs.extended",
+      "fields": [
+        {
+          "source": "pack_voltage",
+          "frame": "0x1902",
+          "native_unit": "V",
+          "element": "storage.pack.voltage",
+          "dimension": "pack",
+          "qualifiers": [
+            {
+              "name": "slot",
+              "role": "stack_address"
+            }
+          ],
+          "conversion": {
+            "native_unit": "V",
+            "canonical_unit": "unit.volt",
+            "factor": {
+              "coefficient": "1",
+              "exponent10": 0
+            },
+            "offset": {
+              "coefficient": "0",
+              "exponent10": 0
+            },
+            "rule": "identity"
+          },
+          "disposition": "mapped",
+          "grade": "Proven",
+          "subject_kind": "resource.battery_pack",
+          "measurement_point": "pack_terminals",
+          "loss": [],
+          "emitted": true,
+          "package_e": null,
+          "reason": null
+        },
+        {
+          "source": "port_voltage",
+          "frame": "0x1902",
+          "native_unit": "V",
+          "element": null,
+          "dimension": "pack",
+          "qualifiers": [
+            {
+              "name": "slot",
+              "role": "stack_address"
+            }
+          ],
+          "conversion": {
+            "native_unit": "V",
+            "canonical_unit": "unit.volt",
+            "factor": {
+              "coefficient": "1",
+              "exponent10": 0
+            },
+            "offset": {
+              "coefficient": "0",
+              "exponent10": 0
+            },
+            "rule": "identity"
+          },
+          "disposition": "not_admitted",
+          "grade": "Proven",
+          "subject_kind": null,
+          "measurement_point": null,
+          "loss": [],
+          "emitted": false,
+          "package_e": null,
+          "reason": "port_voltage_is_not_pack_voltage"
+        },
+        {
+          "source": "pack_current",
+          "frame": "0x1902",
+          "native_unit": "A",
+          "element": "storage.pack.current",
+          "dimension": "pack",
+          "qualifiers": [
+            {
+              "name": "slot",
+              "role": "stack_address"
+            }
+          ],
+          "conversion": {
+            "native_unit": "A",
+            "canonical_unit": "unit.ampere",
+            "factor": {
+              "coefficient": "1",
+              "exponent10": 0
+            },
+            "offset": {
+              "coefficient": "0",
+              "exponent10": 0
+            },
+            "rule": "identity"
+          },
+          "disposition": "mapped",
+          "grade": "Proven",
+          "subject_kind": "resource.battery_pack",
+          "measurement_point": "pack_terminals",
+          "loss": [
+            {
+              "kind": "provenance",
+              "reversible": true
+            }
+          ],
+          "emitted": true,
+          "package_e": null,
+          "reason": null
+        },
+        {
+          "source": "state_of_charge",
+          "frame": "0x1902",
+          "native_unit": "%",
+          "element": "storage.state.soc",
+          "dimension": "pack",
+          "qualifiers": [
+            {
+              "name": "slot",
+              "role": "stack_address"
+            }
+          ],
+          "conversion": {
+            "native_unit": "%",
+            "canonical_unit": "unit.ratio",
+            "factor": {
+              "coefficient": "1",
+              "exponent10": -2
+            },
+            "offset": {
+              "coefficient": "0",
+              "exponent10": 0
+            },
+            "rule": "percent_over_100"
+          },
+          "disposition": "mapped",
+          "grade": "Proven",
+          "subject_kind": "resource.battery_pack",
+          "measurement_point": "pack_as_a_whole",
+          "loss": [
+            {
+              "kind": "unit",
+              "reversible": true
+            }
+          ],
+          "emitted": true,
+          "package_e": null,
+          "reason": null
+        },
+        {
+          "source": "limit_word_0",
+          "frame": "0x1903",
+          "native_unit": "unassigned",
+          "element": null,
+          "dimension": "interface",
+          "qualifiers": [
+            {
+              "name": "slot",
+              "role": "stack_address"
+            }
+          ],
+          "conversion": null,
+          "disposition": "not_admitted",
+          "grade": "Unknown",
+          "subject_kind": null,
+          "measurement_point": null,
+          "loss": [],
+          "emitted": false,
+          "package_e": null,
+          "reason": "limit_quantity_unassigned"
+        },
+        {
+          "source": "limit_word_1",
+          "frame": "0x1903",
+          "native_unit": "unassigned",
+          "element": null,
+          "dimension": "interface",
+          "qualifiers": [
+            {
+              "name": "slot",
+              "role": "stack_address"
+            }
+          ],
+          "conversion": null,
+          "disposition": "not_admitted",
+          "grade": "Unknown",
+          "subject_kind": null,
+          "measurement_point": null,
+          "loss": [],
+          "emitted": false,
+          "package_e": null,
+          "reason": "limit_quantity_unassigned"
+        },
+        {
+          "source": "full_charge_capacity",
+          "frame": "0x1904",
+          "native_unit": "Ah",
+          "element": null,
+          "dimension": "pack",
+          "qualifiers": [
+            {
+              "name": "slot",
+              "role": "stack_address"
+            }
+          ],
+          "conversion": {
+            "native_unit": "Ah",
+            "canonical_unit": "unit.ampere_hour",
+            "factor": {
+              "coefficient": "1",
+              "exponent10": 0
+            },
+            "offset": {
+              "coefficient": "0",
+              "exponent10": 0
+            },
+            "rule": "ampere_hour_unchanged"
+          },
+          "disposition": "not_admitted",
+          "grade": "Proven",
+          "subject_kind": null,
+          "measurement_point": null,
+          "loss": [],
+          "emitted": false,
+          "package_e": null,
+          "reason": "ampere_hour_estimate_is_not_a_pack_element"
+        },
+        {
+          "source": "remaining_capacity",
+          "frame": "0x1904",
+          "native_unit": "Ah",
+          "element": null,
+          "dimension": "pack",
+          "qualifiers": [
+            {
+              "name": "slot",
+              "role": "stack_address"
+            }
+          ],
+          "conversion": {
+            "native_unit": "Ah",
+            "canonical_unit": "unit.ampere_hour",
+            "factor": {
+              "coefficient": "1",
+              "exponent10": 0
+            },
+            "offset": {
+              "coefficient": "0",
+              "exponent10": 0
+            },
+            "rule": "ampere_hour_unchanged"
+          },
+          "disposition": "not_admitted",
+          "grade": "Proven",
+          "subject_kind": null,
+          "measurement_point": null,
+          "loss": [],
+          "emitted": false,
+          "package_e": null,
+          "reason": "ampere_hour_estimate_is_not_a_pack_element"
+        },
+        {
+          "source": "cycle_count",
+          "frame": "0x1904",
+          "native_unit": "cycles",
+          "element": "storage.state.cycle_count",
+          "dimension": "pack",
+          "qualifiers": [
+            {
+              "name": "slot",
+              "role": "stack_address"
+            }
+          ],
+          "conversion": {
+            "native_unit": "cycles",
+            "canonical_unit": null,
+            "factor": {
+              "coefficient": "1",
+              "exponent10": 0
+            },
+            "offset": {
+              "coefficient": "0",
+              "exponent10": 0
+            },
+            "rule": "count_unchanged"
+          },
+          "disposition": "waiting",
+          "grade": "Proven",
+          "subject_kind": null,
+          "measurement_point": null,
+          "loss": [],
+          "emitted": false,
+          "package_e": "cycle_count",
+          "reason": null
+        },
+        {
+          "source": "maximum_cell_voltage",
+          "frame": "0x1905",
+          "native_unit": "mV",
+          "element": "storage.cell.voltage_maximum",
+          "dimension": "cell",
+          "qualifiers": [
+            {
+              "name": "slot",
+              "role": "stack_address"
+            }
+          ],
+          "conversion": {
+            "native_unit": "mV",
+            "canonical_unit": "unit.volt",
+            "factor": {
+              "coefficient": "1",
+              "exponent10": -3
+            },
+            "offset": {
+              "coefficient": "0",
+              "exponent10": 0
+            },
+            "rule": "millivolt_to_volt"
+          },
+          "disposition": "mapped",
+          "grade": "Proven",
+          "subject_kind": "resource.battery_cell",
+          "measurement_point": "cell_extremum",
+          "loss": [
+            {
+              "kind": "unit",
+              "reversible": true
+            }
+          ],
+          "emitted": false,
+          "package_e": null,
+          "reason": null
+        },
+        {
+          "source": "minimum_cell_voltage",
+          "frame": "0x1905",
+          "native_unit": "mV",
+          "element": "storage.cell.voltage_minimum",
+          "dimension": "cell",
+          "qualifiers": [
+            {
+              "name": "slot",
+              "role": "stack_address"
+            }
+          ],
+          "conversion": {
+            "native_unit": "mV",
+            "canonical_unit": "unit.volt",
+            "factor": {
+              "coefficient": "1",
+              "exponent10": -3
+            },
+            "offset": {
+              "coefficient": "0",
+              "exponent10": 0
+            },
+            "rule": "millivolt_to_volt"
+          },
+          "disposition": "mapped",
+          "grade": "Proven",
+          "subject_kind": "resource.battery_cell",
+          "measurement_point": "cell_extremum",
+          "loss": [
+            {
+              "kind": "unit",
+              "reversible": true
+            }
+          ],
+          "emitted": false,
+          "package_e": null,
+          "reason": null
+        },
+        {
+          "source": "temperature_maximum",
+          "frame": "0x1906",
+          "native_unit": "degC",
+          "element": "storage.temperature.cell",
+          "dimension": "cell",
+          "qualifiers": [
+            {
+              "name": "slot",
+              "role": "stack_address"
+            }
+          ],
+          "conversion": {
+            "native_unit": "degC",
+            "canonical_unit": "unit.kelvin",
+            "factor": {
+              "coefficient": "1",
+              "exponent10": 0
+            },
+            "offset": {
+              "coefficient": "27315",
+              "exponent10": -2
+            },
+            "rule": "celsius_plus_273_15"
+          },
+          "disposition": "mapped",
+          "grade": "Hypothesis",
+          "subject_kind": "resource.battery_cell",
+          "measurement_point": "cell_as_reported",
+          "loss": [
+            {
+              "kind": "unit",
+              "reversible": true
+            }
+          ],
+          "emitted": false,
+          "package_e": null,
+          "reason": null
+        },
+        {
+          "source": "temperature_minimum",
+          "frame": "0x1906",
+          "native_unit": "degC",
+          "element": "storage.temperature.cell",
+          "dimension": "cell",
+          "qualifiers": [
+            {
+              "name": "slot",
+              "role": "stack_address"
+            }
+          ],
+          "conversion": {
+            "native_unit": "degC",
+            "canonical_unit": "unit.kelvin",
+            "factor": {
+              "coefficient": "1",
+              "exponent10": 0
+            },
+            "offset": {
+              "coefficient": "27315",
+              "exponent10": -2
+            },
+            "rule": "celsius_plus_273_15"
+          },
+          "disposition": "mapped",
+          "grade": "Hypothesis",
+          "subject_kind": "resource.battery_cell",
+          "measurement_point": "cell_as_reported",
+          "loss": [
+            {
+              "kind": "unit",
+              "reversible": true
+            }
+          ],
+          "emitted": false,
+          "package_e": null,
+          "reason": null
+        },
+        {
+          "source": "state_of_health",
+          "frame": "0x1906",
+          "native_unit": "%",
+          "element": "storage.state.soh",
+          "dimension": "pack",
+          "qualifiers": [
+            {
+              "name": "slot",
+              "role": "stack_address"
+            }
+          ],
+          "conversion": {
+            "native_unit": "%",
+            "canonical_unit": "unit.ratio",
+            "factor": {
+              "coefficient": "1",
+              "exponent10": -2
+            },
+            "offset": {
+              "coefficient": "0",
+              "exponent10": 0
+            },
+            "rule": "percent_over_100"
+          },
+          "disposition": "mapped",
+          "grade": "Hypothesis",
+          "subject_kind": "resource.battery_pack",
+          "measurement_point": "pack_as_a_whole",
+          "loss": [
+            {
+              "kind": "unit",
+              "reversible": true
+            }
+          ],
+          "emitted": true,
+          "package_e": null,
+          "reason": null
+        }
+      ]
+    },
+    {
+      "id": "pcs_gauge",
+      "selector": "growatt.bms.low_voltage.can.pcs.gauge",
+      "fields": [
+        {
+          "source": "full_charge_capacity",
+          "frame": "0x316",
+          "native_unit": "Ah",
+          "element": null,
+          "dimension": "pack",
+          "qualifiers": [],
+          "conversion": {
+            "native_unit": "Ah",
+            "canonical_unit": "unit.ampere_hour",
+            "factor": {
+              "coefficient": "1",
+              "exponent10": 0
+            },
+            "offset": {
+              "coefficient": "0",
+              "exponent10": 0
+            },
+            "rule": "ampere_hour_unchanged"
+          },
+          "disposition": "not_admitted",
+          "grade": "Proven",
+          "subject_kind": null,
+          "measurement_point": null,
+          "loss": [],
+          "emitted": false,
+          "package_e": null,
+          "reason": "ampere_hour_estimate_is_not_a_pack_element"
+        },
+        {
+          "source": "fine_cycle_count",
+          "frame": "0x316",
+          "native_unit": "cycles",
+          "element": "storage.state.cycle_count",
+          "dimension": "pack",
+          "qualifiers": [],
+          "conversion": {
+            "native_unit": "cycles",
+            "canonical_unit": null,
+            "factor": {
+              "coefficient": "1",
+              "exponent10": 0
+            },
+            "offset": {
+              "coefficient": "0",
+              "exponent10": 0
+            },
+            "rule": "count_unchanged"
+          },
+          "disposition": "waiting",
+          "grade": "Proven",
+          "subject_kind": null,
+          "measurement_point": null,
+          "loss": [],
+          "emitted": false,
+          "package_e": "cycle_count",
+          "reason": null
+        },
+        {
+          "source": "cell_source_word",
+          "frame": "0x315",
+          "native_unit": "mV",
+          "element": "storage.measurement.cell_voltage",
+          "dimension": "cell",
+          "qualifiers": [
+            {
+              "name": "slot",
+              "role": "cell_index"
+            }
+          ],
+          "conversion": {
+            "native_unit": "mV",
+            "canonical_unit": "unit.volt",
+            "factor": {
+              "coefficient": "1",
+              "exponent10": -3
+            },
+            "offset": {
+              "coefficient": "0",
+              "exponent10": 0
+            },
+            "rule": "millivolt_to_volt"
+          },
+          "disposition": "waiting",
+          "grade": "Hypothesis",
+          "subject_kind": null,
+          "measurement_point": null,
+          "loss": [
+            {
+              "kind": "unit",
+              "reversible": true
+            }
+          ],
+          "emitted": false,
+          "package_e": "per_cell_voltage",
+          "reason": null
+        },
+        {
+          "source": "biased_accumulator",
+          "frame": "0x316",
+          "native_unit": "unassigned",
+          "element": null,
+          "dimension": "pack",
+          "qualifiers": [],
+          "conversion": null,
+          "disposition": "not_admitted",
+          "grade": "Proven",
+          "subject_kind": null,
+          "measurement_point": null,
+          "loss": [],
+          "emitted": false,
+          "package_e": null,
+          "reason": "accumulator_is_not_ampere_hour"
+        }
+      ]
+    },
+    {
+      "id": "pcs_parallel",
+      "selector": "growatt.bms.low_voltage.can.pcs.parallel",
+      "fields": [
+        {
+          "source": "summary_voltage",
+          "frame": "0x61X",
+          "native_unit": "unassigned",
+          "element": null,
+          "dimension": "pack",
+          "qualifiers": [
+            {
+              "name": "bank",
+              "role": "caller_resolved_bank"
+            }
+          ],
+          "conversion": null,
+          "disposition": "not_admitted",
+          "grade": "Unknown",
+          "subject_kind": null,
+          "measurement_point": null,
+          "loss": [],
+          "emitted": false,
+          "package_e": null,
+          "reason": "multiplexer_selects_the_quantity"
+        },
+        {
+          "source": "summary_current",
+          "frame": "0x61X",
+          "native_unit": "A",
+          "element": "storage.pack.current",
+          "dimension": "pack",
+          "qualifiers": [
+            {
+              "name": "bank",
+              "role": "caller_resolved_bank"
+            }
+          ],
+          "conversion": {
+            "native_unit": "A",
+            "canonical_unit": "unit.ampere",
+            "factor": {
+              "coefficient": "1",
+              "exponent10": 0
+            },
+            "offset": {
+              "coefficient": "0",
+              "exponent10": 0
+            },
+            "rule": "identity"
+          },
+          "disposition": "mapped",
+          "grade": "Hypothesis",
+          "subject_kind": "resource.battery_pack",
+          "measurement_point": "pack_terminals",
+          "loss": [
+            {
+              "kind": "provenance",
+              "reversible": true
+            }
+          ],
+          "emitted": true,
+          "package_e": null,
+          "reason": null
+        },
+        {
+          "source": "port_voltage",
+          "frame": "0x61X",
+          "native_unit": "V",
+          "element": null,
+          "dimension": "pack",
+          "qualifiers": [
+            {
+              "name": "bank",
+              "role": "caller_resolved_bank"
+            }
+          ],
+          "conversion": {
+            "native_unit": "V",
+            "canonical_unit": "unit.volt",
+            "factor": {
+              "coefficient": "1",
+              "exponent10": 0
+            },
+            "offset": {
+              "coefficient": "0",
+              "exponent10": 0
+            },
+            "rule": "identity"
+          },
+          "disposition": "not_admitted",
+          "grade": "Proven",
+          "subject_kind": null,
+          "measurement_point": null,
+          "loss": [],
+          "emitted": false,
+          "package_e": null,
+          "reason": "port_voltage_is_not_pack_voltage"
+        },
+        {
+          "source": "state_of_charge",
+          "frame": "0x61X",
+          "native_unit": "%",
+          "element": "storage.state.soc",
+          "dimension": "pack",
+          "qualifiers": [
+            {
+              "name": "bank",
+              "role": "caller_resolved_bank"
+            }
+          ],
+          "conversion": {
+            "native_unit": "%",
+            "canonical_unit": "unit.ratio",
+            "factor": {
+              "coefficient": "1",
+              "exponent10": -2
+            },
+            "offset": {
+              "coefficient": "0",
+              "exponent10": 0
+            },
+            "rule": "percent_over_100"
+          },
+          "disposition": "mapped",
+          "grade": "Hypothesis",
+          "subject_kind": "resource.battery_pack",
+          "measurement_point": "pack_as_a_whole",
+          "loss": [
+            {
+              "kind": "unit",
+              "reversible": true
+            }
+          ],
+          "emitted": true,
+          "package_e": null,
+          "reason": null
+        },
+        {
+          "source": "limit_word_0",
+          "frame": "0x62X",
+          "native_unit": "unassigned",
+          "element": null,
+          "dimension": "interface",
+          "qualifiers": [
+            {
+              "name": "bank",
+              "role": "caller_resolved_bank"
+            }
+          ],
+          "conversion": null,
+          "disposition": "not_admitted",
+          "grade": "Unknown",
+          "subject_kind": null,
+          "measurement_point": null,
+          "loss": [],
+          "emitted": false,
+          "package_e": null,
+          "reason": "limit_quantity_unassigned"
+        },
+        {
+          "source": "limit_word_1",
+          "frame": "0x62X",
+          "native_unit": "unassigned",
+          "element": null,
+          "dimension": "interface",
+          "qualifiers": [
+            {
+              "name": "bank",
+              "role": "caller_resolved_bank"
+            }
+          ],
+          "conversion": null,
+          "disposition": "not_admitted",
+          "grade": "Unknown",
+          "subject_kind": null,
+          "measurement_point": null,
+          "loss": [],
+          "emitted": false,
+          "package_e": null,
+          "reason": "limit_quantity_unassigned"
+        },
+        {
+          "source": "full_charge_capacity",
+          "frame": "0x63X",
+          "native_unit": "unassigned",
+          "element": null,
+          "dimension": "pack",
+          "qualifiers": [
+            {
+              "name": "bank",
+              "role": "caller_resolved_bank"
+            }
+          ],
+          "conversion": null,
+          "disposition": "not_admitted",
+          "grade": "Unknown",
+          "subject_kind": null,
+          "measurement_point": null,
+          "loss": [],
+          "emitted": false,
+          "package_e": null,
+          "reason": "capacity_unit_unassigned"
+        },
+        {
+          "source": "remaining_capacity",
+          "frame": "0x63X",
+          "native_unit": "unassigned",
+          "element": null,
+          "dimension": "pack",
+          "qualifiers": [
+            {
+              "name": "bank",
+              "role": "caller_resolved_bank"
+            }
+          ],
+          "conversion": null,
+          "disposition": "not_admitted",
+          "grade": "Unknown",
+          "subject_kind": null,
+          "measurement_point": null,
+          "loss": [],
+          "emitted": false,
+          "package_e": null,
+          "reason": "capacity_unit_unassigned"
+        },
+        {
+          "source": "cycle_count",
+          "frame": "0x63X",
+          "native_unit": "cycles",
+          "element": "storage.state.cycle_count",
+          "dimension": "pack",
+          "qualifiers": [
+            {
+              "name": "bank",
+              "role": "caller_resolved_bank"
+            }
+          ],
+          "conversion": {
+            "native_unit": "cycles",
+            "canonical_unit": null,
+            "factor": {
+              "coefficient": "1",
+              "exponent10": 0
+            },
+            "offset": {
+              "coefficient": "0",
+              "exponent10": 0
+            },
+            "rule": "count_unchanged"
+          },
+          "disposition": "waiting",
+          "grade": "Unknown",
+          "subject_kind": null,
+          "measurement_point": null,
+          "loss": [],
+          "emitted": false,
+          "package_e": "cycle_count",
+          "reason": null
+        },
+        {
+          "source": "maximum_cell_voltage",
+          "frame": "0x64X",
+          "native_unit": "mV",
+          "element": "storage.cell.voltage_maximum",
+          "dimension": "cell",
+          "qualifiers": [
+            {
+              "name": "bank",
+              "role": "caller_resolved_bank"
+            }
+          ],
+          "conversion": {
+            "native_unit": "mV",
+            "canonical_unit": "unit.volt",
+            "factor": {
+              "coefficient": "1",
+              "exponent10": -3
+            },
+            "offset": {
+              "coefficient": "0",
+              "exponent10": 0
+            },
+            "rule": "millivolt_to_volt"
+          },
+          "disposition": "mapped",
+          "grade": "Proven",
+          "subject_kind": "resource.battery_cell",
+          "measurement_point": "cell_extremum",
+          "loss": [
+            {
+              "kind": "unit",
+              "reversible": true
+            }
+          ],
+          "emitted": false,
+          "package_e": null,
+          "reason": null
+        },
+        {
+          "source": "minimum_cell_voltage",
+          "frame": "0x64X",
+          "native_unit": "mV",
+          "element": "storage.cell.voltage_minimum",
+          "dimension": "cell",
+          "qualifiers": [
+            {
+              "name": "bank",
+              "role": "caller_resolved_bank"
+            }
+          ],
+          "conversion": {
+            "native_unit": "mV",
+            "canonical_unit": "unit.volt",
+            "factor": {
+              "coefficient": "1",
+              "exponent10": -3
+            },
+            "offset": {
+              "coefficient": "0",
+              "exponent10": 0
+            },
+            "rule": "millivolt_to_volt"
+          },
+          "disposition": "mapped",
+          "grade": "Proven",
+          "subject_kind": "resource.battery_cell",
+          "measurement_point": "cell_extremum",
+          "loss": [
+            {
+              "kind": "unit",
+              "reversible": true
+            }
+          ],
+          "emitted": false,
+          "package_e": null,
+          "reason": null
+        },
+        {
+          "source": "temperature_maximum",
+          "frame": "0x65X",
+          "native_unit": "degC",
+          "element": "storage.temperature.cell",
+          "dimension": "cell",
+          "qualifiers": [
+            {
+              "name": "bank",
+              "role": "caller_resolved_bank"
+            }
+          ],
+          "conversion": {
+            "native_unit": "degC",
+            "canonical_unit": "unit.kelvin",
+            "factor": {
+              "coefficient": "1",
+              "exponent10": 0
+            },
+            "offset": {
+              "coefficient": "27315",
+              "exponent10": -2
+            },
+            "rule": "celsius_plus_273_15"
+          },
+          "disposition": "mapped",
+          "grade": "Hypothesis",
+          "subject_kind": "resource.battery_cell",
+          "measurement_point": "cell_as_reported",
+          "loss": [
+            {
+              "kind": "unit",
+              "reversible": true
+            }
+          ],
+          "emitted": false,
+          "package_e": null,
+          "reason": null
+        },
+        {
+          "source": "temperature_minimum",
+          "frame": "0x65X",
+          "native_unit": "degC",
+          "element": "storage.temperature.cell",
+          "dimension": "cell",
+          "qualifiers": [
+            {
+              "name": "bank",
+              "role": "caller_resolved_bank"
+            }
+          ],
+          "conversion": {
+            "native_unit": "degC",
+            "canonical_unit": "unit.kelvin",
+            "factor": {
+              "coefficient": "1",
+              "exponent10": 0
+            },
+            "offset": {
+              "coefficient": "27315",
+              "exponent10": -2
+            },
+            "rule": "celsius_plus_273_15"
+          },
+          "disposition": "mapped",
+          "grade": "Hypothesis",
+          "subject_kind": "resource.battery_cell",
+          "measurement_point": "cell_as_reported",
+          "loss": [
+            {
+              "kind": "unit",
+              "reversible": true
+            }
+          ],
+          "emitted": false,
+          "package_e": null,
+          "reason": null
+        },
+        {
+          "source": "cell_sum_voltage",
+          "frame": "0x6DX",
+          "native_unit": "V",
+          "element": null,
+          "dimension": "pack",
+          "qualifiers": [
+            {
+              "name": "bank",
+              "role": "caller_resolved_bank"
+            }
+          ],
+          "conversion": {
+            "native_unit": "V",
+            "canonical_unit": "unit.volt",
+            "factor": {
+              "coefficient": "1",
+              "exponent10": 0
+            },
+            "offset": {
+              "coefficient": "0",
+              "exponent10": 0
+            },
+            "rule": "identity"
+          },
+          "disposition": "not_admitted",
+          "grade": "Proven",
+          "subject_kind": null,
+          "measurement_point": null,
+          "loss": [],
+          "emitted": false,
+          "package_e": null,
+          "reason": "sum_is_not_one_cell_voltage"
+        }
+      ]
+    },
+    {
+      "id": "link",
+      "selector": "growatt.bms.low_voltage.can.link",
+      "fields": [
+        {
+          "source": "module_voltage",
+          "frame": "0x1805",
+          "native_unit": "V",
+          "element": null,
+          "dimension": "module",
+          "qualifiers": [
+            {
+              "name": "slot",
+              "role": "module_source"
+            }
+          ],
+          "conversion": {
+            "native_unit": "V",
+            "canonical_unit": "unit.volt",
+            "factor": {
+              "coefficient": "1",
+              "exponent10": 0
+            },
+            "offset": {
+              "coefficient": "0",
+              "exponent10": 0
+            },
+            "rule": "identity"
+          },
+          "disposition": "not_admitted",
+          "grade": "Proven",
+          "subject_kind": null,
+          "measurement_point": null,
+          "loss": [],
+          "emitted": false,
+          "package_e": null,
+          "reason": "module_report_is_not_the_pack"
+        },
+        {
+          "source": "module_current",
+          "frame": "0x1805",
+          "native_unit": "A",
+          "element": null,
+          "dimension": "module",
+          "qualifiers": [
+            {
+              "name": "slot",
+              "role": "module_source"
+            }
+          ],
+          "conversion": {
+            "native_unit": "A",
+            "canonical_unit": "unit.ampere",
+            "factor": {
+              "coefficient": "1",
+              "exponent10": 0
+            },
+            "offset": {
+              "coefficient": "0",
+              "exponent10": 0
+            },
+            "rule": "identity"
+          },
+          "disposition": "not_admitted",
+          "grade": "Proven",
+          "subject_kind": null,
+          "measurement_point": null,
+          "loss": [],
+          "emitted": false,
+          "package_e": null,
+          "reason": "module_report_is_not_the_pack"
+        },
+        {
+          "source": "port_voltage",
+          "frame": "0x1805",
+          "native_unit": "V",
+          "element": null,
+          "dimension": "module",
+          "qualifiers": [
+            {
+              "name": "slot",
+              "role": "module_source"
+            }
+          ],
+          "conversion": {
+            "native_unit": "V",
+            "canonical_unit": "unit.volt",
+            "factor": {
+              "coefficient": "1",
+              "exponent10": 0
+            },
+            "offset": {
+              "coefficient": "0",
+              "exponent10": 0
+            },
+            "rule": "identity"
+          },
+          "disposition": "not_admitted",
+          "grade": "Proven",
+          "subject_kind": null,
+          "measurement_point": null,
+          "loss": [],
+          "emitted": false,
+          "package_e": null,
+          "reason": "port_voltage_is_not_pack_voltage"
+        },
+        {
+          "source": "charge_limit",
+          "frame": "0x1805",
+          "native_unit": "unassigned",
+          "element": "storage.limit.charge_current",
+          "dimension": "interface",
+          "qualifiers": [
+            {
+              "name": "slot",
+              "role": "module_source"
+            }
+          ],
+          "conversion": null,
+          "disposition": "waiting",
+          "grade": "Unknown",
+          "subject_kind": null,
+          "measurement_point": null,
+          "loss": [],
+          "emitted": false,
+          "package_e": "current_limit",
+          "reason": null
+        },
+        {
+          "source": "discharge_limit",
+          "frame": "0x1805",
+          "native_unit": "unassigned",
+          "element": "storage.limit.discharge_current",
+          "dimension": "interface",
+          "qualifiers": [
+            {
+              "name": "slot",
+              "role": "module_source"
+            }
+          ],
+          "conversion": null,
+          "disposition": "waiting",
+          "grade": "Unknown",
+          "subject_kind": null,
+          "measurement_point": null,
+          "loss": [],
+          "emitted": false,
+          "package_e": "current_limit",
+          "reason": null
+        },
+        {
+          "source": "maximum_cell_voltage",
+          "frame": "0x1806",
+          "native_unit": "mV",
+          "element": "storage.cell.voltage_maximum",
+          "dimension": "cell",
+          "qualifiers": [
+            {
+              "name": "slot",
+              "role": "module_source"
+            }
+          ],
+          "conversion": {
+            "native_unit": "mV",
+            "canonical_unit": "unit.volt",
+            "factor": {
+              "coefficient": "1",
+              "exponent10": -3
+            },
+            "offset": {
+              "coefficient": "0",
+              "exponent10": 0
+            },
+            "rule": "millivolt_to_volt"
+          },
+          "disposition": "mapped",
+          "grade": "Proven",
+          "subject_kind": "resource.battery_cell",
+          "measurement_point": "cell_extremum",
+          "loss": [
+            {
+              "kind": "unit",
+              "reversible": true
+            }
+          ],
+          "emitted": false,
+          "package_e": null,
+          "reason": null
+        },
+        {
+          "source": "minimum_cell_voltage",
+          "frame": "0x1806",
+          "native_unit": "mV",
+          "element": "storage.cell.voltage_minimum",
+          "dimension": "cell",
+          "qualifiers": [
+            {
+              "name": "slot",
+              "role": "module_source"
+            }
+          ],
+          "conversion": {
+            "native_unit": "mV",
+            "canonical_unit": "unit.volt",
+            "factor": {
+              "coefficient": "1",
+              "exponent10": -3
+            },
+            "offset": {
+              "coefficient": "0",
+              "exponent10": 0
+            },
+            "rule": "millivolt_to_volt"
+          },
+          "disposition": "mapped",
+          "grade": "Proven",
+          "subject_kind": "resource.battery_cell",
+          "measurement_point": "cell_extremum",
+          "loss": [
+            {
+              "kind": "unit",
+              "reversible": true
+            }
+          ],
+          "emitted": false,
+          "package_e": null,
+          "reason": null
+        },
+        {
+          "source": "mean_cell_voltage",
+          "frame": "0x1806",
+          "native_unit": "mV",
+          "element": null,
+          "dimension": "cell",
+          "qualifiers": [
+            {
+              "name": "slot",
+              "role": "module_source"
+            }
+          ],
+          "conversion": {
+            "native_unit": "mV",
+            "canonical_unit": "unit.volt",
+            "factor": {
+              "coefficient": "1",
+              "exponent10": -3
+            },
+            "offset": {
+              "coefficient": "0",
+              "exponent10": 0
+            },
+            "rule": "millivolt_to_volt"
+          },
+          "disposition": "not_admitted",
+          "grade": "Proven",
+          "subject_kind": null,
+          "measurement_point": null,
+          "loss": [
+            {
+              "kind": "unit",
+              "reversible": true
+            }
+          ],
+          "emitted": false,
+          "package_e": null,
+          "reason": "mean_is_not_a_cell_or_an_extremum"
+        },
+        {
+          "source": "cell_voltage",
+          "frame": "0x1810",
+          "native_unit": "mV",
+          "element": "storage.measurement.cell_voltage",
+          "dimension": "cell",
+          "qualifiers": [
+            {
+              "name": "slot",
+              "role": "module_source"
+            },
+            {
+              "name": "slot",
+              "role": "cell_index"
+            }
+          ],
+          "conversion": {
+            "native_unit": "mV",
+            "canonical_unit": "unit.volt",
+            "factor": {
+              "coefficient": "1",
+              "exponent10": -3
+            },
+            "offset": {
+              "coefficient": "0",
+              "exponent10": 0
+            },
+            "rule": "millivolt_to_volt"
+          },
+          "disposition": "waiting",
+          "grade": "Proven",
+          "subject_kind": null,
+          "measurement_point": null,
+          "loss": [
+            {
+              "kind": "unit",
+              "reversible": true
+            }
+          ],
+          "emitted": false,
+          "package_e": "per_cell_voltage",
+          "reason": null
+        },
+        {
+          "source": "temperature_maximum",
+          "frame": "0x1808",
+          "native_unit": "degC",
+          "element": "storage.temperature.cell",
+          "dimension": "cell",
+          "qualifiers": [
+            {
+              "name": "slot",
+              "role": "module_source"
+            }
+          ],
+          "conversion": {
+            "native_unit": "degC",
+            "canonical_unit": "unit.kelvin",
+            "factor": {
+              "coefficient": "1",
+              "exponent10": 0
+            },
+            "offset": {
+              "coefficient": "27315",
+              "exponent10": -2
+            },
+            "rule": "celsius_plus_273_15"
+          },
+          "disposition": "mapped",
+          "grade": "Hypothesis",
+          "subject_kind": "resource.battery_cell",
+          "measurement_point": "cell_as_reported",
+          "loss": [
+            {
+              "kind": "unit",
+              "reversible": true
+            }
+          ],
+          "emitted": false,
+          "package_e": null,
+          "reason": null
+        },
+        {
+          "source": "temperature_minimum",
+          "frame": "0x1808",
+          "native_unit": "degC",
+          "element": "storage.temperature.cell",
+          "dimension": "cell",
+          "qualifiers": [
+            {
+              "name": "slot",
+              "role": "module_source"
+            }
+          ],
+          "conversion": {
+            "native_unit": "degC",
+            "canonical_unit": "unit.kelvin",
+            "factor": {
+              "coefficient": "1",
+              "exponent10": 0
+            },
+            "offset": {
+              "coefficient": "27315",
+              "exponent10": -2
+            },
+            "rule": "celsius_plus_273_15"
+          },
+          "disposition": "mapped",
+          "grade": "Hypothesis",
+          "subject_kind": "resource.battery_cell",
+          "measurement_point": "cell_as_reported",
+          "loss": [
+            {
+              "kind": "unit",
+              "reversible": true
+            }
+          ],
+          "emitted": false,
+          "package_e": null,
+          "reason": null
+        },
+        {
+          "source": "temperature_slot",
+          "frame": "0x1830",
+          "native_unit": "degC",
+          "element": "storage.temperature.cell",
+          "dimension": "cell",
+          "qualifiers": [
+            {
+              "name": "slot",
+              "role": "module_source"
+            },
+            {
+              "name": "slot",
+              "role": "sensor_index"
+            }
+          ],
+          "conversion": {
+            "native_unit": "degC",
+            "canonical_unit": "unit.kelvin",
+            "factor": {
+              "coefficient": "1",
+              "exponent10": 0
+            },
+            "offset": {
+              "coefficient": "27315",
+              "exponent10": -2
+            },
+            "rule": "celsius_plus_273_15"
+          },
+          "disposition": "mapped",
+          "grade": "Hypothesis",
+          "subject_kind": "resource.battery_cell",
+          "measurement_point": "cell_as_reported",
+          "loss": [
+            {
+              "kind": "unit",
+              "reversible": true
+            }
+          ],
+          "emitted": false,
+          "package_e": null,
+          "reason": null
+        },
+        {
+          "source": "fine_state_of_charge",
+          "frame": "0x1807",
+          "native_unit": "%",
+          "element": null,
+          "dimension": "module",
+          "qualifiers": [
+            {
+              "name": "slot",
+              "role": "module_source"
+            }
+          ],
+          "conversion": {
+            "native_unit": "%",
+            "canonical_unit": "unit.ratio",
+            "factor": {
+              "coefficient": "1",
+              "exponent10": -2
+            },
+            "offset": {
+              "coefficient": "0",
+              "exponent10": 0
+            },
+            "rule": "percent_over_100"
+          },
+          "disposition": "not_admitted",
+          "grade": "Hypothesis",
+          "subject_kind": null,
+          "measurement_point": null,
+          "loss": [
+            {
+              "kind": "unit",
+              "reversible": true
+            }
+          ],
+          "emitted": false,
+          "package_e": null,
+          "reason": "module_report_is_not_the_pack"
+        },
+        {
+          "source": "full_charge_capacity",
+          "frame": "0x180B",
+          "native_unit": "Ah",
+          "element": null,
+          "dimension": "pack",
+          "qualifiers": [
+            {
+              "name": "slot",
+              "role": "module_source"
+            }
+          ],
+          "conversion": {
+            "native_unit": "Ah",
+            "canonical_unit": "unit.ampere_hour",
+            "factor": {
+              "coefficient": "1",
+              "exponent10": 0
+            },
+            "offset": {
+              "coefficient": "0",
+              "exponent10": 0
+            },
+            "rule": "ampere_hour_unchanged"
+          },
+          "disposition": "not_admitted",
+          "grade": "Proven",
+          "subject_kind": null,
+          "measurement_point": null,
+          "loss": [],
+          "emitted": false,
+          "package_e": null,
+          "reason": "ampere_hour_estimate_is_not_a_pack_element"
+        },
+        {
+          "source": "remaining_capacity",
+          "frame": "0x180B",
+          "native_unit": "Ah",
+          "element": null,
+          "dimension": "pack",
+          "qualifiers": [
+            {
+              "name": "slot",
+              "role": "module_source"
+            }
+          ],
+          "conversion": {
+            "native_unit": "Ah",
+            "canonical_unit": "unit.ampere_hour",
+            "factor": {
+              "coefficient": "1",
+              "exponent10": 0
+            },
+            "offset": {
+              "coefficient": "0",
+              "exponent10": 0
+            },
+            "rule": "ampere_hour_unchanged"
+          },
+          "disposition": "not_admitted",
+          "grade": "Proven",
+          "subject_kind": null,
+          "measurement_point": null,
+          "loss": [],
+          "emitted": false,
+          "package_e": null,
+          "reason": "ampere_hour_estimate_is_not_a_pack_element"
+        },
+        {
+          "source": "fine_cycle_count",
+          "frame": "0x180B",
+          "native_unit": "cycles",
+          "element": "storage.state.cycle_count",
+          "dimension": "pack",
+          "qualifiers": [
+            {
+              "name": "slot",
+              "role": "module_source"
+            }
+          ],
+          "conversion": {
+            "native_unit": "cycles",
+            "canonical_unit": null,
+            "factor": {
+              "coefficient": "1",
+              "exponent10": 0
+            },
+            "offset": {
+              "coefficient": "0",
+              "exponent10": 0
+            },
+            "rule": "count_unchanged"
+          },
+          "disposition": "waiting",
+          "grade": "Proven",
+          "subject_kind": null,
+          "measurement_point": null,
+          "loss": [],
+          "emitted": false,
+          "package_e": "cycle_count",
+          "reason": null
+        },
+        {
+          "source": "fine_temperature_maximum",
+          "frame": "0x1862",
+          "native_unit": "degC",
+          "element": "storage.temperature.cell",
+          "dimension": "cell",
+          "qualifiers": [
+            {
+              "name": "slot",
+              "role": "module_source"
+            }
+          ],
+          "conversion": {
+            "native_unit": "degC",
+            "canonical_unit": "unit.kelvin",
+            "factor": {
+              "coefficient": "1",
+              "exponent10": 0
+            },
+            "offset": {
+              "coefficient": "27315",
+              "exponent10": -2
+            },
+            "rule": "celsius_plus_273_15"
+          },
+          "disposition": "mapped",
+          "grade": "Hypothesis",
+          "subject_kind": "resource.battery_cell",
+          "measurement_point": "cell_as_reported",
+          "loss": [
+            {
+              "kind": "unit",
+              "reversible": true
+            }
+          ],
+          "emitted": false,
+          "package_e": null,
+          "reason": null
+        },
+        {
+          "source": "fine_temperature_minimum",
+          "frame": "0x1862",
+          "native_unit": "degC",
+          "element": "storage.temperature.cell",
+          "dimension": "cell",
+          "qualifiers": [
+            {
+              "name": "slot",
+              "role": "module_source"
+            }
+          ],
+          "conversion": {
+            "native_unit": "degC",
+            "canonical_unit": "unit.kelvin",
+            "factor": {
+              "coefficient": "1",
+              "exponent10": 0
+            },
+            "offset": {
+              "coefficient": "27315",
+              "exponent10": -2
+            },
+            "rule": "celsius_plus_273_15"
+          },
+          "disposition": "mapped",
+          "grade": "Hypothesis",
+          "subject_kind": "resource.battery_cell",
+          "measurement_point": "cell_as_reported",
+          "loss": [
+            {
+              "kind": "unit",
+              "reversible": true
+            }
+          ],
+          "emitted": false,
+          "package_e": null,
+          "reason": null
+        }
+      ]
+    }
+  ],
+  "field_rules": [
+    {
+      "target": "storage.pack.voltage",
+      "native_unit": "V",
+      "unit": "unit.volt",
+      "conversion": {
+        "factor": {
+          "coefficient": "1",
+          "exponent10": 0
+        },
+        "offset": {
+          "coefficient": "0",
+          "exponent10": 0
+        }
+      },
+      "subject_kind": "resource.battery_pack",
+      "measurement_point": "pack_terminals",
+      "dimension": "storage.dimension.pack",
+      "loss": []
+    },
+    {
+      "target": "storage.pack.current",
+      "native_unit": "A",
+      "unit": "unit.ampere",
+      "conversion": {
+        "factor": {
+          "coefficient": "1",
+          "exponent10": 0
+        },
+        "offset": {
+          "coefficient": "0",
+          "exponent10": 0
+        }
+      },
+      "subject_kind": "resource.battery_pack",
+      "measurement_point": "pack_terminals",
+      "dimension": "storage.dimension.pack",
+      "loss": [
+        {
+          "kind": "provenance",
+          "reversible": true
+        }
+      ]
+    },
+    {
+      "target": "storage.state.soc",
+      "native_unit": "%",
+      "unit": "unit.ratio",
+      "conversion": {
+        "factor": {
+          "coefficient": "1",
+          "exponent10": -2
+        },
+        "offset": {
+          "coefficient": "0",
+          "exponent10": 0
+        }
+      },
+      "subject_kind": "resource.battery_pack",
+      "measurement_point": "pack_as_a_whole",
+      "dimension": "storage.dimension.pack",
+      "loss": [
+        {
+          "kind": "unit",
+          "reversible": true
+        }
+      ]
+    },
+    {
+      "target": "storage.state.soh",
+      "native_unit": "%",
+      "unit": "unit.ratio",
+      "conversion": {
+        "factor": {
+          "coefficient": "1",
+          "exponent10": -2
+        },
+        "offset": {
+          "coefficient": "0",
+          "exponent10": 0
+        }
+      },
+      "subject_kind": "resource.battery_pack",
+      "measurement_point": "pack_as_a_whole",
+      "dimension": "storage.dimension.pack",
+      "loss": [
+        {
+          "kind": "unit",
+          "reversible": true
+        }
+      ]
+    }
+  ]
+}

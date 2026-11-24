@@ -94,7 +94,9 @@ func ParallelIdentityDecodeParallel(s Selection, i LINKInput) NativeResult {
 			offset = 8
 		}
 		for at := 0; at < 8; at++ {
-			b(fmt.Sprintf("fault_%d", offset+at), at)
+			name := fmt.Sprintf("fault_%d", offset+at)
+			b(name, at)
+			growattFaultBits(&r, r.Fields[name], "current_fault_", offset+at, p[at])
 		}
 	case 0x600:
 		w("product", 0)

@@ -40,7 +40,7 @@ func TestSelectionAcceptsOnlyTheOrdinaryAndParallelBanks(t *testing.T) {
 		{"standard", rejected},
 		{"Ordinary", rejected},
 		{"other", rejected},
-		{"", "explicit bank, endpoint and epoch required"},
+		{"", "explicit bank and epoch required"},
 	} {
 		bank, want := v.bank, v.want
 		c := s.SelectionSpecValue()

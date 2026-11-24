@@ -46,6 +46,24 @@ func Read(ctx2 int) {}
 """)
         self.assertEqual(self.check(), [])
 
+    def test_growatt_revision_vocabulary_and_relocated_operands(self):
+        production, _ = GATE.load_policy(GATE.BASELINE)
+        self.assertIn("V104", production)
+        self.assertIn("V108", production)
+        self.assertNotIn("V1", production)
+        self.data["exceptions"] = [row for row in json.loads(GATE.BASELINE.read_text())["exceptions"]
+                                   if row["token"] in ("V104", "V108", "V1")]
+        self.save()
+        self.source("package canbusreg; func TestGrowattV104Read() {}; func TestGrowattV108Read() {}")
+        root = "driverdata/families/mapping-gates/"
+        for name in ("growatt-bms-can-storage.json", "growatt-bms-can-storage.md", "element-catalog.json"):
+            self.assertTrue((GATE.ROOT / root / name).is_file())
+            self.source("", root + name)
+        self.source("", root + "element-catalog-v1.json")
+        self.source("package canbusreg; func TestBatch73Read() {}", "read_test.go")
+        self.assertEqual(self.check(), [(root + "element-catalog-v1.json", "element-catalog-v1.json", "filename"),
+                                        ("read_test.go", "TestBatch73Read", "test")])
+
     def test_payloads_comments_and_uses_are_not_declarations(self):
         self.source('''package modbus
 // XY73 and Batch73 are prose.

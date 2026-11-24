@@ -1,0 +1,7 @@
+{
+  "id": "thermal.mapping.gree.vrf",
+  "native_owner": "helianthus-docs-canbus",
+  "state": "candidate",
+  "qualification": "native_owner_required",
+  "loss": "unknown"
+}

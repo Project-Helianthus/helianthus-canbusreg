@@ -123,7 +123,7 @@ func TestO08IdentityFences(bmsT *testing.T) {
 	}
 }
 func TestO08RevisionSelection(bmsT *testing.T) {
-	for _, bmsRevision := range []string{"", "V1.07", "V1.08"} {
+	for _, bmsRevision := range []string{"", "V1.07", "V1.05"} {
 		if _, bmsErr := NewGrowattBMSProvider(bmsIdentity(bmsT, "o08can", 1), bmsRevision); bmsErr == nil {
 			bmsT.Fatal("unsupported revision admitted")
 		}
@@ -171,7 +171,7 @@ func TestO08LossRecoveryAndDetachedHistory(bmsT *testing.T) {
 		bmsSuccessor.bmsResults <- bmsResult{bmsObservation: BMSObservation{Generation: 2, Evidence: bmsEvidence(bmsT, bmsP.bmsInterface, uint64(bmsI+1), bmsFrame)}}
 		<-bmsSuccessor.bmsEntered
 		bmsGot := bmsP.Snapshot()
-		if bmsI < 2 && (bmsGot.ProjectionGeneration != 1 || bmsGot.State != "awaiting") {
+		if bmsI < 2 && (bmsGot.ProjectionGeneration != 1 || bmsGot.State != "receiving" || bmsGot.ProjectionCurrent) {
 			bmsT.Fatal("successor mixed historical tuple")
 		}
 	}
@@ -221,8 +221,8 @@ func TestO08MalformedPartialRetainsHistory(bmsT *testing.T) {
 		bmsT.Fatal("malformed partial changed last accepted tuple or lost raw")
 	}
 	bmsFeed(bmsP, bmsEvidence(bmsT, bmsP.bmsInterface, 5, 0x313))
-	if bmsP.Snapshot().State != "awaiting" {
-		bmsT.Fatal("malformed tuple was not reset")
+	if got := bmsP.Snapshot(); got.State != "receiving" || got.ProjectionCurrent || got.Projection.MeasurementsEvidence.Sequence != 3 {
+		bmsT.Fatal("standalone measurement replaced the incomplete tuple")
 	}
 	for bmsI, bmsFrame := range []uint32{0x311, 0x312} {
 		bmsFeed(bmsP, bmsEvidence(bmsT, bmsP.bmsInterface, uint64(bmsI+6), bmsFrame))
@@ -297,21 +297,47 @@ func TestGrowattBMSProviderErrorTexts(t *testing.T) {
 		err    error
 		suffix string
 	}{
-		{"revision", revisionErr, "explicit V1.04 selection"},
-		{"interface", interfaceErr, "a valid interface"},
-		{"nil source", p.Start(nil, 3), "a source and a successor generation"},
-		{"zero generation", p.Start(bmsNewSource(), 0), "a source and a successor generation"},
-		{"equal generation", p.Start(bmsNewSource(), 2), "a source and a successor generation"},
-		{"older generation", p.Start(bmsNewSource(), 1), "a source and a successor generation"},
+		{"revision", revisionErr, "growatt revision unresolved: explicitly select V1.04 or V1.08"},
+		{"interface", interfaceErr, "growatt BMS profile requires a valid interface"},
+		{"nil source", p.Start(nil, 3), "growatt BMS provider requires a source and a successor generation"},
+		{"zero generation", p.Start(bmsNewSource(), 0), "growatt BMS provider requires a source and a successor generation"},
+		{"equal generation", p.Start(bmsNewSource(), 2), "growatt BMS provider requires a source and a successor generation"},
+		{"older generation", p.Start(bmsNewSource(), 1), "growatt BMS provider requires a source and a successor generation"},
 	}
 	for _, tc := range cases {
 		t.Run(tc.name, func(t *testing.T) {
 			if tc.err == nil {
 				t.Fatal("expected error")
 			}
-			if got := tc.err.Error(); got == "O08 requires "+tc.suffix || got != "growatt BMS provider requires "+tc.suffix {
+			if got := tc.err.Error(); got != tc.suffix {
 				t.Fatalf("unexpected error: %q", got)
 			}
 		})
+	}
+}
+
+func TestGrowattBMSPublishesStandaloneReports(t *testing.T) {
+	for _, frame := range []uint32{0x312, 0x314, 0x315, 0x316, 0x317, 0x318, 0x319, 0x320, 0x321} {
+		p := bmsProvider(t)
+		bmsStart(t, p, bmsNewSource(), 1)
+		bmsFeed(p, bmsEvidence(t, p.bmsInterface, 1, frame))
+		got := p.Snapshot()
+		if got.State != "receiving" || got.Projection != nil || got.Raw.Sequence != 1 {
+			t.Errorf("%#x: standalone state %s, tuple present %t", frame, got.State, got.Projection != nil)
+		}
+		p.Stop()
+	}
+}
+
+func TestGrowattV108ProviderAdmitsConfiguredRevision(t *testing.T) {
+	p, err := NewGrowattBMSProvider(growattInterface(t, "synthetic", 1), "V1.08")
+	if err != nil {
+		t.Fatal(err)
+	}
+	t.Cleanup(p.Stop)
+	bmsStart(t, p, bmsNewSource(), 1)
+	bmsFeed(p, bmsEvidence(t, p.bmsInterface, 1, 0x315))
+	if p.Snapshot().State != "receiving" {
+		t.Fatalf("configured legacy cells: %+v", p.Snapshot())
 	}
 }

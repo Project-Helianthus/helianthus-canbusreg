@@ -41,6 +41,7 @@ func TestCX16FiniteSelectorConformance(t *testing.T) {
 					id, extended = 0x1900f201, true
 				}
 				if flavor == "link" {
+					c.Endpoint = "01"
 					c.PCSFlavor, c.Direction, c.RouteSet, c.Destination, c.Source = "pcs-standard", "module-to-coordinator", true, 0xf4, 1
 					id, extended = 0x1805f401, true
 				}
@@ -479,6 +480,9 @@ func TestCX16LINKSourceBoundaryPairs(t *testing.T) {
 			s, i := replayTestLINK(t, 0x1805, [8]byte{})
 			c := s.SelectionSpecValue()
 			c.Source = source
+			if source != 0xff {
+				c.Endpoint = fmt.Sprintf("%02X", source)
+			}
 			s = replayTestReselect(t, &i, c)
 			replayTestFrame(t, &i, 0x1805f400|uint32(source), true, [8]byte{})
 			r := replayTestClassify(t, replayTestProfile(t, s, i), i.PCS.Evidence)

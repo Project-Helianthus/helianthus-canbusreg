@@ -201,7 +201,9 @@ func DecodePCSGauge(s Selection, i PCSIdentityPCSInput) NativeResult {
 			if full {
 				grade = "Hypothesis"
 			}
-			add(fmt.Sprintf("retained_%d", 8+at), int64(p[at]), 1, "", "retained fault byte", grade, valid)
+			name := fmt.Sprintf("retained_%d", 8+at)
+			add(name, int64(p[at]), 1, "", "retained fault byte", grade, valid)
+			growattRetainedFaultBits(&r, r.Fields[name], 8+at, p[at])
 		}
 		if !full {
 			sohContract := id == "QAAA0006" || g == "L8"
@@ -214,10 +216,18 @@ func DecodePCSGauge(s Selection, i PCSIdentityPCSInput) NativeResult {
 			break
 		}
 		for at, b := range p {
-			add(fmt.Sprintf("retained_%d", at), int64(b), 1, "", "retained fault byte; never current faults", "Proven", valid)
+			name := fmt.Sprintf("retained_%d", at)
+			add(name, int64(b), 1, "", "retained fault byte; never current faults", "Proven", valid)
+			growattRetainedFaultBits(&r, r.Fields[name], at, b)
 		}
 	default:
 		r.Status = "unsupported"
 	}
 	return r
+}
+
+func growattRetainedFaultBits(r *NativeResult, field NativeField, offset int, value byte) {
+	if field.Status == "accepted" {
+		growattFaultBits(r, field, "retained_fault_bit_", offset, value)
+	}
 }

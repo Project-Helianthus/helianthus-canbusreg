@@ -154,10 +154,7 @@ func DecodePCSExtended(s Selection, i LINKInput) NativeResult {
 		raw("extra", int64(p[6]))
 		raw("soh_like", int64(p[7]))
 	case 0x1907, 0x1908:
-		start := int(kind-0x1907) * 8
-		for at, b := range p {
-			known(fmt.Sprintf("current_fault_%d", start+at), int64(b))
-		}
+		growattExtendedFaultBlock(&r, kind, p, known)
 	case 0x1909:
 		raw("limit_0", le(0))
 		raw("limit_2", le(2))
@@ -225,4 +222,13 @@ func (d *PCSExtendedDecoder) SnapshotPCSExtended() map[string]NativeField {
 		r[k] = v
 	}
 	return r
+}
+
+func growattExtendedFaultBlock(r *NativeResult, kind uint16, p [8]byte, known func(string, int64)) {
+	start := int(kind-0x1907) * 8
+	for at, b := range p {
+		name := fmt.Sprintf("current_fault_%d", start+at)
+		known(name, int64(b))
+		growattFaultBits(r, r.Fields[name], "current_fault_bit_", start+at, b)
+	}
 }

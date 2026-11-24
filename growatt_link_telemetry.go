@@ -24,7 +24,7 @@ func lINKFrameAdmission(s Selection, i LINKInput) bool {
 	f := i.Evidence.Frame
 	c := s.spec
 	id := f.ID().Value()
-	return c.Flavor == "link" && c.RouteSet && f.ID().Extended() && f.DLC() == 8 && f.RawDLC() == 8 && id>>24 == 0x18 && uint8(id>>8) == c.Destination && uint8(id) == c.Source && i.Evidence.Interface == c.Interface && i.Epoch == c.Epoch && i.Direction == c.Direction && i.Scope == c.Scope && i.Bank == c.Bank && i.Endpoint == c.Endpoint && i.Group == c.Group && i.Slot == c.Slot && i.FieldAge >= 0
+	return c.Flavor == "link" && c.RouteSet && f.ID().Extended() && f.DLC() == 8 && f.RawDLC() == 8 && id>>24 == 0x18 && uint8(id>>8) == c.Destination && uint8(id) == c.Source && c.Endpoint == fmt.Sprintf("%02X", uint8(id)) && i.Evidence.Interface == c.Interface && i.Epoch == c.Epoch && i.Direction == c.Direction && i.Scope == c.Scope && i.Bank == c.Bank && i.Endpoint == c.Endpoint && i.Group == c.Group && i.Slot == c.Slot && i.FieldAge >= 0
 }
 func lINKAdmission(s Selection, i LINKInput) bool {
 	c := s.spec

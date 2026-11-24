@@ -171,6 +171,7 @@ func TestCX13ConditionPCSParity(t *testing.T) {
 				}
 				c := dtcTestMember(t, modern).SelectionSpecValue()
 				bankPairTestFlavor(&c, flavor)
+				c.Endpoint = "coordinator"
 				c.Direction = "bms-to-pcs"
 				s := selectionTestSelect(t, c)
 				word, _ := EncodeDTC(s, index)

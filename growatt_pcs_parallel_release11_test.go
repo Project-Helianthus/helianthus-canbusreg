@@ -340,6 +340,12 @@ func TestCX11SelectorNegatives(t *testing.T) {
 			case "slot-missing":
 				c.Slot = ""
 			}
+			if key == "group-canonical" || key == "group-bound" {
+				if _, err := NewSelection(c); err == nil {
+					t.Fatal("invalid group admitted")
+				}
+				return
+			}
 			r := parallelReleaseTestDecode(t, c, 0x513, p, ParallelContext{})
 			if len(r.Fields) != 0 {
 				t.Fatal("unselected member interpreted", r)

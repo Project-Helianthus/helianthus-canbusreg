@@ -1,0 +1,184 @@
+[
+  {
+    "base": "04010000",
+    "field": "internal_pack_voltage",
+    "numerator": 641,
+    "denominator": 10,
+    "unit": "V"
+  },
+  {
+    "base": "04020000",
+    "field": "maximum_cell_voltage",
+    "numerator": 641,
+    "denominator": 1000,
+    "unit": "V"
+  },
+  {
+    "base": "04030000",
+    "field": "minimum_cell_temperature",
+    "numerator": 627,
+    "denominator": 10,
+    "unit": "°C"
+  },
+  {
+    "base": "04040000",
+    "field": "cycle_count",
+    "numerator": 2055,
+    "denominator": 1,
+    "unit": ""
+  },
+  {
+    "base": "04050000",
+    "field": "remaining_capacity_estimate",
+    "numerator": 2055,
+    "denominator": 10,
+    "unit": "Ah"
+  },
+  {
+    "base": "04060000",
+    "field": "cumulative_incoming_charge",
+    "numerator": null,
+    "denominator": null,
+    "unit": ""
+  },
+  {
+    "base": "04070000",
+    "field": "cumulative_incoming_energy",
+    "numerator": null,
+    "denominator": null,
+    "unit": ""
+  },
+  {
+    "base": "040a0000",
+    "field": "protect_alarm_0",
+    "numerator": -127,
+    "denominator": 1,
+    "unit": ""
+  },
+  {
+    "base": "040b0000",
+    "field": "system_fault_code_0",
+    "numerator": -127,
+    "denominator": 1,
+    "unit": ""
+  },
+  {
+    "base": "040c0000",
+    "field": "other_error_code_0",
+    "numerator": -127,
+    "denominator": 1,
+    "unit": ""
+  },
+  {
+    "base": "040d0000",
+    "field": "hardware_error_code_0",
+    "numerator": -127,
+    "denominator": 1,
+    "unit": ""
+  },
+  {
+    "base": "04100000",
+    "field": "qmax",
+    "numerator": 1541,
+    "denominator": 10,
+    "unit": "Ah"
+  },
+  {
+    "base": "04110000",
+    "field": "maximum_sum_discharge_current",
+    "numerator": 2055,
+    "denominator": 10,
+    "unit": ""
+  },
+  {
+    "base": "04120000",
+    "field": "main_software_version",
+    "numerator": -127,
+    "denominator": 1,
+    "unit": ""
+  },
+  {
+    "base": "04130000",
+    "field": "asoc_ah_0",
+    "numerator": 2055,
+    "denominator": 10,
+    "unit": "%"
+  },
+  {
+    "base": "04140000",
+    "field": "asoc_empty_0",
+    "numerator": 2055,
+    "denominator": 10,
+    "unit": "%"
+  },
+  {
+    "base": "04150000",
+    "field": "passed_charge_0",
+    "numerator": 1027,
+    "denominator": 10,
+    "unit": "%"
+  },
+  {
+    "base": "04160000",
+    "field": "sum_voltage",
+    "numerator": 2055,
+    "denominator": 10,
+    "unit": "V"
+  },
+  {
+    "base": "04170000",
+    "field": "insulation_resistance",
+    "numerator": 641,
+    "denominator": 100,
+    "unit": "MΩ"
+  },
+  {
+    "base": "08000000",
+    "field": "cell_voltage_1",
+    "numerator": 641,
+    "denominator": 1,
+    "unit": "mV"
+  },
+  {
+    "base": "08010000",
+    "field": "cell_voltage_5",
+    "numerator": 641,
+    "denominator": 1,
+    "unit": "mV"
+  },
+  {
+    "base": "08020000",
+    "field": "cell_voltage_9",
+    "numerator": 641,
+    "denominator": 1,
+    "unit": "mV"
+  },
+  {
+    "base": "08030000",
+    "field": "cell_voltage_13",
+    "numerator": 641,
+    "denominator": 1,
+    "unit": "mV"
+  },
+  {
+    "base": "10000000",
+    "field": "balance_temperature_1",
+    "numerator": 1655,
+    "denominator": 10,
+    "unit": "°C"
+  },
+  {
+    "base": "10010000",
+    "field": "balance_temperature_2",
+    "numerator": 241,
+    "denominator": 10,
+    "unit": "°C"
+  },
+  {
+    "base": "14000000",
+    "field": "balance_flag",
+    "numerator": 641,
+    "denominator": 1,
+    "unit": ""
+  }
+]

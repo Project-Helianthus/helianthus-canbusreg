@@ -1,6 +1,9 @@
 {
   "version": 1,
-  "exceptions": [],
+  "exceptions": [
+    {"token": "V104", "reason": "Growatt low-voltage BMS CAN protocol V1.04 revision vocabulary."},
+    {"token": "V108", "reason": "Growatt low-voltage BMS CAN protocol V1.08 revision vocabulary."}
+  ],
   "baseline": [
     {
       "path": "gree_vrf_command.go",

@@ -271,10 +271,11 @@ func capabilityTestFixture(t *testing.T, group int, profile, direction, role str
 	tokens := []string{"QAAA0002", "QAAA0005", "QAAA0006", "QAAA0007", "QAAA0010", "QAAB0004", "QAAB0002", "QAAB0006", "QAAA0011"}
 	token := tokens[group]
 	spec := selectionTestSpec(t, token[:4], token[4:])
-	spec.Group = "synthetic-group"
-	spec.Slot = "synthetic-slot"
+	spec.Group = "0"
+	spec.Slot = "1"
 	bankPairTestFlavor(&spec, profile)
 	if profile != "link" {
+		spec.Endpoint = "coordinator"
 		spec.Direction = "bms-to-pcs"
 	}
 	spec.RouteSet = true

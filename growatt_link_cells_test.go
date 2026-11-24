@@ -38,8 +38,8 @@ func TestCX12VectorSpanUsesMeasurementAge(t *testing.T) {
 
 func TestCX12CellBlockMappingAndEvidence(t *testing.T) {
 	spec := selectionTestSpec(t, "QAAA", "0011")
-	spec.Group = "group-a"
-	spec.Slot = "slot-a"
+	spec.Group = "0"
+	spec.Slot = "1"
 	s := selectionTestSelect(t, spec)
 	a := NewLINKCells(s, 16, true)
 	for b := 0; b < 4; b++ {
@@ -96,8 +96,8 @@ func TestCX12CellMeanStaleEachContributorAndLegacyNegative(t *testing.T) {
 
 func TestCX12AdmissionEveryAssociationField(t *testing.T) {
 	spec := selectionTestSpec(t, "QAAA", "0011")
-	spec.Group = "group-a"
-	spec.Slot = "slot-a"
+	spec.Group = "0"
+	spec.Slot = "1"
 	p := vectorTestWords(3300, 3301, 3302, 3303)
 	for _, key := range []string{"interface-name", "interface-index", "epoch", "direction", "scope", "bank", "endpoint", "group", "slot", "destination", "source", "ide", "dlc", "raw-dlc", "sequence", "monotonic", "field-age"} {
 		t.Run(key, func(t *testing.T) {
@@ -171,7 +171,7 @@ func TestCX12AdmissionEveryAssociationField(t *testing.T) {
 				other.ProjectCode = "QAAa"
 				other.Release = "9011"
 			case "flavor":
-				other.Flavor = "pcs-standard"
+				other.Flavor, other.Endpoint = "pcs-standard", "coordinator"
 			case "pcs-flavor":
 				other.PCSFlavor = "invalid"
 			case "route-set":

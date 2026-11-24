@@ -1,5 +1,7 @@
 # helianthus-canbusreg
 
+helianthus-canbusreg is the CAN driver; it may map to SemReg through the permitted public packages `semreg/v1`, `semreg/v1/driver`, `semreg/v1/roweval`, `semreg/v1/catalog` and `semreg/v1/operation`, and encodes the frames the documentation defines as commands; frames are sent through the `helianthus-canbus` publication API; interface setup belongs to the transport.
+
 Fail-closed CAN profile registry for Helianthus.
 
 The caller-selected, receive-only [Growatt low-voltage BMS common

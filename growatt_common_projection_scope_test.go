@@ -8,7 +8,7 @@ import (
 
 func scopeTestSelection(t *testing.T, source canbus.InterfaceIdentity, scope string) Selection {
 	t.Helper()
-	s, err := NewSelection(SelectionSpec{Interface: source, Flavor: "pcs-standard", ProjectCode: "QAAA", Release: "0006", Direction: "bms-to-pcs", Scope: scope, Bank: "ordinary", Endpoint: "pack", Epoch: 1})
+	s, err := NewSelection(SelectionSpec{Interface: source, Flavor: "pcs-standard", ProjectCode: "QAAA", Release: "0006", Direction: "bms-to-pcs", Scope: scope, Bank: "ordinary", Endpoint: "coordinator", Epoch: 1})
 	if err != nil {
 		t.Fatal(err)
 	}

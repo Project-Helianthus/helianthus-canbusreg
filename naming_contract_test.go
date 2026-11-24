@@ -134,11 +134,11 @@ func TestNamingRetentionIdentityCollisionAxes(t *testing.T) {
 					bankPairTestRefused(t, c)
 					return
 				case "endpoint":
-					c.Endpoint = "other"
+					c.Endpoint = "participant"
 				case "group":
-					c.Group = "other"
+					c.Group = "7"
 				case "slot":
-					c.Slot = "other"
+					c.Slot = "255"
 				case "route-set":
 					c.RouteSet = true
 				case "destination":

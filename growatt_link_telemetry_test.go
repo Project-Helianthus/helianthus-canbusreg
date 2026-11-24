@@ -2,6 +2,7 @@ package canbusreg
 
 import (
 	"encoding/binary"
+	"fmt"
 	"github.com/Project-Helianthus/helianthus-canbus"
 	"testing"
 	"time"
@@ -177,7 +178,7 @@ func TestCX01CoordinatorSeparateRole(t *testing.T) {
 	spec := selectionTestSpec(t, "QAAA", "0006")
 	spec.Direction = "coordinator-to-module"
 	spec.Scope = "aggregate"
-	spec.Source = 0xf4
+	spec.Source, spec.Endpoint = 0xf4, "F4"
 	spec.Destination = 0xf5
 	s := selectionTestSelect(t, spec)
 	for _, kind := range []uint32{0x180d, 0x180e, 0x180f} {
@@ -224,9 +225,15 @@ func TestCX01OpaqueHypothesesStayRaw(t *testing.T) {
 		})
 	}
 	for _, source := range []uint8{0, 1, 9, 10, 244, 254, 255} {
-		spec.Source = source
+		spec.Source, spec.Endpoint = source, fmt.Sprintf("%02X", source)
+		if source == 0xff {
+			if _, err := NewSelection(spec); err == nil {
+				t.Fatal("broadcast endpoint admitted")
+			}
+			continue
+		}
 		r := DecodeLINKTelemetry(selectionTestSelect(t, spec), selectionTestInput(t, spec, 0x1805, [8]byte{}))
-		if source == 255 || source == 0xf4 {
+		if source == 0xf4 {
 			if len(r.Fields) != 0 || r.Status != "invalid" {
 				t.Fatalf("reserved source %#x ordinary", source)
 			}
@@ -339,7 +346,7 @@ func TestCX01CoordinatorHighWordsKeepGeometry(t *testing.T) {
 	spec := selectionTestSpec(t, "QAAA", "0006")
 	spec.Direction = "coordinator-to-module"
 	spec.Scope = "aggregate"
-	spec.Source = 0xf4
+	spec.Source, spec.Endpoint = 0xf4, "F4"
 	spec.Destination = 0xf5
 	s := selectionTestSelect(t, spec)
 	for kind, name := range map[uint32]string{0x180e: "additional_limit", 0x180f: "quotient"} {

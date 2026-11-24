@@ -3,6 +3,8 @@ package canbusreg
 import (
 	"errors"
 	"fmt"
+	"strconv"
+	"strings"
 	"time"
 
 	"github.com/Project-Helianthus/helianthus-canbus"
@@ -56,14 +58,30 @@ func NewSelection(spec SelectionSpec) (Selection, error) {
 	if spec.Scope != "local" && spec.Scope != "aggregate" {
 		return s, fmt.Errorf("explicit scope required")
 	}
-	if spec.Bank == "" || spec.Endpoint == "" || spec.Epoch == 0 {
-		return s, fmt.Errorf("explicit bank, endpoint and epoch required")
+	if spec.Bank == "" || spec.Epoch == 0 {
+		return s, fmt.Errorf("explicit bank and epoch required")
 	}
 	if spec.Bank != "ordinary" && spec.Bank != "parallel" {
 		return s, fmt.Errorf("explicit bank ordinary or parallel required")
 	}
 	if (spec.Flavor == "pcs-standard" && spec.Bank != "ordinary") || (spec.Flavor == "pcs-parallel" && spec.Bank != "parallel") {
 		return s, ErrSelectionBankPairing
+	}
+	if spec.Flavor == "link" {
+		if len(spec.Endpoint) != 2 || spec.Endpoint == "FF" || !strings.ContainsRune("0123456789ABCDEF", rune(spec.Endpoint[0])) || !strings.ContainsRune("0123456789ABCDEF", rune(spec.Endpoint[1])) {
+			return s, fmt.Errorf("invalid LINK endpoint: expected two uppercase hexadecimal digits other than FF")
+		}
+	} else if spec.Endpoint != "coordinator" && spec.Endpoint != "participant" && spec.Endpoint != "gateway" {
+		return s, fmt.Errorf("invalid PCS endpoint: expected coordinator, participant or gateway")
+	}
+	if spec.Group != "" && (len(spec.Group) != 1 || spec.Group < "0" || spec.Group > "7") {
+		return s, fmt.Errorf("invalid group: expected 0 to 7 or absent")
+	}
+	if spec.Slot != "" {
+		slot, err := strconv.ParseUint(spec.Slot, 10, 8)
+		if err != nil || strconv.FormatUint(slot, 10) != spec.Slot {
+			return s, fmt.Errorf("invalid slot: expected 0 to 255 or absent")
+		}
 	}
 	flavor := spec.Flavor
 	if flavor == "link" {

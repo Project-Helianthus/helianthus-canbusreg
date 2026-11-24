@@ -56,21 +56,17 @@ func DecodeLINKDiagnostics(s Selection, i LINKInput) NativeResult {
 		if !module || kind == 0x1851 && group == "L0" {
 			return r
 		}
-		grade := "Proven"
 		if kind == 0x1852 {
 			switch group {
 			case "L3", "L4", "L5", "L7", "L8":
 			default:
 				return r
 			}
-			grade = "Hypothesis"
 		}
-		base := int(kind-0x1850) * 64
+		base := int(kind-0x1850) * 8
 		for byteOffset, value := range p {
-			for bit := 0; bit < 8; bit++ {
-				index := base + byteOffset*8 + bit
-				add(fmt.Sprintf("current_fault_%d", index), int64(value>>uint(bit)&1), "current fault bit", grade, "accepted", "")
-			}
+			field := NativeField{Raw: p, Evidence: i.Evidence, Epoch: i.Epoch, Scope: i.Scope, Bank: i.Bank, Endpoint: i.Endpoint, Group: i.Group, Slot: i.Slot, Age: i.FieldAge}
+			growattFaultBits(&r, field, "current_fault_", base+byteOffset, value)
 		}
 	case 0x1853:
 		if !module || group != "L8" {

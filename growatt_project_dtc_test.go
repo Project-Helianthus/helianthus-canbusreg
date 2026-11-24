@@ -11,7 +11,7 @@ import (
 func dtcTestMember(t *testing.T, modern bool) Selection {
 	t.Helper()
 	spec := selectionTestSpec(t, "QAAA", "0011")
-	spec.Group, spec.Slot = "group-a", "slot-a"
+	spec.Group, spec.Slot = "0", "1"
 	if modern {
 		spec.ProjectCode, spec.Release, spec.Choice = "QAAa", "9011", "release11"
 	}
@@ -143,6 +143,9 @@ func TestCX07ByteOrderAndIndependentSiblings(t *testing.T) {
 		spec := s.SelectionSpecValue()
 		bankPairTestFlavor(&spec, flavor)
 		if flavor != "link" {
+			spec.Endpoint = "coordinator"
+		}
+		if flavor != "link" {
 			spec.Direction = "bms-to-pcs"
 		}
 		s = selectionTestSelect(t, spec)
@@ -251,7 +254,7 @@ func TestCX07AdmissionIdentityFields(t *testing.T) {
 			case "route-set":
 				spec.RouteSet = false
 			case "native-flavor":
-				spec.Flavor = "pcs-extended19"
+				spec.Flavor, spec.Endpoint = "pcs-extended19", "coordinator"
 			case "project-case":
 				spec.ProjectCode = "qAAa"
 			case "release":
@@ -427,6 +430,9 @@ func TestCX07PCSAdmissionBoundaries(t *testing.T) {
 	for _, flavor := range []string{"pcs-standard", "pcs-parallel"} {
 		spec := dtcTestMember(t, true).SelectionSpecValue()
 		bankPairTestFlavor(&spec, flavor)
+		if flavor != "link" {
+			spec.Endpoint = "coordinator"
+		}
 		spec.Direction = "bms-to-pcs"
 		s := selectionTestSelect(t, spec)
 		p := [8]byte{3, 0xe8, 0xff, 0xff}

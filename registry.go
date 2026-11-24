@@ -1,8 +1,10 @@
 package canbusreg
 
 import (
-	"github.com/Project-Helianthus/helianthus-canbus"
+	"errors"
 	"time"
+
+	"github.com/Project-Helianthus/helianthus-canbus"
 )
 
 // Evidence preserves the native frame, interface, sequence, monotonic duration and raw record supplied by transport.
@@ -51,4 +53,33 @@ func (r Registry) Classify(e Evidence) Classification {
 		match = candidate
 	}
 	return match
+}
+
+// NewGrowattBMSProfile registers one report layout for one explicitly configured interface.
+// Use GrowattLowVoltageBMSV104 separately for the legacy tuple-only classifier.
+func NewGrowattBMSProfile(source canbus.InterfaceIdentity, revision string) (Profile, error) {
+	name, err := growattBMSRevisionProfile(revision)
+	if err != nil {
+		return nil, err
+	}
+	if source.Name() == "" || source.Index() <= 0 {
+		return nil, errors.New("growatt BMS profile requires a valid interface")
+	}
+	return growattBMSReportProfile{source: source, revision: revision, name: name}, nil
+}
+
+type growattBMSReportProfile struct {
+	source         canbus.InterfaceIdentity
+	revision, name string
+}
+
+func (p growattBMSReportProfile) Classify(e Evidence) Classification {
+	if !growattV104SameInterface(p.source, e.Interface) {
+		return Classification{}
+	}
+	report, ok := decodeGrowattBMSReport(e, p.revision)
+	if !ok {
+		return Classification{}
+	}
+	return Classification{Profile: p.name, Projection: report}
 }

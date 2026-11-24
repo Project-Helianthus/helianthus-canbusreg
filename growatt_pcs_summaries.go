@@ -3,6 +3,7 @@ package canbusreg
 import (
 	"encoding/binary"
 	"fmt"
+	"strings"
 
 	"github.com/Project-Helianthus/helianthus-canbus"
 )
@@ -84,10 +85,7 @@ func DecodePCSSummaries(s Selection, i PCSSummaryPCSInput) PCSSummaryPCSResult {
 	if legacy {
 		// The legacy local frame carries diagnostic index 4 on B/10; release-11
 		// keeps the same bit as an independent status selector instead.
-		mappings["B"] = map[int][]int{}
-		for k, v := range map[int][]int{1: {8}, 2: {6}, 3: {2}, 4: {0, 98}, 6: {22, 89}, 7: {20}, 10: {4}, 12: {40}, 13: {14}, 14: {33}, 15: {12}} {
-			mappings["B"][k] = v
-		}
+		mappings["B"][10] = []int{4}
 	}
 	words := []struct {
 		name  string
@@ -145,6 +143,7 @@ func DecodePCSSummaries(s Selection, i PCSSummaryPCSInput) PCSSummaryPCSResult {
 						b.ConditionalAlternatives = []int{40}
 					}
 				}
+				meaning += growattSummaryConditionNames(s, b.Alternatives)
 				if len(b.Alternatives) > 0 || b.Field.Status == "accepted" {
 					b.Field.Status = "accepted"
 					b.Field.Meaning = meaning
@@ -209,4 +208,18 @@ func DecodePCSSummaries(s Selection, i PCSSummaryPCSInput) PCSSummaryPCSResult {
 		r.Status = "unsupported"
 	}
 	return r
+}
+
+func growattSummaryConditionNames(s Selection, alternatives []int) string {
+	if len(alternatives) == 0 {
+		return ""
+	}
+	labels := make([]string, len(alternatives))
+	for i, index := range alternatives {
+		labels[i] = growattSelectedConditionName(s, index)
+		if labels[i] == "" {
+			labels[i] = fmt.Sprintf("condition %d", index)
+		}
+	}
+	return ": " + strings.Join(labels, " OR ")
 }

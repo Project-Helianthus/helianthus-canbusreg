@@ -1,0 +1,13 @@
+{
+  "control_route": false,
+  "id": "storage.mapping.growatt.can.v104",
+  "loss": "unknown",
+  "native_owner": "helianthus-docs-canbus",
+  "physical_qualified": false,
+  "qualification": "synthetic_offline_selected_interface_only",
+  "source_refs": [
+    "can_docs",
+    "canbusreg"
+  ],
+  "state": "candidate"
+}

@@ -266,7 +266,7 @@ func TestCX14WrongProfilesAndHypothesisScopeNegatives(t *testing.T) {
 					c.Scope = "aggregate"
 					i.Scope = c.Scope
 				case "link":
-					c.Flavor = "link"
+					c.Flavor, c.Endpoint = "link", "02"
 					c.PCSFlavor = "pcs-standard"
 					c.RouteSet = true
 					c.Direction = "module-to-coordinator"

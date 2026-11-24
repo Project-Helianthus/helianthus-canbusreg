@@ -476,7 +476,7 @@ func TestCX17EverySelectionFieldNegative(t *testing.T) {
 		"direction":       func(c *SelectionSpec) { c.Direction = "other" },
 		"scope":           func(c *SelectionSpec) { c.Scope = "aggregate" },
 		// The bank cannot vary alone: NewSelection refuses an unpaired PCS bank.
-		"endpoint":    func(c *SelectionSpec) { c.Endpoint = "other" },
+		"endpoint":    func(c *SelectionSpec) { c.Endpoint = "participant" },
 		"group":       func(c *SelectionSpec) { c.Group = "1" },
 		"slot":        func(c *SelectionSpec) { c.Slot = "2" },
 		"route-set":   func(c *SelectionSpec) { c.RouteSet = true },
@@ -904,7 +904,7 @@ func TestCX17AggregateExtendedIdentityChangeConflicts(t *testing.T) {
 			s, i := replayTestFixture(t)
 			c := s.SelectionSpecValue()
 			c.Flavor, c.Scope, c.Destination, c.Source = "pcs-extended19", "aggregate", 0xdf, 0xf2
-			c.Bank, c.Endpoint, c.Group, c.Slot, c.RouteSet = "ordinary", "endpoint-a", "group-a", "slot-a", true
+			c.Bank, c.Endpoint, c.Group, c.Slot, c.RouteSet = "ordinary", "coordinator", "0", "1", true
 			s = replayTestReselect(t, &i, c)
 			payload := [8]byte{0x34, 0x12, 2, 6, 0, 0, 0, 0}
 			replayTestFrame(t, &i, kind<<16|0xdf<<8|0xf2, true, payload)
@@ -1004,7 +1004,7 @@ func TestCX17ExtendedRoleChangeConflicts(t *testing.T) {
 		t.Run(fmt.Sprintf("%x", kind), func(t *testing.T) {
 			s, i := replayTestFixture(t)
 			c := s.SelectionSpecValue()
-			c.Flavor, c.Bank, c.Endpoint, c.Group, c.Slot, c.RouteSet = "pcs-extended19", "ordinary", "endpoint-a", "group-a", "slot-a", true
+			c.Flavor, c.Bank, c.Endpoint, c.Group, c.Slot, c.RouteSet = "pcs-extended19", "ordinary", "coordinator", "0", "1", true
 			c.Destination, c.Source = 0xf2, 2
 			if kind == 0x1913 {
 				c.Scope, c.Destination, c.Source = "aggregate", 0xdf, 0xf2

@@ -27,7 +27,7 @@ func TestCX08CounterPreservesCachedCode(t *testing.T) {
 	r := RefineCounter(s, CounterInput{PCSIdentityPCSInput: i.PCSIdentityPCSInput})
 	slotTestWant(t, r, "counter", "accepted", 16, 1, "")
 	c := s.SelectionSpecValue()
-	c.Flavor = "link"
+	c.Flavor, c.Endpoint = "link", "01"
 	c.PCSFlavor = "pcs-standard"
 	c.RouteSet = true
 	c.Destination = 0xf4
@@ -119,12 +119,12 @@ func TestCX08CounterWireBoundaries(t *testing.T) {
 		s, i := slotTestFixture(t, 0x329, [8]byte{2, byte(code >> 16), byte(code >> 8), byte(code)})
 		slotTestWant(t, RefineCounter(s, CounterInput{PCSIdentityPCSInput: i.PCSIdentityPCSInput}), "counter", "accepted", int64(code), 1, "")
 		c := s.SelectionSpecValue()
-		c.Flavor = "link"
+		c.Flavor, c.Endpoint = "link", "01"
 		c.PCSFlavor = "pcs-standard"
 		c.Direction = "module-to-coordinator"
 		c.RouteSet = true
 		c.Destination = 0xf4
-		c.Source = 2
+		c.Source, c.Endpoint = 2, "02"
 		link, err := NewSelection(c)
 		if err != nil {
 			t.Fatal(err)
@@ -137,8 +137,8 @@ func TestCX08CounterLINKAdmissionKeys(t *testing.T) {
 	for _, key := range []string{"interface-name", "interface-index", "epoch", "direction", "scope", "bank", "endpoint", "group", "slot", "destination", "source", "ide", "dlc", "raw-dlc", "age", "publisher", "native-record", "raw-record", "pid"} {
 		t.Run(key, func(t *testing.T) {
 			c := selectionTestSpec(t, "QAAA", "0011")
-			c.Group = "group"
-			c.Slot = "slot"
+			c.Group = "0"
+			c.Slot = "1"
 			s := selectionTestSelect(t, c)
 			i := PCSIdentityPCSInput{PCSStandardPCSInput: PCSStandardPCSInput{LINKInput: selectionTestInput(t, c, 0x180a, [8]byte{2, 16}), PublisherResolved: true, MeasurementValid: true}}
 			switch key {

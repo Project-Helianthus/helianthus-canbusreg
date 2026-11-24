@@ -1,0 +1,109 @@
+{
+  "family_id": "gree-vrf-can",
+  "name": "Gree VRF CAN",
+  "native_owner": "Project-Helianthus/helianthus-canbusreg",
+  "semantic_pack": "helianthus.pack.thermal@1.0.0",
+  "state": "qualified",
+  "composition": "not_composed",
+  "reason": "declared_by_specification",
+  "evidence": [
+    {
+      "owner": "Project-Helianthus/helianthus-docs-canbus@3dca48a82a693e4767d1a8e82579f4f245bc2603",
+      "kind": "specification",
+      "locator": "protocols/gree/gree-vrf-can-register-model.md",
+      "statement": "This page is the specification the gree-vrf-can family is declared from."
+    },
+    {
+      "owner": "Project-Helianthus/helianthus-docs-canbus@3dca48a82a693e4767d1a8e82579f4f245bc2603",
+      "kind": "specification",
+      "locator": "protocols/gree/gree-vrf-can-value-types.json",
+      "statement": "This page is the specification the gree-vrf-can family is declared from."
+    },
+    {
+      "owner": "Project-Helianthus/helianthus-docs-canbus@3dca48a82a693e4767d1a8e82579f4f245bc2603",
+      "kind": "specification",
+      "locator": "protocols/gree/gree-vrf-can-dictionary.md",
+      "statement": "This page is the specification the gree-vrf-can family is declared from."
+    },
+    {
+      "owner": "Project-Helianthus/helianthus-docs-canbus@3dca48a82a693e4767d1a8e82579f4f245bc2603",
+      "kind": "specification",
+      "locator": "protocols/gree/dictionary/identity.json",
+      "statement": "This page is the specification the gree-vrf-can family is declared from."
+    },
+    {
+      "owner": "Project-Helianthus/helianthus-docs-canbus@3dca48a82a693e4767d1a8e82579f4f245bc2603",
+      "kind": "specification",
+      "locator": "protocols/gree/dictionary/temperatures-operating-state.json",
+      "statement": "This page is the specification the gree-vrf-can family is declared from."
+    },
+    {
+      "owner": "Project-Helianthus/helianthus-docs-canbus@3dca48a82a693e4767d1a8e82579f4f245bc2603",
+      "kind": "specification",
+      "locator": "protocols/gree/dictionary/status-bits.json",
+      "statement": "This page is the specification the gree-vrf-can family is declared from."
+    },
+    {
+      "owner": "Project-Helianthus/helianthus-docs-canbus@3dca48a82a693e4767d1a8e82579f4f245bc2603",
+      "kind": "specification",
+      "locator": "protocols/gree/dictionary/electrical-system.json",
+      "statement": "This page is the specification the gree-vrf-can family is declared from."
+    },
+    {
+      "owner": "Project-Helianthus/helianthus-docs-canbus@3dca48a82a693e4767d1a8e82579f4f245bc2603",
+      "kind": "specification",
+      "locator": "protocols/gree/dictionary/settings.json",
+      "statement": "This page is the specification the gree-vrf-can family is declared from."
+    },
+    {
+      "owner": "Project-Helianthus/helianthus-docs-canbus@3dca48a82a693e4767d1a8e82579f4f245bc2603",
+      "kind": "specification",
+      "locator": "protocols/gree/dictionary/remaining.json",
+      "statement": "This page is the specification the gree-vrf-can family is declared from."
+    },
+    {
+      "owner": "Project-Helianthus/helianthus-docs-canbus@3dca48a82a693e4767d1a8e82579f4f245bc2603",
+      "kind": "specification",
+      "locator": "protocols/gree/gree-vrf-can-device-classes.md",
+      "statement": "This page is the specification the gree-vrf-can family is declared from."
+    },
+    {
+      "owner": "Project-Helianthus/helianthus-docs-canbus@3dca48a82a693e4767d1a8e82579f4f245bc2603",
+      "kind": "specification",
+      "locator": "protocols/gree/gree-vrf-can-device-classes.json",
+      "statement": "This page is the specification the gree-vrf-can family is declared from."
+    },
+    {
+      "owner": "Project-Helianthus/helianthus-docs-canbus@3dca48a82a693e4767d1a8e82579f4f245bc2603",
+      "kind": "specification",
+      "locator": "protocols/gree/gree-vrf-can-presentation-converters.md",
+      "statement": "This page is the specification the gree-vrf-can family is declared from."
+    },
+    {
+      "owner": "Project-Helianthus/helianthus-docs-canbus@3dca48a82a693e4767d1a8e82579f4f245bc2603",
+      "kind": "specification",
+      "locator": "protocols/gree/gree-vrf-can-presentation-converters.json",
+      "statement": "This page is the specification the gree-vrf-can family is declared from."
+    },
+    {
+      "owner": "Project-Helianthus/helianthus-docs-canbus@3dca48a82a693e4767d1a8e82579f4f245bc2603",
+      "kind": "specification",
+      "locator": "protocols/gree/vrf-canbus.md",
+      "statement": "This page is the specification the gree-vrf-can family is declared from."
+    },
+    {
+      "owner": "Project-Helianthus/helianthus-docs-canbus@3dca48a82a693e4767d1a8e82579f4f245bc2603",
+      "kind": "specification",
+      "locator": "protocols/gree/gree-vrf-command-map.md",
+      "statement": "This page is the specification the gree-vrf-can family is declared from."
+    },
+    {
+      "owner": "Project-Helianthus/helianthus-docs-canbus@3dca48a82a693e4767d1a8e82579f4f245bc2603",
+      "kind": "specification",
+      "locator": "protocols/gree/gree-vrf-can-command-contract.md",
+      "statement": "This page is the specification the gree-vrf-can family is declared from."
+    }
+  ],
+  "composition_verified": false,
+  "verification": "not_tested_on_hardware"
+}

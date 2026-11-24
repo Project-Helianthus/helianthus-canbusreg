@@ -6,6 +6,7 @@ Fixtures are synthetic. Revisions and digests are computed when a case runs.
 from __future__ import annotations
 
 import json
+import re
 import os
 import shutil
 import subprocess
@@ -13,6 +14,7 @@ import sys
 import tempfile
 import unittest
 from pathlib import Path
+from unittest.mock import patch
 
 
 HERE = Path(__file__).resolve().parent
@@ -376,6 +378,11 @@ def pull(number: int, head_repo: int, head_ref: str, base_repo: int, base_ref: s
     }
 
 
+def job_text(workflow: str, name: str) -> str:
+    match = re.search(rf"^  {re.escape(name)}:\n.*?(?=^  (?:[\w-]+:|#)|\Z)", workflow, re.MULTILINE | re.DOTALL)
+    return match[0].rstrip() if match else ""
+
+
 class BaselineGuard(unittest.TestCase):
     def tearDown(self) -> None:
         for rel, blob in BASELINE_BLOBS.items():
@@ -460,25 +467,21 @@ class SelectionTest(BaselineGuard):
         self.assertNotIn("./...", classify.package_args(["registry.go"]))
 
     def test_mapping_commands_follow_the_base_validate_job(self) -> None:
-        absent = (REPO / ".github" / "workflows" / "ci.yml").read_text(encoding="utf-8")
-        self.assertNotIn(MAPPING_VALIDATOR, absent)
-        self.assertNotIn(MAPPING_MUTATOR, absent)
-        self.assertFalse(classify.mapping_active(absent))
-        present = absent.replace(
-            "python3 -m unittest discover -s scripts/tests -p driver_imports_test.py -v",
-            "python3 -m unittest discover -s scripts/tests -p driver_imports_test.py -v\n"
-            "      - run: %s\n      - run: %s" % (MAPPING_VALIDATOR, MAPPING_MUTATOR),
-        )
-        self.assertTrue(classify.mapping_active(present))
-        only_one = present.replace(MAPPING_MUTATOR, "python3 scripts/other.py")
-        self.assertFalse(classify.mapping_active(only_one))
+        before = "jobs:\n  validate:\n    steps:\n      - run: GOWORK=off go test ./...\n"
+        commands = f"      - run: {MAPPING_VALIDATOR}\n      - run: {MAPPING_MUTATOR}\n"
+        self.assertFalse(classify.mapping_active(before))
+        self.assertTrue(classify.mapping_active(before + commands))
+        self.assertFalse(classify.mapping_active(before + "  other:\n    steps:\n" + commands))
+        for command in (MAPPING_VALIDATOR, MAPPING_MUTATOR):
+            with self.subTest(missing=command):
+                self.assertFalse(classify.mapping_active(before + commands.replace(command, "python3 scripts/other.py")))
 
     def test_job_matrix(self) -> None:
         added = [("A", "registry.go")]
         modified = [("M", "registry.go")]
 
         def flags(position: str, matched: bool, entries: list, mapping: bool = False) -> dict:
-            return classify.decide("pull_request", position, matched, entries, mapping)
+            return classify.decide("pull_request", position, matched, entries, mapping, fast_path_ready=matched)
 
         no_match = flags("unstacked", False, modified)
         self.assertTrue(no_match["run_full"])
@@ -540,7 +543,7 @@ class SelectionTest(BaselineGuard):
         self.assertFalse(unresolved["preflight"])
         self.assertFalse(unresolved["dp03"])
 
-        push = classify.decide("push", "lower", True, added, True)
+        push = classify.decide("push", "lower", True, added, True, fast_path_ready=True)
         self.assertTrue(push["run_full"])
         self.assertFalse(push["check"])
 
@@ -549,122 +552,140 @@ class SelectionTest(BaselineGuard):
         self.assertFalse(lower_without["package_tests"])
 
     def test_workflow_commands_and_full_job_gate(self) -> None:
-        additive = (REPO / ".github" / "workflows" / "additive-rows.yml").read_text(encoding="utf-8")
-        ci = (REPO / ".github" / "workflows" / "ci.yml").read_text(encoding="utf-8")
-        size = (REPO / ".github" / "workflows" / "size-ratchet.yml").read_text(encoding="utf-8")
-        names = (REPO / ".github" / "workflows" / "behavior-names.yml").read_text(encoding="utf-8")
-        readability = (REPO / ".github" / "workflows" / "go-readability.yml").read_text(encoding="utf-8")
-        for snippet in (
-            "runs-on: ubuntu-latest",
-            "actions/checkout@v4",
-            "persist-credentials: false",
-            "actions/setup-go@v5",
-            "go-version-file: go.mod",
-            "check-latest: false",
-            "cache: false",
-            "actions/setup-python@v5",
-            "python-version: '3.x'",
-            "python3 scripts/preflight/acquire.py",
-            "python3 scripts/preflight/classify.py gate",
-            "GOWORK=off go test ${{ steps.gate.outputs.packages }}",
-            "python3 acceptance/tools/manifest/main.py check --manifest",
-            "python3 acceptance/tools/manifest/main.py compare --manifest",
-            '--destination "$GITHUB_WORKSPACE"',
-            "python3 scripts/preflight/preflight.py --manifest",
-            "python3 scripts/check_size_ratchet.py",
-            "python3 scripts/check_behavior_names.py --check",
-            "go install github.com/golangci/golangci-lint/v2/cmd/golangci-lint@v2.11.4",
-            "python3 scripts/check_go_lint_baseline.py --check",
-            "python3 -m unittest discover -s scripts/tests -p driver_imports_test.py",
-            "GOPROXY: 'off'",
-            "GOSUMDB: 'off'",
-            "GOTOOLCHAIN: 'local'",
-            "GOFLAGS: -buildvcs=false",
-            MAPPING_VALIDATOR,
-            MAPPING_MUTATOR,
-            "if: steps.gate.outputs.package_tests == 'true'",
-            "if: steps.gate.outputs.check == 'true'",
-            "if: steps.gate.outputs.compare == 'true'",
-            "if: steps.gate.outputs.preflight == 'true'",
-            "if: steps.gate.outputs.checkers == 'true'",
-            "if: steps.gate.outputs.dp03 == 'true'",
-            "if: steps.gate.outputs.mapping == 'true'",
+        workflows = REPO / ".github" / "workflows"
+        ci = (workflows / "ci.yml").read_text(encoding="utf-8")
+        self.assertEqual(
+            sum(path.read_text(encoding="utf-8").count("scripts/preflight/classify.py gate")
+                for path in workflows.glob("*.yml")),
+            1,
+        )
+        additive = job_text(ci, "additive")
+        self.assertIn("run_full: ${{ steps.gate.outputs.run_full }}", additive)
+        self.assertIn("tool_sha: ${{ steps.gate.outputs.tool_sha }}", additive)
+        self.assertIn("python3 scripts/preflight/classify.py gate", additive)
+        self.assertNotIn("scripts/preflight/acquire.py", additive)
+        for command, flag in (
+            ("GOWORK=off go test ${{ steps.gate.outputs.packages }}", "package_tests"),
+            ("python3 acceptance/tools/manifest/main.py check --manifest", "check"),
+            ("python3 acceptance/tools/manifest/main.py compare --manifest", "compare"),
+            ("python3 scripts/preflight/preflight.py --manifest", "preflight"),
+            ("python3 scripts/check_size_ratchet.py", "checkers"),
+            (" ".join(classify.DP03_ARGV), "dp03"),
+            (MAPPING_VALIDATOR, "mapping"),
+            (MAPPING_MUTATOR, "mapping"),
         ):
-            self.assertIn(snippet, additive, snippet)
-        self.assertNotIn("driver_imports_test.py -v", additive)
+            self.assertIn(command, additive)
+            self.assertIn(f"if: steps.gate.outputs.{flag} == 'true'", additive)
         self.assertNotIn("go test ./...", additive)
-        self.assertIn("GOWORK=off go test ./...", ci)
-        self.assertIn("GOWORK=off go vet ./...", ci)
-        self.assertIn("driver_imports_test.py -v", ci)
-        self.assertNotIn(MAPPING_VALIDATOR, ci)
-        for text, name in ((ci, "validate:"), (size, "size:"), (names, "behavior-names:"), (readability, "readability:")):
-            self.assertIn(name, text)
-            self.assertIn("python3 scripts/preflight/classify.py gate", text)
-            self.assertIn("if: steps.gate.outputs.run_full == 'true'", text)
         self.assertIn("pull_request:", ci)
         self.assertIn("push:", ci)
         self.assertIn("branches: [main]", ci)
-        self.assertIn("synology", ci)
-        self.assertIn("python3 scripts/check_size_ratchet.py", size)
-        self.assertIn("python3 scripts/check_behavior_names.py --check", names)
-        self.assertIn("python3 scripts/check_go_lint_baseline.py --check", readability)
-        self.assertIn("golangci-lint@v2.11.4", readability)
+        validate = job_text(ci, "validate")
+        self.assertIn("synology", validate)
+        self.assertIn("GOWORK=off go test ./...", validate)
+        self.assertIn("GOWORK=off go vet ./...", validate)
+        self.assertIn("driver_imports_test.py -v", validate)
+        for name in ("validate", "size", "behavior-names", "readability"):
+            text = job_text(ci, name)
+            self.assertIn("needs: additive", text)
+            self.assertIn("!cancelled()", text)
+            self.assertIn("needs.additive.outputs.run_full != 'false'", text)
+        for file, name in (("size-ratchet", "size"), ("behavior-names", "behavior-names"), ("go-readability", "readability")):
+            push = (workflows / f"{file}.yml").read_text(encoding="utf-8")
+            self.assertNotIn("pull_request:", push)
+            self.assertIn("push:", push)
+            self.assertIn("branches: [main]", push)
+            # Runner, setup, environment and commands stay identical on both routes.
+            for line in job_text(push, name).splitlines()[1:]:
+                self.assertIn(line, job_text(ci, name))
 
-    def test_gate_keeps_full_ci_when_nothing_matches(self) -> None:
+    def test_lower_gate_requires_acquired_comparison_inputs(self) -> None:
         workspace = temp_dir("gate-")
-        commit_tree(workspace, {"keep.go": clean_go("Ready")})
+        commit_tree(workspace, {"ready.go": clean_go("Ready")})
         base = git_out(workspace, "rev-parse", "HEAD")
-        (workspace / "added.go").write_text(clean_go("Added"), encoding="utf-8")
-        git(workspace, "add", "-A")
-        git(workspace, "commit", "-m", "add")
+        (workspace / "ready.go").write_text(clean_go("Changed"), encoding="utf-8")
+        git(workspace, "add", "ready.go")
+        git(workspace, "commit", "-m", "modify sealed path")
         tool = workspace / ".tmp" / "docs-semantic"
-        copy_tool(tool)
-        (tool / "acceptance" / "manifests" / "other.json").write_text(json.dumps({
-            "row": "other",
-            "donor": {"repository": "gateway"},
-            "paths": [{"repository": "canbusreg", "paths": ["unrelated.go"]}],
+        manifests = tool / "acceptance" / "manifests"
+        manifests.mkdir(parents=True)
+        path = manifests / "row.json"
+        body = {
+            "row": "row",
+            "donor": {"repository": "gateway", "sha": base},
+            "paths": [{"repository": "canbusreg", "paths": ["ready.go"]}],
             "symbols": [],
             "destinations": [],
-        }), encoding="utf-8")
-        event = {
-            "pull_request": {
-                "number": 7,
-                "head": {"ref": "topic", "sha": git_out(workspace, "rev-parse", "HEAD"), "repo": {"id": 1}},
-                "base": {"ref": "main", "sha": base, "repo": {"id": 1}},
-            }
         }
+        tool_sha = commit_tree(tool, {"anchor.txt": "synthetic immutable source"})
         event_path = workspace / "event.json"
-        event_path.write_text(json.dumps(event), encoding="utf-8")
+        event_path.write_text(json.dumps({"pull_request": {
+            "number": 7,
+            "head": {"ref": "topic", "repo": {"id": 1}},
+            "base": {"ref": "main", "sha": base, "repo": {"id": 1}},
+        }}), encoding="utf-8")
         output = workspace / "output.txt"
-        previous = {key: os.environ.get(key) for key in ("GITHUB_EVENT_NAME", "GITHUB_EVENT_PATH", "GITHUB_REPOSITORY", "GITHUB_OUTPUT")}
-        called = {"getter": 0}
+        selected = [{"manifest": str(path), "tool_root": str(tool), "donor": str(workspace)}]
+        applicable = dict(body, expectations=[{
+            "case": "observe", "references": [{"repository": "docs-semantic", "revision": tool_sha, "path": "anchor.txt"}],
+        }], destinations=[{
+            "kind": "case", "case": "observe", "repository": "canbusreg", "path": "ready_test.go", "test": "TestReady",
+        }])
+        variants = (
+            (dict(body, paths=[]), [], None, False, True),
+            (body, selected, None, True, True),
+            (applicable, selected, None, True, False),
+            (applicable, [], acquire.AcquireError("donor fetch failed"), True, True),
+        )
+        for manifest, acquired, error, matched, run_full in variants:
+            with self.subTest(matched=matched, run_full=run_full, error=error, oracles=bool(manifest.get("expectations"))):
+                path.write_text(json.dumps(manifest), encoding="utf-8")
+                output.write_text("", encoding="utf-8")
+                with patch.dict(os.environ, {
+                    "GITHUB_EVENT_NAME": "pull_request", "GITHUB_EVENT_PATH": str(event_path),
+                    "GITHUB_REPOSITORY": "example/repo", "GITHUB_OUTPUT": str(output),
+                }), patch.object(classify, "fetch_pulls", return_value=[pull(8, 1, "child", 1, "topic")]), \
+                     patch.object(acquire, "prepare_tool", return_value=tool_sha) as prepare, \
+                     patch.object(classify, "acquire_matches", return_value=acquired, side_effect=error) as fetch:
+                    self.assertEqual(classify.gate(workspace), 0)
+                prepare.assert_called_once_with(tool)
+                self.assertEqual(fetch.call_count, int(matched))
+                payload = classify.read_selection(workspace)
+                plan = payload["plan"]
+                self.assertEqual(plan["position"], "lower")
+                self.assertEqual(plan["matched"], matched)
+                self.assertEqual(plan["run_full"], run_full)
+                self.assertEqual(plan["check"], matched)
+                self.assertEqual(plan["compare"], matched)
+                self.assertEqual(plan["dp03"], not run_full)
+                self.assertEqual(payload["tool_sha"], tool_sha)
+                self.assertEqual(payload["selections"], acquired)
+                self.assertIn(f"tool_sha={tool_sha}\n", output.read_text(encoding="utf-8"))
+                self.assertIn(f"run_full={str(run_full).lower()}\n", output.read_text(encoding="utf-8"))
+                if error:
+                    result = classify.execute_fast_path({"check": plan["check"]}, acquired, workspace)
+                    self.assertEqual(result["failed_step"], "check")
 
-        def getter(url: str):
-            called["getter"] += 1
-            raise AssertionError(url)
-
-        original = classify.github_getter
-        classify.github_getter = getter
-        try:
-            os.environ["GITHUB_EVENT_NAME"] = "pull_request"
-            os.environ["GITHUB_EVENT_PATH"] = str(event_path)
-            os.environ["GITHUB_REPOSITORY"] = ""
-            os.environ["GITHUB_OUTPUT"] = str(output)
-            self.assertEqual(classify.gate(workspace), 0)
-        finally:
-            classify.github_getter = original
-            for key, value in previous.items():
-                if value is None:
-                    os.environ.pop(key, None)
-                else:
-                    os.environ[key] = value
-        self.assertEqual(called["getter"], 0)
-        plan = json.loads((workspace / ".tmp" / "preflight-selection.json").read_text(encoding="utf-8"))["plan"]
-        self.assertEqual(plan["position"], "unstacked")
-        self.assertFalse(plan["matched"])
-        self.assertTrue(plan["run_full"])
-        self.assertFalse(plan["check"])
-        self.assertIn("run_full=true", output.read_text(encoding="utf-8"))
+    def test_comparison_destination_requires_its_inputs(self) -> None:
+        for kind, input_key, identity in (
+            ("case", "expectations", {"case": "example"}),
+            ("assertion", "assertions", {"function": "TestDonor", "name": "observed"}),
+        ):
+            destination = dict(identity, kind=kind, repository="canbusreg", path="ready_test.go", test="TestReady")
+            record = dict(identity)
+            if kind == "case":
+                record["references"] = [{"role": "specification"}]
+            manifest = {input_key: [record], "destinations": [destination]}
+            self.assertTrue(classify.comparison_applicable(manifest))
+            if kind == "case":
+                self.assertFalse(classify.comparison_applicable(dict(manifest, expectations=[identity])))
+            for key, wrong in dict.fromkeys(identity, "different").items():
+                with self.subTest(kind=kind, key=key):
+                    self.assertFalse(classify.comparison_applicable(dict(manifest, destinations=[dict(destination, **{key: wrong})])))
+            for key, wrong in {"repository": "gateway", "path": "", "test": "", "kind": "symbol"}.items():
+                with self.subTest(kind=kind, key=key):
+                    self.assertFalse(classify.comparison_applicable(dict(manifest, destinations=[dict(destination, **{key: wrong})])))
+            self.assertFalse(classify.comparison_applicable(dict(manifest, **{input_key: []})))
 
     def test_push_keeps_the_full_suites(self) -> None:
         workspace = temp_dir("push-")
@@ -680,63 +701,6 @@ class SelectionTest(BaselineGuard):
         plan = json.loads((workspace / ".tmp" / "preflight-selection.json").read_text(encoding="utf-8"))["plan"]
         self.assertTrue(plan["run_full"])
         self.assertFalse(plan["check"])
-
-    def test_selected_manifest_whose_fetch_fails_stays_a_check_failure(self) -> None:
-        workspace = temp_dir("fetch-fail-")
-        commit_tree(workspace, {"keep.go": clean_go("Ready")})
-        base = git_out(workspace, "rev-parse", "HEAD")
-        (workspace / "registry.go").write_text(clean_go("Added"), encoding="utf-8")
-        git(workspace, "add", "-A")
-        git(workspace, "commit", "-m", "add")
-        tool = workspace / ".tmp" / "docs-semantic"
-        copy_tool(tool)
-        (tool / "acceptance" / "manifests" / "classifier.json").write_text(json.dumps({
-            "row": "classifier",
-            "donor": {"repository": "gateway", "sha": "1"},
-            "paths": [{"repository": "canbusreg", "paths": ["registry.go"]}],
-            "symbols": [],
-            "destinations": [],
-        }), encoding="utf-8")
-        event = {
-            "pull_request": {
-                "number": 8,
-                "head": {"ref": "topic", "sha": git_out(workspace, "rev-parse", "HEAD"), "repo": {"id": 1}},
-                "base": {"ref": "main", "sha": base, "repo": {"id": 1}},
-            }
-        }
-        event_path = workspace / "event.json"
-        event_path.write_text(json.dumps(event), encoding="utf-8")
-        previous = {key: os.environ.get(key) for key in ("GITHUB_EVENT_NAME", "GITHUB_EVENT_PATH", "GITHUB_REPOSITORY", "GITHUB_OUTPUT")}
-
-        def broken(*_args, **_kwargs):
-            raise acquire.AcquireError("donor fetch failed")
-
-        original = acquire.checkout_detached
-        acquire.checkout_detached = broken
-        try:
-            os.environ["GITHUB_EVENT_NAME"] = "pull_request"
-            os.environ["GITHUB_EVENT_PATH"] = str(event_path)
-            os.environ["GITHUB_REPOSITORY"] = ""
-            os.environ.pop("GITHUB_OUTPUT", None)
-            self.assertEqual(classify.gate(workspace), 0)
-        finally:
-            acquire.checkout_detached = original
-            for key, value in previous.items():
-                if value is None:
-                    os.environ.pop(key, None)
-                else:
-                    os.environ[key] = value
-        payload = json.loads((workspace / ".tmp" / "preflight-selection.json").read_text(encoding="utf-8"))
-        self.assertTrue(payload["plan"]["matched"])
-        self.assertTrue(payload["plan"]["check"])
-        self.assertFalse(payload["plan"]["run_full"])
-        self.assertEqual(payload["selections"], [])
-        plan = dict(payload["plan"])
-        for flag in ("package_tests", "dp03", "preflight", "checkers", "mapping", "compare"):
-            plan[flag] = False
-        result = classify.execute_fast_path(plan, payload["selections"], workspace)
-        self.assertEqual(result["failed_step"], "check")
-
 
 class AcquireTest(BaselineGuard):
     def test_public_names_include_the_gateway_rename(self) -> None:
@@ -816,6 +780,35 @@ class PreflightCase(BaselineGuard):
         self.assertEqual(manifest.read_bytes(), before)
         self.assertEqual([path.read_bytes() for path in sorted(manifest.parent.glob(row + ".*.lst"))], lists)
         return result, candidate
+
+    def test_candidate_symlinks_reach_the_native_size_ratchet(self) -> None:
+        source = clean_go("Ready")
+        donor = temp_dir("link-donor-")
+        sha = commit_tree(donor, {"ready.go": source})
+        row = "candidate-link"
+        completed = generate(self.tool, donor, base_spec(row, sha, [move("ready.go", "linked.go")]))
+        self.assertEqual(completed.returncode, 0, detail(completed))
+        linked_source = temp_dir("link-target-")
+        # A dangling projected destination also counts as present. In the
+        # unprojected cases both targets exist and their contents are valid.
+        (linked_source / "valid.go").write_text(clean_go("Other"), encoding="utf-8")
+        for name, target, finding in (
+            ("alias.go", linked_source / "valid.go", "source"),
+            ("aliasdir", linked_source, "directory"),
+            ("linked.go", Path("missing.go"), "source"),
+        ):
+            with self.subTest(name=name):
+                candidate = make_candidate({"ready.go": source})
+                link = candidate / name
+                link.symlink_to(target)
+                # Only the dangling case covers the manifest destination.
+                if name != "linked.go":
+                    (candidate / "linked.go").write_text(clean_go("Projected"), encoding="utf-8")
+                result = run_preflight(candidate, manifest_path(self.tool, row), donor)
+                self.assertNotEqual(result.returncode, 0, detail(result))
+                self.assertIn(f"unverifiable {finding} symlink: {name}", result.stdout, detail(result))
+                self.assertEqual(link.readlink(), target)
+                self.assertFalse((candidate / "missing.go").exists())
 
     def test_function_over_the_hard_line_names_the_function(self) -> None:
         source = HEADER + "\n// Long reports a fixture value.\n" + function_block("Long", 151)
@@ -1193,6 +1186,24 @@ class CompareWorld(BaselineGuard):
         self.assertEqual(manifest.read_bytes(), before)
         del approved_spec
 
+    def test_lower_member_runs_a_bound_compare_without_the_full_jobs(self) -> None:
+        manifest = manifest_path(self.tool, self.row)
+        body = json.loads(manifest.read_bytes())
+        entries = [("M", "ready.go")]
+        candidate = make_candidate({"ready.go": clean_go("Ready"), "dest/echo_test.go": ECHO}, policy=True)
+        plan = classify.decide(
+            "pull_request", "lower", classify.covers(body, classify.changed_paths(entries)), entries, False,
+            fast_path_ready=classify.comparison_applicable(body),
+        )
+        self.assertFalse(plan["run_full"])
+        self.assertFalse(plan["preflight"])
+        result = classify.execute_fast_path(plan, [{
+            "tool_root": str(self.tool), "manifest": str(manifest), "donor": str(self.donor),
+        }], candidate)
+        self.assertEqual(result["failed_step"], "", detail(result["results"][-1][1]))
+        self.assertEqual([step for step, _ in result["results"]], ["package_tests", "check", "compare", "dp03"])
+        self.assertIn("result=pass", dict(result["results"])["compare"].stdout)
+
     def test_stale_signature_and_mutated_expectation_fail_check(self) -> None:
         manifest = manifest_path(self.tool, self.row)
         stale_path = self.tool / "acceptance" / "manifests" / "compare-stale.json"
@@ -1218,7 +1229,7 @@ class CompareWorld(BaselineGuard):
         )
         for position, entries, run_full, uses_dp03, uses_mapping in routes:
             changed = [entry[-1] for entry in entries]
-            plan = classify.decide("pull_request", position, classify.covers(body, changed), entries, True)
+            plan = classify.decide("pull_request", position, classify.covers(body, changed), entries, True, fast_path_ready=classify.comparison_applicable(body))
             self.assertTrue(plan["matched"], position)
             self.assertTrue(plan["check"], position)
             self.assertTrue(plan["compare"], position)
@@ -1268,7 +1279,7 @@ class CompareWorld(BaselineGuard):
             ("lower", [("M", "ready.go")]),
         ):
             changed = [entry[-1] for entry in entries]
-            plan = classify.decide("pull_request", position, classify.covers(typed, changed), entries, False)
+            plan = classify.decide("pull_request", position, classify.covers(typed, changed), entries, False, fast_path_ready=classify.comparison_applicable(typed))
             self.assertTrue(plan["check"], position)
             result = classify.execute_fast_path(plan, [{
                 "tool_root": str(self.tool),
@@ -1277,7 +1288,7 @@ class CompareWorld(BaselineGuard):
             }], self.destination)
             self.assertEqual(result["failed_step"], "check", position)
         unmatched = classify.decide(
-            "pull_request", "unstacked", classify.covers(typed, ["unrelated.go"]), [("M", "unrelated.go")], False,
+            "pull_request", "unstacked", classify.covers(typed, ["unrelated.go"]), [("M", "unrelated.go")], False, fast_path_ready=False,
         )
         self.assertFalse(unmatched["matched"])
         self.assertFalse(unmatched["check"])
@@ -1364,7 +1375,7 @@ class FastPathTest(BaselineGuard):
         completed = generate(tool, donor, base_spec("fast-row", sha, [move("ready.go", "ready.go")]))
         self.assertEqual(completed.returncode, 0, detail(completed))
         candidate = make_candidate({"ready.go": source}, policy=True)
-        plan = classify.decide("pull_request", "unstacked", True, [("A", "ready.go")], False)
+        plan = classify.decide("pull_request", "unstacked", True, [("A", "ready.go")], False, fast_path_ready=True)
         result = classify.execute_fast_path(plan, [{
             "tool_root": str(tool),
             "manifest": str(manifest_path(tool, "fast-row")),
@@ -1405,7 +1416,7 @@ class FastPathTest(BaselineGuard):
             ("unstacked", [("A", "ready.go")]),
             ("lower", [("M", "ready.go")]),
         ):
-            plan = classify.decide("pull_request", position, True, entries, False)
+            plan = classify.decide("pull_request", position, True, entries, False, fast_path_ready=True)
             self.assertTrue(plan["dp03"], position)
             self.assertFalse(plan["run_full"], position)
             self.assertFalse(plan["mapping"], position)
@@ -1416,48 +1427,103 @@ class FastPathTest(BaselineGuard):
             self.assertEqual(step[0][1].args[1:], ["-m", "unittest", "discover", "-s", "scripts/tests", "-p", "driver_imports_test.py"])
             self.assertIn("semreg/host", step[0][1].stdout + step[0][1].stderr)
 
-    def test_mapping_commands_follow_the_base(self) -> None:
+    def test_dd03_mapping_commands_on_fast_and_retained_full_routes(self) -> None:
         root = temp_dir("mapping-")
-        plan = classify.empty_plan(False)
-        plan["mapping"] = False
-        skipped = classify.execute_fast_path(plan, [], root)
-        self.assertEqual(skipped["failed_step"], "")
-        self.assertEqual(skipped["results"], [])
-        plan["mapping"] = True
-        missing = classify.execute_fast_path(plan, [], root)
-        self.assertEqual(missing["failed_step"], "mapping-validator")
-        (root / "scripts").mkdir()
-        (root / "scripts" / "validate_growatt_bms_can_storage_mapping.py").write_text("import sys\nsys.exit(1)\n", encoding="utf-8")
-        (root / "scripts" / "test_validate_growatt_bms_can_storage_mapping.py").write_text("import sys\nsys.exit(0)\n", encoding="utf-8")
-        validator = classify.execute_fast_path(plan, [], root)
-        self.assertEqual(validator["failed_step"], "mapping-validator")
-        (root / "scripts" / "validate_growatt_bms_can_storage_mapping.py").write_text("import sys\nsys.exit(0)\n", encoding="utf-8")
-        (root / "scripts" / "test_validate_growatt_bms_can_storage_mapping.py").write_text("import sys\nsys.exit(1)\n", encoding="utf-8")
-        mutator = classify.execute_fast_path(plan, [], root)
-        self.assertEqual(mutator["failed_step"], "mapping-mutator")
-        self.assertEqual([item[0] for item in mutator["results"]], ["mapping-validator", "mapping-mutator"])
+        public = manifest_tool().parents[3]
+        mapping = Path("api/v1/mappings/growatt-bms-can-storage-v1.json")
+        page = mapping.with_suffix(".md")
+        validator = Path(MAPPING_VALIDATOR.split()[1])
+        mutator = Path(MAPPING_MUTATOR.split()[1])
+        for path in (validator, mutator, Path("scripts/mapping_gate_graph_rules.py"),
+                     Path("api/v1/element-catalog-v1.json"), mapping, page):
+            (root / path).parent.mkdir(parents=True, exist_ok=True)
+            shutil.copyfile(public / path, root / path)
 
-    def test_lower_member_runs_compare_without_the_full_jobs(self) -> None:
-        tool = temp_dir("lower-tool-")
-        copy_tool(tool)
-        donor = temp_dir("lower-donor-")
-        source = clean_go("Ready")
-        sha = commit_tree(donor, {"ready.go": source})
-        completed = generate(tool, donor, base_spec("lower-row", sha, [move("ready.go", "ready.go")]))
-        self.assertEqual(completed.returncode, 0, detail(completed))
-        candidate = make_candidate({"ready.go": source}, policy=True)
-        plan = classify.decide("pull_request", "lower", True, [("M", "ready.go")], True)
-        self.assertFalse(plan["run_full"])
-        self.assertFalse(plan["preflight"])
-        # The mapping scripts are absent, so this case uses the pre-DD03 flag.
-        plan["mapping"] = False
-        result = classify.execute_fast_path(plan, [{
-            "tool_root": str(tool),
-            "manifest": str(manifest_path(tool, "lower-row")),
-            "donor": str(donor),
-        }], candidate)
-        self.assertEqual(result["failed_step"], "", detail(result["results"][-1][1]) if result["results"] else result)
-        self.assertEqual([item[0] for item in result["results"]], ["package_tests", "check", "compare", "dp03"])
+        workflow = (REPO / ".github/workflows/ci.yml").read_text(encoding="utf-8")
+        validate = job_text(workflow, "validate")
+        # Model the post-DD03 invocation in the real validate job, without
+        # installing DD03 in this repository or changing the full-route guard.
+        post_validate = validate + f"\n      - run: {MAPPING_VALIDATOR}\n      - run: {MAPPING_MUTATOR}"
+        pre_base = "jobs:\n  validate:\n    steps:\n      - run: GOWORK=off go test ./...\n"
+        post_base = workflow if classify.mapping_active(workflow) else workflow.replace(validate, post_validate, 1)
+        post_job = job_text(post_base, "validate")
+        self.assertFalse(classify.mapping_active(pre_base))
+        self.assertTrue(classify.mapping_active(post_base))
+        additive = job_text(workflow, "additive")
+        for command in (MAPPING_VALIDATOR, MAPPING_MUTATOR):
+            self.assertIn(f"if: steps.gate.outputs.mapping == 'true'\n        run: {command}", additive)
+        self.assertIn("needs.additive.outputs.run_full != 'false'", post_job)
+
+        def run_mapping(job: str, active: bool) -> list[subprocess.CompletedProcess[str]]:
+            commands = re.findall(r"^      (?:- |  )run: (python3 scripts/[^\n]*growatt_bms_can_storage_mapping.py)$", job, re.MULTILINE)
+            self.assertEqual(commands, [MAPPING_VALIDATOR, MAPPING_MUTATOR])
+            results = []
+            for command in commands if active else []:
+                result = subprocess.run(command.split(), cwd=root, env=tool_env(), capture_output=True, text=True, timeout=30)
+                results.append(result)
+                if result.returncode != 0:
+                    break
+            return results
+
+        def assert_passed(results: list[subprocess.CompletedProcess[str]]) -> None:
+            self.assertEqual(len(results), 2, [detail(result) for result in results])
+            for result in results:
+                self.assertEqual(result.returncode, 0, detail(result))
+            self.assertIn("growatt bms can storage mapping: PASS", results[0].stdout)
+            self.assertIn("page drift: REJECTED", results[1].stdout)
+            self.assertIn("can storage mapping mutations: PASS", results[1].stdout)
+
+        def assert_failed(results: list[subprocess.CompletedProcess[str]], step: int, message: str) -> None:
+            self.assertEqual(len(results), step, [detail(result) for result in results])
+            self.assertNotEqual(results[-1].returncode, 0, detail(results[-1]))
+            self.assertIn(message, results[-1].stderr)
+
+        page_text = (root / page).read_text(encoding="utf-8")
+        page_drift = page_text.replace("| `pack_voltage` |", "| `synthetic_drift` |", 1)
+        self.assertNotEqual(page_drift, page_text)
+        record = json.loads((root / mapping).read_bytes())
+        record["status"] = "synthetic_drift"
+        validator_text = (root / validator).read_text(encoding="utf-8")
+        marker = '    text = DOC.read_text(encoding="utf-8")'
+        weak_validator = validator_text.replace(marker, f"    if DOC != ROOT / {str(page)!r}:\n        return\n{marker}", 1)
+        self.assertNotEqual(weak_validator, validator_text)
+
+        for position, status in (("unstacked", "A"), ("lower", "M")):
+            with self.subTest(position=position):
+                entries = [(status, "ready.go")]
+                before = classify.decide("pull_request", position, True, entries, classify.mapping_active(pre_base), fast_path_ready=True)
+                after = classify.decide("pull_request", position, True, entries, classify.mapping_active(post_base), fast_path_ready=True)
+                self.assertFalse(before["run_full"])
+                self.assertFalse(after["run_full"])
+                self.assertEqual(run_mapping(additive, before["mapping"]), [])
+                assert_passed(run_mapping(additive, after["mapping"]))
+                for path, contents, step, message in (
+                    (page, page_drift, 1, "ValueError: page"),
+                    (mapping, json.dumps(record), 1, "ValueError: status"),
+                    (validator, weak_validator, 2, "AssertionError: page drift accepted"),
+                ):
+                    with self.subTest(path=path):
+                        target = root / path
+                        original = target.read_bytes()
+                        try:
+                            target.write_text(contents, encoding="utf-8")
+                            assert_failed(run_mapping(additive, after["mapping"]), step, message)
+                        finally:
+                            target.write_bytes(original)
+                for step, script in enumerate((validator, mutator), start=1):
+                    with self.subTest(missing=script):
+                        target = root / script
+                        moved = target.rename(target.with_suffix(".unavailable"))
+                        try:
+                            assert_failed(run_mapping(additive, after["mapping"]), step, "can't open file")
+                        finally:
+                            moved.rename(target)
+
+        for position, matched, status in (("tip", True, "A"), ("unresolved", True, "M"), ("lower", False, "M")):
+            with self.subTest(position=position, matched=matched):
+                plan = classify.decide("pull_request", position, matched, [(status, "ready.go")], True, fast_path_ready=matched)
+                self.assertEqual(run_mapping(additive, plan["mapping"]), [])
+                assert_passed(run_mapping(post_job, plan["run_full"]))
 
     def test_unpublished_preflight_is_not_passed(self) -> None:
         plan = classify.empty_plan(False)

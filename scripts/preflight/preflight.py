@@ -234,7 +234,8 @@ def project(tree: Path, candidate: Path, manifest: dict, donor: Path) -> list[st
             continue
         whole = len(destinations) == 1
         for dest, names in destinations.items():
-            if (candidate / dest).is_file():
+            existing = candidate / dest
+            if existing.exists() or existing.is_symlink():
                 continue
             target = _inside(tree, dest)
             if target is None:
@@ -370,7 +371,7 @@ def run(manifest_path: Path, donor: Path, candidate: Path | None = None) -> tupl
     parent = Path(tempfile.mkdtemp(prefix="preflight-"))
     tree = parent / "tree"
     try:
-        shutil.copytree(candidate, tree, ignore=_ignore, symlinks=False)
+        shutil.copytree(candidate, tree, ignore=_ignore, symlinks=True)
         lines.extend(project(tree, candidate, manifest, donor))
         if lines and lines[-1].startswith("absent:"):
             failing = True

@@ -106,6 +106,23 @@ func (d GreeVRFMapDecoder) Apply(initial GreeVRFMapState, opcode uint8, data []b
 	return state, matched, true
 }
 
+// ApplyRegister applies the image's latest original frame, without reconstructing
+// a frame from coordinates that arrived at different times.
+func (d GreeVRFMapDecoder) ApplyRegister(initial GreeVRFMapState, image *GreeVRFRegisterImage) (GreeVRFMapState, []int, bool) {
+	if image == nil || image.order == 0 || image.key.Family != GreeVRFData && image.key.Family != GreeVRFAddressedData {
+		return initial, nil, false
+	}
+	data := image.latest.Frame.Data()
+	width := len(data) - 1
+	if image.bits {
+		width *= 8
+	}
+	if int(data[0])+width > 256 {
+		return initial, nil, false
+	}
+	return d.Apply(initial, image.key.Type, data)
+}
+
 func (d GreeVRFMapDecoder) entries() ([]greeVRFMapEntry, bool) {
 	switch d.profile {
 	case GreeVRFMapM94:

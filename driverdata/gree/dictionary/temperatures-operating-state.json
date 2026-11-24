@@ -1,0 +1,3799 @@
+{
+  "schema": "gree.vrf.can.dictionary",
+  "schema_version": 1,
+  "status": "candidate",
+  "slice": "temperatures-operating-state",
+  "types": [
+    "0x20",
+    "0x21",
+    "0x24",
+    "0x25",
+    "0x26",
+    "0x27"
+  ],
+  "counts": {
+    "positions": 179,
+    "named_values": 179,
+    "bit_containers": 0,
+    "named_bits": 0,
+    "label_only": 5
+  },
+  "entries": [
+    {
+      "type": "0x20",
+      "coordinate": "0x00",
+      "kind": "value",
+      "value_type": "uint8Minus100",
+      "width": 1,
+      "label": "IndoorEnvTemp",
+      "unit": "\u2103",
+      "presentation_converter": "CeVsFa",
+      "notes": [
+        "Indoor ambient temperature. The return-air temperature 20:05 and the high-precision ambient temperature 31:0a are different parameters; equal values are not guaranteed."
+      ],
+      "description": "Reported meaning: Indoor ambient temperature."
+    },
+    {
+      "type": "0x20",
+      "coordinate": "0x01",
+      "kind": "value",
+      "value_type": "uint8Minus100",
+      "width": 1,
+      "label": "InletTemp",
+      "unit": "\u2103",
+      "presentation_converter": "CeVsFa",
+      "description": "Reported meaning: Indoor-unit inlet-pipe temperature."
+    },
+    {
+      "type": "0x20",
+      "coordinate": "0x02",
+      "kind": "value",
+      "value_type": "uint8Minus100",
+      "width": 1,
+      "label": "MidletTemp",
+      "unit": "\u2103",
+      "presentation_converter": "CeVsFa",
+      "description": "Reported meaning: Indoor-unit intermediate-pipe temperature."
+    },
+    {
+      "type": "0x20",
+      "coordinate": "0x03",
+      "kind": "value",
+      "value_type": "uint8Minus100",
+      "width": 1,
+      "label": "OutletTemp",
+      "unit": "\u2103",
+      "presentation_converter": "CeVsFa",
+      "description": "Reported meaning: Indoor-unit outlet-pipe temperature."
+    },
+    {
+      "type": "0x20",
+      "coordinate": "0x04",
+      "kind": "value",
+      "value_type": "uint8Minus100",
+      "width": 1,
+      "label": "PipeWaterTemp",
+      "unit": "\u2103",
+      "presentation_converter": "CeVsFa",
+      "description": "Reported meaning: Coil water temperature."
+    },
+    {
+      "type": "0x20",
+      "coordinate": "0x05",
+      "kind": "value",
+      "value_type": "uint8Minus100",
+      "width": 1,
+      "label": "ReturnWindDetectTemp",
+      "unit": "\u2103",
+      "presentation_converter": "CeVsFa",
+      "notes": [
+        "Temperature detected at the return air. It is a different parameter from 20:00 even when the values are equal."
+      ],
+      "description": "Reported meaning: Temperature detected at the indoor-unit return air."
+    },
+    {
+      "type": "0x20",
+      "coordinate": "0x06",
+      "kind": "value",
+      "value_type": "uint8Minus100",
+      "width": 1,
+      "label": "RemoteBoardDetectTemp",
+      "unit": "\u2103",
+      "presentation_converter": "CeVsFa",
+      "description": "Reported meaning: Temperature detected by the indoor-unit remote-controller receiver board."
+    },
+    {
+      "type": "0x20",
+      "coordinate": "0x07",
+      "kind": "value",
+      "value_type": "uint8Minus100",
+      "width": 1,
+      "label": "LineControllerDetectTemp",
+      "unit": "\u2103",
+      "presentation_converter": "CeVsFa",
+      "description": "Reported meaning: Temperature detected by the indoor-unit wired controller."
+    },
+    {
+      "type": "0x20",
+      "coordinate": "0x08",
+      "kind": "value",
+      "value_type": "uint8Minus100",
+      "width": 1,
+      "label": "BodyFeelTemp",
+      "unit": "\u2103",
+      "presentation_converter": "CeVsFa",
+      "description": "Reported meaning: Temperature detected by the indoor-unit portable sensor."
+    },
+    {
+      "type": "0x20",
+      "coordinate": "0x09",
+      "kind": "value",
+      "value_type": "uint8Minus100",
+      "width": 1,
+      "label": "RelativeHumidity",
+      "unit": "%",
+      "notes": [
+        "Relative humidity. The offset of the value type applies: raw 0x91 is 45 %."
+      ],
+      "description": "Reported meaning: Relative humidity."
+    },
+    {
+      "type": "0x20",
+      "coordinate": "0x0a",
+      "kind": "value",
+      "value_type": "uint8Minus100",
+      "width": 1,
+      "label": "OutletFanTemp",
+      "unit": "\u2103",
+      "presentation_converter": "CeVsFa",
+      "description": "Reported meaning: Indoor discharged-air temperature."
+    },
+    {
+      "type": "0x20",
+      "coordinate": "0x0b",
+      "kind": "value",
+      "value_type": "uint8Minus100",
+      "width": 1,
+      "label": "InletTemp2",
+      "unit": "\u2103",
+      "presentation_converter": "CeVsFa",
+      "description": "Reported meaning: Inlet-pipe temperature 2."
+    },
+    {
+      "type": "0x20",
+      "coordinate": "0x0c",
+      "kind": "value",
+      "value_type": "uint8Minus100",
+      "width": 1,
+      "label": "OutletTemp2",
+      "unit": "\u2103",
+      "presentation_converter": "CeVsFa",
+      "description": "Reported meaning: Outlet-pipe temperature 2."
+    },
+    {
+      "type": "0x20",
+      "coordinate": "0x0d",
+      "kind": "value",
+      "value_type": "uint8Minus100",
+      "width": 1,
+      "label": "MidletTemp2",
+      "unit": "\u2103",
+      "presentation_converter": "CeVsFa",
+      "description": "Reported meaning: Indoor-unit intermediate-pipe temperature 2."
+    },
+    {
+      "type": "0x20",
+      "coordinate": "0x0e",
+      "kind": "value",
+      "value_type": "uint8Minus100",
+      "width": 1,
+      "label": "USWtempInWT",
+      "unit": "\u2103",
+      "presentation_converter": "CeVsFa",
+      "description": "Reported meaning: Water temperature in the upper part of the tank."
+    },
+    {
+      "type": "0x20",
+      "coordinate": "0x0f",
+      "kind": "value",
+      "value_type": "uint8Minus100",
+      "width": 1,
+      "label": "LSWtemInWT",
+      "unit": "\u2103",
+      "presentation_converter": "CeVsFa",
+      "description": "Reported meaning: Water temperature in the lower part of the tank."
+    },
+    {
+      "type": "0x20",
+      "coordinate": "0x10",
+      "kind": "value",
+      "value_type": "uint8Minus100",
+      "width": 1,
+      "label": "ReturnWaterTempOfWT",
+      "unit": "\u2103",
+      "presentation_converter": "CeVsFa",
+      "description": "Reported meaning: Tank return-water temperature."
+    },
+    {
+      "type": "0x20",
+      "coordinate": "0x11",
+      "kind": "value",
+      "value_type": "uint8Minus100",
+      "width": 1,
+      "label": "WCDispWTempInWT",
+      "unit": "\u2103",
+      "presentation_converter": "CeVsFa",
+      "description": "Reported meaning: Water temperature displayed by the wired remote controller."
+    },
+    {
+      "type": "0x20",
+      "coordinate": "0x12",
+      "kind": "value",
+      "value_type": "uint8Minus100",
+      "width": 1,
+      "label": "IWTempOfGenerator",
+      "unit": "\u2103",
+      "presentation_converter": "CeVsFa",
+      "description": "Reported meaning: Water temperature at the generator inlet."
+    },
+    {
+      "type": "0x20",
+      "coordinate": "0x13",
+      "kind": "value",
+      "value_type": "uint8Minus100",
+      "width": 1,
+      "label": "OWTempOfGenerator",
+      "unit": "\u2103",
+      "presentation_converter": "CeVsFa",
+      "description": "Reported meaning: Water temperature at the generator outlet."
+    },
+    {
+      "type": "0x20",
+      "coordinate": "0x14",
+      "kind": "value",
+      "value_type": "uint8Minus100",
+      "width": 1,
+      "label": "SPWtemp",
+      "unit": "\u2103",
+      "presentation_converter": "CeVsFa",
+      "description": "Reported meaning: Solar water temperature."
+    },
+    {
+      "type": "0x20",
+      "coordinate": "0x18",
+      "kind": "value",
+      "value_type": "uint8Minus100",
+      "width": 1,
+      "label": "OCHumidity",
+      "unit": "%",
+      "notes": [
+        "Relative humidity. The offset of the value type applies."
+      ],
+      "description": "Reported meaning: Humidity value at the wired remote controller."
+    },
+    {
+      "type": "0x20",
+      "coordinate": "0x38",
+      "kind": "value",
+      "value_type": "uint8Minus100",
+      "width": 1,
+      "label": "SCIPtemp",
+      "unit": "\u2103",
+      "presentation_converter": "CeVsFa",
+      "description": "Reported meaning: Converter-subcooling inlet-pipe temperature."
+    },
+    {
+      "type": "0x20",
+      "coordinate": "0x39",
+      "kind": "value",
+      "value_type": "uint8Minus100",
+      "width": 1,
+      "label": "SCOPtemp",
+      "unit": "\u2103",
+      "presentation_converter": "CeVsFa",
+      "description": "Reported meaning: Converter-subcooling outlet-pipe temperature."
+    },
+    {
+      "type": "0x20",
+      "coordinate": "0x50",
+      "kind": "value",
+      "value_type": "uint8Minus100",
+      "width": 1,
+      "label": "SysOutdoorEnvTemp",
+      "unit": "\u2103",
+      "presentation_converter": "CeVsFa",
+      "description": "Reported meaning: Outdoor ambient temperature."
+    },
+    {
+      "type": "0x20",
+      "coordinate": "0x51",
+      "kind": "value",
+      "value_type": "uint8Minus100",
+      "width": 1,
+      "label": "SysHP",
+      "unit": "\u2103",
+      "presentation_converter": "CeVskPa",
+      "description": "Reported meaning: High-pressure value. The decoded raw value is in the temperature domain; the pressure is obtained by table conversion."
+    },
+    {
+      "type": "0x20",
+      "coordinate": "0x52",
+      "kind": "value",
+      "value_type": "uint8Minus100",
+      "width": 1,
+      "label": "SysLP",
+      "unit": "\u2103",
+      "presentation_converter": "CeVskPa",
+      "description": "Reported meaning: Low-pressure value. The decoded raw value is in the temperature domain; the pressure is obtained by table conversion."
+    },
+    {
+      "type": "0x20",
+      "coordinate": "0x53",
+      "kind": "value",
+      "value_type": "uint8Minus100",
+      "width": 1,
+      "label": "SysAveHP",
+      "unit": "\u2103",
+      "presentation_converter": "CeVskPa",
+      "description": "Reported meaning: Average high-pressure value. The decoded raw value is in the temperature domain; the pressure is obtained by table conversion."
+    },
+    {
+      "type": "0x20",
+      "coordinate": "0x54",
+      "kind": "value",
+      "value_type": "uint8Minus100",
+      "width": 1,
+      "label": "SysAveLP",
+      "unit": "\u2103",
+      "presentation_converter": "CeVskPa",
+      "description": "Reported meaning: Average low-pressure value. The decoded raw value is in the temperature domain; the pressure is obtained by table conversion."
+    },
+    {
+      "type": "0x20",
+      "coordinate": "0x55",
+      "kind": "value",
+      "value_type": "uint8Minus100",
+      "width": 1,
+      "label": "IDUAveEnvTemp",
+      "unit": "\u2103",
+      "presentation_converter": "CeVsFa",
+      "description": "Reported meaning: Average ambient temperature of the indoor units that are on."
+    },
+    {
+      "type": "0x20",
+      "coordinate": "0x56",
+      "kind": "value",
+      "value_type": "uint8Minus100",
+      "width": 1,
+      "label": "IDUAveInletTemp",
+      "unit": "\u2103",
+      "presentation_converter": "CeVsFa",
+      "description": "Reported meaning: Average inlet-pipe temperature of the indoor units that are on."
+    },
+    {
+      "type": "0x20",
+      "coordinate": "0x57",
+      "kind": "value",
+      "value_type": "uint8Minus100",
+      "width": 1,
+      "label": "Compressor1DLT",
+      "unit": "\u2103",
+      "presentation_converter": "CeVsFa",
+      "description": "Reported meaning: Compressor 1 discharge temperature."
+    },
+    {
+      "type": "0x20",
+      "coordinate": "0x58",
+      "kind": "value",
+      "value_type": "uint8Minus100",
+      "width": 1,
+      "label": "Compressor2DLT",
+      "unit": "\u2103",
+      "presentation_converter": "CeVsFa",
+      "description": "Reported meaning: Compressor 2 discharge temperature."
+    },
+    {
+      "type": "0x20",
+      "coordinate": "0x59",
+      "kind": "value",
+      "value_type": "uint8Minus100",
+      "width": 1,
+      "label": "Compressor3DLT",
+      "unit": "\u2103",
+      "presentation_converter": "CeVsFa",
+      "description": "Reported meaning: Compressor 3 discharge temperature."
+    },
+    {
+      "type": "0x20",
+      "coordinate": "0x5a",
+      "kind": "value",
+      "value_type": "uint8Minus100",
+      "width": 1,
+      "label": "Compressor4DLT",
+      "unit": "\u2103",
+      "presentation_converter": "CeVsFa",
+      "description": "Reported meaning: Compressor 4 discharge temperature."
+    },
+    {
+      "type": "0x20",
+      "coordinate": "0x5b",
+      "kind": "value",
+      "value_type": "uint8Minus100",
+      "width": 1,
+      "label": "Compressor5DLT",
+      "unit": "\u2103",
+      "presentation_converter": "CeVsFa",
+      "description": "Reported meaning: Compressor 5 discharge temperature."
+    },
+    {
+      "type": "0x20",
+      "coordinate": "0x5c",
+      "kind": "value",
+      "value_type": "uint8Minus100",
+      "width": 1,
+      "label": "Compressor6DLT",
+      "unit": "\u2103",
+      "presentation_converter": "CeVsFa",
+      "description": "Reported meaning: Compressor 6 discharge temperature."
+    },
+    {
+      "type": "0x20",
+      "coordinate": "0x5d",
+      "kind": "value",
+      "value_type": "uint8Minus100",
+      "width": 1,
+      "label": "Compressor7DLT",
+      "unit": "\u2103",
+      "presentation_converter": "CeVsFa",
+      "conflict": "The native label and the native description of this entry name different quantities: discharge temperature of compressor 7 against shell temperature of compressor 1. Not resolved.",
+      "description": "Reported meaning: Temperature of the upper part of compressor 1 casing."
+    },
+    {
+      "type": "0x20",
+      "coordinate": "0x5e",
+      "kind": "value",
+      "value_type": "uint8Minus100",
+      "width": 1,
+      "label": "Compressor8DLT",
+      "unit": "\u2103",
+      "presentation_converter": "CeVsFa",
+      "conflict": "The native label and the native description of this entry name different quantities: discharge temperature of compressor 8 against shell temperature of compressor 2. Not resolved.",
+      "description": "Reported meaning: Temperature of the upper part of compressor 2 casing."
+    },
+    {
+      "type": "0x20",
+      "coordinate": "0x5f",
+      "kind": "value",
+      "value_type": "uint8Minus100",
+      "width": 1,
+      "label": "OutdoorEnvTemp",
+      "unit": "\u2103",
+      "presentation_converter": "CeVsFa",
+      "description": "Reported meaning: Outdoor ambient temperature of this unit."
+    },
+    {
+      "type": "0x20",
+      "coordinate": "0x60",
+      "kind": "value",
+      "value_type": "uint8Minus100",
+      "width": 1,
+      "label": "InspirationTemp1",
+      "unit": "\u2103",
+      "presentation_converter": "CeVsFa",
+      "description": "Reported meaning: Suction temperature 1."
+    },
+    {
+      "type": "0x20",
+      "coordinate": "0x61",
+      "kind": "value",
+      "value_type": "uint8Minus100",
+      "width": 1,
+      "label": "ThawTsor1Temp",
+      "unit": "\u2103",
+      "presentation_converter": "CeVsFa",
+      "description": "Reported meaning: Defrost temperature sensor 1."
+    },
+    {
+      "type": "0x20",
+      "coordinate": "0x62",
+      "kind": "value",
+      "value_type": "uint8Minus100",
+      "width": 1,
+      "label": "InspirationTemp2",
+      "unit": "\u2103",
+      "presentation_converter": "CeVsFa",
+      "description": "Reported meaning: Suction temperature 2."
+    },
+    {
+      "type": "0x20",
+      "coordinate": "0x63",
+      "kind": "value",
+      "value_type": "uint8Minus100",
+      "width": 1,
+      "label": "CondenserOutletAirTemp",
+      "unit": "\u2103",
+      "presentation_converter": "CeVsFa",
+      "description": "Reported meaning: Gas temperature at the subcooler outlet."
+    },
+    {
+      "type": "0x20",
+      "coordinate": "0x64",
+      "kind": "value",
+      "value_type": "uint8Minus100",
+      "width": 1,
+      "label": "CondenserOutletLiqTemp",
+      "unit": "\u2103",
+      "presentation_converter": "CeVsFa",
+      "description": "Reported meaning: Liquid temperature at the subcooler outlet."
+    },
+    {
+      "type": "0x20",
+      "coordinate": "0x65",
+      "kind": "value",
+      "value_type": "uint8Minus100",
+      "width": 1,
+      "label": "ThawTsor2Temp",
+      "unit": "\u2103",
+      "presentation_converter": "CeVsFa",
+      "description": "Reported meaning: Defrost temperature sensor 2."
+    },
+    {
+      "type": "0x20",
+      "coordinate": "0x66",
+      "kind": "value",
+      "value_type": "uint8Minus100",
+      "width": 1,
+      "label": "HeatExchangerOutletLiqTemp",
+      "unit": "\u2103",
+      "presentation_converter": "CeVsFa",
+      "description": "Reported meaning: Gas temperature at the heat-exchanger outlet."
+    },
+    {
+      "type": "0x20",
+      "coordinate": "0x67",
+      "kind": "value",
+      "value_type": "uint8Minus100",
+      "width": 1,
+      "label": "BackOilTemp",
+      "unit": "\u2103",
+      "presentation_converter": "CeVsFa",
+      "description": "Reported meaning: Oil-return temperature."
+    },
+    {
+      "type": "0x20",
+      "coordinate": "0x68",
+      "kind": "value",
+      "value_type": "uint8Minus100",
+      "width": 1,
+      "label": "CondenserInletAirTemp",
+      "unit": "\u2103",
+      "presentation_converter": "CeVsFa",
+      "description": "Reported meaning: Gas temperature at the subcooler inlet."
+    },
+    {
+      "type": "0x20",
+      "coordinate": "0x69",
+      "kind": "value",
+      "value_type": "uint8Minus100",
+      "width": 1,
+      "label": "HighPressure",
+      "unit": "\u2103",
+      "presentation_converter": "CeVskPa",
+      "description": "Reported meaning: High-pressure value of this unit. The decoded raw value is in the temperature domain; the pressure is obtained by table conversion."
+    },
+    {
+      "type": "0x20",
+      "coordinate": "0x6a",
+      "kind": "value",
+      "value_type": "uint8Minus100",
+      "width": 1,
+      "label": "LP",
+      "unit": "\u2103",
+      "presentation_converter": "CeVskPa",
+      "description": "Reported meaning: Low-pressure value of this unit. The decoded raw value is in the temperature domain; the pressure is obtained by table conversion."
+    },
+    {
+      "type": "0x20",
+      "coordinate": "0x6b",
+      "kind": "value",
+      "value_type": "uint8Minus100",
+      "width": 1,
+      "label": "AveHP",
+      "unit": "\u2103",
+      "presentation_converter": "CeVskPa",
+      "description": "Reported meaning: Average high pressure of this unit. The decoded raw value is in the temperature domain; the pressure is obtained by table conversion."
+    },
+    {
+      "type": "0x20",
+      "coordinate": "0x6c",
+      "kind": "value",
+      "value_type": "uint8Minus100",
+      "width": 1,
+      "label": "AveLP",
+      "unit": "\u2103",
+      "presentation_converter": "CeVskPa",
+      "description": "Reported meaning: Average low pressure of this unit. The decoded raw value is in the temperature domain; the pressure is obtained by table conversion."
+    },
+    {
+      "type": "0x20",
+      "coordinate": "0x6d",
+      "kind": "value",
+      "value_type": "uint8Minus100",
+      "width": 1,
+      "label": "CondenserInletTemperature",
+      "unit": "\u2103",
+      "presentation_converter": "CeVsFa",
+      "description": "Reported meaning: Condenser inlet-pipe temperature."
+    },
+    {
+      "type": "0x20",
+      "coordinate": "0x6e",
+      "kind": "value",
+      "value_type": "uint8Minus100",
+      "width": 1,
+      "label": "CondenserOutletTemperature",
+      "unit": "\u2103",
+      "presentation_converter": "CeVsFa",
+      "description": "Reported meaning: Condenser outlet-pipe temperature."
+    },
+    {
+      "type": "0x20",
+      "coordinate": "0x6f",
+      "kind": "value",
+      "value_type": "uint8Minus100",
+      "width": 1,
+      "label": "BackOilTemp2",
+      "unit": "\u2103",
+      "presentation_converter": "CeVsFa",
+      "description": "Reported meaning: Compressor 2 oil-return temperature."
+    },
+    {
+      "type": "0x20",
+      "coordinate": "0x70",
+      "kind": "value",
+      "value_type": "uint8Minus100",
+      "width": 1,
+      "label": "BackOilTemp3",
+      "unit": "\u2103",
+      "presentation_converter": "CeVsFa",
+      "description": "Reported meaning: Compressor 3 oil-return temperature."
+    },
+    {
+      "type": "0x20",
+      "coordinate": "0x71",
+      "kind": "value",
+      "value_type": "uint8Minus100",
+      "width": 1,
+      "label": "BackOilTemp4",
+      "unit": "\u2103",
+      "presentation_converter": "CeVsFa",
+      "description": "Reported meaning: Compressor 4 oil-return temperature."
+    },
+    {
+      "type": "0x20",
+      "coordinate": "0x72",
+      "kind": "value",
+      "value_type": "uint8Minus100",
+      "width": 1,
+      "label": "CondenserInletLiqTemp",
+      "unit": "\u2103",
+      "presentation_converter": "CeVsFa",
+      "description": "Reported meaning: Liquid temperature at the subcooler inlet."
+    },
+    {
+      "type": "0x20",
+      "coordinate": "0x73",
+      "kind": "value",
+      "value_type": "uint8Minus100",
+      "width": 1,
+      "label": "VFCompressorDriverIPMTemp",
+      "unit": "\u2103",
+      "presentation_converter": "CeVsFa",
+      "description": "Reported meaning: IPM-module temperature of the variable-speed compressor drive."
+    },
+    {
+      "type": "0x20",
+      "coordinate": "0x74",
+      "kind": "value",
+      "value_type": "uint8Minus100",
+      "width": 1,
+      "label": "VFCompressorDriverPFCTemp",
+      "unit": "\u2103",
+      "presentation_converter": "CeVsFa",
+      "description": "Reported meaning: PFC-module temperature of the variable-speed compressor drive."
+    },
+    {
+      "type": "0x20",
+      "coordinate": "0x75",
+      "kind": "value",
+      "value_type": "uint8Minus100",
+      "width": 1,
+      "label": "VFCompressorDriverBoxTemp",
+      "unit": "\u2103",
+      "presentation_converter": "CeVsFa",
+      "description": "Reported meaning: Electrical-box temperature of the variable-speed compressor drive."
+    },
+    {
+      "type": "0x20",
+      "coordinate": "0x7c",
+      "kind": "value",
+      "value_type": "uint8Minus100",
+      "width": 1,
+      "label": "VFFan1DriverIPMTemp",
+      "unit": "\u2103",
+      "presentation_converter": "CeVsFa",
+      "description": "Reported meaning: IPM-module temperature of the variable-speed outdoor-fan 1 drive."
+    },
+    {
+      "type": "0x20",
+      "coordinate": "0x7d",
+      "kind": "value",
+      "value_type": "uint8Minus100",
+      "width": 1,
+      "label": "VFFan1DriverPFCTemp",
+      "unit": "\u2103",
+      "presentation_converter": "CeVsFa",
+      "description": "Reported meaning: PFC-module temperature of the variable-speed outdoor-fan 1 drive."
+    },
+    {
+      "type": "0x20",
+      "coordinate": "0x7e",
+      "kind": "value",
+      "value_type": "uint8Minus100",
+      "width": 1,
+      "label": "VFFan1DriverBoxTemp",
+      "unit": "\u2103",
+      "presentation_converter": "CeVsFa",
+      "description": "Reported meaning: Electrical-box temperature of the variable-speed outdoor-fan 1 drive."
+    },
+    {
+      "type": "0x20",
+      "coordinate": "0x85",
+      "kind": "value",
+      "value_type": "uint8Minus100",
+      "width": 1,
+      "label": "VFFan2DriverIPMTemp",
+      "unit": "\u2103",
+      "presentation_converter": "CeVsFa",
+      "description": "Reported meaning: IPM-module temperature of the variable-speed outdoor-fan 2 drive."
+    },
+    {
+      "type": "0x20",
+      "coordinate": "0x86",
+      "kind": "value",
+      "value_type": "uint8Minus100",
+      "width": 1,
+      "label": "VFFan2DriverPFCTemp",
+      "unit": "\u2103",
+      "presentation_converter": "CeVsFa",
+      "description": "Reported meaning: PFC-module temperature of the variable-speed outdoor-fan 2 drive."
+    },
+    {
+      "type": "0x20",
+      "coordinate": "0x87",
+      "kind": "value",
+      "value_type": "uint8Minus100",
+      "width": 1,
+      "label": "VFFan2DriverBoxTemp",
+      "unit": "\u2103",
+      "presentation_converter": "CeVsFa",
+      "description": "Reported meaning: Electrical-box temperature of the variable-speed outdoor-fan 2 drive."
+    },
+    {
+      "type": "0x20",
+      "coordinate": "0xa0",
+      "kind": "value",
+      "value_type": "uint8Minus100",
+      "width": 1,
+      "label": "VFCompressor2DriverIPMTemp",
+      "unit": "\u2103",
+      "presentation_converter": "CeVsFa",
+      "description": "Reported meaning: IPM-module temperature of the variable-speed compressor 2 drive."
+    },
+    {
+      "type": "0x20",
+      "coordinate": "0xa1",
+      "kind": "value",
+      "value_type": "uint8Minus100",
+      "width": 1,
+      "label": "VFCompressor2DriverPFCTemp",
+      "unit": "\u2103",
+      "presentation_converter": "CeVsFa",
+      "description": "Reported meaning: PFC-module temperature of the variable-speed compressor 2 drive."
+    },
+    {
+      "type": "0x20",
+      "coordinate": "0xa2",
+      "kind": "value",
+      "value_type": "uint8Minus100",
+      "width": 1,
+      "label": "VFCompressor2DriverBoxTemp",
+      "unit": "\u2103",
+      "presentation_converter": "CeVsFa",
+      "description": "Reported meaning: Electrical-box temperature of the variable-speed compressor 2 drive."
+    },
+    {
+      "type": "0x20",
+      "coordinate": "0xa3",
+      "kind": "value",
+      "value_type": "uint8Minus100",
+      "width": 1,
+      "label": "VFCompressor3DriverIPMTemp",
+      "unit": "\u2103",
+      "presentation_converter": "CeVsFa",
+      "description": "Reported meaning: IPM-module temperature of the variable-speed compressor 3 drive."
+    },
+    {
+      "type": "0x20",
+      "coordinate": "0xc8",
+      "kind": "value",
+      "value_type": "uint8Minus100",
+      "width": 1,
+      "label": "HeatingDesHP",
+      "unit": "\u2103",
+      "presentation_converter": "CeVsFa",
+      "conflict": "Target-pressure label on a temperature value type with a temperature converter. Not resolved.",
+      "description": "Reported meaning: Target high pressure in heating."
+    },
+    {
+      "type": "0x20",
+      "coordinate": "0xc9",
+      "kind": "value",
+      "value_type": "uint8Minus100",
+      "width": 1,
+      "label": "HeatingDesHPAdjustValue",
+      "unit": "\u2103",
+      "presentation_converter": "CeVsFa",
+      "conflict": "Target-pressure label on a temperature value type with a temperature converter. Not resolved.",
+      "description": "Reported meaning: Correction of the target high pressure in heating."
+    },
+    {
+      "type": "0x20",
+      "coordinate": "0xca",
+      "kind": "value",
+      "value_type": "uint8Minus100",
+      "width": 1,
+      "label": "CoolingDesHP",
+      "unit": "\u2103",
+      "presentation_converter": "CeVsFa",
+      "conflict": "Target-pressure label on a temperature value type with a temperature converter; the label names the high pressure and the native description the low pressure. Not resolved.",
+      "description": "Reported meaning: Target low pressure in cooling."
+    },
+    {
+      "type": "0x20",
+      "coordinate": "0xcb",
+      "kind": "value",
+      "value_type": "uint8Minus100",
+      "width": 1,
+      "label": "CoolingDesHPAdjustValue",
+      "unit": "\u2103",
+      "presentation_converter": "CeVsFa",
+      "conflict": "Target-pressure label on a temperature value type with a temperature converter. Not resolved.",
+      "description": "Reported meaning: Correction of the target low pressure in cooling."
+    },
+    {
+      "type": "0x20",
+      "coordinate": "0xcd",
+      "kind": "value",
+      "value_type": "uint8Minus100",
+      "width": 1,
+      "label": "HeatLPValue",
+      "description": "Reported meaning: Low-pressure protection value in heating."
+    },
+    {
+      "type": "0x20",
+      "coordinate": "0xce",
+      "kind": "value",
+      "value_type": "uint8Minus100",
+      "width": 1,
+      "label": "CorrectionofIndoorDeviceInlet",
+      "description": "Reported meaning: Indoor-unit inlet-pipe correction."
+    },
+    {
+      "type": "0x20",
+      "coordinate": "0xcf",
+      "kind": "value",
+      "value_type": "uint8Minus100",
+      "width": 1,
+      "label": "CorrectionofInterconnectingDucting",
+      "description": "Reported meaning: Correction value of the connecting-pipe length."
+    },
+    {
+      "type": "0x20",
+      "coordinate": "0xd0",
+      "kind": "value",
+      "value_type": "uint8Minus100",
+      "width": 1,
+      "label": "MeanTemperatureIDUDewPoint",
+      "description": "Reported meaning: Average dew-point temperature of the indoor unit."
+    },
+    {
+      "type": "0x20",
+      "coordinate": "0xd1",
+      "kind": "value",
+      "value_type": "uint8Minus100",
+      "width": 1,
+      "label": "CorrectionofIndoorDeviceInlet2",
+      "description": "Reported meaning: Indoor-unit inlet-pipe correction 2."
+    },
+    {
+      "type": "0x20",
+      "coordinate": "0xd2",
+      "kind": "value",
+      "value_type": "uint8",
+      "width": 1,
+      "label": "OutdoorTempAtLowPress",
+      "enumeration": [
+        {
+          "value": "0x4b",
+          "label": "-25"
+        },
+        {
+          "value": "0x4c",
+          "label": "-24"
+        },
+        {
+          "value": "0x4d",
+          "label": "-23"
+        },
+        {
+          "value": "0x4e",
+          "label": "-22"
+        },
+        {
+          "value": "0x4f",
+          "label": "-21"
+        },
+        {
+          "value": "0x50",
+          "label": "-20"
+        },
+        {
+          "value": "0x51",
+          "label": "-19"
+        },
+        {
+          "value": "0x52",
+          "label": "-18"
+        },
+        {
+          "value": "0x53",
+          "label": "-17"
+        },
+        {
+          "value": "0x54",
+          "label": "-16"
+        },
+        {
+          "value": "0x55",
+          "label": "-15"
+        },
+        {
+          "value": "0x56",
+          "label": "-14"
+        },
+        {
+          "value": "0x57",
+          "label": "-13"
+        },
+        {
+          "value": "0x58",
+          "label": "-12"
+        },
+        {
+          "value": "0x59",
+          "label": "-11"
+        },
+        {
+          "value": "0x5a",
+          "label": "-10"
+        },
+        {
+          "value": "0x5b",
+          "label": "-9"
+        },
+        {
+          "value": "0x5c",
+          "label": "-8"
+        },
+        {
+          "value": "0x5d",
+          "label": "-7"
+        },
+        {
+          "value": "0x5e",
+          "label": "-6"
+        },
+        {
+          "value": "0x5f",
+          "label": "-5"
+        },
+        {
+          "value": "0x60",
+          "label": "-4"
+        },
+        {
+          "value": "0x61",
+          "label": "-3"
+        },
+        {
+          "value": "0x62",
+          "label": "-2"
+        },
+        {
+          "value": "0x63",
+          "label": "-1"
+        },
+        {
+          "value": "0x64",
+          "label": "0"
+        },
+        {
+          "value": "0x65",
+          "label": "1"
+        },
+        {
+          "value": "0x66",
+          "label": "2"
+        },
+        {
+          "value": "0x67",
+          "label": "3"
+        },
+        {
+          "value": "0x68",
+          "label": "4"
+        },
+        {
+          "value": "0x69",
+          "label": "5"
+        },
+        {
+          "value": "0x6a",
+          "label": "6"
+        },
+        {
+          "value": "0x6b",
+          "label": "7"
+        },
+        {
+          "value": "0x6c",
+          "label": "8"
+        },
+        {
+          "value": "0x6d",
+          "label": "9"
+        },
+        {
+          "value": "0x6e",
+          "label": "10"
+        },
+        {
+          "value": "0x6f",
+          "label": "11"
+        },
+        {
+          "value": "0x70",
+          "label": "12"
+        },
+        {
+          "value": "0x71",
+          "label": "13"
+        },
+        {
+          "value": "0x72",
+          "label": "14"
+        },
+        {
+          "value": "0x73",
+          "label": "15"
+        }
+      ]
+    },
+    {
+      "type": "0x20",
+      "coordinate": "0xd3",
+      "kind": "value",
+      "value_type": "uint8Minus100",
+      "width": 1,
+      "label": "DesHPAdjustedValueZ2",
+      "unit": "\u2103",
+      "description": "Reported meaning: Z2 correction value of the upper limit of the target low pressure."
+    },
+    {
+      "type": "0x20",
+      "coordinate": "0xd4",
+      "kind": "value",
+      "value_type": "uint8Minus100",
+      "width": 1,
+      "label": "DesHPAdjustedValueZ0",
+      "unit": "\u2103",
+      "description": "Reported meaning: Z0 correction value of the upper limit of the target low pressure."
+    },
+    {
+      "type": "0x20",
+      "coordinate": "0xd5",
+      "kind": "value",
+      "value_type": "uint8Minus100",
+      "width": 1,
+      "label": "TempAbilityAdjust",
+      "description": "Reported meaning: Capacity adjustment according to temperature."
+    },
+    {
+      "type": "0x20",
+      "coordinate": "0xd6",
+      "kind": "value",
+      "value_type": "uint8Minus100",
+      "width": 1,
+      "label": "HumidityAbilityAdjust",
+      "description": "Reported meaning: Capacity adjustment according to moisture content."
+    },
+    {
+      "type": "0x20",
+      "coordinate": "0xd7",
+      "kind": "value",
+      "value_type": "uint8Minus100",
+      "width": 1,
+      "label": "HumidityDiff",
+      "description": "Reported meaning: Moisture-content difference."
+    },
+    {
+      "type": "0x20",
+      "coordinate": "0xd8",
+      "kind": "value",
+      "value_type": "uint8Minus100",
+      "width": 1,
+      "label": "Future4HLowTemp",
+      "unit": "\u2103",
+      "presentation_converter": "CeVsFa",
+      "description": "Reported meaning: Minimum air temperature for the next 4 hours."
+    },
+    {
+      "type": "0x20",
+      "coordinate": "0xd9",
+      "kind": "value",
+      "value_type": "uint8Minus100",
+      "width": 1,
+      "label": "Future4HHighTemp",
+      "unit": "\u2103",
+      "presentation_converter": "CeVsFa",
+      "description": "Reported meaning: Maximum air temperature for the next 4 hours."
+    },
+    {
+      "type": "0x20",
+      "coordinate": "0xe4",
+      "kind": "value",
+      "value_type": "uint8Minus100",
+      "width": 1,
+      "label": "Future24HHighTemp",
+      "unit": "\u2103",
+      "presentation_converter": "CeVsFa",
+      "description": "Reported meaning: Maximum ambient temperature T24 for the next 24 hours."
+    },
+    {
+      "type": "0x20",
+      "coordinate": "0xe8",
+      "kind": "value",
+      "value_type": "uint8Minus100",
+      "width": 1,
+      "label": "BoardTradeInletTemp",
+      "unit": "\u2103",
+      "presentation_converter": "CeVsFa",
+      "description": "Reported meaning: Temperature sensor on the plate heat-exchanger inlet pipe."
+    },
+    {
+      "type": "0x20",
+      "coordinate": "0xe9",
+      "kind": "value",
+      "value_type": "uint8Minus100",
+      "width": 1,
+      "label": "BoardTradeOutletTemp",
+      "unit": "\u2103",
+      "presentation_converter": "CeVsFa",
+      "description": "Reported meaning: Temperature sensor on the plate heat-exchanger outlet pipe."
+    },
+    {
+      "type": "0x20",
+      "coordinate": "0xea",
+      "kind": "value",
+      "value_type": "uint8Minus100",
+      "width": 1,
+      "label": "ODUInWaterTemp",
+      "unit": "\u2103",
+      "presentation_converter": "CeVsFa",
+      "description": "Reported meaning: Water temperature at the outdoor-unit inlet."
+    },
+    {
+      "type": "0x20",
+      "coordinate": "0xeb",
+      "kind": "value",
+      "value_type": "uint8Minus100",
+      "width": 1,
+      "label": "ODUOutWaterTemp",
+      "unit": "\u2103",
+      "presentation_converter": "CeVsFa",
+      "description": "Reported meaning: Water temperature at the outdoor-unit outlet."
+    },
+    {
+      "type": "0x21",
+      "coordinate": "0x00",
+      "kind": "value",
+      "value_type": "uint8",
+      "width": 1,
+      "label": "IDUMode",
+      "enumeration": [
+        {
+          "value": "0x00",
+          "label": "NaN"
+        },
+        {
+          "value": "0x01",
+          "label": "Cooling"
+        },
+        {
+          "value": "0x02",
+          "label": "Dry"
+        },
+        {
+          "value": "0x03",
+          "label": "Fan"
+        },
+        {
+          "value": "0x04",
+          "label": "Heating"
+        },
+        {
+          "value": "0x05",
+          "label": "AutoCooling"
+        },
+        {
+          "value": "0x06",
+          "label": "AutoHeating"
+        },
+        {
+          "value": "0x07",
+          "label": "FloorHeater"
+        },
+        {
+          "value": "0x08",
+          "label": "QuickHeater"
+        },
+        {
+          "value": "0x09",
+          "label": "SupplyHeater"
+        },
+        {
+          "value": "0x0a",
+          "label": "Dry-Reheat"
+        },
+        {
+          "value": "0x0b",
+          "label": "Air"
+        },
+        {
+          "value": "0x0c",
+          "label": "Auto-Dry"
+        }
+      ],
+      "notes": [
+        "Effective mode. It is not the setting register 71:00, and the two enumerations differ. Whether the last mode is kept while the unit is off is not established."
+      ],
+      "description": "Reported meaning: Indoor-unit operating mode."
+    },
+    {
+      "type": "0x21",
+      "coordinate": "0x01",
+      "kind": "value",
+      "value_type": "uint8",
+      "width": 1,
+      "label": "FanSpeed",
+      "enumeration": [
+        {
+          "value": "0x00",
+          "label": "NaN"
+        },
+        {
+          "value": "0x01",
+          "label": "FanStop"
+        },
+        {
+          "value": "0x02",
+          "label": "SuperLowSpeed"
+        },
+        {
+          "value": "0x03",
+          "label": "LowSpeed"
+        },
+        {
+          "value": "0x04",
+          "label": "LessMidSpeed"
+        },
+        {
+          "value": "0x05",
+          "label": "MidSpeed"
+        },
+        {
+          "value": "0x06",
+          "label": "MoreMidSpeed"
+        },
+        {
+          "value": "0x07",
+          "label": "HighSpeed"
+        },
+        {
+          "value": "0x08",
+          "label": "SuperHighSpeed"
+        },
+        {
+          "value": "0x09",
+          "label": "SilenceFanSpeedR1"
+        },
+        {
+          "value": "0x0a",
+          "label": "SilenceFanSpeedR2"
+        },
+        {
+          "value": "0x0b",
+          "label": "SilenceFanSpeedR3"
+        }
+      ],
+      "notes": [
+        "Effective fan step, not a speed. Its enumeration differs from the setting 71:01; no arithmetic relation between the two holds for every value."
+      ],
+      "description": "Reported meaning: Indoor-unit fan step while running."
+    },
+    {
+      "type": "0x21",
+      "coordinate": "0x02",
+      "kind": "value",
+      "value_type": "uint8",
+      "width": 1,
+      "label": "VerticalSwingSta",
+      "enumeration": [
+        {
+          "value": "0x00",
+          "label": "NaN"
+        },
+        {
+          "value": "0x01",
+          "label": "Off"
+        },
+        {
+          "value": "0x02",
+          "label": "15Pos"
+        },
+        {
+          "value": "0x03",
+          "label": "1Pos"
+        },
+        {
+          "value": "0x04",
+          "label": "2Pos"
+        },
+        {
+          "value": "0x05",
+          "label": "3Pos"
+        },
+        {
+          "value": "0x06",
+          "label": "4Pos"
+        },
+        {
+          "value": "0x07",
+          "label": "5Pos"
+        },
+        {
+          "value": "0x08",
+          "label": "35Pos"
+        },
+        {
+          "value": "0x09",
+          "label": "25Pos"
+        },
+        {
+          "value": "0x0a",
+          "label": "24Pos"
+        },
+        {
+          "value": "0x0b",
+          "label": "14Pos"
+        },
+        {
+          "value": "0x0c",
+          "label": "13Pos"
+        }
+      ],
+      "conflict": "For value 5 the native label and the native description name different positions. Not resolved.",
+      "description": "Reported meaning: Vertical-swing operating status."
+    },
+    {
+      "type": "0x21",
+      "coordinate": "0x03",
+      "kind": "value",
+      "value_type": "uint8",
+      "width": 1,
+      "label": "HorizontalSwingSta",
+      "enumeration": [
+        {
+          "value": "0x00",
+          "label": "NaN"
+        },
+        {
+          "value": "0x01",
+          "label": "Off"
+        },
+        {
+          "value": "0x02",
+          "label": "SameDirection"
+        },
+        {
+          "value": "0x03",
+          "label": "1Pos"
+        },
+        {
+          "value": "0x04",
+          "label": "2Pos"
+        },
+        {
+          "value": "0x05",
+          "label": "3Pos"
+        },
+        {
+          "value": "0x06",
+          "label": "4Pos"
+        },
+        {
+          "value": "0x07",
+          "label": "5Pos"
+        },
+        {
+          "value": "0x0d",
+          "label": "15Pos"
+        },
+        {
+          "value": "0x0e",
+          "label": "OppsiteDirection"
+        }
+      ],
+      "description": "Reported meaning: Left-right air-swing operating status."
+    },
+    {
+      "type": "0x21",
+      "coordinate": "0x04",
+      "kind": "value",
+      "value_type": "uint8",
+      "width": 1,
+      "label": "DoorKeeperSta",
+      "enumeration": [
+        {
+          "value": "0x00",
+          "label": "NaN"
+        },
+        {
+          "value": "0x01",
+          "label": "None"
+        },
+        {
+          "value": "0x02",
+          "label": "CardIn"
+        },
+        {
+          "value": "0x03",
+          "label": "CardOut"
+        }
+      ],
+      "description": "Reported meaning: Access-control status."
+    },
+    {
+      "type": "0x21",
+      "coordinate": "0x05",
+      "kind": "value",
+      "value_type": "uint8",
+      "width": 1,
+      "label": "IndoorEnvTempSamplePoint",
+      "enumeration": [
+        {
+          "value": "0x00",
+          "label": "NaN"
+        },
+        {
+          "value": "0x01",
+          "label": "IDU"
+        },
+        {
+          "value": "0x02",
+          "label": "Receiver"
+        },
+        {
+          "value": "0x03",
+          "label": "HandRemote"
+        },
+        {
+          "value": "0x04",
+          "label": "BodyFeelTsor"
+        }
+      ],
+      "notes": [
+        "Names the sampling point of the indoor ambient temperature 20:00."
+      ],
+      "description": "Reported meaning: Indoor ambient-temperature sampling point."
+    },
+    {
+      "type": "0x21",
+      "coordinate": "0x06",
+      "kind": "value",
+      "value_type": "uint8",
+      "width": 1,
+      "label": "HumiditySetting",
+      "description": "Reported meaning: Indoor-unit set humidity."
+    },
+    {
+      "type": "0x21",
+      "coordinate": "0x07",
+      "kind": "value",
+      "value_type": "uint8",
+      "width": 1,
+      "label": "IDUCapAdjustment",
+      "unit": "%",
+      "enumeration": [
+        {
+          "value": "0x01",
+          "label": "-40"
+        },
+        {
+          "value": "0x02",
+          "label": "-30"
+        },
+        {
+          "value": "0x03",
+          "label": "-20"
+        },
+        {
+          "value": "0x04",
+          "label": "-10"
+        },
+        {
+          "value": "0x05",
+          "label": "0"
+        },
+        {
+          "value": "0x06",
+          "label": "10"
+        },
+        {
+          "value": "0x07",
+          "label": "20"
+        },
+        {
+          "value": "0x08",
+          "label": "30"
+        },
+        {
+          "value": "0x09",
+          "label": "40"
+        }
+      ],
+      "description": "Reported meaning: Indoor-unit capacity adjustment."
+    },
+    {
+      "type": "0x21",
+      "coordinate": "0x08",
+      "kind": "value",
+      "value_type": "uint8",
+      "width": 1,
+      "label": "IDUBackWindTsorCoolAdjusted",
+      "enumeration": [
+        {
+          "value": "0x01",
+          "label": "-15"
+        },
+        {
+          "value": "0x02",
+          "label": "-14"
+        },
+        {
+          "value": "0x03",
+          "label": "-13"
+        },
+        {
+          "value": "0x04",
+          "label": "-12"
+        },
+        {
+          "value": "0x05",
+          "label": "-11"
+        },
+        {
+          "value": "0x06",
+          "label": "-10"
+        },
+        {
+          "value": "0x07",
+          "label": "-9"
+        },
+        {
+          "value": "0x08",
+          "label": "-8"
+        },
+        {
+          "value": "0x09",
+          "label": "-7"
+        },
+        {
+          "value": "0x0a",
+          "label": "-6"
+        },
+        {
+          "value": "0x0b",
+          "label": "-5"
+        },
+        {
+          "value": "0x0c",
+          "label": "-4"
+        },
+        {
+          "value": "0x0d",
+          "label": "-3"
+        },
+        {
+          "value": "0x0e",
+          "label": "-2"
+        },
+        {
+          "value": "0x0f",
+          "label": "-1"
+        },
+        {
+          "value": "0x10",
+          "label": "0"
+        },
+        {
+          "value": "0x11",
+          "label": "1"
+        },
+        {
+          "value": "0x12",
+          "label": "2"
+        },
+        {
+          "value": "0x13",
+          "label": "3"
+        },
+        {
+          "value": "0x14",
+          "label": "4"
+        },
+        {
+          "value": "0x15",
+          "label": "5"
+        },
+        {
+          "value": "0x16",
+          "label": "6"
+        },
+        {
+          "value": "0x17",
+          "label": "7"
+        },
+        {
+          "value": "0x18",
+          "label": "8"
+        },
+        {
+          "value": "0x19",
+          "label": "9"
+        },
+        {
+          "value": "0x1a",
+          "label": "10"
+        },
+        {
+          "value": "0x1b",
+          "label": "11"
+        },
+        {
+          "value": "0x1c",
+          "label": "12"
+        },
+        {
+          "value": "0x1d",
+          "label": "13"
+        },
+        {
+          "value": "0x1e",
+          "label": "14"
+        },
+        {
+          "value": "0x1f",
+          "label": "15"
+        }
+      ],
+      "description": "Reported meaning: Correction of the indoor-unit return-air temperature sensor in cooling/dehumidifying/fan modes."
+    },
+    {
+      "type": "0x21",
+      "coordinate": "0x09",
+      "kind": "value",
+      "value_type": "uint8",
+      "width": 1,
+      "label": "IDUBackWindTsorHeatAdjusted",
+      "enumeration": [
+        {
+          "value": "0x01",
+          "label": "-15"
+        },
+        {
+          "value": "0x02",
+          "label": "-14"
+        },
+        {
+          "value": "0x03",
+          "label": "-13"
+        },
+        {
+          "value": "0x04",
+          "label": "-12"
+        },
+        {
+          "value": "0x05",
+          "label": "-11"
+        },
+        {
+          "value": "0x06",
+          "label": "-10"
+        },
+        {
+          "value": "0x07",
+          "label": "-9"
+        },
+        {
+          "value": "0x08",
+          "label": "-8"
+        },
+        {
+          "value": "0x09",
+          "label": "-7"
+        },
+        {
+          "value": "0x0a",
+          "label": "-6"
+        },
+        {
+          "value": "0x0b",
+          "label": "-5"
+        },
+        {
+          "value": "0x0c",
+          "label": "-4"
+        },
+        {
+          "value": "0x0d",
+          "label": "-3"
+        },
+        {
+          "value": "0x0e",
+          "label": "-2"
+        },
+        {
+          "value": "0x0f",
+          "label": "-1"
+        },
+        {
+          "value": "0x10",
+          "label": "0"
+        },
+        {
+          "value": "0x11",
+          "label": "1"
+        },
+        {
+          "value": "0x12",
+          "label": "2"
+        },
+        {
+          "value": "0x13",
+          "label": "3"
+        },
+        {
+          "value": "0x14",
+          "label": "4"
+        },
+        {
+          "value": "0x15",
+          "label": "5"
+        },
+        {
+          "value": "0x16",
+          "label": "6"
+        },
+        {
+          "value": "0x17",
+          "label": "7"
+        },
+        {
+          "value": "0x18",
+          "label": "8"
+        },
+        {
+          "value": "0x19",
+          "label": "9"
+        },
+        {
+          "value": "0x1a",
+          "label": "10"
+        },
+        {
+          "value": "0x1b",
+          "label": "11"
+        },
+        {
+          "value": "0x1c",
+          "label": "12"
+        },
+        {
+          "value": "0x1d",
+          "label": "13"
+        },
+        {
+          "value": "0x1e",
+          "label": "14"
+        },
+        {
+          "value": "0x1f",
+          "label": "15"
+        }
+      ],
+      "description": "Reported meaning: Correction of the indoor-unit return-air temperature sensor in heating/quick-heating/heat-supply modes."
+    },
+    {
+      "type": "0x21",
+      "coordinate": "0x0a",
+      "kind": "value",
+      "value_type": "uint8",
+      "width": 1,
+      "label": "IDUHeatAreaProt",
+      "unit": "sec",
+      "enumeration": [
+        {
+          "value": "0x01",
+          "label": "0"
+        },
+        {
+          "value": "0x02",
+          "label": "10"
+        },
+        {
+          "value": "0x03",
+          "label": "20"
+        },
+        {
+          "value": "0x04",
+          "label": "30"
+        },
+        {
+          "value": "0x05",
+          "label": "40"
+        },
+        {
+          "value": "0x06",
+          "label": "50"
+        },
+        {
+          "value": "0x07",
+          "label": "60"
+        }
+      ],
+      "description": "Reported meaning: Prevention of heat buildup at the indoor unit."
+    },
+    {
+      "type": "0x21",
+      "coordinate": "0x0b",
+      "kind": "value",
+      "value_type": "uint8",
+      "width": 1,
+      "label": "IDUFilterCleanTime",
+      "unit": "h",
+      "enumeration": [
+        {
+          "value": "0x00",
+          "label": "Invalid"
+        },
+        {
+          "value": "0x01",
+          "label": "0"
+        },
+        {
+          "value": "0x1e",
+          "label": "100"
+        },
+        {
+          "value": "0x1f",
+          "label": "200"
+        },
+        {
+          "value": "0x20",
+          "label": "300"
+        },
+        {
+          "value": "0x21",
+          "label": "400"
+        },
+        {
+          "value": "0x22",
+          "label": "500"
+        },
+        {
+          "value": "0x23",
+          "label": "600"
+        },
+        {
+          "value": "0x24",
+          "label": "700"
+        },
+        {
+          "value": "0x25",
+          "label": "800"
+        },
+        {
+          "value": "0x26",
+          "label": "900"
+        },
+        {
+          "value": "0x27",
+          "label": "1000"
+        },
+        {
+          "value": "0x14",
+          "label": "1400"
+        },
+        {
+          "value": "0x15",
+          "label": "1800"
+        },
+        {
+          "value": "0x16",
+          "label": "2200"
+        },
+        {
+          "value": "0x17",
+          "label": "2600"
+        },
+        {
+          "value": "0x18",
+          "label": "3000"
+        },
+        {
+          "value": "0x19",
+          "label": "3400"
+        },
+        {
+          "value": "0x1a",
+          "label": "3800"
+        },
+        {
+          "value": "0x1b",
+          "label": "4200"
+        },
+        {
+          "value": "0x1c",
+          "label": "4600"
+        },
+        {
+          "value": "0x1d",
+          "label": "5000"
+        },
+        {
+          "value": "0x0a",
+          "label": "5500"
+        },
+        {
+          "value": "0x0b",
+          "label": "6000"
+        },
+        {
+          "value": "0x0c",
+          "label": "6500"
+        },
+        {
+          "value": "0x0d",
+          "label": "7000"
+        },
+        {
+          "value": "0x0e",
+          "label": "7500"
+        },
+        {
+          "value": "0x0f",
+          "label": "8000"
+        },
+        {
+          "value": "0x10",
+          "label": "8500"
+        },
+        {
+          "value": "0x11",
+          "label": "9000"
+        },
+        {
+          "value": "0x12",
+          "label": "9500"
+        },
+        {
+          "value": "0x13",
+          "label": "10000"
+        }
+      ],
+      "description": "Reported meaning: Warning interval for cleaning the indoor-unit filter."
+    },
+    {
+      "type": "0x21",
+      "coordinate": "0x0c",
+      "kind": "value",
+      "value_type": "uint8",
+      "width": 1,
+      "label": "IDUEnvTsorSamplePos",
+      "enumeration": [
+        {
+          "value": "0x00",
+          "label": "NaN"
+        },
+        {
+          "value": "0x01",
+          "label": "IDU"
+        },
+        {
+          "value": "0x02",
+          "label": "HandRemote"
+        },
+        {
+          "value": "0x03",
+          "label": "HeatHandAndCoolIDU"
+        },
+        {
+          "value": "0x04",
+          "label": "HeatIDUAndCoolHand"
+        }
+      ],
+      "description": "Reported meaning: Setting of the indoor ambient-temperature sampling point."
+    },
+    {
+      "type": "0x21",
+      "coordinate": "0x0d",
+      "kind": "value",
+      "value_type": "uint8",
+      "width": 1,
+      "label": "IDUSilenceMode",
+      "enumeration": [
+        {
+          "value": "0x00",
+          "label": "NaN"
+        },
+        {
+          "value": "0x01",
+          "label": "Off"
+        },
+        {
+          "value": "0x02",
+          "label": "Auto"
+        },
+        {
+          "value": "0x03",
+          "label": "On"
+        }
+      ],
+      "description": "Reported meaning: Indoor-unit silent mode."
+    },
+    {
+      "type": "0x21",
+      "coordinate": "0x0e",
+      "kind": "value",
+      "value_type": "uint8",
+      "width": 1,
+      "label": "ExchangeAirLvl",
+      "enumeration": [
+        {
+          "value": "0x00",
+          "label": "NaN"
+        },
+        {
+          "value": "0x01",
+          "label": "L1"
+        },
+        {
+          "value": "0x02",
+          "label": "L2"
+        },
+        {
+          "value": "0x03",
+          "label": "L3"
+        },
+        {
+          "value": "0x04",
+          "label": "L4"
+        },
+        {
+          "value": "0x05",
+          "label": "L5"
+        },
+        {
+          "value": "0x06",
+          "label": "L6"
+        },
+        {
+          "value": "0x07",
+          "label": "L7"
+        },
+        {
+          "value": "0x08",
+          "label": "L8"
+        },
+        {
+          "value": "0x09",
+          "label": "L9"
+        },
+        {
+          "value": "0x0a",
+          "label": "L10"
+        }
+      ],
+      "description": "Reported meaning: Ventilation level."
+    },
+    {
+      "type": "0x21",
+      "coordinate": "0x0f",
+      "kind": "value",
+      "value_type": "uint8",
+      "width": 1,
+      "label": "SleepLvl",
+      "enumeration": [
+        {
+          "value": "0x00",
+          "label": "NaN"
+        },
+        {
+          "value": "0x01",
+          "label": "Off"
+        },
+        {
+          "value": "0x02",
+          "label": "L1"
+        },
+        {
+          "value": "0x03",
+          "label": "L2"
+        },
+        {
+          "value": "0x04",
+          "label": "L3"
+        }
+      ],
+      "description": "Reported meaning: Sleep-mode level."
+    },
+    {
+      "type": "0x21",
+      "coordinate": "0x10",
+      "kind": "value",
+      "value_type": "uint8",
+      "width": 1,
+      "label": "IDUStaticPres",
+      "enumeration": [
+        {
+          "value": "0x01",
+          "label": "StaticPres1"
+        },
+        {
+          "value": "0x02",
+          "label": "StaticPres2"
+        },
+        {
+          "value": "0x03",
+          "label": "StaticPres3"
+        },
+        {
+          "value": "0x04",
+          "label": "StaticPres4"
+        },
+        {
+          "value": "0x05",
+          "label": "StaticPres5"
+        },
+        {
+          "value": "0x06",
+          "label": "StaticPres6"
+        },
+        {
+          "value": "0x07",
+          "label": "StaticPres7"
+        },
+        {
+          "value": "0x08",
+          "label": "StaticPres8"
+        },
+        {
+          "value": "0x09",
+          "label": "StaticPres9"
+        }
+      ]
+    },
+    {
+      "type": "0x21",
+      "coordinate": "0x11",
+      "kind": "label_only_value",
+      "label_only": true,
+      "candidate_labels": {
+        "A": [
+          "ExtraMod"
+        ]
+      },
+      "referenced_by": [
+        "M94"
+      ],
+      "width": 1,
+      "definition": "none; no unit, enumeration or effect is defined"
+    },
+    {
+      "type": "0x21",
+      "coordinate": "0x14",
+      "kind": "value",
+      "value_type": "uint8",
+      "width": 1,
+      "label": "HumidityLevel",
+      "enumeration": [
+        {
+          "value": "0x01",
+          "label": "Off"
+        },
+        {
+          "value": "0x02",
+          "label": "Level1"
+        },
+        {
+          "value": "0x03",
+          "label": "Level2"
+        },
+        {
+          "value": "0x04",
+          "label": "Level3"
+        },
+        {
+          "value": "0x05",
+          "label": "Level4"
+        },
+        {
+          "value": "0x06",
+          "label": "Level5"
+        }
+      ]
+    },
+    {
+      "type": "0x21",
+      "coordinate": "0x15",
+      "kind": "value",
+      "value_type": "uint8",
+      "width": 1,
+      "label": "WaterTankModel",
+      "enumeration": [
+        {
+          "value": "0x00",
+          "label": "Invalid"
+        },
+        {
+          "value": "0x01",
+          "label": "StandardHotWater"
+        },
+        {
+          "value": "0x02",
+          "label": "PresetHotWater"
+        },
+        {
+          "value": "0x03",
+          "label": "NightMode"
+        }
+      ],
+      "description": "Reported meaning: Tank mode; other positions reserved."
+    },
+    {
+      "type": "0x21",
+      "coordinate": "0x17",
+      "kind": "label_only_value",
+      "label_only": true,
+      "candidate_labels": {
+        "A": [
+          "Watpercent"
+        ]
+      },
+      "referenced_by": [
+        "M94"
+      ],
+      "width": 1,
+      "definition": "none; no unit, enumeration or effect is defined"
+    },
+    {
+      "type": "0x21",
+      "coordinate": "0x18",
+      "kind": "label_only_value",
+      "label_only": true,
+      "candidate_labels": {
+        "A": [
+          "WUTHCycle"
+        ]
+      },
+      "referenced_by": [
+        "M94"
+      ],
+      "width": 1,
+      "definition": "none; no unit, enumeration or effect is defined"
+    },
+    {
+      "type": "0x21",
+      "coordinate": "0x19",
+      "kind": "label_only_value",
+      "label_only": true,
+      "candidate_labels": {
+        "A": [
+          "WUTHTmrMin"
+        ]
+      },
+      "referenced_by": [
+        "M94"
+      ],
+      "width": 1,
+      "definition": "none; no unit, enumeration or effect is defined"
+    },
+    {
+      "type": "0x21",
+      "coordinate": "0x1a",
+      "kind": "label_only_value",
+      "label_only": true,
+      "candidate_labels": {
+        "A": [
+          "WUTHTmrHr"
+        ]
+      },
+      "referenced_by": [
+        "M94"
+      ],
+      "width": 1,
+      "definition": "none; no unit, enumeration or effect is defined"
+    },
+    {
+      "type": "0x21",
+      "coordinate": "0x20",
+      "kind": "value",
+      "value_type": "uint8",
+      "width": 1,
+      "label": "HWGSetting",
+      "enumeration": [
+        {
+          "value": "0x00",
+          "label": "Invalid"
+        },
+        {
+          "value": "0x01",
+          "label": "Water Tank"
+        },
+        {
+          "value": "0x02",
+          "label": "Floor Heating"
+        },
+        {
+          "value": "0x03",
+          "label": "GWT and FH"
+        },
+        {
+          "value": "0x04",
+          "label": "GWT and SP"
+        },
+        {
+          "value": "0x05",
+          "label": "GWT FH and SP"
+        },
+        {
+          "value": "0x06",
+          "label": "KWT"
+        },
+        {
+          "value": "0x07",
+          "label": "KT and SP"
+        }
+      ],
+      "description": "Reported meaning: Hot-water generator configuration."
+    },
+    {
+      "type": "0x21",
+      "coordinate": "0x21",
+      "kind": "value",
+      "value_type": "uint8",
+      "width": 1,
+      "label": "WPumpOfGenerator",
+      "enumeration": [
+        {
+          "value": "0x00",
+          "label": "Invalid"
+        },
+        {
+          "value": "0x01",
+          "label": "WaterPumpStops"
+        },
+        {
+          "value": "0x02",
+          "label": "Level1"
+        },
+        {
+          "value": "0x03",
+          "label": "Level2"
+        },
+        {
+          "value": "0x04",
+          "label": "Level3"
+        },
+        {
+          "value": "0x05",
+          "label": "Level4"
+        },
+        {
+          "value": "0x06",
+          "label": "Level5"
+        },
+        {
+          "value": "0x07",
+          "label": "Level6"
+        },
+        {
+          "value": "0x08",
+          "label": "Level7"
+        },
+        {
+          "value": "0x09",
+          "label": "Level8"
+        },
+        {
+          "value": "0x0a",
+          "label": "Level9"
+        },
+        {
+          "value": "0x0b",
+          "label": "Level10"
+        }
+      ],
+      "description": "Reported meaning: Generator water pump."
+    },
+    {
+      "type": "0x21",
+      "coordinate": "0x50",
+      "kind": "value",
+      "value_type": "uint8",
+      "width": 1,
+      "label": "ProjectDebugProcedure",
+      "enumeration": [
+        {
+          "value": "0x00",
+          "label": "NaN"
+        },
+        {
+          "value": "0x01",
+          "label": "FirStep"
+        },
+        {
+          "value": "0x02",
+          "label": "SecStep"
+        },
+        {
+          "value": "0x03",
+          "label": "ThrStep"
+        },
+        {
+          "value": "0x04",
+          "label": "FourthStep"
+        },
+        {
+          "value": "0x05",
+          "label": "FifthStep"
+        },
+        {
+          "value": "0x06",
+          "label": "SixthStep"
+        },
+        {
+          "value": "0x07",
+          "label": "SeventhStep"
+        },
+        {
+          "value": "0x08",
+          "label": "EighthStep"
+        },
+        {
+          "value": "0x09",
+          "label": "NinthStep"
+        },
+        {
+          "value": "0x0a",
+          "label": "TenthStep"
+        },
+        {
+          "value": "0x0b",
+          "label": "EleventhStep"
+        },
+        {
+          "value": "0x0c",
+          "label": "TwelvethStep"
+        },
+        {
+          "value": "0x0d",
+          "label": "ThirteenthStep"
+        },
+        {
+          "value": "0x0e",
+          "label": "FouteenthStep"
+        },
+        {
+          "value": "0x0f",
+          "label": "FifteenthStep"
+        },
+        {
+          "value": "0x10",
+          "label": "SixteenthStep"
+        },
+        {
+          "value": "0x11",
+          "label": "SeventeenthStep"
+        },
+        {
+          "value": "0x12",
+          "label": "EighteenthStep"
+        },
+        {
+          "value": "0x13",
+          "label": "NinteenThStep"
+        }
+      ],
+      "conflict": "For value 4 the native label and the native description name different steps. Not resolved.",
+      "description": "Reported meaning: Commissioning progress."
+    },
+    {
+      "type": "0x21",
+      "coordinate": "0x51",
+      "kind": "value",
+      "value_type": "uint8",
+      "width": 1,
+      "label": "DevGroupMode",
+      "enumeration": [
+        {
+          "value": "0x00",
+          "label": "NaN"
+        },
+        {
+          "value": "0x01",
+          "label": "OffMode"
+        },
+        {
+          "value": "0x02",
+          "label": "Cooling"
+        },
+        {
+          "value": "0x03",
+          "label": "Dry"
+        },
+        {
+          "value": "0x04",
+          "label": "Fan"
+        },
+        {
+          "value": "0x05",
+          "label": "Heating"
+        },
+        {
+          "value": "0x06",
+          "label": "MainlyCooling"
+        },
+        {
+          "value": "0x07",
+          "label": "MainlyHeating"
+        },
+        {
+          "value": "0x08",
+          "label": "CompleteHeaterRecovery"
+        }
+      ],
+      "description": "Reported meaning: Whole-unit operating mode."
+    },
+    {
+      "type": "0x21",
+      "coordinate": "0x52",
+      "kind": "value",
+      "value_type": "uint8",
+      "width": 1,
+      "label": "ProjectDebugModeSetting",
+      "enumeration": [
+        {
+          "value": "0x00",
+          "label": "NaN"
+        },
+        {
+          "value": "0x01",
+          "label": "SilenceMode"
+        },
+        {
+          "value": "0x02",
+          "label": "CoolheatModes"
+        },
+        {
+          "value": "0x03",
+          "label": "RefregantCallbackRunningSetting"
+        },
+        {
+          "value": "0x04",
+          "label": "VaccumizeSetting"
+        },
+        {
+          "value": "0x05",
+          "label": "SysEnergySavingSetting"
+        },
+        {
+          "value": "0x06",
+          "label": "ThawCycleK"
+        },
+        {
+          "value": "0x07",
+          "label": "ODUCapUpLimitSetting"
+        },
+        {
+          "value": "0x08",
+          "label": "ForcedThawSetting"
+        }
+      ],
+      "description": "Reported meaning: Commissioning-mode setting."
+    },
+    {
+      "type": "0x21",
+      "coordinate": "0x53",
+      "kind": "value",
+      "value_type": "uint8",
+      "width": 1,
+      "label": "ProjectDebugModeSta",
+      "enumeration": [
+        {
+          "value": "0x00",
+          "label": "NaN"
+        },
+        {
+          "value": "0x01",
+          "label": "Normal"
+        },
+        {
+          "value": "0x02",
+          "label": "RefregantCallbackMode"
+        },
+        {
+          "value": "0x03",
+          "label": "StaticPresMode"
+        },
+        {
+          "value": "0x04",
+          "label": "VaccumizationMode"
+        },
+        {
+          "value": "0x05",
+          "label": "DevGroupHeatingMode"
+        },
+        {
+          "value": "0x06",
+          "label": "EnergySavingRunning"
+        },
+        {
+          "value": "0x07",
+          "label": "ThawTimeMode"
+        },
+        {
+          "value": "0x08",
+          "label": "ODUCapUplimitMode"
+        },
+        {
+          "value": "0x09",
+          "label": "ForecedThawMode"
+        }
+      ],
+      "description": "Reported meaning: Commissioning mode."
+    },
+    {
+      "type": "0x21",
+      "coordinate": "0x54",
+      "kind": "value",
+      "value_type": "uint8",
+      "width": 1,
+      "label": "SilenceModeSetting",
+      "enumeration": [
+        {
+          "value": "0x01",
+          "label": "Mode0"
+        },
+        {
+          "value": "0x02",
+          "label": "Mode1"
+        },
+        {
+          "value": "0x03",
+          "label": "Mode2"
+        },
+        {
+          "value": "0x04",
+          "label": "Mode3"
+        },
+        {
+          "value": "0x05",
+          "label": "Mode4"
+        },
+        {
+          "value": "0x06",
+          "label": "Mode5"
+        },
+        {
+          "value": "0x07",
+          "label": "Mode6"
+        },
+        {
+          "value": "0x08",
+          "label": "Mode7"
+        },
+        {
+          "value": "0x09",
+          "label": "Mode8"
+        },
+        {
+          "value": "0x0a",
+          "label": "Mode9"
+        },
+        {
+          "value": "0x0b",
+          "label": "Mode10"
+        },
+        {
+          "value": "0x0c",
+          "label": "Mode11"
+        },
+        {
+          "value": "0x0d",
+          "label": "Mode12"
+        },
+        {
+          "value": "0x00",
+          "label": "NaN"
+        }
+      ],
+      "description": "Reported meaning: Silent-mode setting."
+    },
+    {
+      "type": "0x21",
+      "coordinate": "0x55",
+      "kind": "value",
+      "value_type": "uint8",
+      "width": 1,
+      "label": "DevGroupHeatingModeSetting",
+      "enumeration": [
+        {
+          "value": "0x01",
+          "label": "CoolingOnly"
+        },
+        {
+          "value": "0x02",
+          "label": "HeatingOnly"
+        },
+        {
+          "value": "0x03",
+          "label": "HeatSingle"
+        },
+        {
+          "value": "0x04",
+          "label": "Fan"
+        }
+      ],
+      "description": "Reported meaning: Cooling/heating mode setting."
+    },
+    {
+      "type": "0x21",
+      "coordinate": "0x56",
+      "kind": "value",
+      "value_type": "uint8",
+      "width": 1,
+      "label": "RefregantCallbackModeSetting",
+      "enumeration": [
+        {
+          "value": "0x01",
+          "label": "IndoorRefregantCallback"
+        },
+        {
+          "value": "0x02",
+          "label": "BaseModuRefregantCallback"
+        }
+      ],
+      "description": "Reported meaning: Refrigerant-recovery type setting."
+    },
+    {
+      "type": "0x21",
+      "coordinate": "0x57",
+      "kind": "value",
+      "value_type": "uint8",
+      "width": 1,
+      "label": "RefregantCallbackSta",
+      "enumeration": [
+        {
+          "value": "0x00",
+          "label": "NaN"
+        },
+        {
+          "value": "0x01",
+          "label": "RefrigerantRecovery"
+        },
+        {
+          "value": "0x03",
+          "label": "RefrigerantRecoveryComplete"
+        }
+      ],
+      "description": "Reported meaning: Refrigerant-recovery type."
+    },
+    {
+      "type": "0x21",
+      "coordinate": "0x58",
+      "kind": "value",
+      "value_type": "uint8",
+      "width": 1,
+      "label": "IPLVEnergyLevelTestMode",
+      "enumeration": [
+        {
+          "value": "0x04",
+          "label": "25"
+        },
+        {
+          "value": "0x03",
+          "label": "50"
+        },
+        {
+          "value": "0x02",
+          "label": "75"
+        },
+        {
+          "value": "0x01",
+          "label": "100"
+        }
+      ],
+      "description": "Reported meaning: IPLV energy-efficiency test mode."
+    },
+    {
+      "type": "0x21",
+      "coordinate": "0x59",
+      "kind": "value",
+      "value_type": "uint8",
+      "width": 1,
+      "label": "ForcedRunningMode",
+      "enumeration": [
+        {
+          "value": "0x00",
+          "label": "NaN"
+        },
+        {
+          "value": "0x01",
+          "label": "Reserved"
+        },
+        {
+          "value": "0x02",
+          "label": "ForcedCooling"
+        },
+        {
+          "value": "0x03",
+          "label": "ForcedHeating"
+        },
+        {
+          "value": "0x04",
+          "label": "Fan"
+        },
+        {
+          "value": "0x05",
+          "label": "ForcedShutdown"
+        },
+        {
+          "value": "0x06",
+          "label": "Others"
+        }
+      ],
+      "description": "Reported meaning: Forced mode."
+    },
+    {
+      "type": "0x21",
+      "coordinate": "0x5a",
+      "kind": "value",
+      "value_type": "uint8",
+      "width": 1,
+      "label": "DebugStepInfo",
+      "enumeration": [
+        {
+          "value": "0x00",
+          "label": "Normal"
+        },
+        {
+          "value": "0x01",
+          "label": "Exception"
+        }
+      ],
+      "description": "Reported meaning: Step-by-step debugging anomaly."
+    },
+    {
+      "type": "0x21",
+      "coordinate": "0x5b",
+      "kind": "value",
+      "value_type": "uint8",
+      "width": 1,
+      "label": "VaccumizationMode",
+      "enumeration": [
+        {
+          "value": "0x00",
+          "label": "NaN"
+        },
+        {
+          "value": "0x01",
+          "label": "VaccumizationMode"
+        }
+      ],
+      "description": "Reported meaning: Evacuation."
+    },
+    {
+      "type": "0x21",
+      "coordinate": "0x5c",
+      "kind": "value",
+      "value_type": "uint8",
+      "width": 1,
+      "label": "AALvlCapTestMode",
+      "enumeration": [
+        {
+          "value": "0x00",
+          "label": "NaN"
+        },
+        {
+          "value": "0x01",
+          "label": "On"
+        }
+      ],
+      "description": "Reported meaning: Class-A energy-efficiency test mode."
+    },
+    {
+      "type": "0x21",
+      "coordinate": "0x5d",
+      "kind": "value",
+      "value_type": "uint8",
+      "width": 1,
+      "label": "EmergentRunningMode",
+      "enumeration": [
+        {
+          "value": "0x01",
+          "label": "Nothing"
+        },
+        {
+          "value": "0x02",
+          "label": "Compressor"
+        },
+        {
+          "value": "0x03",
+          "label": "Fans"
+        },
+        {
+          "value": "0x04",
+          "label": "Module"
+        }
+      ],
+      "description": "Reported meaning: Emergency operating mode."
+    },
+    {
+      "type": "0x21",
+      "coordinate": "0x5e",
+      "kind": "value",
+      "value_type": "uint8",
+      "width": 1,
+      "label": "SystemHotwaterMode",
+      "enumeration": [
+        {
+          "value": "0x00",
+          "label": "NaN"
+        },
+        {
+          "value": "0x01",
+          "label": "OffMode"
+        },
+        {
+          "value": "0x02",
+          "label": "Hotwater"
+        },
+        {
+          "value": "0x03",
+          "label": "FloorHeater"
+        },
+        {
+          "value": "0x04",
+          "label": "HotwaterFloorHeater"
+        }
+      ],
+      "description": "Reported meaning: Whole-unit hot-water mode."
+    },
+    {
+      "type": "0x21",
+      "coordinate": "0x5f",
+      "kind": "value",
+      "value_type": "uint8",
+      "width": 1,
+      "label": "RefregantCallbackSta",
+      "enumeration": [
+        {
+          "value": "0x00",
+          "label": "NaN"
+        },
+        {
+          "value": "0x01",
+          "label": "Running"
+        },
+        {
+          "value": "0x02",
+          "label": "Completed"
+        }
+      ],
+      "description": "Reported meaning: Refrigerant-recovery status."
+    },
+    {
+      "type": "0x21",
+      "coordinate": "0x60",
+      "kind": "value",
+      "value_type": "uint8",
+      "width": 1,
+      "label": "DevGroupDLProtectionZone",
+      "enumeration": [
+        {
+          "value": "0x00",
+          "label": "NaN"
+        },
+        {
+          "value": "0x01",
+          "label": "SafetyZone"
+        },
+        {
+          "value": "0x02",
+          "label": "GreenZone"
+        },
+        {
+          "value": "0x03",
+          "label": "YellowZone"
+        },
+        {
+          "value": "0x04",
+          "label": "ReservationZone"
+        }
+      ],
+      "description": "Reported meaning: Unit discharge protection zone."
+    },
+    {
+      "type": "0x21",
+      "coordinate": "0x61",
+      "kind": "value",
+      "value_type": "uint8",
+      "width": 1,
+      "label": "MasterOrSlaveSta",
+      "enumeration": [
+        {
+          "value": "0x00",
+          "label": "NaN"
+        },
+        {
+          "value": "0x01",
+          "label": "Master"
+        },
+        {
+          "value": "0x02",
+          "label": "Slave1"
+        },
+        {
+          "value": "0x03",
+          "label": "Slave2"
+        },
+        {
+          "value": "0x04",
+          "label": "Slave3"
+        }
+      ],
+      "description": "Reported meaning: Main/secondary unit status."
+    },
+    {
+      "type": "0x21",
+      "coordinate": "0x62",
+      "kind": "value",
+      "value_type": "uint8",
+      "width": 1,
+      "label": "ValveExceptionSta",
+      "enumeration": [
+        {
+          "value": "0x00",
+          "label": "Normal"
+        },
+        {
+          "value": "0x01",
+          "label": "Exception"
+        }
+      ],
+      "description": "Reported meaning: Abnormal valve operating mode."
+    },
+    {
+      "type": "0x21",
+      "coordinate": "0x63",
+      "kind": "value",
+      "value_type": "uint8",
+      "width": 1,
+      "label": "WaterVolAdjustValveSta",
+      "enumeration": [
+        {
+          "value": "0x00",
+          "label": "Keep"
+        },
+        {
+          "value": "0x01",
+          "label": "Down"
+        },
+        {
+          "value": "0x02",
+          "label": "Up"
+        }
+      ],
+      "description": "Reported meaning: Water-flow regulating valve."
+    },
+    {
+      "type": "0x21",
+      "coordinate": "0x67",
+      "kind": "value",
+      "value_type": "uint8",
+      "width": 1,
+      "label": "FanLevel",
+      "enumeration": [
+        {
+          "value": "0x00",
+          "label": "Stop"
+        },
+        {
+          "value": "0x01",
+          "label": "Level1"
+        },
+        {
+          "value": "0x02",
+          "label": "Level2"
+        },
+        {
+          "value": "0x03",
+          "label": "Level3"
+        },
+        {
+          "value": "0x04",
+          "label": "Level4"
+        }
+      ],
+      "description": "Reported meaning: Fan step."
+    },
+    {
+      "type": "0x21",
+      "coordinate": "0x68",
+      "kind": "value",
+      "value_type": "uint8",
+      "width": 1,
+      "label": "VFCompressorDevSta",
+      "enumeration": [
+        {
+          "value": "0x00",
+          "label": "Stop"
+        },
+        {
+          "value": "0x01",
+          "label": "Running"
+        },
+        {
+          "value": "0x02",
+          "label": "Error"
+        }
+      ],
+      "description": "Reported meaning: Variable-speed compressor equipment status."
+    },
+    {
+      "type": "0x21",
+      "coordinate": "0x69",
+      "kind": "value",
+      "value_type": "uint8",
+      "width": 1,
+      "label": "VFCompressorProgramSta",
+      "enumeration": [
+        {
+          "value": "0x00",
+          "label": "Reset"
+        },
+        {
+          "value": "0x01",
+          "label": "Sampling"
+        },
+        {
+          "value": "0x02",
+          "label": "Wait"
+        },
+        {
+          "value": "0x03",
+          "label": "Input"
+        },
+        {
+          "value": "0x04",
+          "label": "Orientation"
+        },
+        {
+          "value": "0x05",
+          "label": "Startup"
+        },
+        {
+          "value": "0x06",
+          "label": "Running"
+        }
+      ],
+      "description": "Reported meaning: Variable-speed compressor program operating status."
+    },
+    {
+      "type": "0x21",
+      "coordinate": "0x6a",
+      "kind": "value",
+      "value_type": "uint8",
+      "width": 1,
+      "label": "Comperssor1ModelNO",
+      "description": "Reported meaning: Compressor 1 model code."
+    },
+    {
+      "type": "0x21",
+      "coordinate": "0x6c",
+      "kind": "value",
+      "value_type": "uint8",
+      "width": 1,
+      "label": "VFFan1DevSta",
+      "enumeration": [
+        {
+          "value": "0x00",
+          "label": "Stop"
+        },
+        {
+          "value": "0x01",
+          "label": "Running"
+        },
+        {
+          "value": "0x02",
+          "label": "Error"
+        }
+      ],
+      "description": "Reported meaning: Variable-speed outdoor-fan 1 equipment status."
+    },
+    {
+      "type": "0x21",
+      "coordinate": "0x6d",
+      "kind": "value",
+      "value_type": "uint8",
+      "width": 1,
+      "label": "VFFan1ProgramSta",
+      "enumeration": [
+        {
+          "value": "0x00",
+          "label": "Reset"
+        },
+        {
+          "value": "0x01",
+          "label": "Sampling"
+        },
+        {
+          "value": "0x02",
+          "label": "Wait"
+        },
+        {
+          "value": "0x03",
+          "label": "Input"
+        },
+        {
+          "value": "0x04",
+          "label": "Orientation"
+        },
+        {
+          "value": "0x05",
+          "label": "Startup"
+        },
+        {
+          "value": "0x06",
+          "label": "Running"
+        }
+      ],
+      "description": "Reported meaning: Variable-speed outdoor-fan 1 program operating status."
+    },
+    {
+      "type": "0x21",
+      "coordinate": "0x70",
+      "kind": "value",
+      "value_type": "uint8",
+      "width": 1,
+      "label": "VFFan2DevSta",
+      "enumeration": [
+        {
+          "value": "0x00",
+          "label": "Stop"
+        },
+        {
+          "value": "0x01",
+          "label": "Running"
+        },
+        {
+          "value": "0x02",
+          "label": "Error"
+        }
+      ],
+      "description": "Reported meaning: Variable-speed outdoor-fan 2 equipment status."
+    },
+    {
+      "type": "0x21",
+      "coordinate": "0x71",
+      "kind": "value",
+      "value_type": "uint8",
+      "width": 1,
+      "label": "VFFan2ProgramSta",
+      "enumeration": [
+        {
+          "value": "0x00",
+          "label": "Reset"
+        },
+        {
+          "value": "0x01",
+          "label": "Sampling"
+        },
+        {
+          "value": "0x02",
+          "label": "Wait"
+        },
+        {
+          "value": "0x03",
+          "label": "Input"
+        },
+        {
+          "value": "0x04",
+          "label": "Orientation"
+        },
+        {
+          "value": "0x05",
+          "label": "Startup"
+        },
+        {
+          "value": "0x06",
+          "label": "Running"
+        }
+      ],
+      "description": "Reported meaning: Variable-speed outdoor-fan 2 program operating status."
+    },
+    {
+      "type": "0x21",
+      "coordinate": "0xc9",
+      "kind": "value",
+      "value_type": "uint8",
+      "width": 1,
+      "label": "OperationPriority",
+      "enumeration": [
+        {
+          "value": "0x00",
+          "label": "InvalidData"
+        },
+        {
+          "value": "0x01",
+          "label": "FactoryDefault"
+        },
+        {
+          "value": "0x02",
+          "label": "ACInPriority"
+        },
+        {
+          "value": "0x03",
+          "label": "HotWaterInPriority"
+        },
+        {
+          "value": "0x04",
+          "label": "FloorHeatingInPriority"
+        }
+      ],
+      "description": "Reported meaning: Whole-unit priority setting / operating priority."
+    },
+    {
+      "type": "0x21",
+      "coordinate": "0xda",
+      "kind": "value",
+      "value_type": "uint8",
+      "width": 1,
+      "label": "SystemModeSetting",
+      "enumeration": [
+        {
+          "value": "0x00",
+          "label": "MasterIDUPrior"
+        },
+        {
+          "value": "0x01",
+          "label": "FirstOpenPrior"
+        },
+        {
+          "value": "0x02",
+          "label": "LastOpenPrior"
+        },
+        {
+          "value": "0x03",
+          "label": "CoolPriority"
+        },
+        {
+          "value": "0x04",
+          "label": "HeatPriority"
+        },
+        {
+          "value": "0x05",
+          "label": "VoteNumPrior"
+        },
+        {
+          "value": "0x06",
+          "label": "VoteCapacityPrior"
+        }
+      ],
+      "description": "Reported meaning: Whole-unit mode setting method."
+    },
+    {
+      "type": "0x21",
+      "coordinate": "0xdb",
+      "kind": "value",
+      "value_type": "uint8",
+      "width": 1,
+      "label": "WindLevel",
+      "description": "Reported meaning: Air-force level."
+    },
+    {
+      "type": "0x21",
+      "coordinate": "0xdf",
+      "kind": "value",
+      "value_type": "uint8",
+      "width": 1,
+      "label": "Future4HHumidity",
+      "unit": "%",
+      "description": "Reported meaning: Average relative humidity for the next 4 hours."
+    },
+    {
+      "type": "0x24",
+      "coordinate": "0x00",
+      "kind": "value",
+      "value_type": "uint8Minus100",
+      "width": 1,
+      "label": "IDUFanDriverIPMTemp",
+      "unit": "\u2103",
+      "presentation_converter": "CeVsFa",
+      "description": "Reported meaning: IPM-module temperature of the variable-speed indoor-fan drive."
+    },
+    {
+      "type": "0x24",
+      "coordinate": "0x50",
+      "kind": "value",
+      "value_type": "uint8Minus100",
+      "width": 1,
+      "label": "TempProportion",
+      "description": "Reported meaning: Temperature proportional term."
+    },
+    {
+      "type": "0x24",
+      "coordinate": "0x51",
+      "kind": "value",
+      "value_type": "uint8Minus100",
+      "width": 1,
+      "label": "TempIntegral",
+      "description": "Reported meaning: Temperature integral term."
+    },
+    {
+      "type": "0x24",
+      "coordinate": "0x52",
+      "kind": "value",
+      "value_type": "uint8Minus100",
+      "width": 1,
+      "label": "TempDifferential",
+      "description": "Reported meaning: Temperature differential term."
+    },
+    {
+      "type": "0x24",
+      "coordinate": "0x53",
+      "kind": "value",
+      "value_type": "uint8Minus100",
+      "width": 1,
+      "label": "HumidityProportion",
+      "description": "Reported meaning: Moisture-content proportional term."
+    },
+    {
+      "type": "0x24",
+      "coordinate": "0x54",
+      "kind": "value",
+      "value_type": "uint8Minus100",
+      "width": 1,
+      "label": "HumidityIntegral",
+      "description": "Reported meaning: Moisture-content integral term."
+    },
+    {
+      "type": "0x24",
+      "coordinate": "0x55",
+      "kind": "value",
+      "value_type": "uint8Minus100",
+      "width": 1,
+      "label": "HumidityDifferential",
+      "description": "Reported meaning: Moisture-content derivative term."
+    },
+    {
+      "type": "0x25",
+      "coordinate": "0x00",
+      "kind": "value",
+      "value_type": "uint8",
+      "width": 1,
+      "label": "IDUFanStatus",
+      "enumeration": [
+        {
+          "value": "0x00",
+          "label": "Stop"
+        },
+        {
+          "value": "0x01",
+          "label": "Running"
+        },
+        {
+          "value": "0x02",
+          "label": "ErrorStop"
+        }
+      ],
+      "description": "Reported meaning: Variable-speed indoor-fan status."
+    },
+    {
+      "type": "0x25",
+      "coordinate": "0x01",
+      "kind": "value",
+      "value_type": "uint8",
+      "width": 1,
+      "label": "IDUFanProgramRunningSta",
+      "enumeration": [
+        {
+          "value": "0x00",
+          "label": "Reset"
+        },
+        {
+          "value": "0x01",
+          "label": "SamplingExcursionCalculate"
+        },
+        {
+          "value": "0x02",
+          "label": "Wait"
+        },
+        {
+          "value": "0x03",
+          "label": "Input"
+        },
+        {
+          "value": "0x04",
+          "label": "Orientation"
+        },
+        {
+          "value": "0x05",
+          "label": "Startup"
+        },
+        {
+          "value": "0x06",
+          "label": "Running"
+        }
+      ],
+      "description": "Reported meaning: Variable-speed indoor-fan program operating status."
+    },
+    {
+      "type": "0x26",
+      "coordinate": "0x00",
+      "kind": "value",
+      "value_type": "uint8",
+      "width": 1,
+      "label": "IDUFanUPhaseCurrent",
+      "unit": "A",
+      "description": "Reported meaning: Phase-U current of the variable-speed indoor fan."
+    },
+    {
+      "type": "0x26",
+      "coordinate": "0x01",
+      "kind": "value",
+      "value_type": "uint8",
+      "width": 1,
+      "label": "IDUFanVPhaseCurrent",
+      "unit": "A",
+      "description": "Reported meaning: Phase-V current of the variable-speed indoor fan."
+    },
+    {
+      "type": "0x27",
+      "coordinate": "0x00",
+      "kind": "value",
+      "value_type": "uint16DecimalsDevide256",
+      "width": 2,
+      "label": "IDUFanCurrentRMS",
+      "unit": "A",
+      "description": "Reported meaning: RMS value of the variable-speed indoor-fan current."
+    },
+    {
+      "type": "0x27",
+      "coordinate": "0x02",
+      "kind": "value",
+      "value_type": "uint16multi256",
+      "width": 2,
+      "label": "IDUFanDCBusVolt",
+      "unit": "V",
+      "description": "Reported meaning: DC-bus voltage of the variable-speed indoor fan."
+    },
+    {
+      "type": "0x27",
+      "coordinate": "0x04",
+      "kind": "value",
+      "value_type": "uint16multi256",
+      "width": 2,
+      "label": "PipeNetStatPres",
+      "unit": "Pa",
+      "description": "Reported meaning: Duct-network static pressure."
+    },
+    {
+      "type": "0x27",
+      "coordinate": "0x50",
+      "kind": "value",
+      "value_type": "uint8",
+      "width": 1,
+      "label": "OnlineHWGCount",
+      "description": "Reported meaning: Number of connected water tanks with an outdoor heat exchanger."
+    },
+    {
+      "type": "0x27",
+      "coordinate": "0x51",
+      "kind": "value",
+      "value_type": "uint8",
+      "width": 1,
+      "label": "OnlineWTCount",
+      "description": "Reported meaning: Number of connected generators."
+    },
+    {
+      "type": "0x27",
+      "coordinate": "0x52",
+      "kind": "value",
+      "value_type": "uint8",
+      "width": 1,
+      "label": "OccuredYearOfMemoryErrorCode1",
+      "description": "Reported meaning: Year of occurrence of stored fault 1."
+    },
+    {
+      "type": "0x27",
+      "coordinate": "0x53",
+      "kind": "value",
+      "value_type": "uint8",
+      "width": 1,
+      "label": "OccuredMonthOfMemoryErrorCode1",
+      "description": "Reported meaning: Month of occurrence of stored fault 1."
+    },
+    {
+      "type": "0x27",
+      "coordinate": "0x54",
+      "kind": "value",
+      "value_type": "uint8",
+      "width": 1,
+      "label": "OccuredDayOfMemoryErrorCode1",
+      "description": "Reported meaning: Day of occurrence of stored fault 1."
+    },
+    {
+      "type": "0x27",
+      "coordinate": "0x55",
+      "kind": "value",
+      "value_type": "uint8",
+      "width": 1,
+      "label": "OccuredYearOfMemoryErrorCode2",
+      "description": "Reported meaning: Year of occurrence of stored fault 2."
+    },
+    {
+      "type": "0x27",
+      "coordinate": "0x56",
+      "kind": "value",
+      "value_type": "uint8",
+      "width": 1,
+      "label": "OccuredMonthOfMemoryErrorCode2",
+      "description": "Reported meaning: Month of occurrence of stored fault 2."
+    },
+    {
+      "type": "0x27",
+      "coordinate": "0x57",
+      "kind": "value",
+      "value_type": "uint8",
+      "width": 1,
+      "label": "OccuredDayOfMemoryErrorCode2",
+      "description": "Reported meaning: Day of occurrence of stored fault 2."
+    },
+    {
+      "type": "0x27",
+      "coordinate": "0x58",
+      "kind": "value",
+      "value_type": "uint8",
+      "width": 1,
+      "label": "OccuredYearOfMemoryErrorCode3",
+      "description": "Reported meaning: Year of occurrence of stored fault 3."
+    },
+    {
+      "type": "0x27",
+      "coordinate": "0x59",
+      "kind": "value",
+      "value_type": "uint8",
+      "width": 1,
+      "label": "OccuredMonthOfMemoryErrorCode3",
+      "description": "Reported meaning: Month of occurrence of stored fault 3."
+    },
+    {
+      "type": "0x27",
+      "coordinate": "0x5a",
+      "kind": "value",
+      "value_type": "uint8",
+      "width": 1,
+      "label": "OccuredDayOfMemoryErrorCode3",
+      "description": "Reported meaning: Day of occurrence of stored fault 3."
+    },
+    {
+      "type": "0x27",
+      "coordinate": "0x5b",
+      "kind": "value",
+      "value_type": "uint8",
+      "width": 1,
+      "label": "OccuredYearOfMemoryErrorCode4",
+      "description": "Reported meaning: Year of occurrence of stored fault 4."
+    },
+    {
+      "type": "0x27",
+      "coordinate": "0x5c",
+      "kind": "value",
+      "value_type": "uint8",
+      "width": 1,
+      "label": "OccuredMonthOfMemoryErrorCode4",
+      "description": "Reported meaning: Month of occurrence of stored fault 4."
+    },
+    {
+      "type": "0x27",
+      "coordinate": "0x5d",
+      "kind": "value",
+      "value_type": "uint8",
+      "width": 1,
+      "label": "OccuredDayOfMemoryErrorCode4",
+      "description": "Reported meaning: Day of occurrence of stored fault 4."
+    },
+    {
+      "type": "0x27",
+      "coordinate": "0x5e",
+      "kind": "value",
+      "value_type": "uint8",
+      "width": 1,
+      "label": "OccuredYearOfMemoryErrorCode5",
+      "conflict": "The native description names stored fault 4 for the code of stored fault 5. Not resolved.",
+      "description": "Reported meaning: Year of occurrence of stored fault 4."
+    },
+    {
+      "type": "0x27",
+      "coordinate": "0x5f",
+      "kind": "value",
+      "value_type": "uint8",
+      "width": 1,
+      "label": "OccuredMonthOfMemoryErrorCode5",
+      "conflict": "The native description names stored fault 4 for the code of stored fault 5. Not resolved.",
+      "description": "Reported meaning: Month of occurrence of stored fault 4."
+    },
+    {
+      "type": "0x27",
+      "coordinate": "0x60",
+      "kind": "value",
+      "value_type": "uint8",
+      "width": 1,
+      "label": "OccuredDayOfMemoryErrorCode5",
+      "description": "Reported meaning: Day of occurrence of stored fault 5."
+    },
+    {
+      "type": "0x27",
+      "coordinate": "0x65",
+      "kind": "value",
+      "value_type": "uint32",
+      "width": 4,
+      "label": "MemoryChipAccumTimes",
+      "description": "Reported meaning: Cumulative count of the memory chip."
+    }
+  ]
+}

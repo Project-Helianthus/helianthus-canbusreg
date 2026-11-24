@@ -1,0 +1,3380 @@
+{
+  "schema": "gree.vrf.can.dictionary",
+  "schema_version": 1,
+  "status": "candidate",
+  "slice": "electrical-system",
+  "types": [
+    "0x14",
+    "0x28",
+    "0x31",
+    "0x32"
+  ],
+  "counts": {
+    "positions": 198,
+    "named_values": 198,
+    "bit_containers": 0,
+    "named_bits": 0,
+    "label_only": 0
+  },
+  "entries": [
+    {
+      "type": "0x14",
+      "coordinate": "0x00",
+      "kind": "value",
+      "value_type": "uint16Devide100",
+      "width": 2,
+      "label": "Volt",
+      "unit": "V",
+      "description": "Reported meaning: Voltage."
+    },
+    {
+      "type": "0x14",
+      "coordinate": "0x02",
+      "kind": "value",
+      "value_type": "uint16Devide100",
+      "width": 2,
+      "label": "Current",
+      "unit": "A",
+      "description": "Reported meaning: Current."
+    },
+    {
+      "type": "0x14",
+      "coordinate": "0x04",
+      "kind": "value",
+      "value_type": "uint16",
+      "width": 2,
+      "label": "Power",
+      "unit": "W",
+      "notes": [
+        "Electrical quantity, not a thermal capacity. The direction (drawn or exported) and the measuring point are not established. Counter lifetime, reset and rollover are not documented. Reference sets list it for indoor units and for outdoor modules."
+      ],
+      "description": "Reported meaning: Power. The unit is W, not energy."
+    },
+    {
+      "type": "0x14",
+      "coordinate": "0x06",
+      "kind": "value",
+      "value_type": "uint16Devide10",
+      "width": 2,
+      "label": "RunningHourPower",
+      "unit": "kWh",
+      "description": "Reported meaning: Electrical energy of the current hour."
+    },
+    {
+      "type": "0x14",
+      "coordinate": "0x08",
+      "kind": "value",
+      "value_type": "uint16",
+      "width": 2,
+      "label": "RunningDayPower",
+      "unit": "kWh",
+      "description": "Reported meaning: Electrical energy of the current day."
+    },
+    {
+      "type": "0x14",
+      "coordinate": "0x0a",
+      "kind": "value",
+      "value_type": "uint16",
+      "width": 2,
+      "label": "RunningMonthPower",
+      "unit": "kWh",
+      "description": "Reported meaning: Electrical energy of the current month."
+    },
+    {
+      "type": "0x14",
+      "coordinate": "0x0c",
+      "kind": "value",
+      "value_type": "uint32",
+      "width": 4,
+      "label": "ModulePower",
+      "unit": "kWh",
+      "notes": [
+        "Electrical quantity, not a thermal capacity. The direction (drawn or exported) and the measuring point are not established. Counter lifetime, reset and rollover are not documented. Reference sets list it for indoor units and for outdoor modules."
+      ],
+      "description": "Reported meaning: Module electrical energy. The unit is kWh; it is energy, not instantaneous power."
+    },
+    {
+      "type": "0x14",
+      "coordinate": "0x10",
+      "kind": "value",
+      "value_type": "uint32",
+      "width": 4,
+      "label": "SysSumPower",
+      "unit": "kWh",
+      "notes": [
+        "Electrical quantity, not a thermal capacity. The direction (drawn or exported) and the measuring point are not established. Counter lifetime, reset and rollover are not documented. Outdoor reference sets list it as a system value of unit 0x08."
+      ],
+      "description": "Reported meaning: Total electrical energy of the unit. The unit is kWh; it is energy, not instantaneous power."
+    },
+    {
+      "type": "0x14",
+      "coordinate": "0x14",
+      "kind": "value",
+      "value_type": "uint16Devide100",
+      "width": 2,
+      "label": "SysSumP",
+      "unit": "kW",
+      "notes": [
+        "Electrical quantity, not a thermal capacity. The direction (drawn or exported) and the measuring point are not established. Counter lifetime, reset and rollover are not documented. Outdoor reference sets list it as a system value of unit 0x08."
+      ],
+      "description": "Reported meaning: Total power of the unit."
+    },
+    {
+      "type": "0x14",
+      "coordinate": "0x18",
+      "kind": "value",
+      "value_type": "uint16Devide10",
+      "width": 2,
+      "label": "Hour1Power",
+      "description": "Reported meaning: Electrical energy for previous hour interval number 1."
+    },
+    {
+      "type": "0x14",
+      "coordinate": "0x1a",
+      "kind": "value",
+      "value_type": "uint16Devide10",
+      "width": 2,
+      "label": "Hour2Power",
+      "description": "Reported meaning: Electrical energy for previous hour interval number 2."
+    },
+    {
+      "type": "0x14",
+      "coordinate": "0x1c",
+      "kind": "value",
+      "value_type": "uint16Devide10",
+      "width": 2,
+      "label": "Hour3Power",
+      "description": "Reported meaning: Electrical energy for previous hour interval number 3."
+    },
+    {
+      "type": "0x14",
+      "coordinate": "0x1e",
+      "kind": "value",
+      "value_type": "uint16Devide10",
+      "width": 2,
+      "label": "Hour4Power",
+      "description": "Reported meaning: Electrical energy for previous hour interval number 4."
+    },
+    {
+      "type": "0x14",
+      "coordinate": "0x20",
+      "kind": "value",
+      "value_type": "uint16Devide10",
+      "width": 2,
+      "label": "Hour5Power",
+      "description": "Reported meaning: Electrical energy for previous hour interval number 5."
+    },
+    {
+      "type": "0x14",
+      "coordinate": "0x22",
+      "kind": "value",
+      "value_type": "uint16Devide10",
+      "width": 2,
+      "label": "Hour6Power",
+      "description": "Reported meaning: Electrical energy for previous hour interval number 6."
+    },
+    {
+      "type": "0x14",
+      "coordinate": "0x24",
+      "kind": "value",
+      "value_type": "uint16Devide10",
+      "width": 2,
+      "label": "Hour7Power",
+      "description": "Reported meaning: Electrical energy for previous hour interval number 7."
+    },
+    {
+      "type": "0x14",
+      "coordinate": "0x26",
+      "kind": "value",
+      "value_type": "uint16Devide10",
+      "width": 2,
+      "label": "Hour8Power",
+      "description": "Reported meaning: Electrical energy for previous hour interval number 8."
+    },
+    {
+      "type": "0x14",
+      "coordinate": "0x28",
+      "kind": "value",
+      "value_type": "uint16Devide10",
+      "width": 2,
+      "label": "Hour9Power",
+      "description": "Reported meaning: Electrical energy for previous hour interval number 9."
+    },
+    {
+      "type": "0x14",
+      "coordinate": "0x2a",
+      "kind": "value",
+      "value_type": "uint16Devide10",
+      "width": 2,
+      "label": "Hour10Power",
+      "description": "Reported meaning: Electrical energy for previous hour interval number 10."
+    },
+    {
+      "type": "0x14",
+      "coordinate": "0x2c",
+      "kind": "value",
+      "value_type": "uint16Devide10",
+      "width": 2,
+      "label": "Hour11Power",
+      "description": "Reported meaning: Electrical energy for previous hour interval number 11."
+    },
+    {
+      "type": "0x14",
+      "coordinate": "0x2e",
+      "kind": "value",
+      "value_type": "uint16Devide10",
+      "width": 2,
+      "label": "Hour12Power",
+      "description": "Reported meaning: Electrical energy for previous hour interval number 12."
+    },
+    {
+      "type": "0x14",
+      "coordinate": "0x30",
+      "kind": "value",
+      "value_type": "uint16Devide10",
+      "width": 2,
+      "label": "Hour13Power",
+      "description": "Reported meaning: Electrical energy for previous hour interval number 13."
+    },
+    {
+      "type": "0x14",
+      "coordinate": "0x32",
+      "kind": "value",
+      "value_type": "uint16Devide10",
+      "width": 2,
+      "label": "Hour14Power",
+      "description": "Reported meaning: Electrical energy for previous hour interval number 14."
+    },
+    {
+      "type": "0x14",
+      "coordinate": "0x34",
+      "kind": "value",
+      "value_type": "uint16Devide10",
+      "width": 2,
+      "label": "Hour15Power",
+      "description": "Reported meaning: Electrical energy for previous hour interval number 15."
+    },
+    {
+      "type": "0x14",
+      "coordinate": "0x36",
+      "kind": "value",
+      "value_type": "uint16Devide10",
+      "width": 2,
+      "label": "Hour16Power",
+      "description": "Reported meaning: Electrical energy for previous hour interval number 16."
+    },
+    {
+      "type": "0x14",
+      "coordinate": "0x38",
+      "kind": "value",
+      "value_type": "uint16Devide10",
+      "width": 2,
+      "label": "Hour17Power",
+      "description": "Reported meaning: Electrical energy for previous hour interval number 17."
+    },
+    {
+      "type": "0x14",
+      "coordinate": "0x3a",
+      "kind": "value",
+      "value_type": "uint16Devide10",
+      "width": 2,
+      "label": "Hour18Power",
+      "description": "Reported meaning: Electrical energy for previous hour interval number 18."
+    },
+    {
+      "type": "0x14",
+      "coordinate": "0x3c",
+      "kind": "value",
+      "value_type": "uint16Devide10",
+      "width": 2,
+      "label": "Hour19Power",
+      "description": "Reported meaning: Electrical energy for previous hour interval number 19."
+    },
+    {
+      "type": "0x14",
+      "coordinate": "0x3e",
+      "kind": "value",
+      "value_type": "uint16Devide10",
+      "width": 2,
+      "label": "Hour20Power",
+      "description": "Reported meaning: Electrical energy for previous hour interval number 20."
+    },
+    {
+      "type": "0x14",
+      "coordinate": "0x40",
+      "kind": "value",
+      "value_type": "uint16Devide10",
+      "width": 2,
+      "label": "Hour21Power",
+      "description": "Reported meaning: Electrical energy for previous hour interval number 21."
+    },
+    {
+      "type": "0x14",
+      "coordinate": "0x42",
+      "kind": "value",
+      "value_type": "uint16Devide10",
+      "width": 2,
+      "label": "Hour22Power",
+      "description": "Reported meaning: Electrical energy for previous hour interval number 22."
+    },
+    {
+      "type": "0x14",
+      "coordinate": "0x44",
+      "kind": "value",
+      "value_type": "uint16Devide10",
+      "width": 2,
+      "label": "Hour23Power",
+      "description": "Reported meaning: Electrical energy for previous hour interval number 23."
+    },
+    {
+      "type": "0x14",
+      "coordinate": "0x46",
+      "kind": "value",
+      "value_type": "uint16",
+      "width": 2,
+      "label": "Day1Power",
+      "description": "Reported meaning: Electrical energy for previous day interval number 1."
+    },
+    {
+      "type": "0x14",
+      "coordinate": "0x48",
+      "kind": "value",
+      "value_type": "uint16",
+      "width": 2,
+      "label": "Day2Power",
+      "description": "Reported meaning: Electrical energy for previous day interval number 2."
+    },
+    {
+      "type": "0x14",
+      "coordinate": "0x4a",
+      "kind": "value",
+      "value_type": "uint16",
+      "width": 2,
+      "label": "Day3Power",
+      "description": "Reported meaning: Electrical energy for previous day interval number 3."
+    },
+    {
+      "type": "0x14",
+      "coordinate": "0x4c",
+      "kind": "value",
+      "value_type": "uint16",
+      "width": 2,
+      "label": "Day4Power",
+      "description": "Reported meaning: Electrical energy for previous day interval number 4."
+    },
+    {
+      "type": "0x14",
+      "coordinate": "0x4e",
+      "kind": "value",
+      "value_type": "uint16",
+      "width": 2,
+      "label": "Day5Power",
+      "description": "Reported meaning: Electrical energy for previous day interval number 5."
+    },
+    {
+      "type": "0x14",
+      "coordinate": "0x50",
+      "kind": "value",
+      "value_type": "uint16",
+      "width": 2,
+      "label": "Day6Power",
+      "description": "Reported meaning: Electrical energy for previous day interval number 6."
+    },
+    {
+      "type": "0x14",
+      "coordinate": "0x52",
+      "kind": "value",
+      "value_type": "uint16",
+      "width": 2,
+      "label": "Day7Power",
+      "description": "Reported meaning: Electrical energy for previous day interval number 7."
+    },
+    {
+      "type": "0x14",
+      "coordinate": "0x54",
+      "kind": "value",
+      "value_type": "uint16",
+      "width": 2,
+      "label": "Day8Power",
+      "description": "Reported meaning: Electrical energy for previous day interval number 8."
+    },
+    {
+      "type": "0x14",
+      "coordinate": "0x56",
+      "kind": "value",
+      "value_type": "uint16",
+      "width": 2,
+      "label": "Day9Power",
+      "description": "Reported meaning: Electrical energy for previous day interval number 9."
+    },
+    {
+      "type": "0x14",
+      "coordinate": "0x58",
+      "kind": "value",
+      "value_type": "uint16",
+      "width": 2,
+      "label": "Day10Power",
+      "description": "Reported meaning: Electrical energy for previous day interval number 10."
+    },
+    {
+      "type": "0x14",
+      "coordinate": "0x5a",
+      "kind": "value",
+      "value_type": "uint16",
+      "width": 2,
+      "label": "Day11Power",
+      "description": "Reported meaning: Electrical energy for previous day interval number 11."
+    },
+    {
+      "type": "0x14",
+      "coordinate": "0x5c",
+      "kind": "value",
+      "value_type": "uint16",
+      "width": 2,
+      "label": "Day12Power",
+      "description": "Reported meaning: Electrical energy for previous day interval number 12."
+    },
+    {
+      "type": "0x14",
+      "coordinate": "0x5e",
+      "kind": "value",
+      "value_type": "uint16",
+      "width": 2,
+      "label": "Day13Power",
+      "description": "Reported meaning: Electrical energy for previous day interval number 13."
+    },
+    {
+      "type": "0x14",
+      "coordinate": "0x60",
+      "kind": "value",
+      "value_type": "uint16",
+      "width": 2,
+      "label": "Day14Power",
+      "description": "Reported meaning: Electrical energy for previous day interval number 14."
+    },
+    {
+      "type": "0x14",
+      "coordinate": "0x62",
+      "kind": "value",
+      "value_type": "uint16",
+      "width": 2,
+      "label": "Day15Power",
+      "description": "Reported meaning: Electrical energy for previous day interval number 15."
+    },
+    {
+      "type": "0x14",
+      "coordinate": "0x64",
+      "kind": "value",
+      "value_type": "uint16",
+      "width": 2,
+      "label": "Day16Power",
+      "description": "Reported meaning: Electrical energy for previous day interval number 16."
+    },
+    {
+      "type": "0x14",
+      "coordinate": "0x66",
+      "kind": "value",
+      "value_type": "uint16",
+      "width": 2,
+      "label": "Day17Power",
+      "description": "Reported meaning: Electrical energy for previous day interval number 17."
+    },
+    {
+      "type": "0x14",
+      "coordinate": "0x68",
+      "kind": "value",
+      "value_type": "uint16",
+      "width": 2,
+      "label": "Day18Power",
+      "description": "Reported meaning: Electrical energy for previous day interval number 18."
+    },
+    {
+      "type": "0x14",
+      "coordinate": "0x6a",
+      "kind": "value",
+      "value_type": "uint16",
+      "width": 2,
+      "label": "Day19Power",
+      "description": "Reported meaning: Electrical energy for previous day interval number 19."
+    },
+    {
+      "type": "0x14",
+      "coordinate": "0x6c",
+      "kind": "value",
+      "value_type": "uint16",
+      "width": 2,
+      "label": "Day20Power",
+      "description": "Reported meaning: Electrical energy for previous day interval number 20."
+    },
+    {
+      "type": "0x14",
+      "coordinate": "0x6e",
+      "kind": "value",
+      "value_type": "uint16",
+      "width": 2,
+      "label": "Day21Power",
+      "description": "Reported meaning: Electrical energy for previous day interval number 21."
+    },
+    {
+      "type": "0x14",
+      "coordinate": "0x70",
+      "kind": "value",
+      "value_type": "uint16",
+      "width": 2,
+      "label": "Day22Power",
+      "description": "Reported meaning: Electrical energy for previous day interval number 22."
+    },
+    {
+      "type": "0x14",
+      "coordinate": "0x72",
+      "kind": "value",
+      "value_type": "uint16",
+      "width": 2,
+      "label": "Day23Power",
+      "description": "Reported meaning: Electrical energy for previous day interval number 23."
+    },
+    {
+      "type": "0x14",
+      "coordinate": "0x74",
+      "kind": "value",
+      "value_type": "uint16",
+      "width": 2,
+      "label": "Day24Power",
+      "description": "Reported meaning: Electrical energy for previous day interval number 24."
+    },
+    {
+      "type": "0x14",
+      "coordinate": "0x76",
+      "kind": "value",
+      "value_type": "uint16",
+      "width": 2,
+      "label": "Day25Power",
+      "description": "Reported meaning: Electrical energy for previous day interval number 25."
+    },
+    {
+      "type": "0x14",
+      "coordinate": "0x78",
+      "kind": "value",
+      "value_type": "uint16",
+      "width": 2,
+      "label": "Day26Power",
+      "description": "Reported meaning: Electrical energy for previous day interval number 26."
+    },
+    {
+      "type": "0x14",
+      "coordinate": "0x7a",
+      "kind": "value",
+      "value_type": "uint16",
+      "width": 2,
+      "label": "Day27Power",
+      "description": "Reported meaning: Electrical energy for previous day interval number 27."
+    },
+    {
+      "type": "0x14",
+      "coordinate": "0x7c",
+      "kind": "value",
+      "value_type": "uint16",
+      "width": 2,
+      "label": "Day28Power",
+      "description": "Reported meaning: Electrical energy for previous day interval number 28."
+    },
+    {
+      "type": "0x14",
+      "coordinate": "0x7e",
+      "kind": "value",
+      "value_type": "uint16",
+      "width": 2,
+      "label": "Day29Power",
+      "description": "Reported meaning: Electrical energy for previous day interval number 29."
+    },
+    {
+      "type": "0x14",
+      "coordinate": "0x80",
+      "kind": "value",
+      "value_type": "uint16",
+      "width": 2,
+      "label": "Day30Power",
+      "description": "Reported meaning: Electrical energy for previous day interval number 30."
+    },
+    {
+      "type": "0x14",
+      "coordinate": "0x82",
+      "kind": "value",
+      "value_type": "uint16",
+      "width": 2,
+      "label": "Month1Power",
+      "description": "Reported meaning: Electrical energy for previous month interval number 1."
+    },
+    {
+      "type": "0x14",
+      "coordinate": "0x84",
+      "kind": "value",
+      "value_type": "uint16",
+      "width": 2,
+      "label": "Month2Power",
+      "description": "Reported meaning: Electrical energy for previous month interval number 2."
+    },
+    {
+      "type": "0x14",
+      "coordinate": "0x86",
+      "kind": "value",
+      "value_type": "uint16",
+      "width": 2,
+      "label": "Month3Power",
+      "description": "Reported meaning: Electrical energy for previous month interval number 3."
+    },
+    {
+      "type": "0x14",
+      "coordinate": "0x88",
+      "kind": "value",
+      "value_type": "uint16",
+      "width": 2,
+      "label": "Month4Power",
+      "description": "Reported meaning: Electrical energy for previous month interval number 4."
+    },
+    {
+      "type": "0x14",
+      "coordinate": "0x8a",
+      "kind": "value",
+      "value_type": "uint16",
+      "width": 2,
+      "label": "Month5Power",
+      "description": "Reported meaning: Electrical energy for previous month interval number 5."
+    },
+    {
+      "type": "0x14",
+      "coordinate": "0x8c",
+      "kind": "value",
+      "value_type": "uint16",
+      "width": 2,
+      "label": "Month6Power",
+      "description": "Reported meaning: Electrical energy for previous month interval number 6."
+    },
+    {
+      "type": "0x14",
+      "coordinate": "0x8e",
+      "kind": "value",
+      "value_type": "uint16",
+      "width": 2,
+      "label": "Month7Power",
+      "description": "Reported meaning: Electrical energy for previous month interval number 7."
+    },
+    {
+      "type": "0x14",
+      "coordinate": "0x90",
+      "kind": "value",
+      "value_type": "uint16",
+      "width": 2,
+      "label": "Month8Power",
+      "description": "Reported meaning: Electrical energy for previous month interval number 8."
+    },
+    {
+      "type": "0x14",
+      "coordinate": "0x92",
+      "kind": "value",
+      "value_type": "uint16",
+      "width": 2,
+      "label": "Month9Power",
+      "description": "Reported meaning: Electrical energy for previous month interval number 9."
+    },
+    {
+      "type": "0x14",
+      "coordinate": "0x94",
+      "kind": "value",
+      "value_type": "uint16",
+      "width": 2,
+      "label": "Month10Power",
+      "description": "Reported meaning: Electrical energy for previous month interval number 10."
+    },
+    {
+      "type": "0x14",
+      "coordinate": "0x96",
+      "kind": "value",
+      "value_type": "uint16",
+      "width": 2,
+      "label": "Month11Power",
+      "description": "Reported meaning: Electrical energy for previous month interval number 11."
+    },
+    {
+      "type": "0x28",
+      "coordinate": "0x50",
+      "kind": "value",
+      "value_type": "uint8",
+      "width": 1,
+      "label": "OnlineODUCount",
+      "description": "Reported meaning: Number of connected outdoor units."
+    },
+    {
+      "type": "0x28",
+      "coordinate": "0x51",
+      "kind": "value",
+      "value_type": "uint8",
+      "width": 1,
+      "label": "OnlineIDUCount",
+      "description": "Reported meaning: Number of connected indoor units."
+    },
+    {
+      "type": "0x28",
+      "coordinate": "0x52",
+      "kind": "value",
+      "value_type": "uint8",
+      "width": 1,
+      "label": "AddrAssignProcess",
+      "description": "Reported meaning: Progress of outdoor-unit address allocation."
+    },
+    {
+      "type": "0x28",
+      "coordinate": "0x53",
+      "kind": "value",
+      "value_type": "uint8",
+      "width": 1,
+      "label": "CapUpLimitSettingSta",
+      "description": "Reported meaning: Capacity upper-limit setting status."
+    },
+    {
+      "type": "0x28",
+      "coordinate": "0x54",
+      "kind": "value",
+      "value_type": "uint8Devide2",
+      "width": 1,
+      "label": "CompressorPreHeatingTime",
+      "unit": "h",
+      "description": "Reported meaning: Compressor preheating time."
+    },
+    {
+      "type": "0x28",
+      "coordinate": "0x55",
+      "kind": "value",
+      "value_type": "uint8",
+      "width": 1,
+      "label": "CapAdjustedLevel",
+      "description": "Reported meaning: Number of steps after capacity adjustment."
+    },
+    {
+      "type": "0x28",
+      "coordinate": "0x56",
+      "kind": "value",
+      "value_type": "uint8",
+      "width": 1,
+      "label": "CapDesLevel",
+      "description": "Reported meaning: Target number of steps."
+    },
+    {
+      "type": "0x28",
+      "coordinate": "0x57",
+      "kind": "value",
+      "value_type": "uint8",
+      "width": 1,
+      "label": "CountLevel",
+      "description": "Reported meaning: Calculated number of steps."
+    },
+    {
+      "type": "0x28",
+      "coordinate": "0x5a",
+      "kind": "value",
+      "value_type": "uint8",
+      "width": 1,
+      "label": "MemoryErrorCode1ODUModuleNum",
+      "description": "Reported meaning: Outdoor-module number for stored fault 1."
+    },
+    {
+      "type": "0x28",
+      "coordinate": "0x5b",
+      "kind": "value",
+      "value_type": "uint8",
+      "width": 1,
+      "label": "MemoryErrorCode2ODUModuleNum",
+      "description": "Reported meaning: Outdoor-module number for stored fault 2."
+    },
+    {
+      "type": "0x28",
+      "coordinate": "0x5c",
+      "kind": "value",
+      "value_type": "uint8",
+      "width": 1,
+      "label": "MemoryErrorCode3ODUModuleNum",
+      "description": "Reported meaning: Outdoor-module number for stored fault 3."
+    },
+    {
+      "type": "0x28",
+      "coordinate": "0x5d",
+      "kind": "value",
+      "value_type": "uint8",
+      "width": 1,
+      "label": "MemoryErrorCode4ODUModuleNum",
+      "description": "Reported meaning: Outdoor-module number for stored fault 4."
+    },
+    {
+      "type": "0x28",
+      "coordinate": "0x5e",
+      "kind": "value",
+      "value_type": "uint8",
+      "width": 1,
+      "label": "MemoryErrorCode5ODUModuleNum",
+      "description": "Reported meaning: Outdoor-module number for stored fault 5."
+    },
+    {
+      "type": "0x28",
+      "coordinate": "0x5f",
+      "kind": "value",
+      "value_type": "uint8",
+      "width": 1,
+      "label": "VFFan1DesiredFreq",
+      "unit": "Hz",
+      "description": "Reported meaning: Target frequency of variable-speed outdoor fan 1."
+    },
+    {
+      "type": "0x28",
+      "coordinate": "0x60",
+      "kind": "value",
+      "value_type": "uint8",
+      "width": 1,
+      "label": "VFFan2DesiredFreq",
+      "unit": "Hz",
+      "description": "Reported meaning: Target frequency of variable-speed outdoor fan 2."
+    },
+    {
+      "type": "0x28",
+      "coordinate": "0x61",
+      "kind": "value",
+      "value_type": "uint8",
+      "width": 1,
+      "label": "VFCompressor1DesiredFreq",
+      "unit": "Hz",
+      "description": "Reported meaning: Target frequency of the variable-speed compressor."
+    },
+    {
+      "type": "0x28",
+      "coordinate": "0x62",
+      "kind": "value",
+      "value_type": "uint8",
+      "width": 1,
+      "label": "VFCompressor2DesiredFreq",
+      "unit": "Hz",
+      "description": "Reported meaning: Target frequency of variable-speed compressor 2."
+    },
+    {
+      "type": "0x28",
+      "coordinate": "0x63",
+      "kind": "value",
+      "value_type": "cfloat8base10",
+      "width": 1,
+      "label": "Compressor1Current",
+      "unit": "A",
+      "description": "Reported meaning: Compressor 1 current."
+    },
+    {
+      "type": "0x28",
+      "coordinate": "0x64",
+      "kind": "value",
+      "value_type": "cfloat8base10",
+      "width": 1,
+      "label": "Compressor2Current",
+      "unit": "A",
+      "description": "Reported meaning: Compressor 2 current value."
+    },
+    {
+      "type": "0x28",
+      "coordinate": "0x65",
+      "kind": "value",
+      "value_type": "cfloat8base10",
+      "width": 1,
+      "label": "Compressor3Current",
+      "unit": "A",
+      "description": "Reported meaning: Compressor 3 current value."
+    },
+    {
+      "type": "0x28",
+      "coordinate": "0x66",
+      "kind": "value",
+      "value_type": "cfloat8base10",
+      "width": 1,
+      "label": "Compressor4Current",
+      "unit": "A",
+      "description": "Reported meaning: Compressor 4 current value."
+    },
+    {
+      "type": "0x28",
+      "coordinate": "0x67",
+      "kind": "value",
+      "value_type": "cfloat8base10",
+      "width": 1,
+      "label": "Compressor5Current",
+      "unit": "A",
+      "description": "Reported meaning: Compressor 5 current value."
+    },
+    {
+      "type": "0x28",
+      "coordinate": "0x68",
+      "kind": "value",
+      "value_type": "cfloat8base10",
+      "width": 1,
+      "label": "Compressor6Current",
+      "unit": "A",
+      "description": "Reported meaning: Compressor 6 current value."
+    },
+    {
+      "type": "0x28",
+      "coordinate": "0x69",
+      "kind": "value",
+      "value_type": "cfloat8base10",
+      "width": 1,
+      "label": "Compressor7Current",
+      "unit": "A",
+      "description": "Reported meaning: Compressor 7 current value."
+    },
+    {
+      "type": "0x28",
+      "coordinate": "0x6a",
+      "kind": "value",
+      "value_type": "uint8",
+      "width": 1,
+      "label": "VFCompressor3DesiredFreq",
+      "unit": "Hz",
+      "description": "Reported meaning: Target frequency of compressor 3."
+    },
+    {
+      "type": "0x28",
+      "coordinate": "0x80",
+      "kind": "value",
+      "value_type": "cfloat16base256",
+      "width": 2,
+      "label": "VFCompressorCurrent",
+      "unit": "A",
+      "description": "Reported meaning: Variable-speed compressor current."
+    },
+    {
+      "type": "0x28",
+      "coordinate": "0x82",
+      "kind": "value",
+      "value_type": "uint16",
+      "width": 2,
+      "label": "VFCompressorDriverDCBusVolt",
+      "unit": "V",
+      "description": "Reported meaning: DC-bus voltage of the variable-speed compressor drive."
+    },
+    {
+      "type": "0x28",
+      "coordinate": "0x84",
+      "kind": "value",
+      "value_type": "cfloat16base256",
+      "width": 2,
+      "label": "VFCompressorDriverPowerCurrent",
+      "unit": "A",
+      "description": "Reported meaning: Supply current at the input of the variable-speed compressor drive."
+    },
+    {
+      "type": "0x28",
+      "coordinate": "0x86",
+      "kind": "value",
+      "value_type": "uint8",
+      "width": 1,
+      "label": "VFCompressorUPhaseCurrent",
+      "unit": "A",
+      "description": "Reported meaning: Phase-U current of the variable-speed compressor."
+    },
+    {
+      "type": "0x28",
+      "coordinate": "0x87",
+      "kind": "value",
+      "value_type": "uint8",
+      "width": 1,
+      "label": "VFCompressorVPhaseCurrent",
+      "unit": "A",
+      "description": "Reported meaning: Phase-V current of the variable-speed compressor."
+    },
+    {
+      "type": "0x28",
+      "coordinate": "0x88",
+      "kind": "value",
+      "value_type": "uint8Multi2",
+      "width": 1,
+      "label": "VFCompressorDriverACVolt",
+      "unit": "V",
+      "notes": [
+        "The value type has no decode rule; only the raw byte is exposed."
+      ],
+      "description": "Reported meaning: Phase voltage at the AC input of the variable-speed compressor drive."
+    },
+    {
+      "type": "0x28",
+      "coordinate": "0x89",
+      "kind": "value",
+      "value_type": "uint8",
+      "width": 1,
+      "label": "VFCompressorRunningFreq",
+      "unit": "Hz",
+      "description": "Reported meaning: Operating frequency of the variable-speed compressor. The frequency in Hz is not a duty-cycle percentage."
+    },
+    {
+      "type": "0x28",
+      "coordinate": "0x8a",
+      "kind": "value",
+      "value_type": "uint8",
+      "width": 1,
+      "label": "Compressor1ResistorHeatSta",
+      "description": "Reported meaning: Heating status of compressor 1 winding."
+    },
+    {
+      "type": "0x28",
+      "coordinate": "0x8b",
+      "kind": "value",
+      "value_type": "uint8",
+      "width": 1,
+      "label": "Compressor2ResistorHeatSta",
+      "description": "Reported meaning: Heating status of compressor 2 windings."
+    },
+    {
+      "type": "0x28",
+      "coordinate": "0x8c",
+      "kind": "value",
+      "value_type": "cfloat16base256",
+      "width": 2,
+      "label": "VFFan1Current",
+      "unit": "A",
+      "description": "Reported meaning: Variable-speed outdoor-fan 1 current."
+    },
+    {
+      "type": "0x28",
+      "coordinate": "0x8e",
+      "kind": "value",
+      "value_type": "uint16",
+      "width": 2,
+      "label": "VFFan1DriverDCBusVolt",
+      "unit": "V",
+      "description": "Reported meaning: DC-bus voltage of the variable-speed outdoor-fan 1 drive."
+    },
+    {
+      "type": "0x28",
+      "coordinate": "0x90",
+      "kind": "value",
+      "value_type": "cfloat16base256",
+      "width": 2,
+      "label": "VFFan1DriverPowerCurrent",
+      "unit": "A",
+      "description": "Reported meaning: Supply current at the input of the variable-speed outdoor-fan 1 drive."
+    },
+    {
+      "type": "0x28",
+      "coordinate": "0x92",
+      "kind": "value",
+      "value_type": "uint8",
+      "width": 1,
+      "label": "VFFan1UPhaseCurrent",
+      "unit": "A",
+      "description": "Reported meaning: Phase-U current of variable-speed outdoor fan 1."
+    },
+    {
+      "type": "0x28",
+      "coordinate": "0x93",
+      "kind": "value",
+      "value_type": "uint8",
+      "width": 1,
+      "label": "VFFan1VPhaseCurrent",
+      "unit": "A",
+      "description": "Reported meaning: Phase-V current of variable-speed outdoor fan 1."
+    },
+    {
+      "type": "0x28",
+      "coordinate": "0x94",
+      "kind": "value",
+      "value_type": "uint8Multi2",
+      "width": 1,
+      "label": "VFFan1DriverACPowerVolt",
+      "unit": "V",
+      "notes": [
+        "The value type has no decode rule; only the raw byte is exposed."
+      ],
+      "description": "Reported meaning: Phase voltage at the AC input of the variable-speed outdoor-fan 1 drive."
+    },
+    {
+      "type": "0x28",
+      "coordinate": "0x95",
+      "kind": "value",
+      "value_type": "uint8",
+      "width": 1,
+      "label": "VFFan1RunningFreq",
+      "unit": "Hz",
+      "description": "Reported meaning: Operating frequency of variable-speed outdoor fan 1."
+    },
+    {
+      "type": "0x28",
+      "coordinate": "0x98",
+      "kind": "value",
+      "value_type": "cfloat16base256",
+      "width": 2,
+      "label": "VFFan2Current",
+      "unit": "A",
+      "description": "Reported meaning: Variable-speed outdoor-fan 2 current."
+    },
+    {
+      "type": "0x28",
+      "coordinate": "0x9a",
+      "kind": "value",
+      "value_type": "uint16",
+      "width": 2,
+      "label": "VFFan2DriverDCBusVolt",
+      "unit": "V",
+      "description": "Reported meaning: DC-bus voltage of the variable-speed outdoor-fan 2 drive."
+    },
+    {
+      "type": "0x28",
+      "coordinate": "0x9c",
+      "kind": "value",
+      "value_type": "cfloat16base256",
+      "width": 2,
+      "label": "VFFan2DriverPowerCurrent",
+      "unit": "A",
+      "description": "Reported meaning: Supply current at the input of the variable-speed outdoor-fan 2 drive."
+    },
+    {
+      "type": "0x28",
+      "coordinate": "0x9e",
+      "kind": "value",
+      "value_type": "uint8",
+      "width": 1,
+      "label": "VFFan2UPhaseCurrent",
+      "unit": "A",
+      "description": "Reported meaning: Phase-U current of variable-speed outdoor fan 2."
+    },
+    {
+      "type": "0x28",
+      "coordinate": "0x9f",
+      "kind": "value",
+      "value_type": "uint8",
+      "width": 1,
+      "label": "VFFan2VPhaseCurrent",
+      "unit": "A",
+      "description": "Reported meaning: Phase-V current of variable-speed outdoor fan 2."
+    },
+    {
+      "type": "0x28",
+      "coordinate": "0xa0",
+      "kind": "value",
+      "value_type": "uint8Multi2",
+      "width": 1,
+      "label": "VFFan2DriverACPowerVolt",
+      "unit": "V",
+      "notes": [
+        "The value type has no decode rule; only the raw byte is exposed."
+      ],
+      "description": "Reported meaning: Phase voltage of the AC supply at the input of the variable-speed outdoor-fan 2 drive."
+    },
+    {
+      "type": "0x28",
+      "coordinate": "0xa1",
+      "kind": "value",
+      "value_type": "uint8",
+      "width": 1,
+      "label": "VFFan2RunningFreq",
+      "unit": "Hz",
+      "description": "Reported meaning: Operating frequency of variable-speed outdoor fan 2."
+    },
+    {
+      "type": "0x28",
+      "coordinate": "0xaa",
+      "kind": "value",
+      "value_type": "cfloat16base256",
+      "width": 2,
+      "label": "VFCompressor2Current",
+      "unit": "A",
+      "description": "Reported meaning: Variable-speed compressor 2 current."
+    },
+    {
+      "type": "0x28",
+      "coordinate": "0xac",
+      "kind": "value",
+      "value_type": "uint16",
+      "width": 2,
+      "label": "VFCompressor2DCBusVolt",
+      "unit": "V",
+      "description": "Reported meaning: DC-bus voltage of the variable-speed compressor 2 drive."
+    },
+    {
+      "type": "0x28",
+      "coordinate": "0xae",
+      "kind": "value",
+      "value_type": "cfloat16base256",
+      "width": 2,
+      "label": "VFCompressor2PowerCurrent",
+      "unit": "A",
+      "description": "Reported meaning: Supply current at the input of the variable-speed compressor 2 drive."
+    },
+    {
+      "type": "0x28",
+      "coordinate": "0xb0",
+      "kind": "value",
+      "value_type": "uint8",
+      "width": 1,
+      "label": "VFCompressor2UPhaseCurrent",
+      "unit": "A",
+      "description": "Reported meaning: Phase-U current of variable-speed compressor 2."
+    },
+    {
+      "type": "0x28",
+      "coordinate": "0xb1",
+      "kind": "value",
+      "value_type": "uint8",
+      "width": 1,
+      "label": "VFCompressor2VPhaseCurrent",
+      "unit": "A",
+      "description": "Reported meaning: Phase-V current of variable-speed compressor 2."
+    },
+    {
+      "type": "0x28",
+      "coordinate": "0xb2",
+      "kind": "value",
+      "value_type": "uint8Multi2",
+      "width": 1,
+      "label": "VFCompressor2DriverACPowerVolt",
+      "unit": "V",
+      "notes": [
+        "The value type has no decode rule; only the raw byte is exposed."
+      ],
+      "description": "Reported meaning: Phase voltage at the AC input of the variable-speed compressor 2 drive."
+    },
+    {
+      "type": "0x28",
+      "coordinate": "0xb3",
+      "kind": "value",
+      "value_type": "uint8",
+      "width": 1,
+      "label": "VFCompressor2RunningFreq",
+      "unit": "Hz",
+      "description": "Reported meaning: Operating frequency of variable-speed compressor 2."
+    },
+    {
+      "type": "0x28",
+      "coordinate": "0xb4",
+      "kind": "value",
+      "value_type": "uint8",
+      "width": 1,
+      "label": "VFCompressor2DevSta",
+      "enumeration": [
+        {
+          "value": "0x00",
+          "label": "Stop"
+        },
+        {
+          "value": "0x01",
+          "label": "Running"
+        },
+        {
+          "value": "0x02",
+          "label": "Error"
+        }
+      ],
+      "description": "Reported meaning: Variable-speed compressor 2 equipment status."
+    },
+    {
+      "type": "0x28",
+      "coordinate": "0xb5",
+      "kind": "value",
+      "value_type": "uint8",
+      "width": 1,
+      "label": "VFCompressor2ProgramSta",
+      "enumeration": [
+        {
+          "value": "0x00",
+          "label": "Reset"
+        },
+        {
+          "value": "0x01",
+          "label": "Sampling"
+        },
+        {
+          "value": "0x02",
+          "label": "Wait"
+        },
+        {
+          "value": "0x03",
+          "label": "Input"
+        },
+        {
+          "value": "0x04",
+          "label": "Orientation"
+        },
+        {
+          "value": "0x05",
+          "label": "Startup"
+        },
+        {
+          "value": "0x06",
+          "label": "Running"
+        }
+      ],
+      "description": "Reported meaning: Variable-speed compressor 2 program operating status."
+    },
+    {
+      "type": "0x28",
+      "coordinate": "0xb6",
+      "kind": "value",
+      "value_type": "uint8",
+      "width": 1,
+      "label": "VFCompressor2ModelCode",
+      "description": "Reported meaning: Model code of variable-speed compressor 2."
+    },
+    {
+      "type": "0x28",
+      "coordinate": "0xb8",
+      "kind": "value",
+      "value_type": "cfloat16base256",
+      "width": 2,
+      "label": "VFCompressor3Current",
+      "unit": "A",
+      "description": "Reported meaning: Variable-speed compressor 3 current."
+    },
+    {
+      "type": "0x28",
+      "coordinate": "0xba",
+      "kind": "value",
+      "value_type": "uint16",
+      "width": 2,
+      "label": "VFCompressor3DCBusVolt",
+      "unit": "V",
+      "description": "Reported meaning: Compressor 3 bus voltage."
+    },
+    {
+      "type": "0x28",
+      "coordinate": "0xbe",
+      "kind": "value",
+      "value_type": "uint8",
+      "width": 1,
+      "label": "VFCompressor3UPhaseCurrent",
+      "unit": "A",
+      "description": "Reported meaning: Phase-U current of compressor 3."
+    },
+    {
+      "type": "0x28",
+      "coordinate": "0xbf",
+      "kind": "value",
+      "value_type": "uint8",
+      "width": 1,
+      "label": "VFCompressor3VPhaseCurrent",
+      "unit": "A",
+      "description": "Reported meaning: Phase-V current of compressor 3."
+    },
+    {
+      "type": "0x28",
+      "coordinate": "0xc1",
+      "kind": "value",
+      "value_type": "uint8",
+      "width": 1,
+      "label": "VFCompressor3RunningFreq",
+      "unit": "Hz",
+      "description": "Reported meaning: Operating frequency of variable-speed compressor 3, operating frequency of compressor 3."
+    },
+    {
+      "type": "0x28",
+      "coordinate": "0xc3",
+      "kind": "value",
+      "value_type": "uint8",
+      "width": 1,
+      "label": "VFCompressor3WorkStatus",
+      "enumeration": [
+        {
+          "value": "0x00",
+          "label": "Reset"
+        },
+        {
+          "value": "0x01",
+          "label": "SamplingExcursionCalculate"
+        },
+        {
+          "value": "0x02",
+          "label": "Wait"
+        },
+        {
+          "value": "0x03",
+          "label": "Input"
+        },
+        {
+          "value": "0x04",
+          "label": "Orientation"
+        },
+        {
+          "value": "0x05",
+          "label": "Startup"
+        },
+        {
+          "value": "0x06",
+          "label": "Running"
+        }
+      ],
+      "description": "Reported meaning: Compressor 3 operating status."
+    },
+    {
+      "type": "0x28",
+      "coordinate": "0xc8",
+      "kind": "value",
+      "value_type": "uint8Minus100",
+      "width": 1,
+      "label": "ODUEXVDesOHQTY",
+      "description": "Reported meaning: Target superheat of the outdoor electronic expansion valve."
+    },
+    {
+      "type": "0x28",
+      "coordinate": "0xc9",
+      "kind": "value",
+      "value_type": "uint8Minus100",
+      "width": 1,
+      "label": "CoolerTartgetLiquidOutTemp",
+      "unit": "\u2103",
+      "description": "Reported meaning: Target liquid temperature at the subcooler outlet."
+    },
+    {
+      "type": "0x28",
+      "coordinate": "0xca",
+      "kind": "value",
+      "value_type": "uint8Minus100",
+      "width": 1,
+      "label": "CoolerTartgetCoolerTemp",
+      "unit": "\u2103",
+      "description": "Reported meaning: Target subcooling temperature of the subcooler."
+    },
+    {
+      "type": "0x28",
+      "coordinate": "0xdc",
+      "kind": "value",
+      "value_type": "uint8",
+      "width": 1,
+      "label": "ModbusAddr",
+      "description": "Reported meaning: Modbus address."
+    },
+    {
+      "type": "0x31",
+      "coordinate": "0x00",
+      "kind": "value",
+      "value_type": "uint16",
+      "width": 2,
+      "label": "RunningEXV1",
+      "unit": "Pls",
+      "description": "Reported meaning: Electronic expansion valve 1 in operation."
+    },
+    {
+      "type": "0x31",
+      "coordinate": "0x02",
+      "kind": "value",
+      "value_type": "uint16",
+      "width": 2,
+      "label": "DesiredEXV1",
+      "unit": "Pls",
+      "description": "Reported meaning: Target value of electronic expansion valve 1."
+    },
+    {
+      "type": "0x31",
+      "coordinate": "0x04",
+      "kind": "value",
+      "value_type": "uint16",
+      "width": 2,
+      "label": "DesiredEXV2",
+      "unit": "Pls",
+      "description": "Reported meaning: Target value of electronic expansion valve 2."
+    },
+    {
+      "type": "0x31",
+      "coordinate": "0x06",
+      "kind": "value",
+      "value_type": "uint16",
+      "width": 2,
+      "label": "IDUFanActualRotateSpeed",
+      "description": "Reported meaning: Indoor fan speed."
+    },
+    {
+      "type": "0x31",
+      "coordinate": "0x08",
+      "kind": "value",
+      "value_type": "uint16",
+      "width": 2,
+      "label": "IDUFanAimRotateSpeed",
+      "description": "Reported meaning: Indoor fan target speed."
+    },
+    {
+      "type": "0x31",
+      "coordinate": "0x0a",
+      "kind": "value",
+      "value_type": "uint16Minus1000Devide10",
+      "width": 2,
+      "label": "IndoorEnvTemp1",
+      "notes": [
+        "High-precision ambient temperature."
+      ],
+      "description": "Reported meaning: Indoor ambient temperature."
+    },
+    {
+      "type": "0x31",
+      "coordinate": "0x0e",
+      "kind": "value",
+      "value_type": "uint16",
+      "width": 2,
+      "label": "RunningEXV2",
+      "description": "Reported meaning: EXV2."
+    },
+    {
+      "type": "0x31",
+      "coordinate": "0x12",
+      "kind": "value",
+      "value_type": "uint16Minus1000Devide10",
+      "width": 2,
+      "label": "USWtempInWT",
+      "description": "Reported meaning: Water temperature in the upper part of the tank, high precision."
+    },
+    {
+      "type": "0x31",
+      "coordinate": "0x14",
+      "kind": "value",
+      "value_type": "uint16Minus1000Devide10",
+      "width": 2,
+      "label": "LSWtemInWT",
+      "description": "Reported meaning: Water temperature in the lower part of the tank, high precision."
+    },
+    {
+      "type": "0x31",
+      "coordinate": "0x16",
+      "kind": "value",
+      "value_type": "uint16Minus1000Devide10",
+      "width": 2,
+      "label": "IWTempOfGenerator",
+      "description": "Reported meaning: Generator inlet water temperature."
+    },
+    {
+      "type": "0x31",
+      "coordinate": "0x18",
+      "kind": "value",
+      "value_type": "uint16Minus1000Devide10",
+      "width": 2,
+      "label": "OWTempOfGenerator",
+      "description": "Reported meaning: Generator outlet water temperature."
+    },
+    {
+      "type": "0x31",
+      "coordinate": "0x22",
+      "kind": "value",
+      "value_type": "uint16Minus1000Devide10",
+      "width": 2,
+      "label": "IDUBodyTem",
+      "description": "Reported meaning: Indoor perceived temperature."
+    },
+    {
+      "type": "0x31",
+      "coordinate": "0x50",
+      "kind": "value",
+      "value_type": "uint16Devide10",
+      "width": 2,
+      "label": "DevGroupCoolingCapRequired",
+      "unit": "kW",
+      "presentation_converter": "kWVskBtuh",
+      "description": "Reported meaning: Cooling capacity demand of the complete unit."
+    },
+    {
+      "type": "0x31",
+      "coordinate": "0x52",
+      "kind": "value",
+      "value_type": "uint16Devide10",
+      "width": 2,
+      "label": "DevGroupHeatingingCapRequired",
+      "unit": "kW",
+      "presentation_converter": "kWVskBtuh",
+      "description": "Reported meaning: Heating capacity demand of the complete unit."
+    },
+    {
+      "type": "0x31",
+      "coordinate": "0x54",
+      "kind": "value",
+      "value_type": "uint16Devide10",
+      "width": 2,
+      "label": "DevGroupRunningCap",
+      "unit": "kW",
+      "presentation_converter": "kWVskBtuh",
+      "description": "Reported meaning: Operating capacity of the complete unit."
+    },
+    {
+      "type": "0x31",
+      "coordinate": "0x56",
+      "kind": "value",
+      "value_type": "uint16Devide10",
+      "width": 2,
+      "label": "DevGroupDesiredCap",
+      "unit": "kW",
+      "presentation_converter": "kWVskBtuh",
+      "description": "Reported meaning: Target operating capacity of the complete unit."
+    },
+    {
+      "type": "0x31",
+      "coordinate": "0x58",
+      "kind": "value",
+      "value_type": "uint16Devide10",
+      "width": 2,
+      "label": "SysHotwaterCap",
+      "unit": "kW",
+      "presentation_converter": "kWVskBtuh",
+      "description": "Reported meaning: Hot-water capacity demand of the complete unit."
+    },
+    {
+      "type": "0x31",
+      "coordinate": "0x5a",
+      "kind": "value",
+      "value_type": "uint16Devide10",
+      "width": 2,
+      "label": "SysFloorHeaterCap",
+      "unit": "kW",
+      "presentation_converter": "kWVskBtuh",
+      "description": "Reported meaning: Floor-heating capacity demand of the complete unit."
+    },
+    {
+      "type": "0x31",
+      "coordinate": "0x5f",
+      "kind": "value",
+      "value_type": "uint16",
+      "width": 2,
+      "label": "Comp1SumRunTime",
+      "unit": "h",
+      "description": "Reported meaning: Cumulative operating duration of compressor 1."
+    },
+    {
+      "type": "0x31",
+      "coordinate": "0x61",
+      "kind": "value",
+      "value_type": "uint16",
+      "width": 2,
+      "label": "Comp2SumRunTime",
+      "unit": "h",
+      "description": "Reported meaning: Cumulative operating time of compressor 2."
+    },
+    {
+      "type": "0x31",
+      "coordinate": "0x63",
+      "kind": "value",
+      "value_type": "uint16",
+      "width": 2,
+      "label": "Comp3SumRunTime",
+      "unit": "h",
+      "description": "Reported meaning: Cumulative operating time of compressor 3."
+    },
+    {
+      "type": "0x31",
+      "coordinate": "0x65",
+      "kind": "value",
+      "value_type": "uint16",
+      "width": 2,
+      "label": "Comp4SumRunTime",
+      "unit": "h",
+      "description": "Reported meaning: Cumulative operating time of compressor 4."
+    },
+    {
+      "type": "0x31",
+      "coordinate": "0x67",
+      "kind": "value",
+      "value_type": "uint16",
+      "width": 2,
+      "label": "Comp5SumRunTime",
+      "unit": "h",
+      "description": "Reported meaning: Cumulative operating time of compressor 5."
+    },
+    {
+      "type": "0x31",
+      "coordinate": "0x69",
+      "kind": "value",
+      "value_type": "uint16",
+      "width": 2,
+      "label": "Comp6SumRunTime",
+      "unit": "h",
+      "description": "Reported meaning: Cumulative operating time of compressor 6."
+    },
+    {
+      "type": "0x31",
+      "coordinate": "0x6b",
+      "kind": "value",
+      "value_type": "uint16",
+      "width": 2,
+      "label": "Comp1OnTimes",
+      "description": "Reported meaning: Number of starts/stops of compressor 1."
+    },
+    {
+      "type": "0x31",
+      "coordinate": "0x6d",
+      "kind": "value",
+      "value_type": "uint16",
+      "width": 2,
+      "label": "Comp2OnTimes",
+      "description": "Reported meaning: Number of starts/stops of compressor 2."
+    },
+    {
+      "type": "0x31",
+      "coordinate": "0x6f",
+      "kind": "value",
+      "value_type": "uint16",
+      "width": 2,
+      "label": "Comp3OnTimes",
+      "description": "Reported meaning: Number of starts and stops of compressor 3."
+    },
+    {
+      "type": "0x31",
+      "coordinate": "0x71",
+      "kind": "value",
+      "value_type": "uint16",
+      "width": 2,
+      "label": "Comp4OnTimes",
+      "description": "Reported meaning: Number of starts and stops of compressor 4."
+    },
+    {
+      "type": "0x31",
+      "coordinate": "0x73",
+      "kind": "value",
+      "value_type": "uint16",
+      "width": 2,
+      "label": "Comp5OnTimes",
+      "description": "Reported meaning: Number of starts and stops of compressor 5."
+    },
+    {
+      "type": "0x31",
+      "coordinate": "0x75",
+      "kind": "value",
+      "value_type": "uint16",
+      "width": 2,
+      "label": "Comp6OnTimes",
+      "description": "Reported meaning: Number of starts and stops of compressor 6."
+    },
+    {
+      "type": "0x31",
+      "coordinate": "0x77",
+      "kind": "value",
+      "value_type": "uint16",
+      "width": 2,
+      "label": "HeatSumTime",
+      "unit": "h",
+      "description": "Reported meaning: Cumulative heating duration."
+    },
+    {
+      "type": "0x31",
+      "coordinate": "0x79",
+      "kind": "value",
+      "value_type": "uint16",
+      "width": 2,
+      "label": "HeatDf_RoSumTime",
+      "description": "Reported meaning: Cumulative number of defrosts/oil returns in heating."
+    },
+    {
+      "type": "0x31",
+      "coordinate": "0x7b",
+      "kind": "value",
+      "value_type": "uint16",
+      "width": 2,
+      "label": "CoolRoSumTime",
+      "description": "Reported meaning: Cumulative number of oil returns in cooling."
+    },
+    {
+      "type": "0x31",
+      "coordinate": "0x7d",
+      "kind": "value",
+      "value_type": "uint16",
+      "width": 2,
+      "label": "CoolLPSumRunTime",
+      "unit": "h",
+      "description": "Reported meaning: Cumulative duration of low-load operation in cooling."
+    },
+    {
+      "type": "0x31",
+      "coordinate": "0x7f",
+      "kind": "value",
+      "value_type": "uint16",
+      "width": 2,
+      "label": "CoolHPSumRunTime",
+      "unit": "h",
+      "description": "Reported meaning: Cumulative duration of high-load operation in cooling."
+    },
+    {
+      "type": "0x31",
+      "coordinate": "0x81",
+      "kind": "value",
+      "value_type": "uint16",
+      "width": 2,
+      "label": "HeatLPSumRunTime",
+      "unit": "h",
+      "description": "Reported meaning: Cumulative duration of low-load operation in heating."
+    },
+    {
+      "type": "0x31",
+      "coordinate": "0x83",
+      "kind": "value",
+      "value_type": "uint16",
+      "width": 2,
+      "label": "HeatHPSumRunTime",
+      "unit": "h",
+      "description": "Reported meaning: Cumulative duration of high-load operation in heating."
+    },
+    {
+      "type": "0x31",
+      "coordinate": "0x85",
+      "kind": "value",
+      "value_type": "uint16",
+      "width": 2,
+      "label": "RunningCap",
+      "unit": "\u2030",
+      "notes": [
+        "Running capacity of the own module in per mille. The relation to the rated capacity 10:0e is not documented; the value is neither a delivered thermal power nor a duty cycle."
+      ],
+      "description": "Reported meaning: Operating capacity of the own unit."
+    },
+    {
+      "type": "0x31",
+      "coordinate": "0x87",
+      "kind": "value",
+      "value_type": "uint16",
+      "width": 2,
+      "label": "RunningCapPercentage",
+      "unit": "\u2030",
+      "notes": [
+        "Target capacity of the own module in per mille. The relation to the rated capacity 10:0e is not documented."
+      ],
+      "description": "Reported meaning: Target capacity percentage of the own unit."
+    },
+    {
+      "type": "0x31",
+      "coordinate": "0x89",
+      "kind": "value",
+      "value_type": "uint16Devide10",
+      "width": 2,
+      "label": "AssignedCap",
+      "unit": "kW",
+      "presentation_converter": "kWVskBtuh",
+      "description": "Reported meaning: Capacity allocated to the own unit."
+    },
+    {
+      "type": "0x31",
+      "coordinate": "0x8b",
+      "kind": "value",
+      "value_type": "uint16",
+      "width": 2,
+      "label": "EXV1",
+      "unit": "Pls",
+      "description": "Reported meaning: Outdoor-unit electronic expansion valve in heating."
+    },
+    {
+      "type": "0x31",
+      "coordinate": "0x8d",
+      "kind": "value",
+      "value_type": "uint16",
+      "width": 2,
+      "label": "EXV2",
+      "unit": "Pls",
+      "description": "Reported meaning: Subcooler electronic expansion valve."
+    },
+    {
+      "type": "0x31",
+      "coordinate": "0x8f",
+      "kind": "value",
+      "value_type": "uint16",
+      "width": 2,
+      "label": "EXV3",
+      "unit": "Pls",
+      "description": "Reported meaning: Outdoor-unit electronic expansion valve 2 in heating."
+    },
+    {
+      "type": "0x31",
+      "coordinate": "0x91",
+      "kind": "value",
+      "value_type": "uint16",
+      "width": 2,
+      "label": "AbsHP",
+      "unit": "kPa",
+      "presentation_converter": "kPaVsinWG",
+      "notes": [
+        "Absolute pressure."
+      ],
+      "description": "Reported meaning: Module absolute high pressure."
+    },
+    {
+      "type": "0x31",
+      "coordinate": "0x93",
+      "kind": "value",
+      "value_type": "uint16",
+      "width": 2,
+      "label": "AbsLP",
+      "unit": "kPa",
+      "presentation_converter": "kPaVsinWG",
+      "notes": [
+        "Absolute pressure."
+      ],
+      "description": "Reported meaning: Module absolute low pressure."
+    },
+    {
+      "type": "0x31",
+      "coordinate": "0x95",
+      "kind": "value",
+      "value_type": "uint16",
+      "width": 2,
+      "label": "PHEXV1",
+      "unit": "Pls",
+      "description": "Reported meaning: Vapor-injection electronic expansion valve 1."
+    },
+    {
+      "type": "0x31",
+      "coordinate": "0x97",
+      "kind": "value",
+      "value_type": "uint16",
+      "width": 2,
+      "label": "PHEXV2",
+      "unit": "Pls",
+      "description": "Reported meaning: Vapor-injection electronic expansion valve 2."
+    },
+    {
+      "type": "0x31",
+      "coordinate": "0xa8",
+      "kind": "value",
+      "value_type": "uint16",
+      "width": 2,
+      "label": "Compressor1DriverInputPower",
+      "unit": "10W",
+      "description": "Reported meaning: Input power of compressor 1 drive."
+    },
+    {
+      "type": "0x32",
+      "coordinate": "0x00",
+      "kind": "value",
+      "value_type": "uint16",
+      "width": 2,
+      "label": "IDUContinueRunningTime",
+      "description": "Reported meaning: Continuous operating duration of the indoor unit."
+    },
+    {
+      "type": "0x32",
+      "coordinate": "0x02",
+      "kind": "value",
+      "value_type": "uint16",
+      "width": 2,
+      "label": "IDUAccumulateRunningTime",
+      "description": "Reported meaning: Cumulative operating duration of the indoor unit."
+    },
+    {
+      "type": "0x32",
+      "coordinate": "0x50",
+      "kind": "value",
+      "value_type": "uint16",
+      "width": 2,
+      "label": "MemoryErrorCode1",
+      "enumeration": [
+        {
+          "value": "0x6241",
+          "label": "bA"
+        },
+        {
+          "value": "0x4332",
+          "label": "C2"
+        },
+        {
+          "value": "0x4333",
+          "label": "C3"
+        },
+        {
+          "value": "0x4531",
+          "label": "E1"
+        },
+        {
+          "value": "0x4532",
+          "label": "E2"
+        },
+        {
+          "value": "0x4533",
+          "label": "E3"
+        },
+        {
+          "value": "0x4534",
+          "label": "E4"
+        },
+        {
+          "value": "0x4535",
+          "label": "E5"
+        },
+        {
+          "value": "0x4536",
+          "label": "E6"
+        },
+        {
+          "value": "0x4562",
+          "label": "Eb"
+        },
+        {
+          "value": "0x4564",
+          "label": "Ed"
+        },
+        {
+          "value": "0x4555",
+          "label": "EU"
+        },
+        {
+          "value": "0x4730",
+          "label": "G0"
+        },
+        {
+          "value": "0x4731",
+          "label": "G1"
+        },
+        {
+          "value": "0x4732",
+          "label": "G2"
+        },
+        {
+          "value": "0x4733",
+          "label": "G3"
+        },
+        {
+          "value": "0x4734",
+          "label": "G4"
+        },
+        {
+          "value": "0x4735",
+          "label": "G5"
+        },
+        {
+          "value": "0x4736",
+          "label": "G6"
+        },
+        {
+          "value": "0x4737",
+          "label": "G7"
+        },
+        {
+          "value": "0x4738",
+          "label": "G8"
+        },
+        {
+          "value": "0x4739",
+          "label": "G9"
+        },
+        {
+          "value": "0x4741",
+          "label": "GA"
+        },
+        {
+          "value": "0x4759",
+          "label": "GY"
+        },
+        {
+          "value": "0x4779",
+          "label": "Gy"
+        },
+        {
+          "value": "0x4833",
+          "label": "H3"
+        },
+        {
+          "value": "0x4835",
+          "label": "H5"
+        },
+        {
+          "value": "0x4836",
+          "label": "H6"
+        },
+        {
+          "value": "0x4837",
+          "label": "H7"
+        },
+        {
+          "value": "0x4838",
+          "label": "H8"
+        },
+        {
+          "value": "0x4839",
+          "label": "H9"
+        },
+        {
+          "value": "0x4843",
+          "label": "HC"
+        },
+        {
+          "value": "0x4845",
+          "label": "HE"
+        },
+        {
+          "value": "0x4848",
+          "label": "HH"
+        },
+        {
+          "value": "0x484a",
+          "label": "HJ"
+        },
+        {
+          "value": "0x484c",
+          "label": "HL"
+        },
+        {
+          "value": "0x4850",
+          "label": "HP"
+        },
+        {
+          "value": "0x4a31",
+          "label": "J1"
+        },
+        {
+          "value": "0x4a32",
+          "label": "J2"
+        },
+        {
+          "value": "0x4a37",
+          "label": "J7"
+        },
+        {
+          "value": "0x4a38",
+          "label": "J8"
+        },
+        {
+          "value": "0x4a39",
+          "label": "J9"
+        },
+        {
+          "value": "0x4a41",
+          "label": "JA"
+        },
+        {
+          "value": "0x4a43",
+          "label": "JC"
+        },
+        {
+          "value": "0x4a45",
+          "label": "JE"
+        },
+        {
+          "value": "0x4a46",
+          "label": "JF"
+        },
+        {
+          "value": "0x4a4c",
+          "label": "JL"
+        },
+        {
+          "value": "0x5033",
+          "label": "P3"
+        },
+        {
+          "value": "0x5034",
+          "label": "P4"
+        },
+        {
+          "value": "0x5035",
+          "label": "P5"
+        },
+        {
+          "value": "0x5036",
+          "label": "P6"
+        },
+        {
+          "value": "0x5037",
+          "label": "P7"
+        },
+        {
+          "value": "0x5038",
+          "label": "P8"
+        },
+        {
+          "value": "0x5039",
+          "label": "P9"
+        },
+        {
+          "value": "0x5043",
+          "label": "PC"
+        },
+        {
+          "value": "0x5045",
+          "label": "PE"
+        },
+        {
+          "value": "0x5046",
+          "label": "PF"
+        },
+        {
+          "value": "0x5048",
+          "label": "PH"
+        },
+        {
+          "value": "0x504a",
+          "label": "PJ"
+        },
+        {
+          "value": "0x504c",
+          "label": "PL"
+        },
+        {
+          "value": "0x5062",
+          "label": "Pb"
+        },
+        {
+          "value": "0x5064",
+          "label": "Pd"
+        },
+        {
+          "value": "0x5534",
+          "label": "U4"
+        },
+        {
+          "value": "0x5555",
+          "label": "UU"
+        },
+        {
+          "value": "0x5550",
+          "label": "UP"
+        },
+        {
+          "value": "0x0000",
+          "label": "U5"
+        },
+        {
+          "value": "0xffff",
+          "label": "U5"
+        }
+      ],
+      "notes": [
+        "Stored fault code. Raw 0x0000 and raw 0xffff carry the same label; neither is declared as no fault. The first stored code is not the current fault, and no register is defined as the currently displayed fault code."
+      ],
+      "description": "Reported meaning: Stored fault code 1; Photovoltaic fault-history display."
+    },
+    {
+      "type": "0x32",
+      "coordinate": "0x52",
+      "kind": "value",
+      "value_type": "uint16",
+      "width": 2,
+      "label": "MemoryErrorCode2",
+      "enumeration": [
+        {
+          "value": "0x6241",
+          "label": "bA"
+        },
+        {
+          "value": "0x4332",
+          "label": "C2"
+        },
+        {
+          "value": "0x4333",
+          "label": "C3"
+        },
+        {
+          "value": "0x4531",
+          "label": "E1"
+        },
+        {
+          "value": "0x4532",
+          "label": "E2"
+        },
+        {
+          "value": "0x4533",
+          "label": "E3"
+        },
+        {
+          "value": "0x4534",
+          "label": "E4"
+        },
+        {
+          "value": "0x4535",
+          "label": "E5"
+        },
+        {
+          "value": "0x4536",
+          "label": "E6"
+        },
+        {
+          "value": "0x4562",
+          "label": "Eb"
+        },
+        {
+          "value": "0x4564",
+          "label": "Ed"
+        },
+        {
+          "value": "0x4555",
+          "label": "EU"
+        },
+        {
+          "value": "0x4730",
+          "label": "G0"
+        },
+        {
+          "value": "0x4731",
+          "label": "G1"
+        },
+        {
+          "value": "0x4732",
+          "label": "G2"
+        },
+        {
+          "value": "0x4733",
+          "label": "G3"
+        },
+        {
+          "value": "0x4734",
+          "label": "G4"
+        },
+        {
+          "value": "0x4735",
+          "label": "G5"
+        },
+        {
+          "value": "0x4736",
+          "label": "G6"
+        },
+        {
+          "value": "0x4737",
+          "label": "G7"
+        },
+        {
+          "value": "0x4738",
+          "label": "G8"
+        },
+        {
+          "value": "0x4739",
+          "label": "G9"
+        },
+        {
+          "value": "0x4741",
+          "label": "GA"
+        },
+        {
+          "value": "0x4759",
+          "label": "GY"
+        },
+        {
+          "value": "0x4779",
+          "label": "Gy"
+        },
+        {
+          "value": "0x4833",
+          "label": "H3"
+        },
+        {
+          "value": "0x4835",
+          "label": "H5"
+        },
+        {
+          "value": "0x4836",
+          "label": "H6"
+        },
+        {
+          "value": "0x4837",
+          "label": "H7"
+        },
+        {
+          "value": "0x4838",
+          "label": "H8"
+        },
+        {
+          "value": "0x4839",
+          "label": "H9"
+        },
+        {
+          "value": "0x4843",
+          "label": "HC"
+        },
+        {
+          "value": "0x4845",
+          "label": "HE"
+        },
+        {
+          "value": "0x4848",
+          "label": "HH"
+        },
+        {
+          "value": "0x484a",
+          "label": "HJ"
+        },
+        {
+          "value": "0x484c",
+          "label": "HL"
+        },
+        {
+          "value": "0x4850",
+          "label": "HP"
+        },
+        {
+          "value": "0x4a31",
+          "label": "J1"
+        },
+        {
+          "value": "0x4a32",
+          "label": "J2"
+        },
+        {
+          "value": "0x4a37",
+          "label": "J7"
+        },
+        {
+          "value": "0x4a38",
+          "label": "J8"
+        },
+        {
+          "value": "0x4a39",
+          "label": "J9"
+        },
+        {
+          "value": "0x4a41",
+          "label": "JA"
+        },
+        {
+          "value": "0x4a43",
+          "label": "JC"
+        },
+        {
+          "value": "0x4a45",
+          "label": "JE"
+        },
+        {
+          "value": "0x4a46",
+          "label": "JF"
+        },
+        {
+          "value": "0x4a4c",
+          "label": "JL"
+        },
+        {
+          "value": "0x5033",
+          "label": "P3"
+        },
+        {
+          "value": "0x5034",
+          "label": "P4"
+        },
+        {
+          "value": "0x5035",
+          "label": "P5"
+        },
+        {
+          "value": "0x5036",
+          "label": "P6"
+        },
+        {
+          "value": "0x5037",
+          "label": "P7"
+        },
+        {
+          "value": "0x5038",
+          "label": "P8"
+        },
+        {
+          "value": "0x5039",
+          "label": "P9"
+        },
+        {
+          "value": "0x5043",
+          "label": "PC"
+        },
+        {
+          "value": "0x5045",
+          "label": "PE"
+        },
+        {
+          "value": "0x5046",
+          "label": "PF"
+        },
+        {
+          "value": "0x5048",
+          "label": "PH"
+        },
+        {
+          "value": "0x504a",
+          "label": "PJ"
+        },
+        {
+          "value": "0x504c",
+          "label": "PL"
+        },
+        {
+          "value": "0x5062",
+          "label": "Pb"
+        },
+        {
+          "value": "0x5064",
+          "label": "Pd"
+        },
+        {
+          "value": "0x5534",
+          "label": "U4"
+        },
+        {
+          "value": "0x5555",
+          "label": "UU"
+        },
+        {
+          "value": "0x5550",
+          "label": "UP"
+        },
+        {
+          "value": "0x0000",
+          "label": "U5"
+        },
+        {
+          "value": "0xffff",
+          "label": "U5"
+        }
+      ],
+      "notes": [
+        "Stored fault code. Raw 0x0000 and raw 0xffff carry the same label; neither is declared as no fault. The first stored code is not the current fault, and no register is defined as the currently displayed fault code."
+      ],
+      "description": "Reported meaning: Stored fault code 2; Photovoltaic fault-history display."
+    },
+    {
+      "type": "0x32",
+      "coordinate": "0x54",
+      "kind": "value",
+      "value_type": "uint16",
+      "width": 2,
+      "label": "MemoryErrorCode3",
+      "enumeration": [
+        {
+          "value": "0x6241",
+          "label": "bA"
+        },
+        {
+          "value": "0x4332",
+          "label": "C2"
+        },
+        {
+          "value": "0x4333",
+          "label": "C3"
+        },
+        {
+          "value": "0x4531",
+          "label": "E1"
+        },
+        {
+          "value": "0x4532",
+          "label": "E2"
+        },
+        {
+          "value": "0x4533",
+          "label": "E3"
+        },
+        {
+          "value": "0x4534",
+          "label": "E4"
+        },
+        {
+          "value": "0x4535",
+          "label": "E5"
+        },
+        {
+          "value": "0x4536",
+          "label": "E6"
+        },
+        {
+          "value": "0x4562",
+          "label": "Eb"
+        },
+        {
+          "value": "0x4564",
+          "label": "Ed"
+        },
+        {
+          "value": "0x4555",
+          "label": "EU"
+        },
+        {
+          "value": "0x4730",
+          "label": "G0"
+        },
+        {
+          "value": "0x4731",
+          "label": "G1"
+        },
+        {
+          "value": "0x4732",
+          "label": "G2"
+        },
+        {
+          "value": "0x4733",
+          "label": "G3"
+        },
+        {
+          "value": "0x4734",
+          "label": "G4"
+        },
+        {
+          "value": "0x4735",
+          "label": "G5"
+        },
+        {
+          "value": "0x4736",
+          "label": "G6"
+        },
+        {
+          "value": "0x4737",
+          "label": "G7"
+        },
+        {
+          "value": "0x4738",
+          "label": "G8"
+        },
+        {
+          "value": "0x4739",
+          "label": "G9"
+        },
+        {
+          "value": "0x4741",
+          "label": "GA"
+        },
+        {
+          "value": "0x4759",
+          "label": "GY"
+        },
+        {
+          "value": "0x4779",
+          "label": "Gy"
+        },
+        {
+          "value": "0x4833",
+          "label": "H3"
+        },
+        {
+          "value": "0x4835",
+          "label": "H5"
+        },
+        {
+          "value": "0x4836",
+          "label": "H6"
+        },
+        {
+          "value": "0x4837",
+          "label": "H7"
+        },
+        {
+          "value": "0x4838",
+          "label": "H8"
+        },
+        {
+          "value": "0x4839",
+          "label": "H9"
+        },
+        {
+          "value": "0x4843",
+          "label": "HC"
+        },
+        {
+          "value": "0x4845",
+          "label": "HE"
+        },
+        {
+          "value": "0x4848",
+          "label": "HH"
+        },
+        {
+          "value": "0x484a",
+          "label": "HJ"
+        },
+        {
+          "value": "0x484c",
+          "label": "HL"
+        },
+        {
+          "value": "0x4850",
+          "label": "HP"
+        },
+        {
+          "value": "0x4a31",
+          "label": "J1"
+        },
+        {
+          "value": "0x4a32",
+          "label": "J2"
+        },
+        {
+          "value": "0x4a37",
+          "label": "J7"
+        },
+        {
+          "value": "0x4a38",
+          "label": "J8"
+        },
+        {
+          "value": "0x4a39",
+          "label": "J9"
+        },
+        {
+          "value": "0x4a41",
+          "label": "JA"
+        },
+        {
+          "value": "0x4a43",
+          "label": "JC"
+        },
+        {
+          "value": "0x4a45",
+          "label": "JE"
+        },
+        {
+          "value": "0x4a46",
+          "label": "JF"
+        },
+        {
+          "value": "0x4a4c",
+          "label": "JL"
+        },
+        {
+          "value": "0x5033",
+          "label": "P3"
+        },
+        {
+          "value": "0x5034",
+          "label": "P4"
+        },
+        {
+          "value": "0x5035",
+          "label": "P5"
+        },
+        {
+          "value": "0x5036",
+          "label": "P6"
+        },
+        {
+          "value": "0x5037",
+          "label": "P7"
+        },
+        {
+          "value": "0x5038",
+          "label": "P8"
+        },
+        {
+          "value": "0x5039",
+          "label": "P9"
+        },
+        {
+          "value": "0x5043",
+          "label": "PC"
+        },
+        {
+          "value": "0x5045",
+          "label": "PE"
+        },
+        {
+          "value": "0x5046",
+          "label": "PF"
+        },
+        {
+          "value": "0x5048",
+          "label": "PH"
+        },
+        {
+          "value": "0x504a",
+          "label": "PJ"
+        },
+        {
+          "value": "0x504c",
+          "label": "PL"
+        },
+        {
+          "value": "0x5062",
+          "label": "Pb"
+        },
+        {
+          "value": "0x5064",
+          "label": "Pd"
+        },
+        {
+          "value": "0x5534",
+          "label": "U4"
+        },
+        {
+          "value": "0x5555",
+          "label": "UU"
+        },
+        {
+          "value": "0x5550",
+          "label": "UP"
+        },
+        {
+          "value": "0x0000",
+          "label": "U5"
+        },
+        {
+          "value": "0xffff",
+          "label": "U5"
+        }
+      ],
+      "notes": [
+        "Stored fault code. Raw 0x0000 and raw 0xffff carry the same label; neither is declared as no fault. The first stored code is not the current fault, and no register is defined as the currently displayed fault code."
+      ],
+      "description": "Reported meaning: Stored fault code 3; Photovoltaic fault-history display."
+    },
+    {
+      "type": "0x32",
+      "coordinate": "0x56",
+      "kind": "value",
+      "value_type": "uint16",
+      "width": 2,
+      "label": "MemoryErrorCode4",
+      "enumeration": [
+        {
+          "value": "0x6241",
+          "label": "bA"
+        },
+        {
+          "value": "0x4332",
+          "label": "C2"
+        },
+        {
+          "value": "0x4333",
+          "label": "C3"
+        },
+        {
+          "value": "0x4531",
+          "label": "E1"
+        },
+        {
+          "value": "0x4532",
+          "label": "E2"
+        },
+        {
+          "value": "0x4533",
+          "label": "E3"
+        },
+        {
+          "value": "0x4534",
+          "label": "E4"
+        },
+        {
+          "value": "0x4535",
+          "label": "E5"
+        },
+        {
+          "value": "0x4536",
+          "label": "E6"
+        },
+        {
+          "value": "0x4562",
+          "label": "Eb"
+        },
+        {
+          "value": "0x4564",
+          "label": "Ed"
+        },
+        {
+          "value": "0x4555",
+          "label": "EU"
+        },
+        {
+          "value": "0x4730",
+          "label": "G0"
+        },
+        {
+          "value": "0x4731",
+          "label": "G1"
+        },
+        {
+          "value": "0x4732",
+          "label": "G2"
+        },
+        {
+          "value": "0x4733",
+          "label": "G3"
+        },
+        {
+          "value": "0x4734",
+          "label": "G4"
+        },
+        {
+          "value": "0x4735",
+          "label": "G5"
+        },
+        {
+          "value": "0x4736",
+          "label": "G6"
+        },
+        {
+          "value": "0x4737",
+          "label": "G7"
+        },
+        {
+          "value": "0x4738",
+          "label": "G8"
+        },
+        {
+          "value": "0x4739",
+          "label": "G9"
+        },
+        {
+          "value": "0x4741",
+          "label": "GA"
+        },
+        {
+          "value": "0x4759",
+          "label": "GY"
+        },
+        {
+          "value": "0x4779",
+          "label": "Gy"
+        },
+        {
+          "value": "0x4833",
+          "label": "H3"
+        },
+        {
+          "value": "0x4835",
+          "label": "H5"
+        },
+        {
+          "value": "0x4836",
+          "label": "H6"
+        },
+        {
+          "value": "0x4837",
+          "label": "H7"
+        },
+        {
+          "value": "0x4838",
+          "label": "H8"
+        },
+        {
+          "value": "0x4839",
+          "label": "H9"
+        },
+        {
+          "value": "0x4843",
+          "label": "HC"
+        },
+        {
+          "value": "0x4845",
+          "label": "HE"
+        },
+        {
+          "value": "0x4848",
+          "label": "HH"
+        },
+        {
+          "value": "0x484a",
+          "label": "HJ"
+        },
+        {
+          "value": "0x484c",
+          "label": "HL"
+        },
+        {
+          "value": "0x4850",
+          "label": "HP"
+        },
+        {
+          "value": "0x4a31",
+          "label": "J1"
+        },
+        {
+          "value": "0x4a32",
+          "label": "J2"
+        },
+        {
+          "value": "0x4a37",
+          "label": "J7"
+        },
+        {
+          "value": "0x4a38",
+          "label": "J8"
+        },
+        {
+          "value": "0x4a39",
+          "label": "J9"
+        },
+        {
+          "value": "0x4a41",
+          "label": "JA"
+        },
+        {
+          "value": "0x4a43",
+          "label": "JC"
+        },
+        {
+          "value": "0x4a45",
+          "label": "JE"
+        },
+        {
+          "value": "0x4a46",
+          "label": "JF"
+        },
+        {
+          "value": "0x4a4c",
+          "label": "JL"
+        },
+        {
+          "value": "0x5033",
+          "label": "P3"
+        },
+        {
+          "value": "0x5034",
+          "label": "P4"
+        },
+        {
+          "value": "0x5035",
+          "label": "P5"
+        },
+        {
+          "value": "0x5036",
+          "label": "P6"
+        },
+        {
+          "value": "0x5037",
+          "label": "P7"
+        },
+        {
+          "value": "0x5038",
+          "label": "P8"
+        },
+        {
+          "value": "0x5039",
+          "label": "P9"
+        },
+        {
+          "value": "0x5043",
+          "label": "PC"
+        },
+        {
+          "value": "0x5045",
+          "label": "PE"
+        },
+        {
+          "value": "0x5046",
+          "label": "PF"
+        },
+        {
+          "value": "0x5048",
+          "label": "PH"
+        },
+        {
+          "value": "0x504a",
+          "label": "PJ"
+        },
+        {
+          "value": "0x504c",
+          "label": "PL"
+        },
+        {
+          "value": "0x5062",
+          "label": "Pb"
+        },
+        {
+          "value": "0x5064",
+          "label": "Pd"
+        },
+        {
+          "value": "0x5534",
+          "label": "U4"
+        },
+        {
+          "value": "0x5555",
+          "label": "UU"
+        },
+        {
+          "value": "0x5550",
+          "label": "UP"
+        },
+        {
+          "value": "0x0000",
+          "label": "U5"
+        },
+        {
+          "value": "0xffff",
+          "label": "U5"
+        }
+      ],
+      "notes": [
+        "Stored fault code. Raw 0x0000 and raw 0xffff carry the same label; neither is declared as no fault. The first stored code is not the current fault, and no register is defined as the currently displayed fault code."
+      ],
+      "description": "Reported meaning: Stored fault code 4; Photovoltaic fault-history display."
+    },
+    {
+      "type": "0x32",
+      "coordinate": "0x58",
+      "kind": "value",
+      "value_type": "uint16",
+      "width": 2,
+      "label": "MemoryErrorCode5",
+      "enumeration": [
+        {
+          "value": "0x6241",
+          "label": "bA"
+        },
+        {
+          "value": "0x4332",
+          "label": "C2"
+        },
+        {
+          "value": "0x4333",
+          "label": "C3"
+        },
+        {
+          "value": "0x4531",
+          "label": "E1"
+        },
+        {
+          "value": "0x4532",
+          "label": "E2"
+        },
+        {
+          "value": "0x4533",
+          "label": "E3"
+        },
+        {
+          "value": "0x4534",
+          "label": "E4"
+        },
+        {
+          "value": "0x4535",
+          "label": "E5"
+        },
+        {
+          "value": "0x4536",
+          "label": "E6"
+        },
+        {
+          "value": "0x4562",
+          "label": "Eb"
+        },
+        {
+          "value": "0x4564",
+          "label": "Ed"
+        },
+        {
+          "value": "0x4555",
+          "label": "EU"
+        },
+        {
+          "value": "0x4730",
+          "label": "G0"
+        },
+        {
+          "value": "0x4731",
+          "label": "G1"
+        },
+        {
+          "value": "0x4732",
+          "label": "G2"
+        },
+        {
+          "value": "0x4733",
+          "label": "G3"
+        },
+        {
+          "value": "0x4734",
+          "label": "G4"
+        },
+        {
+          "value": "0x4735",
+          "label": "G5"
+        },
+        {
+          "value": "0x4736",
+          "label": "G6"
+        },
+        {
+          "value": "0x4737",
+          "label": "G7"
+        },
+        {
+          "value": "0x4738",
+          "label": "G8"
+        },
+        {
+          "value": "0x4739",
+          "label": "G9"
+        },
+        {
+          "value": "0x4741",
+          "label": "GA"
+        },
+        {
+          "value": "0x4759",
+          "label": "GY"
+        },
+        {
+          "value": "0x4779",
+          "label": "Gy"
+        },
+        {
+          "value": "0x4833",
+          "label": "H3"
+        },
+        {
+          "value": "0x4835",
+          "label": "H5"
+        },
+        {
+          "value": "0x4836",
+          "label": "H6"
+        },
+        {
+          "value": "0x4837",
+          "label": "H7"
+        },
+        {
+          "value": "0x4838",
+          "label": "H8"
+        },
+        {
+          "value": "0x4839",
+          "label": "H9"
+        },
+        {
+          "value": "0x4843",
+          "label": "HC"
+        },
+        {
+          "value": "0x4845",
+          "label": "HE"
+        },
+        {
+          "value": "0x4848",
+          "label": "HH"
+        },
+        {
+          "value": "0x484a",
+          "label": "HJ"
+        },
+        {
+          "value": "0x484c",
+          "label": "HL"
+        },
+        {
+          "value": "0x4850",
+          "label": "HP"
+        },
+        {
+          "value": "0x4a31",
+          "label": "J1"
+        },
+        {
+          "value": "0x4a32",
+          "label": "J2"
+        },
+        {
+          "value": "0x4a37",
+          "label": "J7"
+        },
+        {
+          "value": "0x4a38",
+          "label": "J8"
+        },
+        {
+          "value": "0x4a39",
+          "label": "J9"
+        },
+        {
+          "value": "0x4a41",
+          "label": "JA"
+        },
+        {
+          "value": "0x4a43",
+          "label": "JC"
+        },
+        {
+          "value": "0x4a45",
+          "label": "JE"
+        },
+        {
+          "value": "0x4a46",
+          "label": "JF"
+        },
+        {
+          "value": "0x4a4c",
+          "label": "JL"
+        },
+        {
+          "value": "0x5033",
+          "label": "P3"
+        },
+        {
+          "value": "0x5034",
+          "label": "P4"
+        },
+        {
+          "value": "0x5035",
+          "label": "P5"
+        },
+        {
+          "value": "0x5036",
+          "label": "P6"
+        },
+        {
+          "value": "0x5037",
+          "label": "P7"
+        },
+        {
+          "value": "0x5038",
+          "label": "P8"
+        },
+        {
+          "value": "0x5039",
+          "label": "P9"
+        },
+        {
+          "value": "0x5043",
+          "label": "PC"
+        },
+        {
+          "value": "0x5045",
+          "label": "PE"
+        },
+        {
+          "value": "0x5046",
+          "label": "PF"
+        },
+        {
+          "value": "0x5048",
+          "label": "PH"
+        },
+        {
+          "value": "0x504a",
+          "label": "PJ"
+        },
+        {
+          "value": "0x504c",
+          "label": "PL"
+        },
+        {
+          "value": "0x5062",
+          "label": "Pb"
+        },
+        {
+          "value": "0x5064",
+          "label": "Pd"
+        },
+        {
+          "value": "0x5534",
+          "label": "U4"
+        },
+        {
+          "value": "0x5555",
+          "label": "UU"
+        },
+        {
+          "value": "0x5550",
+          "label": "UP"
+        },
+        {
+          "value": "0x0000",
+          "label": "U5"
+        },
+        {
+          "value": "0xffff",
+          "label": "U5"
+        }
+      ],
+      "notes": [
+        "Stored fault code. Raw 0x0000 and raw 0xffff carry the same label; neither is declared as no fault. The first stored code is not the current fault, and no register is defined as the currently displayed fault code."
+      ],
+      "description": "Reported meaning: Stored fault code 5; Photovoltaic fault-history display."
+    },
+    {
+      "type": "0x32",
+      "coordinate": "0x5c",
+      "kind": "value",
+      "value_type": "uint16",
+      "width": 2,
+      "label": "DevGroupContinueRunningTime",
+      "unit": "min",
+      "description": "Reported meaning: Continuous operating time of the unit."
+    },
+    {
+      "type": "0x32",
+      "coordinate": "0x5e",
+      "kind": "value",
+      "value_type": "uint16",
+      "width": 2,
+      "label": "DevGroupAccumulateRunningTime",
+      "unit": "h",
+      "description": "Reported meaning: Cumulative operating time of the unit."
+    }
+  ]
+}

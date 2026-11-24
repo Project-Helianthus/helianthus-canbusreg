@@ -258,6 +258,26 @@ def mapping_active(ci_text: str) -> bool:
     return MAPPING_VALIDATOR in job and MAPPING_MUTATOR in job
 
 
+def comparison_applicable(manifest: dict) -> bool:
+    """A symbol-only move can pass QQ06 compare without running a test."""
+    bindings = {"case": ("expectations", ("case",)), "assertion": ("assertions", ("function", "name"))}
+    for entry in manifest.get("destinations") or []:
+        if entry.get("repository") not in DESTINATION_REPOSITORIES:
+            continue
+        binding = bindings.get(entry.get("kind"))
+        if not binding:
+            continue
+        section, keys = binding
+        if not all(isinstance(entry.get(key), str) and entry[key].strip() for key in ("path", "test", *keys)):
+            continue
+        for item in manifest.get(section) or []:
+            if not isinstance(item, dict) or any(item.get(key) != entry[key] for key in keys):
+                continue
+            if section == "assertions" or item.get("references"):
+                return True
+    return False
+
+
 def empty_plan(run_full: bool = True) -> dict:
     plan = {flag: False for flag in PLAN_FLAGS}
     plan["run_full"] = run_full
@@ -274,13 +294,16 @@ def decide(
     matched: bool,
     entries: list[tuple],
     mapping: bool,
+    *,
+    fast_path_ready: bool,
 ) -> dict:
     """Choose full jobs and fast-path steps.
 
     Stack position is decided before additive classification. Full jobs stay
     for a tip, an unresolved relationship, no matching manifest, and an
     unstacked change that is not additive. They are skipped for an unstacked
-    additive batch and for a lower member with a matching manifest.
+    additive batch and for a lower member with applicable comparison inputs.
+    A match without ready inputs remains selected for validation.
     """
     plan = empty_plan(True)
     plan["position"] = position
@@ -303,26 +326,26 @@ def decide(
             plan["preflight"] = True
         return plan
     if position == "lower":
-        plan["run_full"] = False
+        plan["run_full"] = not fast_path_ready
         plan["package_tests"] = True
         plan["check"] = True
         plan["compare"] = True
-        plan["dp03"] = True
-        plan["mapping"] = mapping
+        plan["dp03"] = fast_path_ready
+        plan["mapping"] = fast_path_ready and mapping
         if additive:
             plan["preflight"] = True
             plan["checkers"] = True
         return plan
     # Unstacked.
     if additive:
-        plan["run_full"] = False
+        plan["run_full"] = not fast_path_ready
         plan["package_tests"] = True
         plan["check"] = True
         plan["compare"] = True
         plan["preflight"] = True
         plan["checkers"] = True
-        plan["dp03"] = True
-        plan["mapping"] = mapping
+        plan["dp03"] = fast_path_ready
+        plan["mapping"] = fast_path_ready and mapping
         return plan
     plan["package_tests"] = True
     plan["check"] = True
@@ -380,12 +403,13 @@ def load_manifests(tool: Path) -> list[tuple[Path, dict]]:
     return found
 
 
-def write_github_output(plan: dict) -> None:
+def write_github_output(plan: dict, tool_sha: str) -> None:
     lines = []
     for flag in PLAN_FLAGS:
         lines.append("%s=%s" % (flag, "true" if plan.get(flag) else "false"))
     lines.append("packages=%s" % plan.get("packages", "."))
     lines.append("position=%s" % plan.get("position", "unresolved"))
+    lines.append("tool_sha=%s" % tool_sha)
     text = "\n".join(lines) + "\n"
     target = os.environ.get("GITHUB_OUTPUT")
     if target:
@@ -427,7 +451,7 @@ def acquire_matches(tool: Path, matches: list[tuple[Path, dict]], url_for) -> li
         repository = donor_record.get("repository")
         sha = donor_record.get("sha")
         if not isinstance(repository, str) or not isinstance(sha, str):
-            continue
+            raise acquire.AcquireError("selected manifest has no donor: %s" % path.name)
         dest = donors / ("%02d-%s" % (index, manifest.get("row") or "row"))
         if dest.exists():
             shutil.rmtree(dest)
@@ -452,11 +476,12 @@ def gate(workspace: Path | None = None) -> int:
     event_name = os.environ.get("GITHUB_EVENT_NAME", "")
     plan = empty_plan(True)
     selections: list[dict] = []
+    tool_sha = ""
+    if event_name != "pull_request":
+        write_selection(workspace, {"selections": [], "plan": plan, "tool_sha": tool_sha})
+        write_github_output(plan, tool_sha)
+        return 0
     try:
-        if event_name != "pull_request":
-            write_selection(workspace, {"selections": [], "plan": plan})
-            write_github_output(plan)
-            return 0
         event_path = os.environ.get("GITHUB_EVENT_PATH", "")
         event = json.loads(Path(event_path).read_text(encoding="utf-8")) if event_path else {}
         current = _current_from_event(event)
@@ -474,37 +499,37 @@ def gate(workspace: Path | None = None) -> int:
         if not diff_known:
             # A diff that cannot be read cannot prove coverage.
             entries = []
-        matched = False
         matched_manifests = []
         tool = workspace / ".tmp" / "docs-semantic"
-        if not (tool / "acceptance" / "tools" / "manifest" / "main.py").is_file():
-            try:
-                acquire.prepare_tool(tool)
-            except (acquire.AcquireError, OSError, subprocess.TimeoutExpired):
-                tool = None
-        if tool is not None and diff_known:
+        try:
+            tool_sha = acquire.prepare_tool(tool)
+        except (acquire.AcquireError, OSError, subprocess.TimeoutExpired) as error:
+            sys.stderr.write("acquire unresolved: %s\n" % error)
+        if tool_sha and diff_known:
             changed = changed_paths(entries)
-            for path, manifest in load_manifests(tool):
-                if covers(manifest, changed):
-                    matched_manifests.append((path, manifest))
-            matched = bool(matched_manifests)
+            matched_manifests = [(path, manifest) for path, manifest in load_manifests(tool) if covers(manifest, changed)]
         ci_text = show_file(workspace, base_sha, ".github/workflows/ci.yml") if base_sha else ""
-        plan = decide(event_name, position, matched, entries, mapping_active(ci_text))
-        if matched_manifests and (plan["check"] or plan["compare"] or plan["preflight"]):
-            def url_for(name: str) -> str:
-                return acquire.repository_url(name)
+        if matched_manifests:
             try:
-                selections = acquire_matches(tool, matched_manifests, url_for)
+                selections = acquire_matches(tool, matched_manifests, acquire.repository_url)
             except (acquire.AcquireError, OSError, subprocess.TimeoutExpired, KeyError) as error:
                 # A matched manifest whose inputs could not be fetched stays selected.
                 sys.stderr.write("acquire unresolved: %s\n" % error)
-                selections = []
+        ready = bool(selections)
+        if ready and position == "lower":
+            ready = all(comparison_applicable(manifest) for _, manifest in matched_manifests)
+        plan = decide(
+            event_name, position, bool(matched_manifests), entries, mapping_active(ci_text),
+            fast_path_ready=ready,
+        )
     except (OSError, RuntimeError, json.JSONDecodeError, subprocess.TimeoutExpired, KeyError, urllib.error.URLError) as error:
         sys.stderr.write("classification unresolved: %s\n" % error)
         plan = empty_plan(True)
         selections = []
-    write_selection(workspace, {"selections": selections, "plan": plan})
-    write_github_output(plan)
+    write_selection(workspace, {"selections": selections, "plan": plan, "tool_sha": tool_sha})
+    write_github_output(plan, tool_sha)
+    if tool_sha:
+        sys.stderr.write("docs-semantic source: %s\n" % tool_sha)
     sys.stderr.write(
         "position=%s matched=%s additive=%s run_full=%s\n"
         % (plan["position"], plan["matched"], plan["additive"], plan["run_full"])

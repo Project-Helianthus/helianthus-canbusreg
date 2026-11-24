@@ -27,12 +27,17 @@ jobs:
           go-version-file: go.mod
           check-latest: false
           cache: false
-      - run: GOWORK=off go test ./...
-      - run: GOWORK=off go vet ./...
       - uses: actions/setup-python@v5
         with:
           python-version: '3.x'
+      - id: gate
+        run: python3 scripts/preflight/classify.py gate
+      - run: GOWORK=off go test ./...
+        if: steps.gate.outputs.run_full == 'true'
+      - run: GOWORK=off go vet ./...
+        if: steps.gate.outputs.run_full == 'true'
       - run: python3 -m unittest discover -s scripts/tests -p driver_imports_test.py -v
+        if: steps.gate.outputs.run_full == 'true'
         env:
           GOWORK: 'off'
           GOPROXY: 'off'

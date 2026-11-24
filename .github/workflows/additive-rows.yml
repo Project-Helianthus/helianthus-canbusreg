@@ -1,0 +1,105 @@
+name: Additive rows
+
+on:
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  additive:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: actions/setup-go@v5
+        with:
+          go-version-file: go.mod
+          check-latest: false
+          cache: false
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.x'
+      - run: python3 scripts/preflight/acquire.py
+      - id: gate
+        run: python3 scripts/preflight/classify.py gate
+      - name: Package tests
+        if: steps.gate.outputs.package_tests == 'true'
+        run: GOWORK=off go test ${{ steps.gate.outputs.packages }}
+      - name: QQ06 check
+        if: steps.gate.outputs.check == 'true'
+        run: |
+          set -euo pipefail
+          lines=$(python3 scripts/preflight/classify.py selected)
+          if [ -z "$lines" ]; then
+            echo "selected manifest inputs were not acquired"
+            exit 1
+          fi
+          while IFS="$(printf '\t')" read -r tool_root manifest donor; do
+            (
+              cd "$tool_root"
+              python3 acceptance/tools/manifest/main.py check --manifest "$manifest" --donor "$donor"
+            )
+          done <<EOF
+          $lines
+          EOF
+      - name: QQ06 compare
+        if: steps.gate.outputs.compare == 'true'
+        run: |
+          set -euo pipefail
+          lines=$(python3 scripts/preflight/classify.py selected)
+          if [ -z "$lines" ]; then
+            echo "selected manifest inputs were not acquired"
+            exit 1
+          fi
+          while IFS="$(printf '\t')" read -r tool_root manifest donor; do
+            (
+              cd "$tool_root"
+              python3 acceptance/tools/manifest/main.py compare --manifest "$manifest" --destination "$GITHUB_WORKSPACE"
+            )
+          done <<EOF
+          $lines
+          EOF
+      - name: Install golangci-lint
+        if: steps.gate.outputs.preflight == 'true' || steps.gate.outputs.checkers == 'true'
+        run: go install github.com/golangci/golangci-lint/v2/cmd/golangci-lint@v2.11.4
+      - name: Preflight
+        if: steps.gate.outputs.preflight == 'true'
+        run: |
+          set -euo pipefail
+          lines=$(python3 scripts/preflight/classify.py selected)
+          if [ -z "$lines" ]; then
+            echo "manifest not published"
+            exit 1
+          fi
+          while IFS="$(printf '\t')" read -r tool_root manifest donor; do
+            if [ ! -f "$manifest" ]; then
+              echo "manifest not published"
+              exit 1
+            fi
+            python3 scripts/preflight/preflight.py --manifest "$manifest" --donor "$donor"
+          done <<EOF
+          $lines
+          EOF
+      - name: Existing gates
+        if: steps.gate.outputs.checkers == 'true'
+        run: |
+          python3 scripts/check_size_ratchet.py
+          python3 scripts/check_behavior_names.py --check
+          python3 scripts/check_go_lint_baseline.py --check
+      - name: CAN production-import policy
+        if: steps.gate.outputs.dp03 == 'true'
+        run: python3 -m unittest discover -s scripts/tests -p driver_imports_test.py
+        env:
+          GOWORK: 'off'
+          GOPROXY: 'off'
+          GOSUMDB: 'off'
+          GOTOOLCHAIN: 'local'
+          GOFLAGS: -buildvcs=false
+      - name: Growatt CAN storage mapping validator
+        if: steps.gate.outputs.mapping == 'true'
+        run: python3 scripts/validate_growatt_bms_can_storage_mapping.py
+      - name: Growatt CAN storage mapping mutator
+        if: steps.gate.outputs.mapping == 'true'
+        run: python3 scripts/test_validate_growatt_bms_can_storage_mapping.py

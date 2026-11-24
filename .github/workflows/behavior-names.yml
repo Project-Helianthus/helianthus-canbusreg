@@ -13,5 +13,9 @@ jobs:
       - uses: actions/setup-go@v5
         with:
           go-version-file: go.mod
+      - id: gate
+        run: python3 scripts/preflight/classify.py gate
       - run: python3 -m unittest discover -s scripts/tests -p test_behavior_name_gate.py -v
+        if: steps.gate.outputs.run_full == 'true'
       - run: python3 scripts/check_behavior_names.py --check
+        if: steps.gate.outputs.run_full == 'true'

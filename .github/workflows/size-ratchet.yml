@@ -28,5 +28,9 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: '3.x'
+      - id: gate
+        run: python3 scripts/preflight/classify.py gate
       - run: python3 -m unittest discover -s scripts/tests -p test_size_ratchet.py -v
+        if: steps.gate.outputs.run_full == 'true'
       - run: python3 scripts/check_size_ratchet.py
+        if: steps.gate.outputs.run_full == 'true'

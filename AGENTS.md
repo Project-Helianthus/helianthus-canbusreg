@@ -2,16 +2,24 @@
 
 ## Purpose and Ownership
 
-This repository owns CAN product and profile qualification, bounded read-only
-raw records, and profile-level semantic results. It does not own SocketCAN or
-other transport I/O, generic CAN framing, universal cross-protocol semantics,
-consumer APIs, or vendor control.
-
-Qualification is default-denied. Keep native identifiers and raw records
-available, distinguish candidate from qualified results, and preserve
-last-known-good fields when a partial read fails. Discovery and qualification
-must use explicit bounded allowlists and retries. Do not add writes, active
-probing, interface configuration, or live-device actions.
+- This repository is the CAN driver. It owns CAN product and profile knowledge,
+  its mapping to SemReg in both directions through the SemReg driver contract,
+  whose public packages it may import: `semreg/v1`, `semreg/v1/driver`,
+  `semreg/v1/roweval`, `semreg/v1/catalog` and `semreg/v1/operation`, and the
+  encoders of the frames that the documentation defines as commands (Gree VRF
+  included). It decides what is sent and how often, and hands frames to the
+  publication API of `helianthus-canbus` (OPERATOR item 11; decisions D1, D2).
+- It does not own SocketCAN or other interface setup, transport I/O or generic
+  CAN framing (OPERATOR item 11, Commandment 4), host code or consumer APIs
+  (rule 3). `scripts/tests/driver_imports_test.py` checks the imports.
+- Support is declared from the specification and tested representatively. The
+  level of verification is recorded; it never blocks definition, implementation
+  or publication. The operator's own hardware session on the operator's
+  documented hardware, while it has not been run, blocks only the release review
+  (rule 12, OPERATOR item 31, D14). Native identifiers and raw records stay
+  available; last-known-good fields are kept when a partial read fails.
+- A transmission on a real installation during development or test needs the
+  operator's word at that moment (rule 16).
 
 ## Documentation
 

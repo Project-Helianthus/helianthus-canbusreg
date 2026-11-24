@@ -1,0 +1,3691 @@
+{
+  "schema": "gree.vrf.can.dictionary",
+  "schema_version": 1,
+  "status": "candidate",
+  "slice": "remaining",
+  "types": [
+    "0x34",
+    "0x35",
+    "0x3d",
+    "0x3e",
+    "0x3f",
+    "0x40",
+    "0x41",
+    "0x4d",
+    "0x52",
+    "0x53",
+    "0x54",
+    "0x55",
+    "0x56",
+    "0x57",
+    "0x58",
+    "0x59"
+  ],
+  "counts": {
+    "positions": 135,
+    "named_values": 112,
+    "bit_containers": 23,
+    "named_bits": 127,
+    "label_only": 16
+  },
+  "entries": [
+    {
+      "type": "0x34",
+      "coordinate": "0x00",
+      "kind": "value",
+      "value_type": "uint8Devide10",
+      "width": 1,
+      "label": "TempPrecision",
+      "unit": "\u2103",
+      "notes": [
+        "The value type has no decode rule; only the raw byte is exposed."
+      ],
+      "description": "Reported meaning: Temperature precision."
+    },
+    {
+      "type": "0x34",
+      "coordinate": "0x01",
+      "kind": "value",
+      "value_type": "uint8Minus100Devide10",
+      "width": 1,
+      "label": "TempRevise",
+      "unit": "\u2103",
+      "notes": [
+        "The value type has no decode rule; only the raw byte is exposed."
+      ],
+      "description": "Reported meaning: Temperature correction."
+    },
+    {
+      "type": "0x34",
+      "coordinate": "0x02",
+      "kind": "value",
+      "value_type": "uint8",
+      "width": 1,
+      "label": "HumidityPrecision",
+      "unit": "%",
+      "description": "Reported meaning: Humidity precision."
+    },
+    {
+      "type": "0x34",
+      "coordinate": "0x03",
+      "kind": "value",
+      "value_type": "uint8Minus100",
+      "width": 1,
+      "label": "HumidityRevise",
+      "unit": "%",
+      "description": "Reported meaning: Humidity correction."
+    },
+    {
+      "type": "0x34",
+      "coordinate": "0x04",
+      "kind": "value",
+      "value_type": "uint8",
+      "width": 1,
+      "label": "HandleOutput",
+      "unit": "%",
+      "description": "Reported meaning: Manual output."
+    },
+    {
+      "type": "0x34",
+      "coordinate": "0x05",
+      "kind": "value",
+      "value_type": "uint8Minus100Devide10",
+      "width": 1,
+      "label": "AidHeatReviseUpperLimit",
+      "unit": "\u2103",
+      "notes": [
+        "The value type has no decode rule; only the raw byte is exposed."
+      ],
+      "description": "Reported meaning: Upper limit of the auxiliary-heating correction."
+    },
+    {
+      "type": "0x34",
+      "coordinate": "0x06",
+      "kind": "value",
+      "value_type": "uint8Minus100Devide10",
+      "width": 1,
+      "label": "AidHeatReviseLowerLimit",
+      "unit": "\u2103",
+      "notes": [
+        "The value type has no decode rule; only the raw byte is exposed."
+      ],
+      "description": "Reported meaning: Lower limit of the auxiliary-heating correction."
+    },
+    {
+      "type": "0x34",
+      "coordinate": "0x07",
+      "kind": "value",
+      "value_type": "uint8Minus100",
+      "width": 1,
+      "label": "HumidityReviseUpperLimit",
+      "unit": "%",
+      "description": "Reported meaning: Upper limit of the humidification correction."
+    },
+    {
+      "type": "0x34",
+      "coordinate": "0x08",
+      "kind": "value",
+      "value_type": "uint8Minus100",
+      "width": 1,
+      "label": "HumidityReviseLowerLimit",
+      "unit": "%",
+      "description": "Reported meaning: Lower limit of the humidification correction."
+    },
+    {
+      "type": "0x34",
+      "coordinate": "0x09",
+      "kind": "value",
+      "value_type": "uint8",
+      "width": 1,
+      "label": "HumidityQuantity",
+      "unit": "kg/h",
+      "description": "Reported meaning: Humidification quantity."
+    },
+    {
+      "type": "0x34",
+      "coordinate": "0x0a",
+      "kind": "value",
+      "value_type": "uint8",
+      "width": 1,
+      "label": "FirstInflowTime",
+      "unit": "min",
+      "description": "Reported meaning: Duration of the first water supply."
+    },
+    {
+      "type": "0x34",
+      "coordinate": "0x0b",
+      "kind": "value",
+      "value_type": "uint8",
+      "width": 1,
+      "label": "InflowInterval",
+      "unit": "min",
+      "description": "Reported meaning: Interval between water supplies."
+    },
+    {
+      "type": "0x34",
+      "coordinate": "0x0c",
+      "kind": "value",
+      "value_type": "uint8",
+      "width": 1,
+      "label": "CatchWaterPlateTemp",
+      "unit": "\u2103",
+      "presentation_converter": "CeVsFa",
+      "description": "Reported meaning: Condensate-tray limit temperature."
+    },
+    {
+      "type": "0x34",
+      "coordinate": "0x0d",
+      "kind": "value",
+      "value_type": "uint8",
+      "width": 1,
+      "label": "LampChimneyTemp",
+      "unit": "\u2103",
+      "presentation_converter": "CeVsFa",
+      "description": "Reported meaning: Lampshade limit temperature."
+    },
+    {
+      "type": "0x34",
+      "coordinate": "0x0e",
+      "kind": "value",
+      "value_type": "uint8",
+      "width": 1,
+      "label": "HumidityProportionSetting",
+      "unit": "%",
+      "description": "Reported meaning: Humidification proportion setting."
+    },
+    {
+      "type": "0x34",
+      "coordinate": "0x0f",
+      "kind": "value",
+      "value_type": "uint8",
+      "width": 1,
+      "label": "DrainWaterTime",
+      "unit": "s",
+      "description": "Reported meaning: Water-drain duration."
+    },
+    {
+      "type": "0x34",
+      "coordinate": "0x10",
+      "kind": "value",
+      "value_type": "uint8",
+      "width": 1,
+      "label": "DrainWaterAccumulateTime",
+      "description": "Reported meaning: Cumulative number of water drains."
+    },
+    {
+      "type": "0x34",
+      "coordinate": "0x11",
+      "kind": "value",
+      "value_type": "uint8",
+      "width": 1,
+      "label": "GroupControlNum",
+      "description": "Reported meaning: Total number of the group control."
+    },
+    {
+      "type": "0x34",
+      "coordinate": "0x12",
+      "kind": "value",
+      "value_type": "uint8",
+      "width": 1,
+      "label": "TurnValueNum",
+      "description": "Reported meaning: Number of units in rotation."
+    },
+    {
+      "type": "0x34",
+      "coordinate": "0x13",
+      "kind": "value",
+      "value_type": "uint8",
+      "width": 1,
+      "label": "TurnValueTime",
+      "unit": "d",
+      "description": "Reported meaning: Rotation duration."
+    },
+    {
+      "type": "0x34",
+      "coordinate": "0x14",
+      "kind": "value",
+      "value_type": "uint8Devide10",
+      "width": 1,
+      "label": "WetterTargetCurrent",
+      "unit": "A",
+      "notes": [
+        "The value type has no decode rule; only the raw byte is exposed."
+      ],
+      "description": "Reported meaning: Humidifier target current."
+    },
+    {
+      "type": "0x34",
+      "coordinate": "0x15",
+      "kind": "value",
+      "value_type": "uint8Devide10",
+      "width": 1,
+      "label": "WetterRunningCurrent",
+      "unit": "A",
+      "notes": [
+        "The value type has no decode rule; only the raw byte is exposed."
+      ],
+      "description": "Reported meaning: Humidifier operating current."
+    },
+    {
+      "type": "0x34",
+      "coordinate": "0x16",
+      "kind": "value",
+      "value_type": "uint8",
+      "width": 1,
+      "label": "RelativeHumiditySetting",
+      "unit": "%",
+      "description": "Reported meaning: Relative humidity setting."
+    },
+    {
+      "type": "0x34",
+      "coordinate": "0x17",
+      "kind": "value",
+      "value_type": "uint8",
+      "width": 1,
+      "label": "WetterStatus",
+      "description": "Reported meaning: Humidifier state."
+    },
+    {
+      "type": "0x35",
+      "coordinate": "0x00",
+      "kind": "value",
+      "value_type": "uint16",
+      "width": 2,
+      "label": "InflowTime",
+      "unit": "s",
+      "description": "Reported meaning: Water-supply duration."
+    },
+    {
+      "type": "0x35",
+      "coordinate": "0x02",
+      "kind": "value",
+      "value_type": "uint16",
+      "width": 2,
+      "label": "DrainWaterIntervalTime",
+      "unit": "min",
+      "description": "Reported meaning: Interval between water drains."
+    },
+    {
+      "type": "0x3d",
+      "container": "0x00",
+      "kind": "bits",
+      "value_type": "bits",
+      "bits": [
+        {
+          "bit": 0,
+          "coordinate": "0x00",
+          "label": "NewFANTotalSta",
+          "set_label": "Error",
+          "clear_label": "Normal",
+          "description": "Reported meaning: Fresh-air unit fault."
+        },
+        {
+          "bit": 1,
+          "coordinate": "0x01",
+          "label": "NewFANHandControlErr",
+          "set_label": "Error",
+          "clear_label": "Normal",
+          "description": "Reported meaning: Wired remote-controller ambient-temperature sensor fault."
+        },
+        {
+          "bit": 2,
+          "coordinate": "0x02",
+          "label": "MulMasterLiControllerSta1",
+          "set_label": "Error",
+          "clear_label": "Normal",
+          "description": "Reported meaning: Multiple main remote controllers fault on the fresh-air unit."
+        },
+        {
+          "bit": 4,
+          "coordinate": "0x04",
+          "label": "NewFANIDUProjectNOSta",
+          "set_label": "Conflicted",
+          "clear_label": "Normal",
+          "description": "Reported meaning: Fresh-air unit project-number conflict."
+        },
+        {
+          "bit": 5,
+          "coordinate": "0x05",
+          "label": "NewFANCommMainErr",
+          "set_label": "Error",
+          "clear_label": "Normal",
+          "description": "Reported meaning: Indoor-unit general communication fault."
+        }
+      ]
+    },
+    {
+      "type": "0x3d",
+      "coordinate": "0x06",
+      "kind": "label_only_bit",
+      "label_only": true,
+      "candidate_labels": {
+        "B": [
+          "ErrType"
+        ]
+      },
+      "referenced_by": [
+        "M115"
+      ],
+      "container": "0x00",
+      "bit": 6,
+      "note": "Contributes to an aggregate error type; no individual fault name is defined.",
+      "definition": "none; no unit, enumeration or effect is defined"
+    },
+    {
+      "type": "0x3d",
+      "coordinate": "0x07",
+      "kind": "label_only_bit",
+      "label_only": true,
+      "candidate_labels": {
+        "B": [
+          "ErrType"
+        ]
+      },
+      "referenced_by": [
+        "M115"
+      ],
+      "container": "0x00",
+      "bit": 7,
+      "note": "Contributes to an aggregate error type; no individual fault name is defined.",
+      "definition": "none; no unit, enumeration or effect is defined"
+    },
+    {
+      "type": "0x3d",
+      "container": "0x01",
+      "kind": "bits",
+      "value_type": "bits",
+      "bits": [
+        {
+          "bit": 0,
+          "coordinate": "0x08",
+          "label": "RFCommErr",
+          "set_label": "Error",
+          "clear_label": "Normal",
+          "description": "Reported meaning: RF communication fault."
+        }
+      ]
+    },
+    {
+      "type": "0x3d",
+      "coordinate": "0x09",
+      "kind": "label_only_bit",
+      "label_only": true,
+      "candidate_labels": {
+        "B": [
+          "ErrType"
+        ]
+      },
+      "referenced_by": [
+        "M115"
+      ],
+      "container": "0x01",
+      "bit": 1,
+      "note": "Contributes to an aggregate error type; no individual fault name is defined.",
+      "definition": "none; no unit, enumeration or effect is defined"
+    },
+    {
+      "type": "0x3d",
+      "coordinate": "0x0a",
+      "kind": "label_only_bit",
+      "label_only": true,
+      "candidate_labels": {
+        "B": [
+          "ErrType"
+        ]
+      },
+      "referenced_by": [
+        "M115"
+      ],
+      "container": "0x01",
+      "bit": 2,
+      "note": "Contributes to an aggregate error type; no individual fault name is defined.",
+      "definition": "none; no unit, enumeration or effect is defined"
+    },
+    {
+      "type": "0x3d",
+      "coordinate": "0x0b",
+      "kind": "label_only_bit",
+      "label_only": true,
+      "candidate_labels": {
+        "B": [
+          "ErrType"
+        ]
+      },
+      "referenced_by": [
+        "M115"
+      ],
+      "container": "0x01",
+      "bit": 3,
+      "note": "Contributes to an aggregate error type; no individual fault name is defined.",
+      "definition": "none; no unit, enumeration or effect is defined"
+    },
+    {
+      "type": "0x3d",
+      "container": "0x02",
+      "kind": "bits",
+      "value_type": "bits",
+      "bits": [
+        {
+          "bit": 3,
+          "coordinate": "0x13",
+          "label": "NewFANJumperSta",
+          "set_label": "Error",
+          "clear_label": "Normal",
+          "description": "Reported meaning: Fresh-air unit jumper fault."
+        },
+        {
+          "bit": 4,
+          "coordinate": "0x14",
+          "label": "NewFANDialUpSettingAbnormal",
+          "set_label": "Error",
+          "clear_label": "Normal",
+          "description": "Reported meaning: Abnormal switch setting of the fresh-air flow rate."
+        },
+        {
+          "bit": 5,
+          "coordinate": "0x15",
+          "label": "NewFANOutTempCMOSErr",
+          "set_label": "Error",
+          "clear_label": "Normal",
+          "description": "Reported meaning: Fresh-air outlet temperature sensor fault."
+        },
+        {
+          "bit": 6,
+          "coordinate": "0x16",
+          "label": "NewFANInTempCMOSErr",
+          "set_label": "Error",
+          "clear_label": "Normal",
+          "description": "Reported meaning: Fresh-air inlet temperature sensor fault."
+        },
+        {
+          "bit": 7,
+          "coordinate": "0x17",
+          "label": "IndoorHumErr",
+          "set_label": "Error",
+          "clear_label": "Normal",
+          "description": "Reported meaning: Indoor humidity sensor fault."
+        }
+      ]
+    },
+    {
+      "type": "0x3d",
+      "coordinate": "0x10",
+      "kind": "label_only_bit",
+      "label_only": true,
+      "candidate_labels": {
+        "B": [
+          "ErrType"
+        ]
+      },
+      "referenced_by": [
+        "M115"
+      ],
+      "container": "0x02",
+      "bit": 0,
+      "note": "Contributes to an aggregate error type; no individual fault name is defined.",
+      "definition": "none; no unit, enumeration or effect is defined"
+    },
+    {
+      "type": "0x3d",
+      "coordinate": "0x11",
+      "kind": "label_only_bit",
+      "label_only": true,
+      "candidate_labels": {},
+      "referenced_by": [
+        "M115"
+      ],
+      "container": "0x02",
+      "bit": 1,
+      "note": "Contributes to an aggregate error type; no individual fault name is defined.",
+      "definition": "none; no unit, enumeration or effect is defined"
+    },
+    {
+      "type": "0x3d",
+      "container": "0x03",
+      "kind": "bits",
+      "value_type": "bits",
+      "bits": [
+        {
+          "bit": 0,
+          "coordinate": "0x18",
+          "label": "NewFanFreeze",
+          "set_label": "Protection",
+          "clear_label": "Normal",
+          "description": "Reported meaning: Anti-freeze protection."
+        },
+        {
+          "bit": 1,
+          "coordinate": "0x19",
+          "label": "IDUBox1ComErr",
+          "set_label": "Error",
+          "clear_label": "Normal",
+          "description": "Reported meaning: Communication fault between the indoor unit and indoor module 1."
+        },
+        {
+          "bit": 2,
+          "coordinate": "0x1a",
+          "label": "IDUBox2ComErr",
+          "set_label": "Error",
+          "clear_label": "Normal",
+          "description": "Reported meaning: Communication fault between the indoor unit and indoor module 2."
+        },
+        {
+          "bit": 3,
+          "coordinate": "0x1b",
+          "label": "IDUBox3ComErr",
+          "set_label": "Error",
+          "clear_label": "Normal",
+          "description": "Reported meaning: Communication fault between the indoor unit and indoor module 3."
+        },
+        {
+          "bit": 4,
+          "coordinate": "0x1c",
+          "label": "IDUBox4ComErr",
+          "set_label": "Error",
+          "clear_label": "Normal",
+          "description": "Reported meaning: Communication fault between the indoor unit and indoor module 4."
+        },
+        {
+          "bit": 5,
+          "coordinate": "0x1d",
+          "label": "IDUBox5ComErr",
+          "set_label": "Error",
+          "clear_label": "Normal",
+          "description": "Reported meaning: Communication fault between the indoor unit and indoor module 5."
+        },
+        {
+          "bit": 6,
+          "coordinate": "0x1e",
+          "label": "NewFanSta",
+          "set_label": "Error",
+          "clear_label": "Normal",
+          "description": "Reported meaning: Indoor fan protection."
+        },
+        {
+          "bit": 7,
+          "coordinate": "0x1f",
+          "label": "BackInTempErr",
+          "set_label": "Error",
+          "clear_label": "Normal",
+          "description": "Reported meaning: Return-air inlet temperature sensor fault."
+        }
+      ]
+    },
+    {
+      "type": "0x3d",
+      "container": "0x04",
+      "kind": "bits",
+      "value_type": "bits",
+      "bits": [
+        {
+          "bit": 0,
+          "coordinate": "0x20",
+          "label": "OutdoorHumErr",
+          "set_label": "Error",
+          "clear_label": "Normal",
+          "description": "Reported meaning: Outdoor humidity sensor fault."
+        },
+        {
+          "bit": 1,
+          "coordinate": "0x21",
+          "label": "IFDErr",
+          "set_label": "Error",
+          "clear_label": "Normal",
+          "description": "Reported meaning: IFD fault."
+        }
+      ]
+    },
+    {
+      "type": "0x3d",
+      "coordinate": "0x22",
+      "kind": "label_only_bit",
+      "label_only": true,
+      "candidate_labels": {},
+      "referenced_by": [
+        "M115"
+      ],
+      "container": "0x04",
+      "bit": 2,
+      "note": "Contributes to an aggregate error type; no individual fault name is defined.",
+      "definition": "none; no unit, enumeration or effect is defined"
+    },
+    {
+      "type": "0x3d",
+      "coordinate": "0x27",
+      "kind": "label_only_bit",
+      "label_only": true,
+      "candidate_labels": {},
+      "referenced_by": [
+        "M115"
+      ],
+      "container": "0x04",
+      "bit": 7,
+      "note": "Contributes to an aggregate error type; no individual fault name is defined.",
+      "definition": "none; no unit, enumeration or effect is defined"
+    },
+    {
+      "type": "0x3d",
+      "coordinate": "0x28",
+      "kind": "label_only_bit",
+      "label_only": true,
+      "candidate_labels": {},
+      "referenced_by": [
+        "M115"
+      ],
+      "container": "0x05",
+      "bit": 0,
+      "note": "Contributes to an aggregate error type; no individual fault name is defined.",
+      "definition": "none; no unit, enumeration or effect is defined"
+    },
+    {
+      "type": "0x3e",
+      "container": "0x00",
+      "kind": "bits",
+      "value_type": "bits",
+      "bits": [
+        {
+          "bit": 0,
+          "coordinate": "0x00",
+          "label": "IndoorBox1MainErr",
+          "set_label": "Error",
+          "clear_label": "Normal",
+          "description": "Reported meaning: Indoor air sensor 1: general fault."
+        },
+        {
+          "bit": 1,
+          "coordinate": "0x01",
+          "label": "IndoorBox2MainErr",
+          "set_label": "Error",
+          "clear_label": "Normal",
+          "description": "Reported meaning: Indoor air sensor 2: general fault."
+        },
+        {
+          "bit": 2,
+          "coordinate": "0x02",
+          "label": "IndoorBox3MainErr",
+          "set_label": "Error",
+          "clear_label": "Normal",
+          "description": "Reported meaning: Indoor air sensor 3: general fault."
+        },
+        {
+          "bit": 3,
+          "coordinate": "0x03",
+          "label": "IndoorBox4MainErr",
+          "set_label": "Error",
+          "clear_label": "Normal",
+          "description": "Reported meaning: Indoor air sensor 4: general fault."
+        },
+        {
+          "bit": 4,
+          "coordinate": "0x04",
+          "label": "IndoorBox5MainErr",
+          "set_label": "Error",
+          "clear_label": "Normal",
+          "description": "Reported meaning: Indoor air sensor 5: general fault."
+        },
+        {
+          "bit": 5,
+          "coordinate": "0x05",
+          "label": "IndoorBox1PMErr",
+          "set_label": "Error",
+          "clear_label": "Normal",
+          "description": "Reported meaning: Indoor air sensor 1: PM2.5 sensor fault."
+        },
+        {
+          "bit": 6,
+          "coordinate": "0x06",
+          "label": "IndoorBox2PMErr",
+          "set_label": "Error",
+          "clear_label": "Normal",
+          "description": "Reported meaning: Indoor air sensor 2: PM2.5 sensor fault."
+        },
+        {
+          "bit": 7,
+          "coordinate": "0x07",
+          "label": "IndoorBox3PMErr",
+          "set_label": "Error",
+          "clear_label": "Normal",
+          "description": "Reported meaning: Indoor air sensor 3: PM2.5 sensor fault."
+        }
+      ]
+    },
+    {
+      "type": "0x3e",
+      "container": "0x01",
+      "kind": "bits",
+      "value_type": "bits",
+      "bits": [
+        {
+          "bit": 0,
+          "coordinate": "0x08",
+          "label": "IndoorBox4PMErr",
+          "set_label": "Error",
+          "clear_label": "Normal",
+          "description": "Reported meaning: Indoor air sensor 4: PM2.5 sensor fault."
+        },
+        {
+          "bit": 1,
+          "coordinate": "0x09",
+          "label": "IndoorBox5PMErr",
+          "set_label": "Error",
+          "clear_label": "Normal",
+          "description": "Reported meaning: Indoor air sensor 5: PM2.5 sensor fault."
+        },
+        {
+          "bit": 2,
+          "coordinate": "0x0a",
+          "label": "IndoorBox1VOCErr",
+          "set_label": "Error",
+          "clear_label": "Normal",
+          "description": "Reported meaning: Indoor air sensor 1: VOC sensor fault."
+        },
+        {
+          "bit": 3,
+          "coordinate": "0x0b",
+          "label": "IndoorBox2VOCErr",
+          "set_label": "Error",
+          "clear_label": "Normal",
+          "description": "Reported meaning: Indoor air sensor 2: VOC sensor fault."
+        },
+        {
+          "bit": 4,
+          "coordinate": "0x0c",
+          "label": "IndoorBox3VOCErr",
+          "set_label": "Error",
+          "clear_label": "Normal",
+          "description": "Reported meaning: Indoor air sensor 3: VOC sensor fault."
+        },
+        {
+          "bit": 5,
+          "coordinate": "0x0d",
+          "label": "IndoorBox4VOCErr",
+          "set_label": "Error",
+          "clear_label": "Normal",
+          "description": "Reported meaning: Indoor air sensor 4: VOC sensor fault."
+        },
+        {
+          "bit": 6,
+          "coordinate": "0x0e",
+          "label": "IndoorBox5VOCErr",
+          "set_label": "Error",
+          "clear_label": "Normal",
+          "description": "Reported meaning: Indoor air sensor 5: VOC sensor fault."
+        },
+        {
+          "bit": 7,
+          "coordinate": "0x0f",
+          "label": "IndoorBox1CO2Err",
+          "set_label": "Error",
+          "clear_label": "Normal",
+          "description": "Reported meaning: Indoor air sensor 1: CO2 sensor fault."
+        }
+      ]
+    },
+    {
+      "type": "0x3e",
+      "container": "0x02",
+      "kind": "bits",
+      "value_type": "bits",
+      "bits": [
+        {
+          "bit": 0,
+          "coordinate": "0x10",
+          "label": "IndoorBox2CO2Err",
+          "set_label": "Error",
+          "clear_label": "Normal",
+          "description": "Reported meaning: Indoor air sensor 2: CO2 sensor fault."
+        },
+        {
+          "bit": 1,
+          "coordinate": "0x11",
+          "label": "IndoorBox3CO2Err",
+          "set_label": "Error",
+          "clear_label": "Normal",
+          "description": "Reported meaning: Indoor air sensor 3: CO2 sensor fault."
+        },
+        {
+          "bit": 2,
+          "coordinate": "0x12",
+          "label": "IndoorBox4CO2Err",
+          "set_label": "Error",
+          "clear_label": "Normal",
+          "description": "Reported meaning: Indoor air sensor 4: CO2 sensor fault."
+        },
+        {
+          "bit": 3,
+          "coordinate": "0x13",
+          "label": "IndoorBox5CO2Err",
+          "set_label": "Error",
+          "clear_label": "Normal",
+          "description": "Reported meaning: Indoor air sensor 5: CO2 sensor fault."
+        },
+        {
+          "bit": 4,
+          "coordinate": "0x14",
+          "label": "IndoorBox1TempHumErr",
+          "set_label": "Error",
+          "clear_label": "Normal",
+          "description": "Reported meaning: Indoor air sensor 1: temperature and humidity sensor fault."
+        },
+        {
+          "bit": 5,
+          "coordinate": "0x15",
+          "label": "IndoorBox2TempHumErr",
+          "set_label": "Error",
+          "clear_label": "Normal",
+          "description": "Reported meaning: Indoor air sensor 2: temperature and humidity sensor fault."
+        },
+        {
+          "bit": 6,
+          "coordinate": "0x16",
+          "label": "IndoorBox3TempHumErr",
+          "set_label": "Error",
+          "clear_label": "Normal",
+          "description": "Reported meaning: Indoor air sensor 3: temperature and humidity sensor fault."
+        },
+        {
+          "bit": 7,
+          "coordinate": "0x17",
+          "label": "IndoorBox4TempHumErr",
+          "set_label": "Error",
+          "clear_label": "Normal",
+          "description": "Reported meaning: Indoor air sensor 4: temperature and humidity sensor fault."
+        }
+      ]
+    },
+    {
+      "type": "0x3e",
+      "container": "0x03",
+      "kind": "bits",
+      "value_type": "bits",
+      "bits": [
+        {
+          "bit": 0,
+          "coordinate": "0x18",
+          "label": "IndoorBox5TempHumErr",
+          "set_label": "Error",
+          "clear_label": "Normal",
+          "description": "Reported meaning: Indoor air sensor 5: temperature and humidity sensor fault."
+        },
+        {
+          "bit": 1,
+          "coordinate": "0x19",
+          "label": "IndoorBox1IncomErr",
+          "set_label": "Error",
+          "clear_label": "Normal",
+          "description": "Reported meaning: Indoor air sensor 1: internal communication fault."
+        },
+        {
+          "bit": 2,
+          "coordinate": "0x1a",
+          "label": "IndoorBox2IncomErr",
+          "set_label": "Error",
+          "clear_label": "Normal",
+          "description": "Reported meaning: Indoor air sensor 2: internal communication fault."
+        },
+        {
+          "bit": 3,
+          "coordinate": "0x1b",
+          "label": "IndoorBox3IncomErr",
+          "set_label": "Error",
+          "clear_label": "Normal",
+          "description": "Reported meaning: Indoor air sensor 3: internal communication fault."
+        },
+        {
+          "bit": 4,
+          "coordinate": "0x1c",
+          "label": "IndoorBox4IncomErr",
+          "set_label": "Error",
+          "clear_label": "Normal",
+          "description": "Reported meaning: Indoor air sensor 4: internal communication fault."
+        },
+        {
+          "bit": 5,
+          "coordinate": "0x1d",
+          "label": "IndoorBox5IncomErr",
+          "set_label": "Error",
+          "clear_label": "Normal",
+          "description": "Reported meaning: Indoor air sensor 5: internal communication fault."
+        }
+      ]
+    },
+    {
+      "type": "0x3f",
+      "container": "0x00",
+      "kind": "bits",
+      "value_type": "bits",
+      "bits": [
+        {
+          "bit": 0,
+          "coordinate": "0x00",
+          "label": "NewFANPowerCtrl",
+          "set_label": "Poweron",
+          "clear_label": "Poweroff",
+          "description": "Reported meaning: Fresh-air unit power on/off."
+        },
+        {
+          "bit": 1,
+          "coordinate": "0x01",
+          "label": "NewFANSuperSpeed",
+          "set_label": "Poweron",
+          "clear_label": "Poweroff",
+          "description": "Reported meaning: Very-strong ventilation step state."
+        },
+        {
+          "bit": 3,
+          "coordinate": "0x03",
+          "label": "NewFANRemoteCtrlMode",
+          "set_label": "Mask",
+          "clear_label": "Unmask",
+          "description": "Reported meaning: Remote lock function of the control mode."
+        },
+        {
+          "bit": 4,
+          "coordinate": "0x04",
+          "label": "NewFANRemoteSwitch",
+          "set_label": "Mask",
+          "clear_label": "Unmask",
+          "description": "Reported meaning: Remote lock function of power on/off."
+        },
+        {
+          "bit": 5,
+          "coordinate": "0x05",
+          "label": "NewFANRemoteLock",
+          "set_label": "Mask",
+          "clear_label": "Unmask",
+          "description": "Reported meaning: Remote lock function."
+        },
+        {
+          "bit": 6,
+          "coordinate": "0x06",
+          "label": "NewFANMaskOn",
+          "set_label": "Mask",
+          "clear_label": "Unmask",
+          "description": "Reported meaning: Start lock."
+        },
+        {
+          "bit": 7,
+          "coordinate": "0x07",
+          "label": "NewFANMaskOff",
+          "set_label": "Mask",
+          "clear_label": "Unmask",
+          "description": "Reported meaning: Stop lock."
+        }
+      ]
+    },
+    {
+      "type": "0x3f",
+      "container": "0x01",
+      "kind": "bits",
+      "value_type": "bits",
+      "bits": [
+        {
+          "bit": 0,
+          "coordinate": "0x08",
+          "label": "NewFANMaskTiming",
+          "set_label": "Mask",
+          "clear_label": "Unmask",
+          "description": "Reported meaning: Timer lock."
+        },
+        {
+          "bit": 7,
+          "coordinate": "0x0f",
+          "label": "NewFANRemindFilterCleanSta",
+          "set_label": "PromptClean",
+          "clear_label": "None",
+          "description": "Reported meaning: Fresh-air unit filter cleaning indication."
+        }
+      ]
+    },
+    {
+      "type": "0x3f",
+      "container": "0x02",
+      "kind": "bits",
+      "value_type": "bits",
+      "bits": [
+        {
+          "bit": 0,
+          "coordinate": "0x10",
+          "label": "NewFANStrainerChange",
+          "set_label": "PromptChange",
+          "clear_label": "None",
+          "description": "Reported meaning: Filter replacement warning."
+        },
+        {
+          "bit": 1,
+          "coordinate": "0x11",
+          "label": "IncPressFan",
+          "set_label": "On",
+          "clear_label": "Off",
+          "description": "Reported meaning: Boost fan."
+        },
+        {
+          "bit": 2,
+          "coordinate": "0x12",
+          "label": "BypassValve",
+          "set_label": "On",
+          "clear_label": "Off",
+          "description": "Reported meaning: Bypass valve."
+        },
+        {
+          "bit": 3,
+          "coordinate": "0x13",
+          "label": "LowTempValve",
+          "set_label": "On",
+          "clear_label": "Off",
+          "description": "Reported meaning: Low-temperature valve."
+        },
+        {
+          "bit": 4,
+          "coordinate": "0x14",
+          "label": "NewFANDecryption",
+          "set_label": "NotDecrypt",
+          "clear_label": "Decryption",
+          "description": "Reported meaning: Fresh-air unit decryption indicator."
+        },
+        {
+          "bit": 5,
+          "coordinate": "0x15",
+          "label": "CirculateValve",
+          "set_label": "On",
+          "clear_label": "Off",
+          "description": "Reported meaning: Circulation valve."
+        }
+      ]
+    },
+    {
+      "type": "0x3f",
+      "coordinate": "0x16",
+      "kind": "label_only_bit",
+      "label_only": true,
+      "candidate_labels": {
+        "B": [
+          "PctCle"
+        ]
+      },
+      "referenced_by": [
+        "M115"
+      ],
+      "container": "0x02",
+      "bit": 6,
+      "definition": "none; no unit, enumeration or effect is defined"
+    },
+    {
+      "type": "0x3f",
+      "coordinate": "0x17",
+      "kind": "label_only_bit",
+      "label_only": true,
+      "candidate_labels": {
+        "B": [
+          "PctRe"
+        ]
+      },
+      "referenced_by": [
+        "M115"
+      ],
+      "container": "0x02",
+      "bit": 7,
+      "definition": "none; no unit, enumeration or effect is defined"
+    },
+    {
+      "type": "0x3f",
+      "coordinate": "0x18",
+      "kind": "label_only_bit",
+      "label_only": true,
+      "candidate_labels": {
+        "B": [
+          "Inloop"
+        ]
+      },
+      "referenced_by": [
+        "M115"
+      ],
+      "container": "0x03",
+      "bit": 0,
+      "definition": "none; no unit, enumeration or effect is defined"
+    },
+    {
+      "type": "0x40",
+      "coordinate": "0x00",
+      "kind": "value",
+      "value_type": "uint8Minus100",
+      "width": 1,
+      "label": "BackInTemp",
+      "unit": "\u2103",
+      "presentation_converter": "CeVsFa",
+      "description": "Reported meaning: Return-air temperature at the inlet."
+    },
+    {
+      "type": "0x40",
+      "coordinate": "0x02",
+      "kind": "value",
+      "value_type": "uint8Minus100",
+      "width": 1,
+      "label": "NewFANOutTemp",
+      "unit": "\u2103",
+      "presentation_converter": "CeVsFa",
+      "description": "Reported meaning: Temperature sensor at the fresh-air outlet."
+    },
+    {
+      "type": "0x40",
+      "coordinate": "0x03",
+      "kind": "value",
+      "value_type": "uint8Minus100",
+      "width": 1,
+      "label": "NewFANInTemp",
+      "unit": "\u2103",
+      "presentation_converter": "CeVsFa",
+      "description": "Reported meaning: Temperature sensor at the fresh-air inlet."
+    },
+    {
+      "type": "0x40",
+      "coordinate": "0x04",
+      "kind": "value",
+      "value_type": "uint8Minus100",
+      "width": 1,
+      "label": "IndoorRelaHum",
+      "unit": "%",
+      "description": "Reported meaning: Indoor relative humidity."
+    },
+    {
+      "type": "0x40",
+      "coordinate": "0x05",
+      "kind": "value",
+      "value_type": "uint8Minus100",
+      "width": 1,
+      "label": "NewFANBaseFilterTemp",
+      "unit": "\u2103",
+      "presentation_converter": "CeVsFa",
+      "description": "Reported meaning: Primary-filter contamination level."
+    },
+    {
+      "type": "0x40",
+      "coordinate": "0x06",
+      "kind": "value",
+      "value_type": "uint8Minus100",
+      "width": 1,
+      "label": "NewFANUtilsFilterTemp",
+      "unit": "\u2103",
+      "presentation_converter": "CeVsFa",
+      "description": "Reported meaning: High-efficiency filter soiling level."
+    },
+    {
+      "type": "0x40",
+      "coordinate": "0x07",
+      "kind": "value",
+      "value_type": "uint8Minus100",
+      "width": 1,
+      "label": "IndoorBox1Temp",
+      "description": "Reported meaning: Indoor air sensor 1: temperature."
+    },
+    {
+      "type": "0x40",
+      "coordinate": "0x08",
+      "kind": "value",
+      "value_type": "uint8Minus100",
+      "width": 1,
+      "label": "IndoorBox2Temp",
+      "description": "Reported meaning: Indoor air sensor 2: temperature."
+    },
+    {
+      "type": "0x40",
+      "coordinate": "0x09",
+      "kind": "value",
+      "value_type": "uint8Minus100",
+      "width": 1,
+      "label": "IndoorBox3Temp",
+      "description": "Reported meaning: Indoor air sensor 3: temperature."
+    },
+    {
+      "type": "0x40",
+      "coordinate": "0x0a",
+      "kind": "value",
+      "value_type": "uint8Minus100",
+      "width": 1,
+      "label": "IndoorBox4Temp",
+      "description": "Reported meaning: Indoor air sensor 4: temperature."
+    },
+    {
+      "type": "0x40",
+      "coordinate": "0x0b",
+      "kind": "value",
+      "value_type": "uint8Minus100",
+      "width": 1,
+      "label": "IndoorBox5Temp",
+      "description": "Reported meaning: Indoor air sensor 5: temperature."
+    },
+    {
+      "type": "0x40",
+      "coordinate": "0x0c",
+      "kind": "value",
+      "value_type": "uint8Minus100",
+      "width": 1,
+      "label": "IndoorBox1Hum",
+      "description": "Reported meaning: Indoor air sensor 1: humidity."
+    },
+    {
+      "type": "0x40",
+      "coordinate": "0x0d",
+      "kind": "value",
+      "value_type": "uint8Minus100",
+      "width": 1,
+      "label": "IndoorBox2Hum",
+      "description": "Reported meaning: Indoor air sensor 2: humidity."
+    },
+    {
+      "type": "0x40",
+      "coordinate": "0x0e",
+      "kind": "value",
+      "value_type": "uint8Minus100",
+      "width": 1,
+      "label": "IndoorBox3Hum",
+      "description": "Reported meaning: Indoor air sensor 3: humidity."
+    },
+    {
+      "type": "0x40",
+      "coordinate": "0x0f",
+      "kind": "value",
+      "value_type": "uint8Minus100",
+      "width": 1,
+      "label": "IndoorBox4Hum",
+      "description": "Reported meaning: Indoor air sensor 4: humidity."
+    },
+    {
+      "type": "0x40",
+      "coordinate": "0x10",
+      "kind": "value",
+      "value_type": "uint8Minus100",
+      "width": 1,
+      "label": "IndoorBox5Hum",
+      "description": "Reported meaning: Indoor air sensor 5: humidity."
+    },
+    {
+      "type": "0x40",
+      "coordinate": "0x11",
+      "kind": "value",
+      "value_type": "uint8Minus100",
+      "width": 1,
+      "label": "OutdoorRelaHum",
+      "unit": "%",
+      "description": "Reported meaning: Outdoor relative humidity."
+    },
+    {
+      "type": "0x40",
+      "coordinate": "0x12",
+      "kind": "label_only_value",
+      "label_only": true,
+      "candidate_labels": {
+        "B": [
+          "InVitiGrCg"
+        ]
+      },
+      "referenced_by": [
+        "M115"
+      ],
+      "width": 1,
+      "definition": "none; no unit, enumeration or effect is defined"
+    },
+    {
+      "type": "0x40",
+      "coordinate": "0x13",
+      "kind": "label_only_value",
+      "label_only": true,
+      "candidate_labels": {
+        "B": [
+          "IFDtiGr"
+        ]
+      },
+      "referenced_by": [
+        "M115"
+      ],
+      "width": 1,
+      "definition": "none; no unit, enumeration or effect is defined"
+    },
+    {
+      "type": "0x41",
+      "coordinate": "0x00",
+      "kind": "label_only_value",
+      "label_only": true,
+      "candidate_labels": {
+        "B": [
+          "ModS"
+        ]
+      },
+      "referenced_by": [
+        "M115"
+      ],
+      "width": 1,
+      "definition": "none; no unit, enumeration or effect is defined"
+    },
+    {
+      "type": "0x41",
+      "coordinate": "0x01",
+      "kind": "value",
+      "value_type": "uint8",
+      "width": 1,
+      "label": "NewFANCtrlMode",
+      "enumeration": [
+        {
+          "value": "0x00",
+          "label": "NaN"
+        },
+        {
+          "value": "0x01",
+          "label": "Running"
+        },
+        {
+          "value": "0x02",
+          "label": "Linkage"
+        },
+        {
+          "value": "0x03",
+          "label": "Auto"
+        }
+      ],
+      "description": "Reported meaning: Fresh-air unit control mode."
+    },
+    {
+      "type": "0x41",
+      "coordinate": "0x02",
+      "kind": "value",
+      "value_type": "uint8",
+      "width": 1,
+      "label": "NewFANRunningSpeed",
+      "enumeration": [
+        {
+          "value": "0x00",
+          "label": "NaN"
+        },
+        {
+          "value": "0x01",
+          "label": "FanStop"
+        },
+        {
+          "value": "0x02",
+          "label": "SuperLowSpeed"
+        },
+        {
+          "value": "0x03",
+          "label": "LowSpeed"
+        },
+        {
+          "value": "0x04",
+          "label": "LessMidSpeed"
+        },
+        {
+          "value": "0x05",
+          "label": "MidSpeed"
+        },
+        {
+          "value": "0x06",
+          "label": "MoreMidSpeed"
+        },
+        {
+          "value": "0x07",
+          "label": "HighSpeed"
+        },
+        {
+          "value": "0x08",
+          "label": "SuperHighSpeed"
+        },
+        {
+          "value": "0x09",
+          "label": "SilenceFanSpeedR1"
+        },
+        {
+          "value": "0x0a",
+          "label": "SilenceFanSpeedR2"
+        },
+        {
+          "value": "0x0b",
+          "label": "SilenceFanSpeedR3"
+        }
+      ],
+      "description": "Reported meaning: Operating speed of the fresh-air fan."
+    },
+    {
+      "type": "0x41",
+      "coordinate": "0x04",
+      "kind": "value",
+      "value_type": "uint8",
+      "width": 1,
+      "label": "NewFANOutAitQty",
+      "enumeration": [
+        {
+          "value": "0x00",
+          "label": "NaN"
+        },
+        {
+          "value": "0x01",
+          "label": "NewFANAirGreed"
+        },
+        {
+          "value": "0x02",
+          "label": "NewFANAirGood"
+        },
+        {
+          "value": "0x03",
+          "label": "NewFANAirPollute1"
+        },
+        {
+          "value": "0x04",
+          "label": "NewFANAirPollute2"
+        },
+        {
+          "value": "0x05",
+          "label": "NewFANAirPollute3"
+        },
+        {
+          "value": "0x06",
+          "label": "NewFANAirPollute4"
+        }
+      ],
+      "notes": [
+        "Values 0x05 and 0x06 are distinct levels: high pollution and severe pollution."
+      ],
+      "description": "Reported meaning: Outdoor air-quality level."
+    },
+    {
+      "type": "0x41",
+      "coordinate": "0x05",
+      "kind": "value",
+      "value_type": "uint8",
+      "width": 1,
+      "label": "NewFANAirQty1",
+      "enumeration": [
+        {
+          "value": "0x00",
+          "label": "NaN"
+        },
+        {
+          "value": "0x01",
+          "label": "NewFANAirGreed"
+        },
+        {
+          "value": "0x02",
+          "label": "NewFANAirGood"
+        },
+        {
+          "value": "0x03",
+          "label": "NewFANAirPollute1"
+        },
+        {
+          "value": "0x04",
+          "label": "NewFANAirPollute2"
+        },
+        {
+          "value": "0x05",
+          "label": "NewFANAirPollute3"
+        },
+        {
+          "value": "0x06",
+          "label": "NewFANAirPollute4"
+        }
+      ],
+      "description": "Reported meaning: Indoor air-quality level 1."
+    },
+    {
+      "type": "0x41",
+      "coordinate": "0x06",
+      "kind": "value",
+      "value_type": "uint8",
+      "width": 1,
+      "label": "NewFANAirQty2",
+      "enumeration": [
+        {
+          "value": "0x00",
+          "label": "NaN"
+        },
+        {
+          "value": "0x01",
+          "label": "NewFANAirGreed"
+        },
+        {
+          "value": "0x02",
+          "label": "NewFANAirGood"
+        },
+        {
+          "value": "0x03",
+          "label": "NewFANAirPollute1"
+        },
+        {
+          "value": "0x04",
+          "label": "NewFANAirPollute2"
+        },
+        {
+          "value": "0x05",
+          "label": "NewFANAirPollute3"
+        },
+        {
+          "value": "0x06",
+          "label": "NewFANAirPollute4"
+        }
+      ],
+      "description": "Reported meaning: Indoor air-quality level 2."
+    },
+    {
+      "type": "0x41",
+      "coordinate": "0x07",
+      "kind": "value",
+      "value_type": "uint8",
+      "width": 1,
+      "label": "NewFANAirQty3",
+      "enumeration": [
+        {
+          "value": "0x00",
+          "label": "NaN"
+        },
+        {
+          "value": "0x01",
+          "label": "NewFANAirGreed"
+        },
+        {
+          "value": "0x02",
+          "label": "NewFANAirGood"
+        },
+        {
+          "value": "0x03",
+          "label": "NewFANAirPollute1"
+        },
+        {
+          "value": "0x04",
+          "label": "NewFANAirPollute2"
+        },
+        {
+          "value": "0x05",
+          "label": "NewFANAirPollute3"
+        },
+        {
+          "value": "0x06",
+          "label": "NewFANAirPollute4"
+        }
+      ],
+      "description": "Reported meaning: Indoor air-quality level 3."
+    },
+    {
+      "type": "0x41",
+      "coordinate": "0x08",
+      "kind": "value",
+      "value_type": "uint8",
+      "width": 1,
+      "label": "NewFANAirQty4",
+      "enumeration": [
+        {
+          "value": "0x00",
+          "label": "NaN"
+        },
+        {
+          "value": "0x01",
+          "label": "NewFANAirGreed"
+        },
+        {
+          "value": "0x02",
+          "label": "NewFANAirGood"
+        },
+        {
+          "value": "0x03",
+          "label": "NewFANAirPollute1"
+        },
+        {
+          "value": "0x04",
+          "label": "NewFANAirPollute2"
+        },
+        {
+          "value": "0x05",
+          "label": "NewFANAirPollute3"
+        },
+        {
+          "value": "0x06",
+          "label": "NewFANAirPollute4"
+        }
+      ],
+      "description": "Reported meaning: Indoor air-quality level 4."
+    },
+    {
+      "type": "0x41",
+      "coordinate": "0x09",
+      "kind": "value",
+      "value_type": "uint8",
+      "width": 1,
+      "label": "NewFANAirQty5",
+      "enumeration": [
+        {
+          "value": "0x00",
+          "label": "NaN"
+        },
+        {
+          "value": "0x01",
+          "label": "NewFANAirGreed"
+        },
+        {
+          "value": "0x02",
+          "label": "NewFANAirGood"
+        },
+        {
+          "value": "0x03",
+          "label": "NewFANAirPollute1"
+        },
+        {
+          "value": "0x04",
+          "label": "NewFANAirPollute2"
+        },
+        {
+          "value": "0x05",
+          "label": "NewFANAirPollute3"
+        },
+        {
+          "value": "0x06",
+          "label": "NewFANAirPollute4"
+        }
+      ],
+      "description": "Reported meaning: Indoor air-quality level 5."
+    },
+    {
+      "type": "0x41",
+      "coordinate": "0x0a",
+      "kind": "value",
+      "value_type": "uint8",
+      "width": 1,
+      "label": "AirBoxOnlineSta",
+      "enumeration": [
+        {
+          "value": "0x00",
+          "label": "Set_0"
+        },
+        {
+          "value": "0x01",
+          "label": "Set_1"
+        },
+        {
+          "value": "0x02",
+          "label": "Set_2"
+        },
+        {
+          "value": "0x03",
+          "label": "Set_3"
+        },
+        {
+          "value": "0x04",
+          "label": "Set_4"
+        },
+        {
+          "value": "0x05",
+          "label": "Set_5"
+        },
+        {
+          "value": "0x06",
+          "label": "Set_6"
+        },
+        {
+          "value": "0x07",
+          "label": "Set_7"
+        },
+        {
+          "value": "0x08",
+          "label": "Set_8"
+        },
+        {
+          "value": "0x09",
+          "label": "Set_9"
+        },
+        {
+          "value": "0x0a",
+          "label": "Set_10"
+        },
+        {
+          "value": "0x0b",
+          "label": "Set_11"
+        },
+        {
+          "value": "0x0c",
+          "label": "Set_12"
+        },
+        {
+          "value": "0x0d",
+          "label": "Set_13"
+        },
+        {
+          "value": "0x0e",
+          "label": "Set_14"
+        },
+        {
+          "value": "0x0f",
+          "label": "Set_15"
+        },
+        {
+          "value": "0x10",
+          "label": "Set_16"
+        },
+        {
+          "value": "0x11",
+          "label": "Set_17"
+        },
+        {
+          "value": "0x12",
+          "label": "Set_18"
+        },
+        {
+          "value": "0x13",
+          "label": "Set_19"
+        },
+        {
+          "value": "0x14",
+          "label": "Set_20"
+        },
+        {
+          "value": "0x15",
+          "label": "Set_21"
+        },
+        {
+          "value": "0x16",
+          "label": "Set_22"
+        },
+        {
+          "value": "0x17",
+          "label": "Set_23"
+        },
+        {
+          "value": "0x18",
+          "label": "Set_24"
+        },
+        {
+          "value": "0x19",
+          "label": "Set_25"
+        },
+        {
+          "value": "0x1a",
+          "label": "Set_26"
+        },
+        {
+          "value": "0x1b",
+          "label": "Set_27"
+        },
+        {
+          "value": "0x1c",
+          "label": "Set_28"
+        },
+        {
+          "value": "0x1d",
+          "label": "Set_29"
+        },
+        {
+          "value": "0x1e",
+          "label": "Set_30"
+        },
+        {
+          "value": "0x1f",
+          "label": "Set_31"
+        }
+      ],
+      "description": "Reported meaning: Air-module online status."
+    },
+    {
+      "type": "0x41",
+      "coordinate": "0x0b",
+      "kind": "value",
+      "value_type": "uint8",
+      "width": 1,
+      "label_en": "air box operating state",
+      "enumeration": [
+        {
+          "value": "0x00",
+          "label": "Set_0"
+        },
+        {
+          "value": "0x01",
+          "label": "Set_1"
+        },
+        {
+          "value": "0x02",
+          "label": "Set_2"
+        },
+        {
+          "value": "0x03",
+          "label": "Set_3"
+        },
+        {
+          "value": "0x04",
+          "label": "Set_4"
+        },
+        {
+          "value": "0x05",
+          "label": "Set_5"
+        },
+        {
+          "value": "0x06",
+          "label": "Set_6"
+        },
+        {
+          "value": "0x07",
+          "label": "Set_7"
+        },
+        {
+          "value": "0x08",
+          "label": "Set_8"
+        },
+        {
+          "value": "0x09",
+          "label": "Set_9"
+        },
+        {
+          "value": "0x0a",
+          "label": "Set_10"
+        },
+        {
+          "value": "0x0b",
+          "label": "Set_11"
+        },
+        {
+          "value": "0x0c",
+          "label": "Set_12"
+        },
+        {
+          "value": "0x0d",
+          "label": "Set_13"
+        },
+        {
+          "value": "0x0e",
+          "label": "Set_14"
+        },
+        {
+          "value": "0x0f",
+          "label": "Set_15"
+        },
+        {
+          "value": "0x10",
+          "label": "Set_16"
+        },
+        {
+          "value": "0x11",
+          "label": "Set_17"
+        },
+        {
+          "value": "0x12",
+          "label": "Set_18"
+        },
+        {
+          "value": "0x13",
+          "label": "Set_19"
+        },
+        {
+          "value": "0x14",
+          "label": "Set_20"
+        },
+        {
+          "value": "0x15",
+          "label": "Set_21"
+        },
+        {
+          "value": "0x16",
+          "label": "Set_22"
+        },
+        {
+          "value": "0x17",
+          "label": "Set_23"
+        },
+        {
+          "value": "0x18",
+          "label": "Set_24"
+        },
+        {
+          "value": "0x19",
+          "label": "Set_25"
+        },
+        {
+          "value": "0x1a",
+          "label": "Set_26"
+        },
+        {
+          "value": "0x1b",
+          "label": "Set_27"
+        },
+        {
+          "value": "0x1c",
+          "label": "Set_28"
+        },
+        {
+          "value": "0x1d",
+          "label": "Set_29"
+        },
+        {
+          "value": "0x1e",
+          "label": "Set_30"
+        },
+        {
+          "value": "0x1f",
+          "label": "Set_31"
+        }
+      ],
+      "description": "Reported meaning: Air-module operating status."
+    },
+    {
+      "type": "0x41",
+      "coordinate": "0x0c",
+      "kind": "value",
+      "value_type": "uint8",
+      "width": 1,
+      "label_en": "indoor air box LED state",
+      "enumeration": [
+        {
+          "value": "0x00",
+          "label": "Set_0"
+        },
+        {
+          "value": "0x01",
+          "label": "Set_1"
+        },
+        {
+          "value": "0x02",
+          "label": "Set_2"
+        },
+        {
+          "value": "0x03",
+          "label": "Set_3"
+        },
+        {
+          "value": "0x04",
+          "label": "Set_4"
+        },
+        {
+          "value": "0x05",
+          "label": "Set_5"
+        },
+        {
+          "value": "0x06",
+          "label": "Set_6"
+        },
+        {
+          "value": "0x07",
+          "label": "Set_7"
+        },
+        {
+          "value": "0x08",
+          "label": "Set_8"
+        },
+        {
+          "value": "0x09",
+          "label": "Set_9"
+        },
+        {
+          "value": "0x0a",
+          "label": "Set_10"
+        },
+        {
+          "value": "0x0b",
+          "label": "Set_11"
+        },
+        {
+          "value": "0x0c",
+          "label": "Set_12"
+        },
+        {
+          "value": "0x0d",
+          "label": "Set_13"
+        },
+        {
+          "value": "0x0e",
+          "label": "Set_14"
+        },
+        {
+          "value": "0x0f",
+          "label": "Set_15"
+        },
+        {
+          "value": "0x10",
+          "label": "Set_16"
+        },
+        {
+          "value": "0x11",
+          "label": "Set_17"
+        },
+        {
+          "value": "0x12",
+          "label": "Set_18"
+        },
+        {
+          "value": "0x13",
+          "label": "Set_19"
+        },
+        {
+          "value": "0x14",
+          "label": "Set_20"
+        },
+        {
+          "value": "0x15",
+          "label": "Set_21"
+        },
+        {
+          "value": "0x16",
+          "label": "Set_22"
+        },
+        {
+          "value": "0x17",
+          "label": "Set_23"
+        },
+        {
+          "value": "0x18",
+          "label": "Set_24"
+        },
+        {
+          "value": "0x19",
+          "label": "Set_25"
+        },
+        {
+          "value": "0x1a",
+          "label": "Set_26"
+        },
+        {
+          "value": "0x1b",
+          "label": "Set_27"
+        },
+        {
+          "value": "0x1c",
+          "label": "Set_28"
+        },
+        {
+          "value": "0x1d",
+          "label": "Set_29"
+        },
+        {
+          "value": "0x1e",
+          "label": "Set_30"
+        },
+        {
+          "value": "0x1f",
+          "label": "Set_31"
+        }
+      ],
+      "description": "Reported meaning: Indoor air-module LED status."
+    },
+    {
+      "type": "0x41",
+      "coordinate": "0x0d",
+      "kind": "value",
+      "value_type": "uint8",
+      "width": 1,
+      "label_en": "indoor air box LED mode",
+      "enumeration": [
+        {
+          "value": "0x00",
+          "label": "Set_0"
+        },
+        {
+          "value": "0x01",
+          "label": "Set_1"
+        },
+        {
+          "value": "0x02",
+          "label": "Set_2"
+        },
+        {
+          "value": "0x03",
+          "label": "Set_3"
+        },
+        {
+          "value": "0x04",
+          "label": "Set_4"
+        },
+        {
+          "value": "0x05",
+          "label": "Set_5"
+        },
+        {
+          "value": "0x06",
+          "label": "Set_6"
+        },
+        {
+          "value": "0x07",
+          "label": "Set_7"
+        },
+        {
+          "value": "0x08",
+          "label": "Set_8"
+        },
+        {
+          "value": "0x09",
+          "label": "Set_9"
+        },
+        {
+          "value": "0x0a",
+          "label": "Set_10"
+        },
+        {
+          "value": "0x0b",
+          "label": "Set_11"
+        },
+        {
+          "value": "0x0c",
+          "label": "Set_12"
+        },
+        {
+          "value": "0x0d",
+          "label": "Set_13"
+        },
+        {
+          "value": "0x0e",
+          "label": "Set_14"
+        },
+        {
+          "value": "0x0f",
+          "label": "Set_15"
+        },
+        {
+          "value": "0x10",
+          "label": "Set_16"
+        },
+        {
+          "value": "0x11",
+          "label": "Set_17"
+        },
+        {
+          "value": "0x12",
+          "label": "Set_18"
+        },
+        {
+          "value": "0x13",
+          "label": "Set_19"
+        },
+        {
+          "value": "0x14",
+          "label": "Set_20"
+        },
+        {
+          "value": "0x15",
+          "label": "Set_21"
+        },
+        {
+          "value": "0x16",
+          "label": "Set_22"
+        },
+        {
+          "value": "0x17",
+          "label": "Set_23"
+        },
+        {
+          "value": "0x18",
+          "label": "Set_24"
+        },
+        {
+          "value": "0x19",
+          "label": "Set_25"
+        },
+        {
+          "value": "0x1a",
+          "label": "Set_26"
+        },
+        {
+          "value": "0x1b",
+          "label": "Set_27"
+        },
+        {
+          "value": "0x1c",
+          "label": "Set_28"
+        },
+        {
+          "value": "0x1d",
+          "label": "Set_29"
+        },
+        {
+          "value": "0x1e",
+          "label": "Set_30"
+        },
+        {
+          "value": "0x1f",
+          "label": "Set_31"
+        }
+      ],
+      "description": "Reported meaning: Indoor air-module LED mode."
+    },
+    {
+      "type": "0x41",
+      "coordinate": "0x0e",
+      "kind": "value",
+      "value_type": "uint8",
+      "width": 1,
+      "label_en": "indoor main air box state",
+      "enumeration": [
+        {
+          "value": "0x00",
+          "label": "Set_0"
+        },
+        {
+          "value": "0x01",
+          "label": "Set_1"
+        },
+        {
+          "value": "0x02",
+          "label": "Set_2"
+        },
+        {
+          "value": "0x04",
+          "label": "Set_4"
+        },
+        {
+          "value": "0x08",
+          "label": "Set_8"
+        },
+        {
+          "value": "0x10",
+          "label": "Set_16"
+        }
+      ],
+      "description": "Reported meaning: Indoor main air-module status."
+    },
+    {
+      "type": "0x41",
+      "coordinate": "0x0f",
+      "kind": "value",
+      "value_type": "uint8",
+      "width": 1,
+      "label_en": "indoor air box PM2.5 state",
+      "enumeration": [
+        {
+          "value": "0x00",
+          "label": "Set_0"
+        },
+        {
+          "value": "0x01",
+          "label": "Set_1"
+        },
+        {
+          "value": "0x02",
+          "label": "Set_2"
+        },
+        {
+          "value": "0x03",
+          "label": "Set_3"
+        },
+        {
+          "value": "0x04",
+          "label": "Set_4"
+        },
+        {
+          "value": "0x05",
+          "label": "Set_5"
+        },
+        {
+          "value": "0x06",
+          "label": "Set_6"
+        },
+        {
+          "value": "0x07",
+          "label": "Set_7"
+        },
+        {
+          "value": "0x08",
+          "label": "Set_8"
+        },
+        {
+          "value": "0x09",
+          "label": "Set_9"
+        },
+        {
+          "value": "0x0a",
+          "label": "Set_10"
+        },
+        {
+          "value": "0x0b",
+          "label": "Set_11"
+        },
+        {
+          "value": "0x0c",
+          "label": "Set_12"
+        },
+        {
+          "value": "0x0d",
+          "label": "Set_13"
+        },
+        {
+          "value": "0x0e",
+          "label": "Set_14"
+        },
+        {
+          "value": "0x0f",
+          "label": "Set_15"
+        },
+        {
+          "value": "0x10",
+          "label": "Set_16"
+        },
+        {
+          "value": "0x11",
+          "label": "Set_17"
+        },
+        {
+          "value": "0x12",
+          "label": "Set_18"
+        },
+        {
+          "value": "0x13",
+          "label": "Set_19"
+        },
+        {
+          "value": "0x14",
+          "label": "Set_20"
+        },
+        {
+          "value": "0x15",
+          "label": "Set_21"
+        },
+        {
+          "value": "0x16",
+          "label": "Set_22"
+        },
+        {
+          "value": "0x17",
+          "label": "Set_23"
+        },
+        {
+          "value": "0x18",
+          "label": "Set_24"
+        },
+        {
+          "value": "0x19",
+          "label": "Set_25"
+        },
+        {
+          "value": "0x1a",
+          "label": "Set_26"
+        },
+        {
+          "value": "0x1b",
+          "label": "Set_27"
+        },
+        {
+          "value": "0x1c",
+          "label": "Set_28"
+        },
+        {
+          "value": "0x1d",
+          "label": "Set_29"
+        },
+        {
+          "value": "0x1e",
+          "label": "Set_30"
+        },
+        {
+          "value": "0x1f",
+          "label": "Set_31"
+        }
+      ],
+      "description": "Reported meaning: Indoor air-module PM2.5 status."
+    },
+    {
+      "type": "0x41",
+      "coordinate": "0x10",
+      "kind": "value",
+      "value_type": "uint8",
+      "width": 1,
+      "label": "NewFANRunningMode",
+      "enumeration": [
+        {
+          "value": "0x00",
+          "label": "NaN"
+        },
+        {
+          "value": "0x01",
+          "label": "FullHotMode"
+        },
+        {
+          "value": "0x02",
+          "label": "BypassMode"
+        },
+        {
+          "value": "0x03",
+          "label": "AirBackMode"
+        },
+        {
+          "value": "0x04",
+          "label": "LowTempMode"
+        },
+        {
+          "value": "0x05",
+          "label": "InCirculate1"
+        },
+        {
+          "value": "0x06",
+          "label": "InCirculate2"
+        }
+      ],
+      "description": "Reported meaning: Operating mode of the fresh-air unit."
+    },
+    {
+      "type": "0x41",
+      "coordinate": "0x11",
+      "kind": "value",
+      "value_type": "uint8",
+      "width": 1,
+      "label": "AirBackRunningSpeed",
+      "enumeration": [
+        {
+          "value": "0x00",
+          "label": "NaN"
+        },
+        {
+          "value": "0x01",
+          "label": "FanStop"
+        },
+        {
+          "value": "0x02",
+          "label": "SuperLowSpeed"
+        },
+        {
+          "value": "0x03",
+          "label": "LowSpeed"
+        },
+        {
+          "value": "0x04",
+          "label": "LessMidSpeed"
+        },
+        {
+          "value": "0x05",
+          "label": "MidSpeed"
+        },
+        {
+          "value": "0x06",
+          "label": "MoreMidSpeed"
+        },
+        {
+          "value": "0x07",
+          "label": "HighSpeed"
+        },
+        {
+          "value": "0x08",
+          "label": "SuperHighSpeed"
+        },
+        {
+          "value": "0x09",
+          "label": "SilenceFanSpeedR1"
+        },
+        {
+          "value": "0x0a",
+          "label": "SilenceFanSpeedR2"
+        },
+        {
+          "value": "0x0b",
+          "label": "SilenceFanSpeedR3"
+        }
+      ],
+      "description": "Reported meaning: Operating speed of the exhaust fan."
+    },
+    {
+      "type": "0x4d",
+      "coordinate": "0x00",
+      "kind": "value",
+      "value_type": "uint16",
+      "width": 2,
+      "label": "NewFanAimRotateSpeed",
+      "description": "Reported meaning: Target rotational speed of the fresh-air fan."
+    },
+    {
+      "type": "0x4d",
+      "coordinate": "0x02",
+      "kind": "value",
+      "value_type": "uint16",
+      "width": 2,
+      "label": "NewFanActualRotateSpeed",
+      "description": "Reported meaning: Actual rotational speed of the fresh-air fan."
+    },
+    {
+      "type": "0x4d",
+      "coordinate": "0x04",
+      "kind": "value",
+      "value_type": "uint16",
+      "width": 2,
+      "label": "NewFanActualRate",
+      "description": "Reported meaning: Actual duty cycle of the fresh-air fan."
+    },
+    {
+      "type": "0x4d",
+      "coordinate": "0x06",
+      "kind": "value",
+      "value_type": "uint16",
+      "width": 2,
+      "label": "IndoorBox1PM",
+      "description": "Reported meaning: Indoor air sensor 1: PM2.5."
+    },
+    {
+      "type": "0x4d",
+      "coordinate": "0x08",
+      "kind": "value",
+      "value_type": "uint16",
+      "width": 2,
+      "label": "IndoorBox2PM",
+      "description": "Reported meaning: Indoor air sensor 2: PM2.5."
+    },
+    {
+      "type": "0x4d",
+      "coordinate": "0x0a",
+      "kind": "value",
+      "value_type": "uint16",
+      "width": 2,
+      "label": "IndoorBox3PM",
+      "description": "Reported meaning: Indoor air sensor 3: PM2.5."
+    },
+    {
+      "type": "0x4d",
+      "coordinate": "0x0c",
+      "kind": "value",
+      "value_type": "uint16",
+      "width": 2,
+      "label": "IndoorBox4PM",
+      "description": "Reported meaning: Indoor air sensor 4: PM2.5."
+    },
+    {
+      "type": "0x4d",
+      "coordinate": "0x0e",
+      "kind": "value",
+      "value_type": "uint16",
+      "width": 2,
+      "label": "IndoorBox5PM",
+      "description": "Reported meaning: Indoor air sensor 5: PM2.5."
+    },
+    {
+      "type": "0x4d",
+      "coordinate": "0x10",
+      "kind": "value",
+      "value_type": "uint16",
+      "width": 2,
+      "label": "IndoorBox1VOC",
+      "description": "Reported meaning: Indoor air sensor 1: VOC concentration."
+    },
+    {
+      "type": "0x4d",
+      "coordinate": "0x12",
+      "kind": "value",
+      "value_type": "uint16",
+      "width": 2,
+      "label": "IndoorBox2VOC",
+      "description": "Reported meaning: Indoor air sensor 2: VOC concentration."
+    },
+    {
+      "type": "0x4d",
+      "coordinate": "0x14",
+      "kind": "value",
+      "value_type": "uint16",
+      "width": 2,
+      "label": "IndoorBox3VOC",
+      "description": "Reported meaning: Indoor air sensor 3: VOC concentration."
+    },
+    {
+      "type": "0x4d",
+      "coordinate": "0x16",
+      "kind": "value",
+      "value_type": "uint16",
+      "width": 2,
+      "label": "IndoorBox4VOC",
+      "description": "Reported meaning: Indoor air sensor 4: VOC concentration."
+    },
+    {
+      "type": "0x4d",
+      "coordinate": "0x18",
+      "kind": "value",
+      "value_type": "uint16",
+      "width": 2,
+      "label": "IndoorBox5VOC",
+      "description": "Reported meaning: Indoor air sensor 5: VOC concentration."
+    },
+    {
+      "type": "0x4d",
+      "coordinate": "0x1a",
+      "kind": "value",
+      "value_type": "uint16",
+      "width": 2,
+      "label": "IndoorBox1CO2",
+      "description": "Reported meaning: Indoor air sensor 1: CO2 concentration."
+    },
+    {
+      "type": "0x4d",
+      "coordinate": "0x1c",
+      "kind": "value",
+      "value_type": "uint16",
+      "width": 2,
+      "label": "IndoorBox2CO2",
+      "description": "Reported meaning: Indoor air sensor 2: CO2 concentration."
+    },
+    {
+      "type": "0x4d",
+      "coordinate": "0x1e",
+      "kind": "value",
+      "value_type": "uint16",
+      "width": 2,
+      "label": "IndoorBox3CO2",
+      "description": "Reported meaning: Indoor air sensor 3: CO2 concentration."
+    },
+    {
+      "type": "0x4d",
+      "coordinate": "0x20",
+      "kind": "value",
+      "value_type": "uint16",
+      "width": 2,
+      "label": "IndoorBox4CO2",
+      "description": "Reported meaning: Indoor air sensor 4: CO2 concentration."
+    },
+    {
+      "type": "0x4d",
+      "coordinate": "0x22",
+      "kind": "value",
+      "value_type": "uint16",
+      "width": 2,
+      "label": "IndoorBox5CO2",
+      "description": "Reported meaning: Indoor air sensor 5: CO2 concentration."
+    },
+    {
+      "type": "0x4d",
+      "coordinate": "0x24",
+      "kind": "value",
+      "value_type": "uint16",
+      "width": 2,
+      "label": "AirBackAimRotateSpeed",
+      "description": "Reported meaning: Target rotational speed of the exhaust fan."
+    },
+    {
+      "type": "0x4d",
+      "coordinate": "0x26",
+      "kind": "value",
+      "value_type": "uint16",
+      "width": 2,
+      "label": "AirBackActualRotateSpeed",
+      "description": "Reported meaning: Actual rotational speed of the exhaust fan."
+    },
+    {
+      "type": "0x4d",
+      "coordinate": "0x28",
+      "kind": "value",
+      "value_type": "uint16",
+      "width": 2,
+      "label": "AirBackActualRate",
+      "description": "Reported meaning: Actual duty cycle of the exhaust fan."
+    },
+    {
+      "type": "0x52",
+      "container": "0x0a",
+      "kind": "bits",
+      "value_type": "bits",
+      "bits": [
+        {
+          "bit": 0,
+          "coordinate": "0x50",
+          "label": "PowergridcombinedSta",
+          "set_label": "On",
+          "clear_label": "Off",
+          "description": "Reported meaning: Grid-side status of connection to the electrical grid."
+        },
+        {
+          "bit": 1,
+          "coordinate": "0x51",
+          "label": "CompressorWeakMagStaPV",
+          "set_label": "Yes",
+          "clear_label": "No",
+          "description": "Reported meaning: Photovoltaic compressor magnetic-field weakening status."
+        },
+        {
+          "bit": 2,
+          "coordinate": "0x52",
+          "label": "CompressorDriverFreqLimitStaPV",
+          "set_label": "Yes",
+          "clear_label": "No",
+          "description": "Reported meaning: Compressor-drive frequency limiting."
+        },
+        {
+          "bit": 3,
+          "coordinate": "0x53",
+          "label": "CompressorDriverFreqDownStaPV",
+          "set_label": "Yes",
+          "clear_label": "No",
+          "description": "Reported meaning: Compressor-drive frequency reduction."
+        },
+        {
+          "bit": 4,
+          "coordinate": "0x54",
+          "label": "MPPTStaPV",
+          "set_label": "On",
+          "clear_label": "Off",
+          "description": "Reported meaning: Photovoltaic MPPT status."
+        },
+        {
+          "bit": 5,
+          "coordinate": "0x55",
+          "label": "CompressorDriverChargeStaPV",
+          "set_label": "Uncompleted",
+          "clear_label": "Completed",
+          "description": "Reported meaning: Compressor-drive charging status."
+        },
+        {
+          "bit": 7,
+          "coordinate": "0x57",
+          "label": "PowergridInputPowerTypePV",
+          "set_label": "TriPhases",
+          "clear_label": "BiPhases",
+          "description": "Reported meaning: Grid input-supply type."
+        }
+      ]
+    },
+    {
+      "type": "0x52",
+      "container": "0x0b",
+      "kind": "bits",
+      "value_type": "bits",
+      "bits": [
+        {
+          "bit": 0,
+          "coordinate": "0x58",
+          "label": "PVsideLimitpowerPV",
+          "set_label": "Yes",
+          "clear_label": "No",
+          "description": "Reported meaning: Power limiting on the photovoltaic side."
+        },
+        {
+          "bit": 1,
+          "coordinate": "0x59",
+          "label": "PowerSumStaPV",
+          "set_label": "Yes",
+          "clear_label": "No",
+          "description": "Reported meaning: Electric-energy metering indicator."
+        },
+        {
+          "bit": 6,
+          "coordinate": "0x5e",
+          "label": "TempLimitPowerPV",
+          "set_label": "Yes",
+          "clear_label": "No",
+          "description": "Reported meaning: Power limiting as a function of temperature."
+        }
+      ]
+    },
+    {
+      "type": "0x52",
+      "container": "0x0e",
+      "kind": "bits",
+      "value_type": "bits",
+      "bits": [
+        {
+          "bit": 0,
+          "coordinate": "0x70",
+          "label": "photovoltaicReadySta",
+          "set_label": "On",
+          "clear_label": "Off",
+          "description": "Reported meaning: Photovoltaic ready status."
+        },
+        {
+          "bit": 1,
+          "coordinate": "0x71",
+          "label": "MPPT1Sta",
+          "set_label": "On",
+          "clear_label": "Off",
+          "description": "Reported meaning: MPPT1 status."
+        },
+        {
+          "bit": 2,
+          "coordinate": "0x72",
+          "label": "MPPT2Sta",
+          "set_label": "On",
+          "clear_label": "Off",
+          "description": "Reported meaning: MPPT2 status."
+        }
+      ]
+    },
+    {
+      "type": "0x52",
+      "container": "0x0f",
+      "kind": "bits",
+      "value_type": "bits",
+      "bits": [
+        {
+          "bit": 0,
+          "coordinate": "0x78",
+          "label": "PVInputside1LimitPower",
+          "set_label": "Yes",
+          "clear_label": "No",
+          "description": "Reported meaning: Power limiting at photovoltaic input 1."
+        },
+        {
+          "bit": 1,
+          "coordinate": "0x79",
+          "label": "PVInputside2LimitPower",
+          "set_label": "Yes",
+          "clear_label": "No",
+          "description": "Reported meaning: Power limiting at photovoltaic input 2."
+        },
+        {
+          "bit": 2,
+          "coordinate": "0x7a",
+          "label": "PVInputside1PowerSumSta",
+          "set_label": "Completed",
+          "clear_label": "Uncompleted",
+          "description": "Reported meaning: Energy-metering indicator at photovoltaic input 1."
+        },
+        {
+          "bit": 3,
+          "coordinate": "0x7b",
+          "label": "PVInputside2PowerSumSta",
+          "set_label": "Completed",
+          "clear_label": "Uncompleted",
+          "description": "Reported meaning: Energy-metering indicator at photovoltaic input 2."
+        }
+      ]
+    },
+    {
+      "type": "0x53",
+      "container": "0x0a",
+      "kind": "bits",
+      "value_type": "bits",
+      "bits": [
+        {
+          "bit": 0,
+          "coordinate": "0x50",
+          "label": "PLPV",
+          "set_label": "Error",
+          "clear_label": "Normal",
+          "description": "Reported meaning: Photovoltaic DC-bus undervoltage protection, or a fault due to voltage sag."
+        },
+        {
+          "bit": 1,
+          "coordinate": "0x51",
+          "label": "PHPV",
+          "set_label": "Error",
+          "clear_label": "Normal",
+          "description": "Reported meaning: Photovoltaic DC-bus overvoltage protection."
+        },
+        {
+          "bit": 2,
+          "coordinate": "0x52",
+          "label": "G8PV",
+          "set_label": "Error",
+          "clear_label": "Normal",
+          "description": "Reported meaning: Overcurrent protection on the electrical-grid side."
+        },
+        {
+          "bit": 3,
+          "coordinate": "0x53",
+          "label": "P6PV",
+          "set_label": "Error",
+          "clear_label": "Normal",
+          "description": "Reported meaning: IPM-module protection of the photovoltaic compressor drive."
+        },
+        {
+          "bit": 4,
+          "coordinate": "0x54",
+          "label": "G9PV",
+          "set_label": "Error",
+          "clear_label": "Normal",
+          "description": "Reported meaning: Grid-side drive IPM-module protection."
+        },
+        {
+          "bit": 5,
+          "coordinate": "0x55",
+          "label": "PJPV",
+          "set_label": "Error",
+          "clear_label": "Normal",
+          "description": "Reported meaning: Failed start of the variable-speed compressor."
+        },
+        {
+          "bit": 6,
+          "coordinate": "0x56",
+          "label": "PEPV",
+          "set_label": "Error",
+          "clear_label": "Normal",
+          "description": "Reported meaning: Phase-loss protection of the variable-speed compressor."
+        },
+        {
+          "bit": 7,
+          "coordinate": "0x57",
+          "label": "P3PV",
+          "set_label": "Error",
+          "clear_label": "Normal",
+          "description": "Reported meaning: Reset of the compressor drive module."
+        }
+      ]
+    },
+    {
+      "type": "0x53",
+      "container": "0x0b",
+      "kind": "bits",
+      "value_type": "bits",
+      "bits": [
+        {
+          "bit": 0,
+          "coordinate": "0x58",
+          "label": "P5PV",
+          "set_label": "Error",
+          "clear_label": "Normal",
+          "description": "Reported meaning: Overcurrent protection of the variable-speed compressor."
+        },
+        {
+          "bit": 1,
+          "coordinate": "0x59",
+          "label": "GyPV",
+          "set_label": "Error",
+          "clear_label": "Normal",
+          "description": "Reported meaning: Non-recoverable fault of the grid-side drive."
+        },
+        {
+          "bit": 2,
+          "coordinate": "0x5a",
+          "label": "PCPV",
+          "set_label": "Error",
+          "clear_label": "Normal",
+          "description": "Reported meaning: Fault of the current-measurement circuit of the variable-speed compressor drive."
+        },
+        {
+          "bit": 3,
+          "coordinate": "0x5b",
+          "label": "P9PV",
+          "set_label": "Error",
+          "clear_label": "Normal",
+          "description": "Reported meaning: Compressor loss-of-synchronism protection."
+        },
+        {
+          "bit": 5,
+          "coordinate": "0x5d",
+          "label": "C2PV",
+          "set_label": "Error",
+          "clear_label": "Normal",
+          "description": "Reported meaning: Communication fault between the main controller and the variable-speed compressor drive."
+        },
+        {
+          "bit": 6,
+          "coordinate": "0x5e",
+          "label": "P8PV",
+          "set_label": "Error",
+          "clear_label": "Normal",
+          "description": "Reported meaning: IPM-module overtemperature protection."
+        },
+        {
+          "bit": 7,
+          "coordinate": "0x5f",
+          "label": "P7PV",
+          "set_label": "Error",
+          "clear_label": "Normal",
+          "description": "Reported meaning: IPM-module temperature-sensor fault."
+        }
+      ]
+    },
+    {
+      "type": "0x53",
+      "container": "0x0c",
+      "kind": "bits",
+      "value_type": "bits",
+      "bits": [
+        {
+          "bit": 0,
+          "coordinate": "0x60",
+          "label": "PbPV",
+          "set_label": "Error",
+          "clear_label": "Normal",
+          "description": "Reported meaning: Insulation-impedance protection of the photovoltaic array."
+        },
+        {
+          "bit": 1,
+          "coordinate": "0x61",
+          "label": "PdPV",
+          "set_label": "Error",
+          "clear_label": "Normal",
+          "description": "Reported meaning: The charging relay is not fully closed."
+        },
+        {
+          "bit": 2,
+          "coordinate": "0x62",
+          "label": "PFPV",
+          "set_label": "Error",
+          "clear_label": "Normal",
+          "description": "Reported meaning: Fault of the compressor-drive charging circuit."
+        },
+        {
+          "bit": 3,
+          "coordinate": "0x63",
+          "label": "GAPV",
+          "set_label": "Error",
+          "clear_label": "Normal",
+          "description": "Reported meaning: Grid-side input undervoltage/overvoltage protection."
+        }
+      ]
+    },
+    {
+      "type": "0x53",
+      "container": "0x0d",
+      "kind": "bits",
+      "value_type": "bits",
+      "bits": [
+        {
+          "bit": 0,
+          "coordinate": "0x68",
+          "label": "G0PV",
+          "set_label": "Error",
+          "clear_label": "Normal",
+          "description": "Reported meaning: Photovoltaic polarity-reversal protection."
+        },
+        {
+          "bit": 1,
+          "coordinate": "0x69",
+          "label": "G1PV",
+          "set_label": "Error",
+          "clear_label": "Normal",
+          "description": "Reported meaning: Photovoltaic anti-islanding protection."
+        },
+        {
+          "bit": 2,
+          "coordinate": "0x6a",
+          "label": "G2PV",
+          "set_label": "Error",
+          "clear_label": "Normal",
+          "description": "Reported meaning: Photovoltaic DC overcurrent protection."
+        },
+        {
+          "bit": 3,
+          "coordinate": "0x6b",
+          "label": "G3PV",
+          "set_label": "Error",
+          "clear_label": "Normal",
+          "description": "Reported meaning: Photovoltaic-generation overload."
+        },
+        {
+          "bit": 4,
+          "coordinate": "0x6c",
+          "label": "G4PV",
+          "set_label": "Error",
+          "clear_label": "Normal",
+          "description": "Reported meaning: Photovoltaic leakage-current protection."
+        },
+        {
+          "bit": 5,
+          "coordinate": "0x6d",
+          "label": "G5PV",
+          "set_label": "Error",
+          "clear_label": "Normal",
+          "description": "Reported meaning: Phase-loss protection on the electrical-grid side."
+        },
+        {
+          "bit": 6,
+          "coordinate": "0x6e",
+          "label": "G6PV",
+          "set_label": "Error",
+          "clear_label": "Normal",
+          "description": "Reported meaning: Operation during a photovoltaic voltage sag."
+        },
+        {
+          "bit": 7,
+          "coordinate": "0x6f",
+          "label": "G7PV",
+          "set_label": "Error",
+          "clear_label": "Normal",
+          "description": "Reported meaning: Protection against grid-voltage frequency too high/too low."
+        }
+      ]
+    },
+    {
+      "type": "0x54",
+      "container": "0x0a",
+      "kind": "bits",
+      "value_type": "bits",
+      "bits": [
+        {
+          "bit": 0,
+          "coordinate": "0x50",
+          "label": "PVIn1VoltHighSta",
+          "set_label": "Error",
+          "clear_label": "Normal",
+          "description": "Reported meaning: Overvoltage protection at photovoltaic input 1."
+        },
+        {
+          "bit": 1,
+          "coordinate": "0x51",
+          "label": "PVIn1SOCSta",
+          "set_label": "Error",
+          "clear_label": "Normal",
+          "description": "Reported meaning: Software overcurrent protection at photovoltaic input 1."
+        },
+        {
+          "bit": 2,
+          "coordinate": "0x52",
+          "label": "PVIn1HOCSta",
+          "set_label": "Error",
+          "clear_label": "Normal",
+          "description": "Reported meaning: Hardware overcurrent protection at photovoltaic input 1."
+        },
+        {
+          "bit": 3,
+          "coordinate": "0x53",
+          "label": "PVIn1PTSta",
+          "set_label": "Error",
+          "clear_label": "Normal",
+          "description": "Reported meaning: Polarity-reversal protection at photovoltaic input 1."
+        },
+        {
+          "bit": 4,
+          "coordinate": "0x54",
+          "label": "PVIn2VoltHighSta",
+          "set_label": "Error",
+          "clear_label": "Normal",
+          "description": "Reported meaning: Overvoltage protection at photovoltaic input 2."
+        },
+        {
+          "bit": 5,
+          "coordinate": "0x55",
+          "label": "PVIn2SOCSta",
+          "set_label": "Error",
+          "clear_label": "Normal",
+          "description": "Reported meaning: Software overcurrent protection at photovoltaic input 2."
+        },
+        {
+          "bit": 6,
+          "coordinate": "0x56",
+          "label": "PVIn2HOCSta",
+          "set_label": "Error",
+          "clear_label": "Normal",
+          "description": "Reported meaning: Hardware overcurrent protection at photovoltaic input 2."
+        },
+        {
+          "bit": 7,
+          "coordinate": "0x57",
+          "label": "PVIn2PTSta",
+          "set_label": "Error",
+          "clear_label": "Normal",
+          "description": "Reported meaning: Polarity-reversal protection at photovoltaic input 2."
+        }
+      ]
+    },
+    {
+      "type": "0x54",
+      "container": "0x0b",
+      "kind": "bits",
+      "value_type": "bits",
+      "bits": [
+        {
+          "bit": 0,
+          "coordinate": "0x58",
+          "label": "PVDCBusVoltSta",
+          "set_label": "Error",
+          "clear_label": "Normal",
+          "description": "Reported meaning: Photovoltaic DC-bus undervoltage or overvoltage protection."
+        },
+        {
+          "bit": 1,
+          "coordinate": "0x59",
+          "label": "MasterToDCCommErr",
+          "set_label": "Error",
+          "clear_label": "Normal",
+          "description": "Reported meaning: Communication fault between the main controller and the DC-DC controller."
+        },
+        {
+          "bit": 2,
+          "coordinate": "0x5a",
+          "label": "PVIn1ModuTempHighSta",
+          "set_label": "Error",
+          "clear_label": "Normal",
+          "description": "Reported meaning: Module overtemperature at photovoltaic input 1."
+        },
+        {
+          "bit": 3,
+          "coordinate": "0x5b",
+          "label": "PVIn1TsorErr",
+          "set_label": "Error",
+          "clear_label": "Normal",
+          "description": "Reported meaning: Temperature-sensor fault at photovoltaic input 1."
+        },
+        {
+          "bit": 4,
+          "coordinate": "0x5c",
+          "label": "PVIn2ModuTempHighSta",
+          "set_label": "Error",
+          "clear_label": "Normal",
+          "description": "Reported meaning: Module overtemperature at photovoltaic input 2."
+        },
+        {
+          "bit": 5,
+          "coordinate": "0x5d",
+          "label": "PVIn2TsorErr",
+          "set_label": "Error",
+          "clear_label": "Normal",
+          "description": "Reported meaning: Temperature-sensor fault at photovoltaic input 2."
+        }
+      ]
+    },
+    {
+      "type": "0x54",
+      "container": "0x0c",
+      "kind": "bits",
+      "value_type": "bits",
+      "bits": [
+        {
+          "bit": 0,
+          "coordinate": "0x60",
+          "label": "PVInCsorErr",
+          "set_label": "Error",
+          "clear_label": "Normal",
+          "description": "Reported meaning: Photovoltaic input current-sensor fault."
+        },
+        {
+          "bit": 1,
+          "coordinate": "0x61",
+          "label": "PVIn1IsoImpDetectErr",
+          "set_label": "Error",
+          "clear_label": "Normal",
+          "description": "Reported meaning: Insulation-impedance detection fault at photovoltaic input 1."
+        },
+        {
+          "bit": 2,
+          "coordinate": "0x62",
+          "label": "PVIn2IsoImpDetectErr",
+          "set_label": "Error",
+          "clear_label": "Normal",
+          "description": "Reported meaning: Insulation-impedance detection fault at photovoltaic input 2."
+        }
+      ]
+    },
+    {
+      "type": "0x55",
+      "coordinate": "0x50",
+      "kind": "value",
+      "value_type": "uint8",
+      "width": 1,
+      "label": "CompressorRunningFreqPV",
+      "unit": "Hz",
+      "description": "Reported meaning: Compressor operating frequency."
+    },
+    {
+      "type": "0x55",
+      "coordinate": "0x51",
+      "kind": "value",
+      "value_type": "uint8",
+      "width": 1,
+      "label": "CompressorUPhaseCurrentPV",
+      "unit": "A",
+      "description": "Reported meaning: Compressor phase-U current."
+    },
+    {
+      "type": "0x55",
+      "coordinate": "0x52",
+      "kind": "value",
+      "value_type": "uint8",
+      "width": 1,
+      "label": "CompressorVPhaseCurrentPV",
+      "unit": "A",
+      "description": "Reported meaning: Compressor phase-V current."
+    },
+    {
+      "type": "0x55",
+      "coordinate": "0x53",
+      "kind": "value",
+      "value_type": "uint8",
+      "width": 1,
+      "label": "CompressorModelNOPV",
+      "description": "Reported meaning: Compressor model code."
+    },
+    {
+      "type": "0x55",
+      "coordinate": "0x54",
+      "kind": "value",
+      "value_type": "uint8Multi2",
+      "width": 1,
+      "label": "PowergridInputVoltPV",
+      "unit": "V",
+      "notes": [
+        "The value type has no decode rule; only the raw byte is exposed."
+      ],
+      "description": "Reported meaning: Input phase voltage on the electrical-grid side."
+    },
+    {
+      "type": "0x55",
+      "coordinate": "0x55",
+      "kind": "value",
+      "value_type": "uint8",
+      "width": 1,
+      "label": "ProgramVersionPV",
+      "description": "Reported meaning: Program version number."
+    },
+    {
+      "type": "0x56",
+      "coordinate": "0x50",
+      "kind": "value",
+      "value_type": "uint8",
+      "width": 1,
+      "label": "CompressorStaPV",
+      "enumeration": [
+        {
+          "value": "0x00",
+          "label": "Stop"
+        },
+        {
+          "value": "0x01",
+          "label": "Running"
+        },
+        {
+          "value": "0x02",
+          "label": "ErrorStop"
+        }
+      ],
+      "description": "Reported meaning: Compressor status."
+    },
+    {
+      "type": "0x56",
+      "coordinate": "0x51",
+      "kind": "value",
+      "value_type": "uint8",
+      "width": 1,
+      "label": "CompressorProgramRunningStaPV",
+      "enumeration": [
+        {
+          "value": "0x00",
+          "label": "Reset"
+        },
+        {
+          "value": "0x01",
+          "label": "SamplingExcursionCalculate"
+        },
+        {
+          "value": "0x02",
+          "label": "Wait"
+        },
+        {
+          "value": "0x03",
+          "label": "Input"
+        },
+        {
+          "value": "0x04",
+          "label": "Orientation"
+        },
+        {
+          "value": "0x05",
+          "label": "Startup"
+        },
+        {
+          "value": "0x06",
+          "label": "Running"
+        }
+      ],
+      "description": "Reported meaning: Compressor program operating status."
+    },
+    {
+      "type": "0x56",
+      "coordinate": "0x52",
+      "kind": "value",
+      "value_type": "uint8",
+      "width": 1,
+      "label": "PowergridProgramRunningStaPV",
+      "enumeration": [
+        {
+          "value": "0x00",
+          "label": "Stop"
+        },
+        {
+          "value": "0x01",
+          "label": "SamplingExcursionCalculate"
+        },
+        {
+          "value": "0x02",
+          "label": "Startup"
+        },
+        {
+          "value": "0x03",
+          "label": "Running"
+        }
+      ],
+      "description": "Reported meaning: Grid-side program operating status."
+    },
+    {
+      "type": "0x56",
+      "coordinate": "0x5e",
+      "kind": "value",
+      "value_type": "uint8",
+      "width": 1,
+      "label": "PVIn1RunningSta",
+      "enumeration": [
+        {
+          "value": "0x00",
+          "label": "Stop"
+        },
+        {
+          "value": "0x01",
+          "label": "Wait"
+        },
+        {
+          "value": "0x02",
+          "label": "Startup"
+        },
+        {
+          "value": "0x03",
+          "label": "Running"
+        }
+      ],
+      "description": "Reported meaning: Operating status of photovoltaic input 1."
+    },
+    {
+      "type": "0x56",
+      "coordinate": "0x5f",
+      "kind": "value",
+      "value_type": "uint8",
+      "width": 1,
+      "label": "PVIn2RunningSta",
+      "enumeration": [
+        {
+          "value": "0x00",
+          "label": "Stop"
+        },
+        {
+          "value": "0x01",
+          "label": "Wait"
+        },
+        {
+          "value": "0x02",
+          "label": "Startup"
+        },
+        {
+          "value": "0x03",
+          "label": "Running"
+        }
+      ],
+      "description": "Reported meaning: Operating status of photovoltaic input 2."
+    },
+    {
+      "type": "0x57",
+      "coordinate": "0x50",
+      "kind": "value",
+      "value_type": "uint8Minus100",
+      "width": 1,
+      "label": "CompDriveIPMModuTempPV",
+      "unit": "\u2103",
+      "description": "Reported meaning: Temperature of the compressor-drive IPM module."
+    },
+    {
+      "type": "0x57",
+      "coordinate": "0x51",
+      "kind": "value",
+      "value_type": "uint8Minus100",
+      "width": 1,
+      "label": "PowergridDriveIPMModuTempPV",
+      "unit": "\u2103",
+      "description": "Reported meaning: Temperature of the grid-side drive IPM module."
+    },
+    {
+      "type": "0x57",
+      "coordinate": "0x5e",
+      "kind": "value",
+      "value_type": "uint8Minus100",
+      "width": 1,
+      "label": "PVIn1ModuTemp",
+      "unit": "\u2103",
+      "description": "Reported meaning: Temperature of photovoltaic input module 1."
+    },
+    {
+      "type": "0x57",
+      "coordinate": "0x5f",
+      "kind": "value",
+      "value_type": "uint8Minus100",
+      "width": 1,
+      "label": "PVIn2ModuTemp",
+      "unit": "\u2103",
+      "description": "Reported meaning: Temperature of photovoltaic input module 2."
+    },
+    {
+      "type": "0x58",
+      "coordinate": "0x50",
+      "kind": "value",
+      "value_type": "uint16DecimalsDevide256",
+      "width": 2,
+      "label": "CompressorCurrentPV",
+      "unit": "A",
+      "description": "Reported meaning: Compressor current."
+    },
+    {
+      "type": "0x58",
+      "coordinate": "0x52",
+      "kind": "value",
+      "value_type": "uint16multi256",
+      "width": 2,
+      "label": "photovoltaicDCBusVolt",
+      "unit": "V",
+      "description": "Reported meaning: Photovoltaic DC-bus voltage."
+    },
+    {
+      "type": "0x58",
+      "coordinate": "0x54",
+      "kind": "value",
+      "value_type": "uint16DecimalsDevide256",
+      "width": 2,
+      "label": "PowergridCurrentPV",
+      "unit": "A",
+      "description": "Reported meaning: Current on the electrical-grid side."
+    },
+    {
+      "type": "0x58",
+      "coordinate": "0x58",
+      "kind": "value",
+      "value_type": "uint16Minus32768Multi10",
+      "width": 2,
+      "label": "PowergridCombinedPower",
+      "unit": "kW",
+      "description": "Reported meaning: Grid-side power of the connection to the electrical grid."
+    },
+    {
+      "type": "0x58",
+      "coordinate": "0x5a",
+      "kind": "value",
+      "value_type": "uint16Multi10",
+      "width": 2,
+      "label": "photovoltaicAddPower",
+      "unit": "kW",
+      "description": "Reported meaning: Generated photovoltaic power."
+    },
+    {
+      "type": "0x58",
+      "coordinate": "0x5c",
+      "kind": "value",
+      "value_type": "uint16Minus32768Multi1000",
+      "width": 2,
+      "label": "PowergridCombinedElectric",
+      "unit": "kWh",
+      "description": "Reported meaning: Grid-side energy of the connection to the electrical grid; protocol synchronized on 2015-05-22."
+    },
+    {
+      "type": "0x58",
+      "coordinate": "0x5e",
+      "kind": "value",
+      "value_type": "uint16Multi1000",
+      "width": 2,
+      "label": "photovoltaicAddElectricQuantity",
+      "unit": "kWh",
+      "description": "Reported meaning: Generated photovoltaic energy."
+    },
+    {
+      "type": "0x58",
+      "coordinate": "0x60",
+      "kind": "value",
+      "value_type": "uint16DecimalsDevide256",
+      "width": 2,
+      "label": "PVsideInputCurrent",
+      "unit": "A",
+      "description": "Reported meaning: Input current on the photovoltaic side."
+    },
+    {
+      "type": "0x59",
+      "coordinate": "0x50",
+      "kind": "value",
+      "value_type": "uint16multi256",
+      "width": 2,
+      "label": "PVInputside1Volt",
+      "unit": "V",
+      "description": "Reported meaning: Voltage at photovoltaic input 1."
+    },
+    {
+      "type": "0x59",
+      "coordinate": "0x52",
+      "kind": "value",
+      "value_type": "uint16multi256",
+      "width": 2,
+      "label": "PVInputside2Volt",
+      "unit": "V",
+      "description": "Reported meaning: Voltage at photovoltaic input 2."
+    },
+    {
+      "type": "0x59",
+      "coordinate": "0x54",
+      "kind": "value",
+      "value_type": "uint16DecimalsDevide256",
+      "width": 2,
+      "label": "PVInputside1Current",
+      "unit": "A",
+      "description": "Reported meaning: Current at photovoltaic input 1."
+    },
+    {
+      "type": "0x59",
+      "coordinate": "0x56",
+      "kind": "value",
+      "value_type": "uint16DecimalsDevide256",
+      "width": 2,
+      "label": "PVInputside2Current",
+      "unit": "A",
+      "description": "Reported meaning: Current at photovoltaic input 2."
+    },
+    {
+      "type": "0x59",
+      "coordinate": "0x58",
+      "kind": "value",
+      "value_type": "uint16multi256",
+      "width": 2,
+      "label": "PhotovoltaicDCBusVoltDC",
+      "unit": "V",
+      "description": "Reported meaning: Photovoltaic DC-bus voltage."
+    },
+    {
+      "type": "0x59",
+      "coordinate": "0x5a",
+      "kind": "value",
+      "value_type": "uint16Devide100",
+      "width": 2,
+      "label": "PVInputside1AddPower",
+      "unit": "kW",
+      "description": "Reported meaning: Power generated at photovoltaic input 1."
+    },
+    {
+      "type": "0x59",
+      "coordinate": "0x5c",
+      "kind": "value",
+      "value_type": "uint16Devide100",
+      "width": 2,
+      "label": "PVInputside2AddPower",
+      "unit": "kW",
+      "description": "Reported meaning: Power generated at photovoltaic input 2."
+    },
+    {
+      "type": "0x59",
+      "coordinate": "0x5e",
+      "kind": "value",
+      "value_type": "uint16Devide3600",
+      "width": 2,
+      "label": "PVInputside1AddElectricQuantity",
+      "unit": "kWh",
+      "description": "Reported meaning: Energy generated at photovoltaic input 1."
+    },
+    {
+      "type": "0x59",
+      "coordinate": "0x60",
+      "kind": "value",
+      "value_type": "uint16Devide3600",
+      "width": 2,
+      "label": "PVInputside2AddElectricQuantity",
+      "unit": "kWh",
+      "description": "Reported meaning: Energy generated at photovoltaic input 2."
+    }
+  ]
+}

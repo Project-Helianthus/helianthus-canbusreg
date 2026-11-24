@@ -1,0 +1,1444 @@
+{
+  "schema": "gree.vrf.can.dictionary",
+  "schema_version": 1,
+  "status": "candidate",
+  "slice": "identity",
+  "types": [
+    "0x10",
+    "0x11",
+    "0x12",
+    "0x13"
+  ],
+  "counts": {
+    "positions": 64,
+    "named_values": 63,
+    "bit_containers": 1,
+    "named_bits": 6,
+    "label_only": 0
+  },
+  "entries": [
+    {
+      "type": "0x10",
+      "coordinate": "0x00",
+      "kind": "value",
+      "value_type": "uint16",
+      "width": 2,
+      "label": "TempProtVer",
+      "description": "Reported meaning: General version of the CAN protocol."
+    },
+    {
+      "type": "0x10",
+      "coordinate": "0x02",
+      "kind": "value",
+      "value_type": "uint16",
+      "width": 2,
+      "label": "DevProtVer",
+      "description": "Reported meaning: Device protocol version."
+    },
+    {
+      "type": "0x10",
+      "coordinate": "0x04",
+      "kind": "value",
+      "value_type": "uint16",
+      "width": 2,
+      "label": "IDUType",
+      "enumeration": [
+        {
+          "value": "0x0603",
+          "label": "0603"
+        },
+        {
+          "value": "0x4021",
+          "label": "ID4021"
+        },
+        {
+          "value": "0x6030",
+          "label": "GMV5"
+        },
+        {
+          "value": "0x6031",
+          "label": "GMV5(T)"
+        },
+        {
+          "value": "0x6032",
+          "label": "WaterSourceHeatPump"
+        },
+        {
+          "value": "0x6033",
+          "label": "J65"
+        },
+        {
+          "value": "0x6034",
+          "label": "GMVUnic"
+        },
+        {
+          "value": "0x6035",
+          "label": "WaterTank"
+        },
+        {
+          "value": "0x6036",
+          "label": "HWG"
+        },
+        {
+          "value": "0x6037",
+          "label": "GMV Unic"
+        },
+        {
+          "value": "0x6038",
+          "label": "GMV HR3"
+        },
+        {
+          "value": "0x6039",
+          "label": "8K8"
+        },
+        {
+          "value": "0x6040",
+          "label": "Duct(PL)"
+        },
+        {
+          "value": "0x6041",
+          "label": "Duct(D-HC)"
+        },
+        {
+          "value": "0x6042",
+          "label": "Duct(PH)"
+        },
+        {
+          "value": "0x6043",
+          "label": "Duct(H)"
+        },
+        {
+          "value": "0x6044",
+          "label": "Cassette(T)"
+        },
+        {
+          "value": "0x6045",
+          "label": "Duct(D-HW)"
+        },
+        {
+          "value": "0x6046",
+          "label": "Duct(D-HY)"
+        },
+        {
+          "value": "0x6047",
+          "label": "Duct(D-HK)"
+        },
+        {
+          "value": "0x6048",
+          "label": "FCeiling(ZD)"
+        },
+        {
+          "value": "0x6049",
+          "label": "W-Mounted(G)"
+        },
+        {
+          "value": "0x604a",
+          "label": "Duct(PHB-NA)"
+        },
+        {
+          "value": "0x604b",
+          "label": "Duct(D-PL)"
+        },
+        {
+          "value": "0x604c",
+          "label": "Duct(D-PH)"
+        },
+        {
+          "value": "0x604d",
+          "label": "Duct(D-H)"
+        },
+        {
+          "value": "0x604e",
+          "label": "Cassette(D-T)"
+        },
+        {
+          "value": "0x604f",
+          "label": "Cassette(D-TS)"
+        },
+        {
+          "value": "0x6050",
+          "label": "Cassette(D-TD)"
+        },
+        {
+          "value": "0x6051",
+          "label": "Cassette(D-?)"
+        },
+        {
+          "value": "0x6052",
+          "label": "FCeiling(D-ZD)"
+        },
+        {
+          "value": "0x6053",
+          "label": "W-Mounted(D-G)"
+        },
+        {
+          "value": "0x6054",
+          "label": "HF-Standing(?)"
+        },
+        {
+          "value": "0x6055",
+          "label": "Console(D-?)"
+        },
+        {
+          "value": "0x6056",
+          "label": "FAPU"
+        },
+        {
+          "value": "0x6057",
+          "label": "HRV"
+        },
+        {
+          "value": "0x6058",
+          "label": "AC-HRV"
+        },
+        {
+          "value": "0x6059",
+          "label": "Duct(?)"
+        },
+        {
+          "value": "0x605a",
+          "label": "Duct(PHB+W)"
+        },
+        {
+          "value": "0x605b",
+          "label": "AHU"
+        },
+        {
+          "value": "0x605c",
+          "label": "Duct(PHB)"
+        },
+        {
+          "value": "0x605d",
+          "label": "ID605D"
+        },
+        {
+          "value": "0x605e",
+          "label": "ID605E"
+        },
+        {
+          "value": "0x6062",
+          "label": "8H5"
+        },
+        {
+          "value": "0x6063",
+          "label": "GMV5Single"
+        },
+        {
+          "value": "0x6064",
+          "label": "GWV"
+        },
+        {
+          "value": "0x6065",
+          "label": "GWV6065"
+        },
+        {
+          "value": "0x6066",
+          "label": "GMV-H160WL/D"
+        },
+        {
+          "value": "0x6067",
+          "label": "photovoltaic"
+        },
+        {
+          "value": "0x6068",
+          "label": "GMV EVI"
+        },
+        {
+          "value": "0x6069",
+          "label": "GMV RD"
+        },
+        {
+          "value": "0x606a",
+          "label": "GMV5Compact"
+        },
+        {
+          "value": "0x606e",
+          "label": "J65PowerStatistics"
+        },
+        {
+          "value": "0x6070",
+          "label": "MV2"
+        },
+        {
+          "value": "0x6071",
+          "label": "MV2F"
+        },
+        {
+          "value": "0x6072",
+          "label": "MV2G"
+        },
+        {
+          "value": "0x6073",
+          "label": "MV2A"
+        },
+        {
+          "value": "0x6074",
+          "label": "ID6074"
+        },
+        {
+          "value": "0x6075",
+          "label": "Air-Handler"
+        },
+        {
+          "value": "0x6076",
+          "label": "ID6076"
+        },
+        {
+          "value": "0x6079",
+          "label": "ID6079"
+        },
+        {
+          "value": "0x607a",
+          "label": "607A"
+        },
+        {
+          "value": "0x607b",
+          "label": "ID607B"
+        },
+        {
+          "value": "0x607d",
+          "label": "ID607D"
+        },
+        {
+          "value": "0x607f",
+          "label": "ID607F"
+        },
+        {
+          "value": "0x6080",
+          "label": "ID6080"
+        },
+        {
+          "value": "0x6082",
+          "label": "ID6082"
+        },
+        {
+          "value": "0x6083",
+          "label": "ID6083"
+        },
+        {
+          "value": "0x6084",
+          "label": "ID6084"
+        },
+        {
+          "value": "0x6085",
+          "label": "ID6085"
+        },
+        {
+          "value": "0x6086",
+          "label": "ID6086"
+        },
+        {
+          "value": "0x6087",
+          "label": "ID6087"
+        },
+        {
+          "value": "0x6088",
+          "label": "ID6088"
+        },
+        {
+          "value": "0x6089",
+          "label": "ID6089"
+        },
+        {
+          "value": "0x608a",
+          "label": "ID608A"
+        },
+        {
+          "value": "0x608b",
+          "label": "Duct(H)"
+        },
+        {
+          "value": "0x608c",
+          "label": "ID608C"
+        },
+        {
+          "value": "0x608d",
+          "label": "ID608D"
+        },
+        {
+          "value": "0x608e",
+          "label": "ID608E"
+        },
+        {
+          "value": "0x608f",
+          "label": "ID608F"
+        },
+        {
+          "value": "0x6090",
+          "label": "ID6090"
+        },
+        {
+          "value": "0x6091",
+          "label": "ID6091"
+        },
+        {
+          "value": "0x6092",
+          "label": "ID6092"
+        },
+        {
+          "value": "0x6093",
+          "label": "ID6093"
+        },
+        {
+          "value": "0x6094",
+          "label": "ID6094"
+        },
+        {
+          "value": "0x6095",
+          "label": "ID6095"
+        },
+        {
+          "value": "0x6096",
+          "label": "ID6096"
+        },
+        {
+          "value": "0x6097",
+          "label": "ID6097"
+        },
+        {
+          "value": "0x6098",
+          "label": "ID6098"
+        },
+        {
+          "value": "0x6099",
+          "label": "ID6099"
+        },
+        {
+          "value": "0x609a",
+          "label": "ID609A"
+        },
+        {
+          "value": "0x609b",
+          "label": "ID609B"
+        },
+        {
+          "value": "0x609c",
+          "label": "ID609C"
+        },
+        {
+          "value": "0x609d",
+          "label": "ID609D"
+        },
+        {
+          "value": "0x609f",
+          "label": "ID609F"
+        },
+        {
+          "value": "0x60a1",
+          "label": "ID60A1"
+        },
+        {
+          "value": "0x60ff",
+          "label": "ID60FF"
+        }
+      ],
+      "notes": [
+        "Carries the family and profile identifier for every device class, outdoor units included, although the native label names indoor units only. It does not identify a commercial model."
+      ],
+      "description": "Reported meaning: family and profile identifier. It does not name a commercial model."
+    },
+    {
+      "type": "0x10",
+      "coordinate": "0x06",
+      "kind": "value",
+      "value_type": "uint8",
+      "width": 1,
+      "label": "addr",
+      "description": "Reported meaning: Native device address, one byte; the label IP does not denote an IPv4 or IPv6 address."
+    },
+    {
+      "type": "0x10",
+      "coordinate": "0x07",
+      "kind": "value",
+      "value_type": "ubytes6",
+      "width": 6,
+      "label": "MAC",
+      "notes": [
+        "Six raw bytes kept in the order b0 to b5. The value is not a number, and the native label does not establish that it is the hardware address of any network adapter."
+      ],
+      "description": "Reported meaning: six-byte identifier kept in byte order. The native label is not established as a network-adapter address."
+    },
+    {
+      "type": "0x10",
+      "coordinate": "0x0d",
+      "kind": "value",
+      "value_type": "uint8",
+      "width": 1,
+      "label": "PowerType",
+      "enumeration": [
+        {
+          "value": "0x00",
+          "label": "NaN"
+        },
+        {
+          "value": "0x01",
+          "label": "100~115V"
+        },
+        {
+          "value": "0x02",
+          "label": "200~240V"
+        },
+        {
+          "value": "0x08",
+          "label": "50Hz"
+        },
+        {
+          "value": "0x09",
+          "label": "50 Hz, 100-115 V",
+          "label_translated": true
+        },
+        {
+          "value": "0x0a",
+          "label": "50 Hz, 200-240 V",
+          "label_translated": true
+        },
+        {
+          "value": "0x10",
+          "label": "60Hz"
+        },
+        {
+          "value": "0x11",
+          "label": "60 Hz, 100-115 V",
+          "label_translated": true
+        },
+        {
+          "value": "0x12",
+          "label": "60 Hz, 200-240 V",
+          "label_translated": true
+        },
+        {
+          "value": "0x18",
+          "label": "50 Hz or 60 Hz compatible",
+          "label_translated": true
+        },
+        {
+          "value": "0x19",
+          "label": "50 Hz or 60 Hz compatible, 100-115",
+          "label_translated": true
+        },
+        {
+          "value": "0x1a",
+          "label": "50 Hz or 60 Hz compatible, 200-240 V",
+          "label_translated": true
+        }
+      ],
+      "description": "Reported meaning: Power-supply type."
+    },
+    {
+      "type": "0x10",
+      "coordinate": "0x0e",
+      "kind": "value",
+      "value_type": "uint16Devide10",
+      "width": 2,
+      "label": "RatedCapacity",
+      "unit": "kW",
+      "presentation_converter": "kWVskBtuh",
+      "description": "Reported meaning: Rated capacity."
+    },
+    {
+      "type": "0x10",
+      "coordinate": "0x10",
+      "kind": "value",
+      "value_type": "uint16",
+      "width": 2,
+      "label": "AdjIDUProjectNO",
+      "description": "Reported meaning: Adjusted project number of the indoor unit."
+    },
+    {
+      "type": "0x10",
+      "coordinate": "0x12",
+      "kind": "value",
+      "value_type": "uint16",
+      "width": 2,
+      "label": "LocalGroupNO",
+      "description": "Reported meaning: Physical group number."
+    },
+    {
+      "type": "0x10",
+      "coordinate": "0x14",
+      "kind": "value",
+      "value_type": "uint8",
+      "width": 1,
+      "label": "RefregantType",
+      "enumeration": [
+        {
+          "value": "0x00",
+          "label": "NaN"
+        },
+        {
+          "value": "0x01",
+          "label": "R410A"
+        }
+      ],
+      "description": "Reported meaning: Refrigerant type."
+    },
+    {
+      "type": "0x10",
+      "coordinate": "0x15",
+      "kind": "value",
+      "value_type": "uint8",
+      "width": 1,
+      "label": "ODUCodeAddr",
+      "description": "Reported meaning: Outdoor-unit DIP switch."
+    },
+    {
+      "type": "0x10",
+      "coordinate": "0x16",
+      "kind": "value",
+      "value_type": "uint8",
+      "width": 1,
+      "label": "MasterSysSetting",
+      "enumeration": [
+        {
+          "value": "0x00",
+          "label": "NaN"
+        },
+        {
+          "value": "0x01",
+          "label": "NoMasterSys"
+        },
+        {
+          "value": "0x02",
+          "label": "MasterSys"
+        }
+      ],
+      "description": "Reported meaning: System master-mode setting."
+    },
+    {
+      "type": "0x10",
+      "coordinate": "0x17",
+      "kind": "value",
+      "value_type": "uint8",
+      "width": 1,
+      "label": "DataManageSign",
+      "description": "Reported meaning: Indicator of use of the data-management area."
+    },
+    {
+      "type": "0x10",
+      "coordinate": "0x18",
+      "kind": "value",
+      "value_type": "uint8",
+      "width": 1,
+      "label": "CAN2Number",
+      "description": "Reported meaning: CAN2 bus number."
+    },
+    {
+      "type": "0x10",
+      "coordinate": "0x1b",
+      "kind": "value",
+      "value_type": "uint16Devide10",
+      "width": 2,
+      "label": "FHRatedCapacity",
+      "unit": "kW",
+      "presentation_converter": "kWVskBtuh",
+      "description": "Reported meaning: Rated capacity of the floor heating."
+    },
+    {
+      "type": "0x10",
+      "coordinate": "0x1d",
+      "kind": "value",
+      "value_type": "uint16",
+      "width": 2,
+      "label": "RatedBlowingrate",
+      "description": "Reported meaning: Rated airflow."
+    },
+    {
+      "type": "0x10",
+      "coordinate": "0x1f",
+      "kind": "value",
+      "value_type": "uint8",
+      "width": 1,
+      "label": "MachineStyle",
+      "enumeration": [
+        {
+          "value": "0x00",
+          "label": "StandardStyle"
+        },
+        {
+          "value": "0x01",
+          "label": "DCStyle"
+        },
+        {
+          "value": "0x02",
+          "label": "PVStyle"
+        },
+        {
+          "value": "0x03",
+          "label": "HeatRecoverStyle"
+        },
+        {
+          "value": "0x04",
+          "label": "WaterSourceStyle"
+        },
+        {
+          "value": "0x05",
+          "label": "IncreaseHStyle"
+        }
+      ],
+      "description": "Reported meaning: Indicator bit for a standard model or a fully direct-current model."
+    },
+    {
+      "type": "0x10",
+      "coordinate": "0x22",
+      "kind": "value",
+      "value_type": "uint8",
+      "width": 1,
+      "label": "AreaStyleCode",
+      "description": "Reported meaning: Switch setting of the unit region type."
+    },
+    {
+      "type": "0x11",
+      "coordinate": "0x00",
+      "kind": "value",
+      "value_type": "uint16",
+      "width": 2,
+      "label": "CapCodeAddr",
+      "unit": "kW",
+      "notes": [
+        "The native unit kW is kept as declared on a switch-code value; the value is not a measured power."
+      ],
+      "description": "Reported meaning: DIP switch for capacity."
+    },
+    {
+      "type": "0x11",
+      "coordinate": "0x02",
+      "kind": "value",
+      "value_type": "uint16Devide10",
+      "width": 2,
+      "label": "RealCap",
+      "unit": "kW",
+      "presentation_converter": "kWVskBtuh",
+      "description": "Reported meaning: System capacity / effective capacity."
+    },
+    {
+      "type": "0x11",
+      "coordinate": "0x04",
+      "kind": "value",
+      "value_type": "uint8",
+      "width": 1,
+      "label": "FanType",
+      "enumeration": [
+        {
+          "value": "0x00",
+          "label": "NaN"
+        },
+        {
+          "value": "0x01",
+          "label": "PGMotor"
+        },
+        {
+          "value": "0x10",
+          "label": "DCMotor"
+        },
+        {
+          "value": "0x11",
+          "label": "BrushMotor"
+        }
+      ],
+      "description": "Reported meaning: Fan type."
+    },
+    {
+      "type": "0x11",
+      "coordinate": "0x05",
+      "kind": "value",
+      "value_type": "uint16",
+      "width": 2,
+      "label": "IDUProjectNO",
+      "description": "Reported meaning: Indoor-unit project number."
+    },
+    {
+      "type": "0x11",
+      "coordinate": "0x07",
+      "kind": "value",
+      "value_type": "uint8",
+      "width": 1,
+      "label": "JumperNumber",
+      "description": "Reported meaning: Indoor-unit jumper number."
+    },
+    {
+      "type": "0x11",
+      "coordinate": "0x08",
+      "kind": "value",
+      "value_type": "uint8",
+      "width": 1,
+      "label": "IDUVersion",
+      "description": "Reported meaning: Indoor-unit program version."
+    },
+    {
+      "type": "0x11",
+      "coordinate": "0x17",
+      "kind": "value",
+      "value_type": "uint8",
+      "width": 1,
+      "label": "PowerModuleIsExist",
+      "enumeration": [
+        {
+          "value": "0x00",
+          "label": "No"
+        },
+        {
+          "value": "0x01",
+          "label": "CommNormal"
+        },
+        {
+          "value": "0x02",
+          "label": "CommException"
+        }
+      ],
+      "description": "Reported meaning: Presence of the electrical-energy module."
+    },
+    {
+      "type": "0x11",
+      "coordinate": "0x18",
+      "kind": "value",
+      "value_type": "uint8",
+      "width": 1,
+      "label": "CompressorDriverVNumber",
+      "description": "Reported meaning: Version number of the compressor-drive control program."
+    },
+    {
+      "type": "0x11",
+      "coordinate": "0x32",
+      "kind": "value",
+      "value_type": "uint16",
+      "width": 2,
+      "label": "IDUProjectNOOffset",
+      "description": "Reported meaning: Offset of the indoor-unit project number."
+    },
+    {
+      "type": "0x11",
+      "coordinate": "0x34",
+      "kind": "value",
+      "value_type": "uint16Devide10",
+      "width": 2,
+      "label": "SysTotalCap",
+      "unit": "kW",
+      "presentation_converter": "kWVskBtuh",
+      "description": "Reported meaning: Total system capacity."
+    },
+    {
+      "type": "0x11",
+      "coordinate": "0x36",
+      "kind": "value",
+      "value_type": "uint8",
+      "width": 1,
+      "label": "StatPresCodeAddr",
+      "enumeration": [
+        {
+          "value": "0x00",
+          "label": "NaN"
+        },
+        {
+          "value": "0x01",
+          "label": "ZeroStaticPres"
+        },
+        {
+          "value": "0x02",
+          "label": "StaticPres1"
+        },
+        {
+          "value": "0x03",
+          "label": "StaticPres2"
+        },
+        {
+          "value": "0x04",
+          "label": "StaticPres3"
+        },
+        {
+          "value": "0x05",
+          "label": "StaticPres4"
+        }
+      ],
+      "description": "Reported meaning: Static-pressure mode of the outdoor fan."
+    },
+    {
+      "type": "0x11",
+      "coordinate": "0x37",
+      "kind": "value",
+      "value_type": "uint8",
+      "width": 1,
+      "label": "VFEmerRunningCode",
+      "enumeration": [
+        {
+          "value": "0x00",
+          "label": "NaN"
+        },
+        {
+          "value": "0x01",
+          "label": "NoNeed"
+        },
+        {
+          "value": "0x02",
+          "label": "VFCompressorErr"
+        },
+        {
+          "value": "0x03",
+          "label": "ModuEmerRunning"
+        },
+        {
+          "value": "0x04",
+          "label": "Both1"
+        }
+      ],
+      "description": "Reported meaning: DIP switch for variable-frequency emergency operation."
+    },
+    {
+      "type": "0x11",
+      "coordinate": "0x38",
+      "kind": "value",
+      "value_type": "uint8",
+      "width": 1,
+      "label": "FFEmerRunningCode",
+      "enumeration": [
+        {
+          "value": "0x00",
+          "label": "NaN"
+        },
+        {
+          "value": "0x01",
+          "label": "NoNeed"
+        },
+        {
+          "value": "0x02",
+          "label": "MaskCompressor1"
+        },
+        {
+          "value": "0x03",
+          "label": "MaskCompressor2"
+        },
+        {
+          "value": "0x04",
+          "label": "MaskCompressor3"
+        },
+        {
+          "value": "0x05",
+          "label": "MaskCompressor4"
+        },
+        {
+          "value": "0x06",
+          "label": "MaskCompressor5"
+        }
+      ],
+      "description": "Reported meaning: DIP switch for fixed-frequency emergency operation."
+    },
+    {
+      "type": "0x11",
+      "coordinate": "0x39",
+      "kind": "value",
+      "value_type": "uint8",
+      "width": 1,
+      "label": "FanEmerRunningCode",
+      "enumeration": [
+        {
+          "value": "0x00",
+          "label": "NaN"
+        },
+        {
+          "value": "0x01",
+          "label": "NoNeed"
+        },
+        {
+          "value": "0x02",
+          "label": "Fan1Err"
+        },
+        {
+          "value": "0x03",
+          "label": "Fan2Err"
+        },
+        {
+          "value": "0x04",
+          "label": "Both"
+        }
+      ],
+      "description": "Reported meaning: Switch setting of fan emergency operation."
+    },
+    {
+      "type": "0x11",
+      "coordinate": "0x3a",
+      "kind": "value",
+      "value_type": "uint8",
+      "width": 1,
+      "label": "EnergySaving",
+      "enumeration": [
+        {
+          "value": "0x01",
+          "label": "Comfortable"
+        },
+        {
+          "value": "0x02",
+          "label": "Saving"
+        }
+      ],
+      "description": "Reported meaning: Energy saving at system level."
+    },
+    {
+      "type": "0x11",
+      "coordinate": "0x3b",
+      "kind": "value",
+      "value_type": "uint8",
+      "width": 1,
+      "label": "ThawCycleSetting",
+      "unit": "min",
+      "enumeration": [
+        {
+          "value": "0x02",
+          "label": "40"
+        },
+        {
+          "value": "0x01",
+          "label": "50"
+        },
+        {
+          "value": "0x03",
+          "label": "60"
+        }
+      ],
+      "description": "Reported meaning: Defrost-cycle setting."
+    },
+    {
+      "type": "0x11",
+      "coordinate": "0x3c",
+      "kind": "value",
+      "value_type": "uint8",
+      "width": 1,
+      "label": "IDURunningMode",
+      "enumeration": [
+        {
+          "value": "0x00",
+          "label": "NaN"
+        },
+        {
+          "value": "0x01",
+          "label": "MasterIDUOffEffect"
+        },
+        {
+          "value": "0x02",
+          "label": "MasterIDUOffUneffect"
+        },
+        {
+          "value": "0x03",
+          "label": "OnFirstPriority"
+        },
+        {
+          "value": "0x04",
+          "label": "CoolPriority"
+        },
+        {
+          "value": "0x05",
+          "label": "HeatPriority"
+        }
+      ],
+      "description": "Reported meaning: Indoor-unit mode priority."
+    },
+    {
+      "type": "0x11",
+      "coordinate": "0x3d",
+      "kind": "value",
+      "value_type": "uint8",
+      "width": 1,
+      "label": "ODUCapConfig",
+      "unit": "%",
+      "enumeration": [
+        {
+          "value": "0x01",
+          "label": "135"
+        },
+        {
+          "value": "0x02",
+          "label": "150"
+        },
+        {
+          "value": "0x03",
+          "label": "110"
+        }
+      ],
+      "description": "Reported meaning: Outdoor-unit capacity-configuration ratio setting, capacity-configuration ratio setting."
+    },
+    {
+      "type": "0x11",
+      "coordinate": "0x3e",
+      "kind": "value",
+      "value_type": "uint8",
+      "width": 1,
+      "label": "SysPowerSavingCapForcedLimit",
+      "unit": "%",
+      "enumeration": [
+        {
+          "value": "0x03",
+          "label": "80"
+        },
+        {
+          "value": "0x02",
+          "label": "90"
+        },
+        {
+          "value": "0x01",
+          "label": "100"
+        }
+      ],
+      "description": "Reported meaning: Forced capacity limitation for energy saving at system level."
+    },
+    {
+      "type": "0x12",
+      "coordinate": "0x00",
+      "kind": "value",
+      "value_type": "uint8",
+      "width": 1,
+      "label": "MainboardCode1",
+      "notes": [
+        "One of twelve bar-code fragments. Fragment encoding and concatenation are not defined; a missing fragment is not replaced by zero."
+      ],
+      "description": "Reported meaning: Main-board barcode 1."
+    },
+    {
+      "type": "0x12",
+      "coordinate": "0x01",
+      "kind": "value",
+      "value_type": "uint8",
+      "width": 1,
+      "label": "MainboardCode2",
+      "notes": [
+        "One of twelve bar-code fragments. Fragment encoding and concatenation are not defined; a missing fragment is not replaced by zero."
+      ],
+      "description": "Reported meaning: Main-board barcode 2."
+    },
+    {
+      "type": "0x12",
+      "coordinate": "0x02",
+      "kind": "value",
+      "value_type": "uint8",
+      "width": 1,
+      "label": "MainboardCode3",
+      "notes": [
+        "One of twelve bar-code fragments. Fragment encoding and concatenation are not defined; a missing fragment is not replaced by zero."
+      ],
+      "description": "Reported meaning: Main-board barcode 3."
+    },
+    {
+      "type": "0x12",
+      "coordinate": "0x03",
+      "kind": "value",
+      "value_type": "uint8",
+      "width": 1,
+      "label": "MainboardCode4",
+      "notes": [
+        "One of twelve bar-code fragments. Fragment encoding and concatenation are not defined; a missing fragment is not replaced by zero."
+      ],
+      "description": "Reported meaning: Main-board barcode 4."
+    },
+    {
+      "type": "0x12",
+      "coordinate": "0x04",
+      "kind": "value",
+      "value_type": "uint8",
+      "width": 1,
+      "label": "MainboardCode5",
+      "notes": [
+        "One of twelve bar-code fragments. Fragment encoding and concatenation are not defined; a missing fragment is not replaced by zero."
+      ],
+      "description": "Reported meaning: Main-board barcode 5."
+    },
+    {
+      "type": "0x12",
+      "coordinate": "0x05",
+      "kind": "value",
+      "value_type": "uint8",
+      "width": 1,
+      "label": "MainboardCode6",
+      "notes": [
+        "One of twelve bar-code fragments. Fragment encoding and concatenation are not defined; a missing fragment is not replaced by zero."
+      ],
+      "description": "Reported meaning: Main-board barcode 6."
+    },
+    {
+      "type": "0x12",
+      "coordinate": "0x06",
+      "kind": "value",
+      "value_type": "uint8",
+      "width": 1,
+      "label": "MainboardCode7",
+      "notes": [
+        "One of twelve bar-code fragments. Fragment encoding and concatenation are not defined; a missing fragment is not replaced by zero."
+      ],
+      "description": "Reported meaning: Main-board barcode 7."
+    },
+    {
+      "type": "0x12",
+      "coordinate": "0x07",
+      "kind": "value",
+      "value_type": "uint8",
+      "width": 1,
+      "label": "MainboardCode8",
+      "notes": [
+        "One of twelve bar-code fragments. Fragment encoding and concatenation are not defined; a missing fragment is not replaced by zero."
+      ],
+      "description": "Reported meaning: Main-board barcode 8."
+    },
+    {
+      "type": "0x12",
+      "coordinate": "0x08",
+      "kind": "value",
+      "value_type": "uint8",
+      "width": 1,
+      "label": "MainboardCode9",
+      "notes": [
+        "One of twelve bar-code fragments. Fragment encoding and concatenation are not defined; a missing fragment is not replaced by zero."
+      ],
+      "description": "Reported meaning: Main-board barcode 9."
+    },
+    {
+      "type": "0x12",
+      "coordinate": "0x09",
+      "kind": "value",
+      "value_type": "uint8",
+      "width": 1,
+      "label": "MainboardCode10",
+      "notes": [
+        "One of twelve bar-code fragments. Fragment encoding and concatenation are not defined; a missing fragment is not replaced by zero."
+      ],
+      "description": "Reported meaning: Main-board barcode 10."
+    },
+    {
+      "type": "0x12",
+      "coordinate": "0x0a",
+      "kind": "value",
+      "value_type": "uint8",
+      "width": 1,
+      "label": "MainboardCode11",
+      "notes": [
+        "One of twelve bar-code fragments. Fragment encoding and concatenation are not defined; a missing fragment is not replaced by zero."
+      ],
+      "description": "Reported meaning: Main-board barcode 11."
+    },
+    {
+      "type": "0x12",
+      "coordinate": "0x0b",
+      "kind": "value",
+      "value_type": "uint8",
+      "width": 1,
+      "label": "MainboardCode12",
+      "notes": [
+        "One of twelve bar-code fragments. Fragment encoding and concatenation are not defined; a missing fragment is not replaced by zero."
+      ],
+      "description": "Reported meaning: Main-board barcode 12."
+    },
+    {
+      "type": "0x12",
+      "coordinate": "0x0c",
+      "kind": "value",
+      "value_type": "uint8",
+      "width": 1,
+      "label": "MainboardCode",
+      "description": "Reported meaning: Main-board barcode."
+    },
+    {
+      "type": "0x12",
+      "coordinate": "0x0d",
+      "kind": "value",
+      "value_type": "uint8",
+      "width": 1,
+      "label": "MachineCode1",
+      "notes": [
+        "One of twelve bar-code fragments. Fragment encoding and concatenation are not defined; a missing fragment is not replaced by zero."
+      ],
+      "description": "Reported meaning: Complete-unit barcode 1."
+    },
+    {
+      "type": "0x12",
+      "coordinate": "0x0e",
+      "kind": "value",
+      "value_type": "uint8",
+      "width": 1,
+      "label": "MachineCode2",
+      "notes": [
+        "One of twelve bar-code fragments. Fragment encoding and concatenation are not defined; a missing fragment is not replaced by zero."
+      ],
+      "description": "Reported meaning: Complete-unit barcode 2."
+    },
+    {
+      "type": "0x12",
+      "coordinate": "0x0f",
+      "kind": "value",
+      "value_type": "uint8",
+      "width": 1,
+      "label": "MachineCode3",
+      "notes": [
+        "One of twelve bar-code fragments. Fragment encoding and concatenation are not defined; a missing fragment is not replaced by zero."
+      ],
+      "description": "Reported meaning: Complete-unit barcode 3."
+    },
+    {
+      "type": "0x12",
+      "coordinate": "0x10",
+      "kind": "value",
+      "value_type": "uint8",
+      "width": 1,
+      "label": "MachineCode4",
+      "notes": [
+        "One of twelve bar-code fragments. Fragment encoding and concatenation are not defined; a missing fragment is not replaced by zero."
+      ],
+      "description": "Reported meaning: Complete-unit barcode 4."
+    },
+    {
+      "type": "0x12",
+      "coordinate": "0x11",
+      "kind": "value",
+      "value_type": "uint8",
+      "width": 1,
+      "label": "MachineCode5",
+      "notes": [
+        "One of twelve bar-code fragments. Fragment encoding and concatenation are not defined; a missing fragment is not replaced by zero."
+      ],
+      "description": "Reported meaning: Complete-unit barcode 5."
+    },
+    {
+      "type": "0x12",
+      "coordinate": "0x12",
+      "kind": "value",
+      "value_type": "uint8",
+      "width": 1,
+      "label": "MachineCode6",
+      "notes": [
+        "One of twelve bar-code fragments. Fragment encoding and concatenation are not defined; a missing fragment is not replaced by zero."
+      ],
+      "description": "Reported meaning: Complete-unit barcode 6."
+    },
+    {
+      "type": "0x12",
+      "coordinate": "0x13",
+      "kind": "value",
+      "value_type": "uint8",
+      "width": 1,
+      "label": "MachineCode7",
+      "notes": [
+        "One of twelve bar-code fragments. Fragment encoding and concatenation are not defined; a missing fragment is not replaced by zero."
+      ],
+      "description": "Reported meaning: Complete-unit barcode 7."
+    },
+    {
+      "type": "0x12",
+      "coordinate": "0x14",
+      "kind": "value",
+      "value_type": "uint8",
+      "width": 1,
+      "label": "MachineCode8",
+      "notes": [
+        "One of twelve bar-code fragments. Fragment encoding and concatenation are not defined; a missing fragment is not replaced by zero."
+      ],
+      "description": "Reported meaning: Complete-unit barcode 8."
+    },
+    {
+      "type": "0x12",
+      "coordinate": "0x15",
+      "kind": "value",
+      "value_type": "uint8",
+      "width": 1,
+      "label": "MachineCode9",
+      "notes": [
+        "One of twelve bar-code fragments. Fragment encoding and concatenation are not defined; a missing fragment is not replaced by zero."
+      ],
+      "description": "Reported meaning: Complete-unit barcode 9."
+    },
+    {
+      "type": "0x12",
+      "coordinate": "0x16",
+      "kind": "value",
+      "value_type": "uint8",
+      "width": 1,
+      "label": "MachineCode10",
+      "notes": [
+        "One of twelve bar-code fragments. Fragment encoding and concatenation are not defined; a missing fragment is not replaced by zero."
+      ],
+      "description": "Reported meaning: Complete-unit barcode 10."
+    },
+    {
+      "type": "0x12",
+      "coordinate": "0x17",
+      "kind": "value",
+      "value_type": "uint8",
+      "width": 1,
+      "label": "MachineCode11",
+      "notes": [
+        "One of twelve bar-code fragments. Fragment encoding and concatenation are not defined; a missing fragment is not replaced by zero."
+      ],
+      "description": "Reported meaning: Complete-unit barcode 11."
+    },
+    {
+      "type": "0x12",
+      "coordinate": "0x18",
+      "kind": "value",
+      "value_type": "uint8",
+      "width": 1,
+      "label": "MachineCode12",
+      "notes": [
+        "One of twelve bar-code fragments. Fragment encoding and concatenation are not defined; a missing fragment is not replaced by zero."
+      ],
+      "description": "Reported meaning: Complete-unit barcode 12."
+    },
+    {
+      "type": "0x12",
+      "coordinate": "0x19",
+      "kind": "value",
+      "value_type": "uint8",
+      "width": 1,
+      "label": "MachineCode",
+      "description": "Reported meaning: Complete-unit barcode."
+    },
+    {
+      "type": "0x13",
+      "container": "0x0a",
+      "kind": "bits",
+      "value_type": "bits",
+      "bits": [
+        {
+          "bit": 0,
+          "coordinate": "0x50",
+          "label": "DebuggerStartupSendData",
+          "set_label": "Startup",
+          "clear_label": "Stop",
+          "description": "Reported meaning: Sending of data at commissioning start."
+        },
+        {
+          "bit": 1,
+          "coordinate": "0x51",
+          "label": "ODUerrStartupSendData",
+          "set_label": "Startup",
+          "clear_label": "Stop",
+          "description": "Reported meaning: Sending of data when an outdoor-unit fault is triggered."
+        },
+        {
+          "bit": 2,
+          "coordinate": "0x52",
+          "label": "SubhealthStartupSendData",
+          "set_label": "Startup",
+          "clear_label": "Stop",
+          "description": "Reported meaning: Transmission of data when the suboptimal-health state is activated."
+        },
+        {
+          "bit": 3,
+          "coordinate": "0x53",
+          "label": "WiFiTestSignal",
+          "set_label": "Startup",
+          "clear_label": "Stop",
+          "description": "Reported meaning: Wireless signal test."
+        },
+        {
+          "bit": 4,
+          "coordinate": "0x54",
+          "label": "IDUerrStartupSendData",
+          "set_label": "Startup",
+          "clear_label": "Stop",
+          "description": "Reported meaning: Transmission of data when an indoor-unit fault occurs."
+        },
+        {
+          "bit": 5,
+          "coordinate": "0x55",
+          "label": "AllIDUPoweroff",
+          "set_label": "Poweroff",
+          "clear_label": "NaN",
+          "description": "Reported meaning: All indoor equipment is off."
+        }
+      ]
+    }
+  ]
+}

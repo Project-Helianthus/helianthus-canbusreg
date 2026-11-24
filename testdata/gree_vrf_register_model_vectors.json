@@ -1,0 +1,38 @@
+[
+  {
+    "name": "partial updates keep other coordinates and complete values",
+    "id": 520081424,
+    "frames": ["1b3412", "1b78", "20ff"],
+    "reads": [
+      {"coordinate": 27, "width": 1, "raw": "78", "receipt": 2},
+      {"coordinate": 28, "width": 1, "raw": "12", "receipt": 1},
+      {"coordinate": 27, "width": 2, "raw": "3412", "receipt": 1},
+      {"coordinate": 32, "width": 1, "raw": "ff", "receipt": 3},
+      {"coordinate": 33, "width": 1, "raw": "", "receipt": 0}
+    ]
+  },
+  {
+    "name": "never join from separate fragments",
+    "id": 520081424,
+    "frames": ["1b34", "1c12"],
+    "reads": [
+      {"coordinate": 27, "width": 2, "raw": "", "receipt": 0},
+      {"coordinate": 27, "width": 1, "raw": "34", "receipt": 1},
+      {"coordinate": 28, "width": 1, "raw": "12", "receipt": 2}
+    ]
+  },
+  {
+    "name": "unaligned bit coordinates are least significant bit first",
+    "id": 486527007,
+    "bits": true,
+    "frames": ["130180", "1401"],
+    "reads": [
+      {"coordinate": 18, "width": 1, "raw": "", "receipt": 0},
+      {"coordinate": 19, "width": 1, "raw": "01", "receipt": 1},
+      {"coordinate": 20, "width": 1, "raw": "01", "receipt": 2},
+      {"coordinate": 21, "width": 1, "raw": "00", "receipt": 2},
+      {"coordinate": 34, "width": 1, "raw": "01", "receipt": 1},
+      {"coordinate": 35, "width": 1, "raw": "", "receipt": 0}
+    ]
+  }
+]

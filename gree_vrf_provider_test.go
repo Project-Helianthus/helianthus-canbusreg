@@ -76,11 +76,13 @@ func greeProviderApply(provider *GreeVRFProvider, generation uint64, evidence Ev
 }
 
 // greeProviderFrame builds an admitted opcode 0x10 candidate frame for one
-// native opaque source field; the payload is the replay vector layout.
-func greeProviderFrame(t *testing.T, opaque uint8, payload []byte, sequence uint64) Evidence {
+// native unit offset; the payload is the replay vector layout.
+func greeProviderFrame(t *testing.T, unitOffset uint8, payload []byte, sequence uint64) Evidence {
 	t.Helper()
-	return greeReplayEvidence(t, greeReplayInterface(t, "can7", 7), 0x1ee00410|uint32(opaque)<<14, payload, sequence)
+	return greeReplayEvidence(t, greeReplayInterface(t, "can7", 7), 0x1effc010|uint32(unitOffset+8)<<7, payload, sequence)
 }
+
+func greeProviderUnitKey(offset uint8) GreeVRFUnitKey { return GreeVRFUnitKey{GreeVRFData, offset + 8} }
 
 var greeProviderVector = []byte{0x02, 0x31, 0x32, 0x33, 0xa1, 0xa2}
 
@@ -98,11 +100,11 @@ func TestGreeVRFProviderStartReceiveSnapshotStop(t *testing.T) {
 	first := greeProviderFrame(t, 0, greeProviderVector, 1)
 	greeProviderSend(source, 1, first)
 	got := provider.Snapshot()
-	unit, ok := got.Units[0]
+	unit, ok := got.Units[greeProviderUnitKey(0)]
 	if got.State != "receiving" || got.Admitted != 1 || !ok || unit.Generation != 1 || unit.Received != time.Millisecond {
 		t.Fatalf("first snapshot = %#v", got)
 	}
-	if unit.Candidate.Evidence != first || unit.Candidate.Opaque7 != 0 || unit.Candidate.Unit7 != 8 || unit.Candidate.Opcode7 != 0x10 {
+	if unit.Candidate.Evidence != first || unit.Candidate.Opaque7 != 0x7f || unit.Candidate.Unit7 != 8 || unit.Candidate.Opcode7 != 0x10 {
 		t.Fatalf("native candidate evidence = %#v", unit.Candidate)
 	}
 	if !reflect.DeepEqual(unit.Candidate.Updates, []GreeVRFCandidateStateCell{{Cell: 0x0f, Value: 0xa1}, {Cell: 0x10, Value: 0xa2}}) {
@@ -113,29 +115,62 @@ func TestGreeVRFProviderStartReceiveSnapshotStop(t *testing.T) {
 	}
 
 	greeProviderSend(source, 1, greeProviderFrame(t, 0, []byte{0x05, 0xb1, 0xb2}, 2))
-	unit = provider.Snapshot().Units[0]
+	unit = provider.Snapshot().Units[greeProviderUnitKey(0)]
 	if unit.State.Cells[0x01] != 0xb1 || unit.State.Cells[0x02] != 0xb2 || unit.State.Cells[0x03] != 0x31 || unit.Received != 2*time.Millisecond {
 		t.Fatalf("generation state did not accumulate: %#v", unit)
 	}
 
 	greeProviderSend(source, 1, greeProviderFrame(t, 1, []byte{0x05, 0xc1, 0xc2}, 3))
 	got = provider.Snapshot()
-	other := got.Units[1]
-	if len(got.Units) != 2 || other.Candidate.Opaque7 != 1 || !reflect.DeepEqual(other.State.Cells, map[uint8]uint8{0x01: 0xc1, 0x02: 0xc2}) {
-		t.Fatalf("units are not separated by the native opaque field: %#v", got.Units)
+	other := got.Units[greeProviderUnitKey(1)]
+	if len(got.Units) != 2 || other.Candidate.Evidence != (Evidence{}) || !reflect.DeepEqual(other.State.Cells, map[uint8]uint8{0x01: 0xc1, 0x02: 0xc2}) {
+		t.Fatalf("units are not separated despite sharing the opaque field: %#v", got.Units)
 	}
 
 	unsupported := greeReplayEvidence(t, greeReplayInterface(t, "can7", 7), 0x1ee00010, greeProviderVector, 4)
 	greeProviderSend(source, 1, unsupported)
 	got = provider.Snapshot()
-	if got.Unsupported != 1 || got.Admitted != 3 || !got.HasRaw || got.Raw != unsupported || got.RawGeneration != 1 || got.Units[0].Received != 2*time.Millisecond {
+	if got.Unsupported != 1 || got.Admitted != 3 || !got.HasRaw || got.Raw != unsupported || got.RawGeneration != 1 || got.Units[greeProviderUnitKey(0)].Received != 2*time.Millisecond {
 		t.Fatalf("unsupported evidence = %#v", got)
 	}
 
 	provider.Stop()
 	got = provider.Snapshot()
-	if got.State != "stopped" || len(got.Units) != 2 || got.Units[0].Generation != 1 {
+	if got.State != "stopped" || len(got.Units) != 2 || got.Units[greeProviderUnitKey(0)].Generation != 1 {
 		t.Fatalf("stop discarded history: %#v", got)
+	}
+}
+
+func TestGreeVRFProviderMapsRegistersOutsideCandidateGate(t *testing.T) {
+	provider := greeProviderNew(t, GreeVRFMapM94, 0)
+	greeProviderStart(t, provider, greeProviderNewSource(), 1)
+	iface := greeReplayInterface(t, "can7", 7)
+	for index, id := range []uint32{0x1effd01e, 0x1effd09e, 0x1cffd01e} {
+		value := byte(1)
+		if index == 1 {
+			value = 0
+		}
+		greeProviderApply(provider, 1, greeReplayEvidence(t, iface, id, []byte{0x13, value}, uint64(index+1)))
+	}
+	snapshot := provider.Snapshot()
+	if snapshot.Admitted != 3 || snapshot.Unsupported != 0 || len(snapshot.Units) != 3 {
+		t.Fatalf("register admission: %+v", snapshot)
+	}
+	for _, row := range []struct {
+		key  GreeVRFUnitKey
+		want byte
+	}{
+		{GreeVRFUnitKey{GreeVRFData, 0x20}, 128},
+		{GreeVRFUnitKey{GreeVRFData, 0x21}, 0},
+		{GreeVRFUnitKey{GreeVRFAddressedData, 0x20}, 128},
+	} {
+		unit := snapshot.Units[row.key]
+		if !reflect.DeepEqual(unit.MatchedRows, []int{25, 26, 27}) {
+			t.Fatal(row.key, unit.MatchedRows)
+		}
+		if unit.State.Cells[0x32]&128 != row.want || unit.Candidate.Evidence != (Evidence{}) || unit.Images[0x1e] == nil {
+			t.Fatalf("unit %+v: %+v", row.key, unit)
+		}
 	}
 }
 
@@ -144,16 +179,16 @@ func TestGreeVRFProviderSnapshotIsDetached(t *testing.T) {
 	greeProviderStart(t, provider, greeProviderNewSource(), 1)
 	greeProviderApply(provider, 1, greeProviderFrame(t, 0, greeProviderVector, 1))
 	mutated := provider.Snapshot()
-	unit := mutated.Units[0]
+	unit := mutated.Units[greeProviderUnitKey(0)]
 	unit.State.Cells[0x03] = 0xee
 	unit.State.SlotFlags[0] = 9
 	unit.Candidate.Updates[0].Value = 0xee
 	unit.MatchedRows[0] = 99
 	unit.Candidate.Evidence.RawRecord[0] = 0xee
-	mutated.Units[0] = unit
-	mutated.Units[9] = GreeVRFUnitSnapshot{}
+	mutated.Units[greeProviderUnitKey(0)] = unit
+	mutated.Units[greeProviderUnitKey(9)] = GreeVRFUnitSnapshot{}
 	got := provider.Snapshot()
-	kept := got.Units[0]
+	kept := got.Units[greeProviderUnitKey(0)]
 	if len(got.Units) != 1 || kept.State.Cells[0x03] != 0x31 || kept.State.SlotFlags[0] != 0 || kept.Candidate.Updates[0].Value != 0xa1 ||
 		kept.MatchedRows[0] != 0 || kept.Candidate.Evidence.RawRecord[0] != 0x10 {
 		t.Fatalf("snapshot aliases provider state: %#v", got)
@@ -181,8 +216,8 @@ func TestGreeVRFProviderAppliesSelectedMapProfileAndProduct(t *testing.T) {
 			}
 			replay, _ := NewGreeVRFQualificationReplay(greeReplayInterface(t, "can7", 7), testCase.mapProfile, testCase.productID)
 			want, _ := replay.Apply(GreeVRFMapState{}, greeProviderFrame(t, 0, greeProviderVector, 1))
-			if !reflect.DeepEqual(got.Units[0].State.Cells, testCase.cells) || !reflect.DeepEqual(got.Units[0].State, want.State) {
-				t.Fatalf("cells = %#v, replay = %#v", got.Units[0].State.Cells, want.State.Cells)
+			if !reflect.DeepEqual(got.Units[greeProviderUnitKey(0)].State.Cells, testCase.cells) || !reflect.DeepEqual(got.Units[greeProviderUnitKey(0)].State, want.State) {
+				t.Fatalf("cells = %#v, replay = %#v", got.Units[greeProviderUnitKey(0)].State.Cells, want.State.Cells)
 			}
 		})
 	}
@@ -215,7 +250,7 @@ func TestGreeVRFProviderFencesObservationIdentity(t *testing.T) {
 			greeProviderStart(t, provider, greeProviderNewSource(), 1)
 			greeProviderApply(provider, 1, greeProviderFrame(t, 0, greeProviderVector, 5))
 			before := provider.Snapshot()
-			candidate := greeReplayEvidence(t, greeReplayInterface(t, testCase.ifName, testCase.ifIndex), 0x1ee00410, []byte{0x05, 0xd1, 0xd2}, testCase.sequence)
+			candidate := greeReplayEvidence(t, greeReplayInterface(t, testCase.ifName, testCase.ifIndex), 0x1effc410, []byte{0x05, 0xd1, 0xd2}, testCase.sequence)
 			candidate.Monotonic = testCase.monotonic
 			greeProviderApply(provider, testCase.generation, candidate)
 			got := provider.Snapshot()
@@ -225,7 +260,7 @@ func TestGreeVRFProviderFencesObservationIdentity(t *testing.T) {
 			successor := greeProviderFrame(t, 0, []byte{0x05, 0xd1, 0xd2}, 6)
 			successor.Monotonic = 5 * time.Millisecond
 			greeProviderApply(provider, 1, successor)
-			if got := provider.Snapshot(); got.Units[0].State.Cells[0x01] != 0xd1 || got.Admitted != 2 {
+			if got := provider.Snapshot(); got.Units[greeProviderUnitKey(0)].State.Cells[0x01] != 0xd1 || got.Admitted != 2 {
 				t.Fatalf("valid successor rejected: %#v", got)
 			}
 		})
@@ -247,7 +282,7 @@ func TestGreeVRFProviderFencesZeroSequenceAndNegativeTimeAtGenerationStart(t *te
 		t.Fatalf("fresh generation admitted a zero sequence or negative time: %#v", got)
 	}
 	greeProviderApply(provider, 1, greeProviderFrame(t, 0, greeProviderVector, 1))
-	if got := provider.Snapshot(); got.Admitted != 1 || got.Units[0].Received != time.Millisecond {
+	if got := provider.Snapshot(); got.Admitted != 1 || got.Units[greeProviderUnitKey(0)].Received != time.Millisecond {
 		t.Fatalf("first valid observation rejected: %#v", got)
 	}
 }
@@ -271,27 +306,27 @@ func TestGreeVRFProviderRestartFencesSupersededGeneration(t *testing.T) {
 	successor := greeProviderNewSource()
 	greeProviderStart(t, provider, successor, 2)
 	got := provider.Snapshot()
-	if got.State != "awaiting" || got.Generation != 2 || got.Units[0].Generation != 1 || got.Rejected != 0 {
+	if got.State != "awaiting" || got.Generation != 2 || got.Units[greeProviderUnitKey(0)].Generation != 1 || got.Rejected != 0 {
 		t.Fatalf("restart snapshot = %#v", got)
 	}
-	if _, published := got.Units[5]; published {
+	if _, published := got.Units[greeProviderUnitKey(5)]; published {
 		t.Fatal("superseded receive loop published after restart")
 	}
 
 	greeProviderSend(successor, 1, greeProviderFrame(t, 0, []byte{0x05, 0xe1, 0xe2}, 7))
-	if got := provider.Snapshot(); got.Rejected != 1 || got.Units[0].Generation != 1 || got.Units[0].State.Cells[0x01] != 0xa1 {
+	if got := provider.Snapshot(); got.Rejected != 1 || got.Units[greeProviderUnitKey(0)].Generation != 1 || got.Units[greeProviderUnitKey(0)].State.Cells[0x01] != 0xa1 {
 		t.Fatalf("superseded generation published: %#v", got)
 	}
 
 	greeProviderSend(successor, 2, greeProviderFrame(t, 0, []byte{0x05, 0xc1, 0xc2}, 1))
-	unit := provider.Snapshot().Units[0]
+	unit := provider.Snapshot().Units[greeProviderUnitKey(0)]
 	if unit.Generation != 2 || !reflect.DeepEqual(unit.State.Cells, map[uint8]uint8{0x01: 0xc1, 0x02: 0xc2}) {
 		t.Fatalf("successor mixed predecessor state: %#v", unit)
 	}
 
 	successor.results <- greeProviderResult{err: errors.New("synthetic source loss")}
 	<-provider.done
-	if got := provider.Snapshot(); got.State != "degraded" || got.Units[0].Generation != 2 {
+	if got := provider.Snapshot(); got.State != "degraded" || got.Units[greeProviderUnitKey(0)].Generation != 2 {
 		t.Fatalf("source loss discarded history or status: %#v", got)
 	}
 	greeProviderStart(t, provider, greeProviderNewSource(), 3)
@@ -315,7 +350,7 @@ func TestGreeVRFProviderStopJoinsAndFencesLateReceive(t *testing.T) {
 		t.Fatal("receive loop not joined")
 	}
 	got := provider.Snapshot()
-	if got.State != "stopped" || got.Units[0].State.Cells[0x01] != 0xa1 || got.Admitted != 1 || got.Rejected != 0 {
+	if got.State != "stopped" || got.Units[greeProviderUnitKey(0)].State.Cells[0x01] != 0xa1 || got.Admitted != 1 || got.Rejected != 0 {
 		t.Fatalf("post-stop receive published: %#v", got)
 	}
 	provider.Stop()
@@ -328,24 +363,24 @@ func TestGreeVRFProviderBoundsUnitsLeastRecentlyReceived(t *testing.T) {
 	provider := greeProviderNew(t, GreeVRFMapM94, 0)
 	greeProviderStart(t, provider, greeProviderNewSource(), 1)
 	sequence := uint64(0)
-	feed := func(opaque uint8) {
+	feed := func(unitOffset uint8) {
 		sequence++
-		greeProviderApply(provider, 1, greeProviderFrame(t, opaque, greeProviderVector, sequence))
+		greeProviderApply(provider, 1, greeProviderFrame(t, unitOffset, greeProviderVector, sequence))
 	}
-	for opaque := 0; opaque <= GreeVRFProviderMaxUnits; opaque++ {
-		feed(uint8(opaque))
+	for unitOffset := 0; unitOffset <= GreeVRFProviderMaxUnits; unitOffset++ {
+		feed(uint8(unitOffset))
 	}
 	got := provider.Snapshot()
-	_, first := got.Units[0]
-	_, last := got.Units[GreeVRFProviderMaxUnits]
+	_, first := got.Units[greeProviderUnitKey(0)]
+	_, last := got.Units[greeProviderUnitKey(GreeVRFProviderMaxUnits)]
 	if len(got.Units) != GreeVRFProviderMaxUnits || first || !last || got.EvictedUnits != 1 {
 		t.Fatalf("bound = %d first = %t last = %t evicted = %d", len(got.Units), first, last, got.EvictedUnits)
 	}
 	feed(1)
 	feed(GreeVRFProviderMaxUnits + 1)
 	got = provider.Snapshot()
-	_, renewed := got.Units[1]
-	_, oldest := got.Units[2]
+	_, renewed := got.Units[greeProviderUnitKey(1)]
+	_, oldest := got.Units[greeProviderUnitKey(2)]
 	if len(got.Units) != GreeVRFProviderMaxUnits || !renewed || oldest || got.EvictedUnits != 2 {
 		t.Fatalf("eviction is not least recently received: renewed = %t oldest = %t evicted = %d", renewed, oldest, got.EvictedUnits)
 	}
@@ -404,7 +439,7 @@ func greeProviderNoTransmit(t *testing.T, current reflect.Type, seen map[reflect
 	switch {
 	case current == reflect.TypeOf(context.CancelFunc(nil)), current == reflect.TypeOf(make(chan struct{})):
 		return
-	case current == reflect.TypeOf(GreeVRFCommand{}), current == reflect.TypeOf(GreeVRFTime{}):
+	case current == reflect.TypeOf(GreeVRFCommand{}):
 		t.Fatalf("provider holds a command encoding: %v", current)
 	case current.PkgPath() == canbusPath && current != reflect.TypeOf(canbus.Frame{}) && current != reflect.TypeOf(canbus.Identifier{}) && current != reflect.TypeOf(canbus.InterfaceIdentity{}):
 		t.Fatalf("provider holds a transport type: %v", current)

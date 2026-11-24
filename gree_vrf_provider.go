@@ -3,6 +3,7 @@ package canbusreg
 import (
 	"context"
 	"errors"
+	"maps"
 	"sync"
 	"time"
 
@@ -26,28 +27,30 @@ type GreeVRFReceiveSource interface {
 	Receive(context.Context) (GreeVRFObservation, error)
 }
 
-// GreeVRFUnitSnapshot is the opaque state of one native unit key. Candidate
-// retains the last admitted native evidence and its one-byte candidate cells;
-// State holds the selected map's opaque cells accumulated within Generation;
-// Received is the transport monotonic time of the last admitted evidence.
-// None of these establishes a device identity or an HVAC meaning.
+// GreeVRFUnitKey separates register families and native unit addresses.
+type GreeVRFUnitKey struct {
+	Family GreeVRFIdentifierFamily
+	Unit   uint8
+}
+
+// GreeVRFUnitSnapshot holds native images, the selected device class and
+// the independent map and specialised projection for a single generation.
 type GreeVRFUnitSnapshot struct {
 	Generation  uint64
 	Received    time.Duration
+	Identifier  GreeVRFIdentifier
+	Evidence    Evidence
+	Identity    GreeVRFDeviceIdentity
+	Images      map[uint8]*GreeVRFRegisterImage
+	Writes      map[uint8]GreeVRFTypedPoint
+	Clock       *GreeVRFClockPoint
 	Candidate   GreeVRFCandidateProjection
 	State       GreeVRFMapState
 	MatchedRows []int
 }
 
-// GreeVRFProviderSnapshot separates lifecycle state from retained history.
-// Units is keyed by the native Opaque7 identifier field of the admitted
-// candidate (Class8 and Unit7 are fixed by admission) and holds at most
-// GreeVRFProviderMaxUnits entries; an entry whose Generation differs from
-// Generation is historical. Raw is the latest observation that passed the
-// identity fences, admitted or not. Counters accumulate over the provider's
-// lifetime: Admitted observations, Rejected by the identity fences,
-// Unsupported by the candidate classifier or the selected map, and
-// EvictedUnits by the bound.
+// GreeVRFProviderSnapshot separates active publication from historical units.
+// Raw is the latest observation passing the interface and generation fences.
 type GreeVRFProviderSnapshot struct {
 	State                                         string
 	Generation                                    uint64
@@ -56,12 +59,11 @@ type GreeVRFProviderSnapshot struct {
 	Raw                                           Evidence
 	HasRaw                                        bool
 	RawGeneration                                 uint64
-	Units                                         map[uint8]GreeVRFUnitSnapshot
+	Units                                         map[GreeVRFUnitKey]GreeVRFUnitSnapshot
 	Admitted, Rejected, Unsupported, EvictedUnits uint64
 }
 
-// GreeVRFProvider is the receive-only lifecycle around the candidate
-// classifier and one explicitly selected offline map. It holds no command
+// GreeVRFProvider receives register families and runs one explicitly selected map. It holds no command
 // encoder and no transmit path. Construct it with NewGreeVRFProvider; its
 // zero value is not usable. Start and Stop join the canceled predecessor;
 // sources must honor cancellation.
@@ -74,7 +76,7 @@ type GreeVRFProvider struct {
 	running   bool
 	sequence  uint64
 	monotonic time.Duration
-	order     []uint8
+	order     []GreeVRFUnitKey
 	cancel    context.CancelFunc
 	done      chan struct{}
 }
@@ -93,7 +95,7 @@ func NewGreeVRFProvider(source canbus.InterfaceIdentity, mapProfile GreeVRFMapPr
 			State:      "stopped",
 			MapProfile: mapProfile,
 			ProductID:  productID,
-			Units:      make(map[uint8]GreeVRFUnitSnapshot),
+			Units:      make(map[GreeVRFUnitKey]GreeVRFUnitSnapshot),
 		},
 	}, nil
 }
@@ -180,35 +182,91 @@ func (p *GreeVRFProvider) greeVRFProviderApply(observation GreeVRFObservation) {
 	// Evidence and Frame own fixed-width arrays; assignment copies all raw bytes.
 	p.snapshot.Raw, p.snapshot.HasRaw, p.snapshot.RawGeneration = evidence, true, observation.Generation
 
-	classification := NewRegistry(GreeVRFCandidate()).Classify(evidence)
-	candidate, ok := classification.Projection.(GreeVRFCandidateProjection)
-	if classification.Profile != GreeVRFCandidateProfile || !ok {
-		p.snapshot.Unsupported++
+	id, classified := ClassifyGreeVRFIdentifier(evidence.Frame.ID())
+	if !classified {
+		// The specialised projection defines its own opaque identifier variants.
+		// They are not interpreted as images or fed to the maps.
+		candidate, ok := GreeVRFCandidate().Classify(evidence).Projection.(GreeVRFCandidateProjection)
+		if !ok {
+			p.snapshot.Unsupported++
+			return
+		}
+		id = GreeVRFIdentifier{GreeVRFData, candidate.Class8, candidate.Opaque7, candidate.Unit7, candidate.Opcode7}
+		key, unit := p.greeVRFProviderUnit(id, observation)
+		unit.Candidate = candidate
+		p.greeVRFProviderPublish(key, unit)
 		return
 	}
-	var initial GreeVRFMapState
-	if unit, found := p.snapshot.Units[candidate.Opaque7]; found && unit.Generation == observation.Generation {
-		initial = unit.State
+	key, unit := p.greeVRFProviderUnit(id, observation)
+	switch id.Family {
+	case GreeVRFClock:
+		point, ok := DecodeGreeVRFClock(evidence)
+		if !ok {
+			p.snapshot.Unsupported++
+			return
+		}
+		unit.Clock = &point
+	case GreeVRFAddressedWrite:
+		point, ok := DecodeGreeVRFAddressedWrite(evidence)
+		if !ok {
+			p.snapshot.Unsupported++
+			return
+		}
+		if unit.Writes == nil {
+			unit.Writes = make(map[uint8]GreeVRFTypedPoint)
+		}
+		unit.Writes[id.Type] = point
+	case GreeVRFData, GreeVRFAddressedData:
+		if !p.greeVRFProviderApplyRegister(&unit, id, evidence) {
+			p.snapshot.Unsupported++
+			return
+		}
+		if candidate, ok := GreeVRFCandidate().Classify(evidence).Projection.(GreeVRFCandidateProjection); ok {
+			unit.Candidate = candidate
+		}
 	}
-	state, rows, ok := p.decoder.Apply(initial, candidate.Opcode7, evidence.Frame.Data())
-	if !ok {
-		p.snapshot.Unsupported++
-		return
+	p.greeVRFProviderPublish(key, unit)
+}
+
+func (p *GreeVRFProvider) greeVRFProviderUnit(id GreeVRFIdentifier, observation GreeVRFObservation) (GreeVRFUnitKey, GreeVRFUnitSnapshot) {
+	key := GreeVRFUnitKey{id.Family, id.Unit}
+	unit := p.snapshot.Units[key]
+	if unit.Generation != observation.Generation {
+		unit = GreeVRFUnitSnapshot{Generation: observation.Generation, Images: make(map[uint8]*GreeVRFRegisterImage)}
 	}
-	p.greeVRFProviderRetain(candidate.Opaque7, GreeVRFUnitSnapshot{
-		Generation:  observation.Generation,
-		Received:    evidence.Monotonic,
-		Candidate:   candidate,
-		State:       state,
-		MatchedRows: rows,
-	})
+	unit.Identifier, unit.Evidence, unit.Received = id, observation.Evidence, observation.Evidence.Monotonic
+	return key, unit
+}
+
+func (p *GreeVRFProvider) greeVRFProviderApplyRegister(unit *GreeVRFUnitSnapshot, id GreeVRFIdentifier, evidence Evidence) bool {
+	image := unit.Images[id.Type]
+	if image == nil {
+		image = NewGreeVRFRegisterImage(GreeVRFRegisterKey{evidence.Interface, id.Family, id.Unit, id.Type})
+	}
+	rows := greeVRFDictionary[id.Type]
+	bits := len(rows) != 0 && rows[0].Kind != GreeVRFDictionaryByte
+	if !image.Apply(evidence, bits) {
+		return false
+	}
+	unit.Images[id.Type] = image
+	if id.Type == 0x10 {
+		unit.Identity = image.DeviceIdentity()
+	}
+	if state, rows, ok := p.decoder.ApplyRegister(unit.State, image); ok {
+		unit.State, unit.MatchedRows = state, rows
+	}
+	return true
+}
+
+func (p *GreeVRFProvider) greeVRFProviderPublish(key GreeVRFUnitKey, unit GreeVRFUnitSnapshot) {
+	p.greeVRFProviderRetain(key, unit)
 	p.snapshot.Admitted++
 	p.snapshot.State = "receiving"
 }
 
 // greeVRFProviderRetain stores one unit entry as the most recently received
 // and evicts the least recently received entry beyond the bound.
-func (p *GreeVRFProvider) greeVRFProviderRetain(key uint8, unit GreeVRFUnitSnapshot) {
+func (p *GreeVRFProvider) greeVRFProviderRetain(key GreeVRFUnitKey, unit GreeVRFUnitSnapshot) {
 	for index, known := range p.order {
 		if known == key {
 			p.order = append(p.order[:index], p.order[index+1:]...)
@@ -231,9 +289,28 @@ func (p *GreeVRFProvider) Snapshot() GreeVRFProviderSnapshot {
 	p.mu.Lock()
 	defer p.mu.Unlock()
 	snapshot := p.snapshot
-	snapshot.Units = make(map[uint8]GreeVRFUnitSnapshot, len(p.snapshot.Units))
+	snapshot.Units = make(map[GreeVRFUnitKey]GreeVRFUnitSnapshot, len(p.snapshot.Units))
 	for key, unit := range p.snapshot.Units {
-		unit.State = cloneGreeVRFMapState(unit.State)
+		if unit.State.Cells != nil {
+			unit.State = cloneGreeVRFMapState(unit.State)
+		}
+		unit.Images = maps.Clone(unit.Images)
+		for typ, image := range unit.Images {
+			clone := *image
+			clone.fragments = maps.Clone(image.fragments)
+			unit.Images[typ] = &clone
+		}
+		if unit.Clock != nil {
+			clock := *unit.Clock
+			unit.Clock = &clock
+		}
+		unit.Writes = maps.Clone(unit.Writes)
+		for typ, point := range unit.Writes {
+			point.Row = point.Row.detached()
+			point.Value.Raw = append([]byte(nil), point.Value.Raw...)
+			point.Value.Bits = maps.Clone(point.Value.Bits)
+			unit.Writes[typ] = point
+		}
 		unit.Candidate.Updates = append([]GreeVRFCandidateStateCell(nil), unit.Candidate.Updates...)
 		unit.MatchedRows = append([]int(nil), unit.MatchedRows...)
 		snapshot.Units[key] = unit

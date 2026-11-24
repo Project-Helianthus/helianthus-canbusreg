@@ -1,0 +1,5109 @@
+{
+  "schema": "gree.vrf.can.dictionary",
+  "schema_version": 1,
+  "status": "candidate",
+  "slice": "status-bits",
+  "types": [
+    "0x1c",
+    "0x1d",
+    "0x1e",
+    "0x1f",
+    "0x22",
+    "0x23",
+    "0x29",
+    "0x33",
+    "0x36"
+  ],
+  "counts": {
+    "positions": 93,
+    "named_values": 0,
+    "bit_containers": 93,
+    "named_bits": 538,
+    "label_only": 2
+  },
+  "entries": [
+    {
+      "type": "0x1c",
+      "container": "0x00",
+      "kind": "bits",
+      "value_type": "bits",
+      "bits": [
+        {
+          "bit": 0,
+          "coordinate": "0x00",
+          "label": "WTPoweronSta",
+          "set_label": "Poweron",
+          "clear_label": "Poweroff",
+          "description": "Reported meaning: Tank on/off."
+        },
+        {
+          "bit": 1,
+          "coordinate": "0x01",
+          "label": "FHPoweronSta",
+          "set_label": "Poweron",
+          "clear_label": "Poweroff",
+          "description": "Reported meaning: Floor-heating on and off."
+        },
+        {
+          "bit": 2,
+          "coordinate": "0x02",
+          "label": "WTHHP",
+          "set_label": "Calefaction",
+          "clear_label": "KeepTemperature",
+          "description": "Reported meaning: Tank heating and temperature holding."
+        },
+        {
+          "bit": 3,
+          "coordinate": "0x03",
+          "label": "FHHHP",
+          "set_label": "Calefaction",
+          "clear_label": "KeepTemperature",
+          "description": "Reported meaning: Floor heating: heating and temperature holding."
+        },
+        {
+          "bit": 4,
+          "coordinate": "0x04",
+          "description": "Reported meaning: Single/dual temperature-sensor status."
+        },
+        {
+          "bit": 5,
+          "coordinate": "0x05",
+          "label": "CelerityHotWater",
+          "set_label": "Quick",
+          "clear_label": "Normal",
+          "description": "Reported meaning: Rapid hot water."
+        },
+        {
+          "bit": 7,
+          "coordinate": "0x07",
+          "label": "AutoWaterTemp",
+          "set_label": "Auto",
+          "clear_label": "Off",
+          "description": "Reported meaning: Automatic water temperature."
+        }
+      ]
+    },
+    {
+      "type": "0x1c",
+      "coordinate": "0x06",
+      "kind": "label_only_bit",
+      "label_only": true,
+      "candidate_labels": {
+        "A": [
+          "WUTHOngoing"
+        ]
+      },
+      "referenced_by": [
+        "M94"
+      ],
+      "container": "0x00",
+      "bit": 6,
+      "definition": "none; no unit, enumeration or effect is defined"
+    },
+    {
+      "type": "0x1c",
+      "container": "0x01",
+      "kind": "bits",
+      "value_type": "bits",
+      "bits": [
+        {
+          "bit": 0,
+          "coordinate": "0x08",
+          "label": "Sunflower",
+          "set_label": "On",
+          "clear_label": "Off",
+          "description": "Reported meaning: Sunflower."
+        },
+        {
+          "bit": 4,
+          "coordinate": "0x0c",
+          "label": "GeneratorPriority",
+          "set_label": "FloorHeater",
+          "clear_label": "WaterTank",
+          "description": "Reported meaning: Priority setting of the tank and of floor heating; priority setting of the generator function."
+        },
+        {
+          "bit": 5,
+          "coordinate": "0x0d",
+          "label": "WTCyclePumpStatus",
+          "set_label": "On",
+          "clear_label": "Off",
+          "description": "Reported meaning: Tank return-pump status."
+        },
+        {
+          "bit": 6,
+          "coordinate": "0x0e",
+          "label": "WTElectricalHeating",
+          "set_label": "On",
+          "clear_label": "Off",
+          "description": "Reported meaning: Auxiliary electric-heating switch of the tank; tank electric heating."
+        },
+        {
+          "bit": 7,
+          "coordinate": "0x0f",
+          "label": "SolenoidValveAStatus",
+          "set_label": "On",
+          "clear_label": "Off",
+          "description": "Reported meaning: Status switch of solenoid valve A."
+        }
+      ]
+    },
+    {
+      "type": "0x1c",
+      "container": "0x02",
+      "kind": "bits",
+      "value_type": "bits",
+      "bits": [
+        {
+          "bit": 0,
+          "coordinate": "0x10",
+          "label": "SolenoidValveBStatus",
+          "set_label": "On",
+          "clear_label": "Off",
+          "description": "Reported meaning: Status switch of tank solenoid valve B."
+        },
+        {
+          "bit": 3,
+          "coordinate": "0x13",
+          "label": "RecoverHeatAutomatically",
+          "set_label": "Unallowed",
+          "clear_label": "Allowed",
+          "description": "Reported meaning: Permission for automatic heat recovery; automatic heat-recovery setting in cooling."
+        }
+      ]
+    },
+    {
+      "type": "0x1c",
+      "container": "0x03",
+      "kind": "bits",
+      "value_type": "bits",
+      "bits": [
+        {
+          "bit": 3,
+          "coordinate": "0x1b",
+          "label": "AutoWaterTemp",
+          "set_label": "Auto",
+          "clear_label": "Off",
+          "description": "Reported meaning: Automatic water-temperature setting for floor heating."
+        }
+      ]
+    },
+    {
+      "type": "0x1c",
+      "container": "0x04",
+      "kind": "bits",
+      "value_type": "bits",
+      "bits": [
+        {
+          "bit": 1,
+          "coordinate": "0x21",
+          "label": "RapidFloorHeating",
+          "set_label": "Quick",
+          "clear_label": "Normal",
+          "description": "Reported meaning: Rapid floor heating."
+        },
+        {
+          "bit": 2,
+          "coordinate": "0x22",
+          "label": "SolenoidValveCStatus",
+          "set_label": "On",
+          "clear_label": "Off",
+          "description": "Reported meaning: Solenoid valve C status."
+        },
+        {
+          "bit": 3,
+          "coordinate": "0x23",
+          "label": "SolenoidValveDStatus",
+          "set_label": "On",
+          "clear_label": "Off",
+          "description": "Reported meaning: Solenoid valve D status."
+        },
+        {
+          "bit": 4,
+          "coordinate": "0x24",
+          "label": "FHEP",
+          "set_label": "On",
+          "clear_label": "Off",
+          "description": "Reported meaning: Floor auxiliary-heating status, floor electric heating."
+        },
+        {
+          "bit": 6,
+          "coordinate": "0x26",
+          "label": "AbsenceFunction",
+          "set_label": "On",
+          "clear_label": "Off",
+          "description": "Reported meaning: Absence-function status for floor heating, the absence function."
+        }
+      ]
+    },
+    {
+      "type": "0x1c",
+      "container": "0x05",
+      "kind": "bits",
+      "value_type": "bits",
+      "bits": [
+        {
+          "bit": 2,
+          "coordinate": "0x2a",
+          "label": "FHHP1IDU",
+          "set_label": "On",
+          "clear_label": "Off",
+          "description": "Reported meaning: Open status of floor-heating actuator 1."
+        },
+        {
+          "bit": 3,
+          "coordinate": "0x2b",
+          "label": "FHHP2IDU",
+          "set_label": "On",
+          "clear_label": "Off",
+          "description": "Reported meaning: Open status of floor-heating distribution valve 2."
+        },
+        {
+          "bit": 4,
+          "coordinate": "0x2c",
+          "label": "FHHP3IDU",
+          "set_label": "On",
+          "clear_label": "Off",
+          "description": "Reported meaning: Open status of floor-heating distribution valve 3."
+        },
+        {
+          "bit": 5,
+          "coordinate": "0x2d",
+          "label": "FHHP4IDU",
+          "set_label": "On",
+          "clear_label": "Off",
+          "description": "Reported meaning: Open status of floor-heating distribution valve 4."
+        },
+        {
+          "bit": 6,
+          "coordinate": "0x2e",
+          "label": "FHHP5IDU",
+          "set_label": "On",
+          "clear_label": "Off",
+          "description": "Reported meaning: Open status of floor-heating distribution valve 5."
+        },
+        {
+          "bit": 7,
+          "coordinate": "0x2f",
+          "label": "FHHP6IDU",
+          "set_label": "On",
+          "clear_label": "Off",
+          "description": "Reported meaning: Open status of floor-heating distribution valve 6."
+        }
+      ]
+    },
+    {
+      "type": "0x1c",
+      "coordinate": "0x29",
+      "kind": "label_only_bit",
+      "label_only": true,
+      "candidate_labels": {
+        "A": [
+          "FIndoorEn"
+        ]
+      },
+      "referenced_by": [
+        "M94"
+      ],
+      "container": "0x05",
+      "bit": 1,
+      "definition": "none; no unit, enumeration or effect is defined"
+    },
+    {
+      "type": "0x1c",
+      "container": "0x06",
+      "kind": "bits",
+      "value_type": "bits",
+      "bits": [
+        {
+          "bit": 0,
+          "coordinate": "0x30",
+          "label": "WaterflowSwitchStatus",
+          "set_label": "On",
+          "clear_label": "Off",
+          "description": "Reported meaning: Water flow-switch contact status."
+        },
+        {
+          "bit": 3,
+          "coordinate": "0x33",
+          "label": "SPPumpStatus",
+          "set_label": "On",
+          "clear_label": "Off",
+          "description": "Reported meaning: Solar water-pump status."
+        }
+      ]
+    },
+    {
+      "type": "0x1c",
+      "container": "0x0a",
+      "kind": "bits",
+      "value_type": "bits",
+      "bits": [
+        {
+          "bit": 0,
+          "coordinate": "0x50",
+          "label": "SysMasterIDU",
+          "set_label": "Has",
+          "clear_label": "Nothing",
+          "description": "Reported meaning: Presence of an indoor unit with master mode in the system."
+        },
+        {
+          "bit": 1,
+          "coordinate": "0x51",
+          "label": "SysResetSta",
+          "set_label": "Yes",
+          "clear_label": "No",
+          "description": "Reported meaning: System reset is finished; Yes; No."
+        },
+        {
+          "bit": 2,
+          "coordinate": "0x52",
+          "label": "AuxiliaryOilReturn",
+          "set_label": "Yes",
+          "clear_label": "No",
+          "description": "Reported meaning: Oil return."
+        },
+        {
+          "bit": 7,
+          "coordinate": "0x57",
+          "label": "AllowedToRecoverHeatAutomatically",
+          "set_label": "Allowed",
+          "clear_label": "Unallowed",
+          "description": "Reported meaning: Allows activation of automatic heat recovery."
+        }
+      ]
+    },
+    {
+      "type": "0x1c",
+      "container": "0x0b",
+      "kind": "bits",
+      "value_type": "bits",
+      "bits": [
+        {
+          "bit": 0,
+          "coordinate": "0x58",
+          "label": "DebugCompletionMode",
+          "set_label": "Normal",
+          "clear_label": "Quick",
+          "description": "Reported meaning: Commissioning-completion mode."
+        },
+        {
+          "bit": 2,
+          "coordinate": "0x5a",
+          "label": "3DModeAllowedFH",
+          "set_label": "Allowed",
+          "clear_label": "Unallowed",
+          "description": "Reported meaning: Rapid-heating mode allows floor heating to start."
+        },
+        {
+          "bit": 3,
+          "coordinate": "0x5b",
+          "label": "HeatingHighTempProtection",
+          "set_label": "HighTempProtection",
+          "clear_label": "Normal",
+          "description": "Reported meaning: High-temperature protection in heating."
+        },
+        {
+          "bit": 6,
+          "coordinate": "0x5e",
+          "label": "DiscontinousHeatingTag",
+          "set_label": "DiscontinousHeating",
+          "clear_label": "ContinousHeating",
+          "description": "Reported meaning: Discontinuous heating."
+        }
+      ]
+    },
+    {
+      "type": "0x1c",
+      "container": "0x0c",
+      "kind": "bits",
+      "value_type": "bits",
+      "bits": [
+        {
+          "bit": 0,
+          "coordinate": "0x60",
+          "label": "SysDecryption",
+          "set_label": "NotDecrypt",
+          "clear_label": "Decryption"
+        },
+        {
+          "bit": 3,
+          "coordinate": "0x63",
+          "label": "SysDecryption",
+          "set_label": "NotDecrypt",
+          "clear_label": "Decryption",
+          "description": "Reported meaning: System decryption indicator."
+        }
+      ]
+    },
+    {
+      "type": "0x1c",
+      "container": "0x0d",
+      "kind": "bits",
+      "value_type": "bits",
+      "bits": [
+        {
+          "bit": 0,
+          "coordinate": "0x68",
+          "label": "BBB",
+          "set_label": "Yes",
+          "clear_label": "No"
+        },
+        {
+          "bit": 2,
+          "coordinate": "0x6a",
+          "label": "SysReheatRunningSta",
+          "set_label": "Yes",
+          "clear_label": "No",
+          "description": "Reported meaning: Reheat running status of the whole unit."
+        },
+        {
+          "bit": 3,
+          "coordinate": "0x6b",
+          "label": "aAAA",
+          "set_label": "Yes",
+          "clear_label": "No",
+          "description": "Reported meaning: Complete-unit status."
+        },
+        {
+          "bit": 4,
+          "coordinate": "0x6c",
+          "label": "TestSta",
+          "set_label": "Yes",
+          "clear_label": "No",
+          "description": "Reported meaning: Test-mode status."
+        }
+      ]
+    },
+    {
+      "type": "0x1c",
+      "container": "0x0e",
+      "kind": "bits",
+      "value_type": "bits",
+      "bits": [
+        {
+          "bit": 4,
+          "coordinate": "0x74",
+          "label": "IDUFrost",
+          "set_label": "Yes",
+          "clear_label": "No",
+          "description": "Reported meaning: Indoor-unit defrost indicator."
+        },
+        {
+          "bit": 6,
+          "coordinate": "0x76",
+          "label": "LimitCapability",
+          "set_label": "Yes",
+          "clear_label": "No",
+          "description": "Reported meaning: Capacity-limitation indicator."
+        }
+      ]
+    },
+    {
+      "type": "0x1c",
+      "container": "0x10",
+      "kind": "bits",
+      "value_type": "bits",
+      "bits": [
+        {
+          "bit": 0,
+          "coordinate": "0x80",
+          "label": "WeatherSelfAdaptionCtrl",
+          "set_label": "Yes",
+          "clear_label": "No",
+          "description": "Reported meaning: Active adaptive control according to weather parameters."
+        },
+        {
+          "bit": 1,
+          "coordinate": "0x81",
+          "label": "HeatStorageFrostCtrl",
+          "set_label": "Yes",
+          "clear_label": "No",
+          "description": "Reported meaning: Activation indicator for defrost control by stored heat."
+        },
+        {
+          "bit": 2,
+          "coordinate": "0x82",
+          "label": "ContinueHeatFrost",
+          "set_label": "Yes",
+          "clear_label": "No",
+          "description": "Reported meaning: Activation indicator for defrost with continuous heating."
+        },
+        {
+          "bit": 3,
+          "coordinate": "0x83",
+          "label": "ColdStartup",
+          "set_label": "Yes",
+          "clear_label": "No",
+          "description": "Reported meaning: Activation indicator for cold start."
+        }
+      ]
+    },
+    {
+      "type": "0x1c",
+      "container": "0x11",
+      "kind": "bits",
+      "value_type": "bits",
+      "bits": [
+        {
+          "bit": 0,
+          "coordinate": "0x88",
+          "label": "LiquIdinletValve",
+          "set_label": "On",
+          "clear_label": "Off",
+          "description": "Reported meaning: Liquid inlet valve."
+        },
+        {
+          "bit": 1,
+          "coordinate": "0x89",
+          "label": "PressureValve",
+          "set_label": "On",
+          "clear_label": "Off",
+          "description": "Reported meaning: Pressurization valve."
+        },
+        {
+          "bit": 2,
+          "coordinate": "0x8a",
+          "label": "DrainValveOfCooling",
+          "set_label": "On",
+          "clear_label": "Off",
+          "description": "Reported meaning: Liquid drain valve in cooling."
+        },
+        {
+          "bit": 3,
+          "coordinate": "0x8b",
+          "label": "GasBalancedValve",
+          "set_label": "On",
+          "clear_label": "Off",
+          "description": "Reported meaning: Gas equalization valve."
+        },
+        {
+          "bit": 4,
+          "coordinate": "0x8c",
+          "label": "DrainValveOfHeating",
+          "set_label": "On",
+          "clear_label": "Off",
+          "description": "Reported meaning: Liquid drain valve in heating."
+        },
+        {
+          "bit": 5,
+          "coordinate": "0x8d",
+          "label": "HighFallValve",
+          "set_label": "On",
+          "clear_label": "Off",
+          "description": "Reported meaning: Valve for a large height difference."
+        }
+      ]
+    },
+    {
+      "type": "0x1c",
+      "container": "0x19",
+      "kind": "bits",
+      "value_type": "bits",
+      "bits": [
+        {
+          "bit": 0,
+          "coordinate": "0xc8",
+          "label": "SelfCleaning",
+          "set_label": "On",
+          "clear_label": "Off",
+          "description": "Reported meaning: Self-cleaning."
+        },
+        {
+          "bit": 1,
+          "coordinate": "0xc9",
+          "label": "GPRSModule",
+          "set_label": "Has",
+          "clear_label": "None",
+          "description": "Reported meaning: Presence of the GPRS module."
+        }
+      ]
+    },
+    {
+      "type": "0x1d",
+      "container": "0x0a",
+      "kind": "bits",
+      "value_type": "bits",
+      "bits": [
+        {
+          "bit": 0,
+          "coordinate": "0x50",
+          "label": "SysFourWayValveSta",
+          "set_label": "Protection",
+          "clear_label": "Normal",
+          "description": "Reported meaning: Protection against gas passing through the system four-way valve; Protection; Normal."
+        },
+        {
+          "bit": 1,
+          "coordinate": "0x51",
+          "label": "SysPresRationSta",
+          "set_label": "HasException",
+          "clear_label": "Normal",
+          "description": "Reported meaning: Abnormal system pressure ratio; Abnormality."
+        },
+        {
+          "bit": 2,
+          "coordinate": "0x52",
+          "label": "SysHPSta",
+          "set_label": "Protection",
+          "clear_label": "Normal",
+          "description": "Reported meaning: System high-pressure protection."
+        },
+        {
+          "bit": 3,
+          "coordinate": "0x53",
+          "label": "SysLPSta",
+          "set_label": "Protection",
+          "clear_label": "Normal",
+          "description": "Reported meaning: System low-pressure protection."
+        },
+        {
+          "bit": 4,
+          "coordinate": "0x54",
+          "label": "SysDLOverHighSta",
+          "set_label": "Protection",
+          "clear_label": "Normal",
+          "description": "Reported meaning: Protection against an excessively high system discharge value."
+        },
+        {
+          "bit": 5,
+          "coordinate": "0x55",
+          "label": "SysOCSta",
+          "set_label": "Protection",
+          "clear_label": "Normal",
+          "description": "Reported meaning: System overcurrent protection."
+        },
+        {
+          "bit": 6,
+          "coordinate": "0x56",
+          "label": "SysCommSta",
+          "set_label": "Error",
+          "clear_label": "Normal",
+          "description": "Reported meaning: System communication fault."
+        },
+        {
+          "bit": 7,
+          "coordinate": "0x57",
+          "label": "SysOEnvTsor",
+          "set_label": "Error",
+          "clear_label": "Normal",
+          "description": "Reported meaning: System outdoor ambient temperature sensor."
+        }
+      ]
+    },
+    {
+      "type": "0x1d",
+      "container": "0x0b",
+      "kind": "bits",
+      "value_type": "bits",
+      "bits": [
+        {
+          "bit": 0,
+          "coordinate": "0x58",
+          "label": "SysDLTsorConnectSta",
+          "set_label": "Unconnected",
+          "clear_label": "Normal",
+          "description": "Reported meaning: The system discharge temperature sensor is disconnected."
+        },
+        {
+          "bit": 1,
+          "coordinate": "0x59",
+          "label": "SysHPTsor",
+          "set_label": "Error",
+          "clear_label": "Normal",
+          "description": "Reported meaning: Temperature sensor on the system high-pressure side."
+        },
+        {
+          "bit": 2,
+          "coordinate": "0x5a",
+          "label": "SysLPTsor",
+          "set_label": "Error",
+          "clear_label": "Normal",
+          "description": "Reported meaning: Temperature sensor on the system low-pressure side."
+        },
+        {
+          "bit": 3,
+          "coordinate": "0x5b",
+          "label": "SysDLTsor",
+          "set_label": "Error",
+          "clear_label": "Normal",
+          "description": "Reported meaning: System discharge temperature sensor."
+        },
+        {
+          "bit": 4,
+          "coordinate": "0x5c",
+          "label": "SysCapMatchSta",
+          "set_label": "Exception",
+          "clear_label": "Normal",
+          "description": "Reported meaning: Abnormal system capacity match."
+        },
+        {
+          "bit": 5,
+          "coordinate": "0x5d",
+          "label": "SysThawTsor",
+          "set_label": "Error",
+          "clear_label": "Normal",
+          "description": "Reported meaning: System defrost temperature sensor."
+        },
+        {
+          "bit": 6,
+          "coordinate": "0x5e",
+          "label": "SysOverColdAirTsor",
+          "set_label": "Error",
+          "clear_label": "Normal",
+          "description": "Reported meaning: System subcooler temperature sensor."
+        },
+        {
+          "bit": 7,
+          "coordinate": "0x5f",
+          "label": "SysAirInletTsor",
+          "set_label": "Error",
+          "clear_label": "Normal",
+          "description": "Reported meaning: System gas-separator temperature sensor."
+        }
+      ]
+    },
+    {
+      "type": "0x1d",
+      "container": "0x0c",
+      "kind": "bits",
+      "value_type": "bits",
+      "bits": [
+        {
+          "bit": 0,
+          "coordinate": "0x60",
+          "label": "SysFanDriverSta",
+          "set_label": "Error",
+          "clear_label": "Normal",
+          "description": "Reported meaning: Fan drive-board fault."
+        },
+        {
+          "bit": 1,
+          "coordinate": "0x61",
+          "label": "SysCompressorDriverSta",
+          "set_label": "Error",
+          "clear_label": "Normal",
+          "description": "Reported meaning: Compressor drive-board fault."
+        },
+        {
+          "bit": 2,
+          "coordinate": "0x62",
+          "label": "CompressorDriverSta",
+          "set_label": "Error",
+          "clear_label": "Normal",
+          "description": "Reported meaning: Abnormal operation of the compressor drive board."
+        },
+        {
+          "bit": 3,
+          "coordinate": "0x63",
+          "label": "CompressorDriverPowerSta",
+          "set_label": "Protection",
+          "clear_label": "Normal",
+          "description": "Reported meaning: Supply-voltage protection of the compressor drive board."
+        },
+        {
+          "bit": 4,
+          "coordinate": "0x64",
+          "label": "FanDriverSta",
+          "set_label": "Error",
+          "clear_label": "Normal",
+          "description": "Reported meaning: Abnormal operation of the fan drive board."
+        },
+        {
+          "bit": 5,
+          "coordinate": "0x65",
+          "label": "FanDrivePowerSta",
+          "set_label": "Protection",
+          "clear_label": "Normal",
+          "description": "Reported meaning: Supply-voltage protection of the fan drive board."
+        },
+        {
+          "bit": 6,
+          "coordinate": "0x66",
+          "label": "Module1Sta",
+          "set_label": "Error",
+          "clear_label": "Normal",
+          "description": "Reported meaning: Module 1 fault."
+        },
+        {
+          "bit": 7,
+          "coordinate": "0x67",
+          "label": "Module2Sta",
+          "set_label": "Error",
+          "clear_label": "Normal",
+          "description": "Reported meaning: Module 2 fault."
+        }
+      ]
+    },
+    {
+      "type": "0x1d",
+      "container": "0x0d",
+      "kind": "bits",
+      "value_type": "bits",
+      "bits": [
+        {
+          "bit": 0,
+          "coordinate": "0x68",
+          "label": "Module3Sta",
+          "set_label": "Error",
+          "clear_label": "Normal",
+          "description": "Reported meaning: Module 3 fault."
+        },
+        {
+          "bit": 1,
+          "coordinate": "0x69",
+          "label": "Module4Sta",
+          "set_label": "Error",
+          "clear_label": "Normal",
+          "description": "Reported meaning: Module 4 fault."
+        },
+        {
+          "bit": 2,
+          "coordinate": "0x6a",
+          "label": "SysTimer",
+          "set_label": "Exception",
+          "clear_label": "Normal",
+          "description": "Reported meaning: Abnormal system clock."
+        },
+        {
+          "bit": 4,
+          "coordinate": "0x6c",
+          "label": "EmerHaltSta",
+          "set_label": "Halt",
+          "clear_label": "Normal",
+          "description": "Reported meaning: Emergency stop; Stop."
+        },
+        {
+          "bit": 5,
+          "coordinate": "0x6d",
+          "label": "SysAddrCodeSta",
+          "set_label": "Yes",
+          "clear_label": "No",
+          "description": "Reported meaning: Conflict in the system address switch settings; Conflict."
+        },
+        {
+          "bit": 6,
+          "coordinate": "0x6e",
+          "label": "RemoteEmerHalstSta",
+          "set_label": "Yes",
+          "clear_label": "No",
+          "description": "Reported meaning: Remote emergency-stop signal; Triggered/Yes."
+        },
+        {
+          "bit": 7,
+          "coordinate": "0x6f",
+          "label": "SysHPOverLowProt",
+          "set_label": "Protection",
+          "clear_label": "Normal",
+          "description": "Reported meaning: System high-pressure-too-low protection."
+        }
+      ]
+    },
+    {
+      "type": "0x1d",
+      "container": "0x0e",
+      "kind": "bits",
+      "value_type": "bits",
+      "bits": [
+        {
+          "bit": 0,
+          "coordinate": "0x70",
+          "label": "RefFillFailure",
+          "set_label": "Yes",
+          "clear_label": "No",
+          "description": "Reported meaning: Invalid refrigerant charge."
+        },
+        {
+          "bit": 1,
+          "coordinate": "0x71",
+          "label": "IDULostSta",
+          "set_label": "Error",
+          "clear_label": "Normal",
+          "description": "Reported meaning: Fault: indoor unit absent."
+        },
+        {
+          "bit": 2,
+          "coordinate": "0x72",
+          "label": "WrongODUCntSta",
+          "set_label": "Yes",
+          "clear_label": "No",
+          "description": "Reported meaning: Incorrect number of outdoor units."
+        },
+        {
+          "bit": 3,
+          "coordinate": "0x73",
+          "label": "SysUnrecoveredErrSta",
+          "set_label": "Error",
+          "clear_label": "Normal",
+          "note": "Unrecoverable system fault. A distinct flag, not an alias of another fault flag.",
+          "description": "Reported meaning: Unrecoverable system fault; Fault."
+        },
+        {
+          "bit": 4,
+          "coordinate": "0x74",
+          "label": "SysRecoverableErrSta",
+          "set_label": "Error",
+          "clear_label": "Normal",
+          "note": "Recoverable system fault. A distinct flag, not an alias of another fault flag.",
+          "description": "Reported meaning: Recoverable system fault; Fault."
+        },
+        {
+          "bit": 5,
+          "coordinate": "0x75",
+          "label": "IpAssignOverflowSta",
+          "set_label": "Yes",
+          "clear_label": "No",
+          "description": "Reported meaning: IP address allocation range exceeded; Yes."
+        },
+        {
+          "bit": 6,
+          "coordinate": "0x76",
+          "label": "SysFreezeProt",
+          "set_label": "Protection",
+          "clear_label": "Normal",
+          "description": "Reported meaning: System anti-freeze protection; Protection."
+        },
+        {
+          "bit": 7,
+          "coordinate": "0x77",
+          "label": "SysHeatExchangerGsor",
+          "set_label": "Error",
+          "clear_label": "Normal",
+          "description": "Reported meaning: Fault of the system heat-exchanger gas-outlet temperature sensor."
+        }
+      ]
+    },
+    {
+      "type": "0x1d",
+      "container": "0x0f",
+      "kind": "bits",
+      "value_type": "bits",
+      "bits": [
+        {
+          "bit": 0,
+          "coordinate": "0x78",
+          "label": "SysBackOilSor",
+          "set_label": "Error",
+          "clear_label": "Normal",
+          "description": "Reported meaning: System oil-return temperature sensor fault."
+        },
+        {
+          "bit": 1,
+          "coordinate": "0x79",
+          "label": "SysDLTOverLowProt",
+          "set_label": "Protection",
+          "clear_label": "Normal",
+          "description": "Reported meaning: System discharge temperature too low protection."
+        },
+        {
+          "bit": 2,
+          "coordinate": "0x7a",
+          "label": "SysPresSor",
+          "set_label": "Error",
+          "clear_label": "Normal",
+          "description": "Reported meaning: System pressure sensor fault."
+        },
+        {
+          "bit": 4,
+          "coordinate": "0x7c",
+          "label": "GPRSErr",
+          "set_label": "Error",
+          "clear_label": "Normal",
+          "description": "Reported meaning: GPRS fault."
+        }
+      ]
+    },
+    {
+      "type": "0x1d",
+      "container": "0x10",
+      "kind": "bits",
+      "value_type": "bits",
+      "bits": [],
+      "note": "The container is defined without named bits; the raw byte is the only value."
+    },
+    {
+      "type": "0x1d",
+      "container": "0x11",
+      "kind": "bits",
+      "value_type": "bits",
+      "bits": [
+        {
+          "bit": 0,
+          "coordinate": "0x88",
+          "label": "ModuleCompDriveError",
+          "set_label": "Error",
+          "clear_label": "Normal",
+          "description": "Reported meaning: Module compressor drive-board fault."
+        },
+        {
+          "bit": 1,
+          "coordinate": "0x89",
+          "label": "ModuleCompDriveErr",
+          "set_label": "Error",
+          "clear_label": "Normal",
+          "description": "Reported meaning: Abnormal operation of the module compressor drive board."
+        },
+        {
+          "bit": 2,
+          "coordinate": "0x8a",
+          "label": "ModuleCompDriveVoltProt",
+          "set_label": "Protection",
+          "clear_label": "Normal",
+          "description": "Reported meaning: Supply-voltage protection of the module compressor drive board."
+        },
+        {
+          "bit": 3,
+          "coordinate": "0x8b",
+          "label": "ModuleFanDriveError",
+          "set_label": "Error",
+          "clear_label": "Normal",
+          "description": "Reported meaning: Module fan drive-board fault."
+        },
+        {
+          "bit": 4,
+          "coordinate": "0x8c",
+          "label": "ModuleFanDriveErr",
+          "set_label": "Error",
+          "clear_label": "Normal",
+          "description": "Reported meaning: Abnormal operation of the module fan drive board."
+        },
+        {
+          "bit": 5,
+          "coordinate": "0x8d",
+          "label": "ModuleFanDriveVoltProt",
+          "set_label": "Error",
+          "clear_label": "Normal",
+          "description": "Reported meaning: Supply-voltage protection of the module fan drive board."
+        },
+        {
+          "bit": 6,
+          "coordinate": "0x8e",
+          "label": "ModuleRecoverableErr",
+          "set_label": "Error",
+          "clear_label": "Normal",
+          "description": "Reported meaning: Recoverable module fault."
+        },
+        {
+          "bit": 7,
+          "coordinate": "0x8f",
+          "label": "ModuleUnrecoveredErr",
+          "set_label": "Error",
+          "clear_label": "Normal",
+          "description": "Reported meaning: Unrecoverable module fault."
+        }
+      ]
+    },
+    {
+      "type": "0x1d",
+      "container": "0x12",
+      "kind": "bits",
+      "value_type": "bits",
+      "bits": [
+        {
+          "bit": 0,
+          "coordinate": "0x90",
+          "label": "CompDriveAddrError",
+          "set_label": "Yes",
+          "clear_label": "No",
+          "description": "Reported meaning: Incorrect compressor drive-board address."
+        },
+        {
+          "bit": 1,
+          "coordinate": "0x91",
+          "label": "CondenserInletTempError",
+          "set_label": "Yes",
+          "clear_label": "No",
+          "description": "Reported meaning: Condenser inlet-pipe temperature sensor fault."
+        },
+        {
+          "bit": 2,
+          "coordinate": "0x92",
+          "label": "CondenserOutletTempError",
+          "set_label": "Yes",
+          "clear_label": "No",
+          "description": "Reported meaning: Condenser outlet-pipe temperature sensor fault."
+        },
+        {
+          "bit": 3,
+          "coordinate": "0x93",
+          "label": "DCMotorErr",
+          "set_label": "Error",
+          "clear_label": "Normal",
+          "description": "Reported meaning: DC motor fault."
+        },
+        {
+          "bit": 4,
+          "coordinate": "0x94",
+          "label": "BackOil2Tsor",
+          "set_label": "Error",
+          "clear_label": "Normal",
+          "description": "Reported meaning: Oil-return temperature sensor 2 fault."
+        },
+        {
+          "bit": 5,
+          "coordinate": "0x95",
+          "label": "BackOil3Tsor",
+          "set_label": "Error",
+          "clear_label": "Normal",
+          "description": "Reported meaning: Oil-return temperature sensor 3 fault."
+        },
+        {
+          "bit": 6,
+          "coordinate": "0x96",
+          "label": "BackOil4Tsor",
+          "set_label": "Error",
+          "clear_label": "Normal",
+          "description": "Reported meaning: Oil-return temperature sensor 4 fault."
+        },
+        {
+          "bit": 7,
+          "coordinate": "0x97",
+          "label": "BackOil1LineBackupError",
+          "set_label": "Error",
+          "clear_label": "Normal",
+          "description": "Reported meaning: Oil-return line 1 fault. The fault-kind word is not established."
+        }
+      ]
+    },
+    {
+      "type": "0x1d",
+      "container": "0x13",
+      "kind": "bits",
+      "value_type": "bits",
+      "bits": [
+        {
+          "bit": 0,
+          "coordinate": "0x98",
+          "label": "BackOil2LineBackupError",
+          "set_label": "Error",
+          "clear_label": "Normal",
+          "description": "Reported meaning: Oil-return line 2 fault. The fault-kind word is not established."
+        },
+        {
+          "bit": 1,
+          "coordinate": "0x99",
+          "label": "BackOil3LineBackupError",
+          "set_label": "Error",
+          "clear_label": "Normal",
+          "description": "Reported meaning: Oil-return line 3 fault. The fault-kind word is not established."
+        },
+        {
+          "bit": 2,
+          "coordinate": "0x9a",
+          "label": "BackOil4LineBackupError",
+          "set_label": "Error",
+          "clear_label": "Normal",
+          "description": "Reported meaning: Oil-return line 4 fault. The fault-kind word is not established."
+        },
+        {
+          "bit": 3,
+          "coordinate": "0x9b",
+          "label": "BackOil1LineLeakError",
+          "set_label": "Error",
+          "clear_label": "Normal",
+          "description": "Reported meaning: Leak on oil-return line 1."
+        },
+        {
+          "bit": 4,
+          "coordinate": "0x9c",
+          "label": "BackOil2LineLeakError",
+          "set_label": "Error",
+          "clear_label": "Normal",
+          "description": "Reported meaning: Leak on oil-return line 2."
+        },
+        {
+          "bit": 5,
+          "coordinate": "0x9d",
+          "label": "BackOil3LineLeakError",
+          "set_label": "Error",
+          "clear_label": "Normal",
+          "description": "Reported meaning: Leak on oil-return line 3."
+        },
+        {
+          "bit": 6,
+          "coordinate": "0x9e",
+          "label": "BackOil4LineLeakError",
+          "set_label": "Error",
+          "clear_label": "Normal",
+          "description": "Reported meaning: Leak on oil-return line 4."
+        },
+        {
+          "bit": 7,
+          "coordinate": "0x9f",
+          "label": "HLPSensorInReverse",
+          "set_label": "Error",
+          "clear_label": "Normal",
+          "description": "Reported meaning: The high-pressure and low-pressure sensors are connected in reverse."
+        }
+      ]
+    },
+    {
+      "type": "0x1d",
+      "container": "0x14",
+      "kind": "bits",
+      "value_type": "bits",
+      "bits": [
+        {
+          "bit": 0,
+          "coordinate": "0xa0",
+          "label": "VFCompressor2DriverDCBusVoltLowSta",
+          "set_label": "Protection",
+          "clear_label": "Normal",
+          "description": "Reported meaning: Too-low DC-bus voltage protection of compressor 2 drive."
+        },
+        {
+          "bit": 1,
+          "coordinate": "0xa1",
+          "label": "VFCompressor2DriverDCBusVoltHighSta",
+          "set_label": "Protection",
+          "clear_label": "Normal",
+          "description": "Reported meaning: Too-high DC-bus voltage protection of compressor 2 drive."
+        },
+        {
+          "bit": 2,
+          "coordinate": "0xa2",
+          "label": "VFCompressor2DriverACCurrentSta",
+          "set_label": "Protection",
+          "clear_label": "Normal",
+          "description": "Reported meaning: Abnormal AC input current protection of compressor 2 drive."
+        },
+        {
+          "bit": 3,
+          "coordinate": "0xa3",
+          "label": "VFCompressor2DriveIPMSta",
+          "set_label": "Protection",
+          "clear_label": "Normal",
+          "description": "Reported meaning: IPM module protection of compressor 2 drive."
+        },
+        {
+          "bit": 4,
+          "coordinate": "0xa4",
+          "label": "VFCompressor2DriverPFCSta",
+          "set_label": "Protection",
+          "clear_label": "Normal",
+          "description": "Reported meaning: PFC protection of compressor 2 drive."
+        },
+        {
+          "bit": 5,
+          "coordinate": "0xa5",
+          "label": "VFCompressor2DLStartupSta",
+          "set_label": "Yes",
+          "clear_label": "No",
+          "description": "Reported meaning: Compressor 2 failed to start; Failure/Yes."
+        },
+        {
+          "bit": 6,
+          "coordinate": "0xa6",
+          "label": "VFCompressor2LostPhaseSta",
+          "set_label": "Protection",
+          "clear_label": "Normal",
+          "description": "Reported meaning: Phase-loss protection of variable-frequency compressor 2."
+        },
+        {
+          "bit": 7,
+          "coordinate": "0xa7",
+          "label": "VFCompressor2DriverResetSta",
+          "set_label": "Yes",
+          "clear_label": "No",
+          "description": "Reported meaning: Reset of the compressor 2 drive module."
+        }
+      ]
+    },
+    {
+      "type": "0x1d",
+      "container": "0x15",
+      "kind": "bits",
+      "value_type": "bits",
+      "bits": [
+        {
+          "bit": 0,
+          "coordinate": "0xa8",
+          "label": "VFCompressor2OCSta",
+          "set_label": "Protection",
+          "clear_label": "Normal",
+          "description": "Reported meaning: Overcurrent protection of variable-frequency compressor 2."
+        },
+        {
+          "bit": 2,
+          "coordinate": "0xaa",
+          "label": "VFCompressor2DriverCurrentDetectCircuitSta",
+          "set_label": "Error",
+          "clear_label": "Normal",
+          "description": "Reported meaning: Current-measurement circuit fault of the variable-frequency compressor 2 drive."
+        },
+        {
+          "bit": 3,
+          "coordinate": "0xab",
+          "label": "VFCompressor2LostStepSta",
+          "set_label": "Protection",
+          "clear_label": "Normal",
+          "description": "Reported meaning: Loss-of-synchronism protection of variable-frequency compressor 2."
+        },
+        {
+          "bit": 5,
+          "coordinate": "0xad",
+          "label": "MasterToVFCompressorDriver2CommSta",
+          "set_label": "Error",
+          "clear_label": "Normal",
+          "description": "Reported meaning: Communication fault between the main controller and the variable-frequency compressor 2 drive."
+        },
+        {
+          "bit": 6,
+          "coordinate": "0xae",
+          "label": "VFCompressor2DriveModuTempSta",
+          "set_label": "Protection",
+          "clear_label": "Normal",
+          "description": "Reported meaning: Overtemperature protection of the variable-frequency compressor 2 drive module."
+        },
+        {
+          "bit": 7,
+          "coordinate": "0xaf",
+          "label": "VFCompressor2DriverModuTsor",
+          "set_label": "Error",
+          "clear_label": "Normal",
+          "description": "Reported meaning: Temperature-sensor fault of the variable-frequency compressor 2 drive module."
+        }
+      ]
+    },
+    {
+      "type": "0x1d",
+      "container": "0x16",
+      "kind": "bits",
+      "value_type": "bits",
+      "bits": [
+        {
+          "bit": 2,
+          "coordinate": "0xb2",
+          "label": "VFCompressor2DriverChargeCircuitSta",
+          "set_label": "Error",
+          "clear_label": "Normal",
+          "description": "Reported meaning: Charging-circuit fault of the variable-frequency compressor 2 drive."
+        },
+        {
+          "bit": 3,
+          "coordinate": "0xb3",
+          "label": "VFCompressor2DriverACVoltSta",
+          "set_label": "Protection",
+          "clear_label": "Normal",
+          "description": "Reported meaning: Abnormal AC input voltage protection of the variable-frequency compressor 2 drive."
+        },
+        {
+          "bit": 4,
+          "coordinate": "0xb4",
+          "label": "VFCompressor2DriverBoxTsor",
+          "set_label": "Error",
+          "clear_label": "Normal",
+          "description": "Reported meaning: Electrical-box temperature-sensor fault of the variable-frequency compressor 2 drive."
+        },
+        {
+          "bit": 5,
+          "coordinate": "0xb5",
+          "label": "VFCompressor2ACZeroSta",
+          "set_label": "Protection",
+          "clear_label": "Normal",
+          "description": "Reported meaning: AC input zero-crossing protection of the variable-frequency compressor 2 drive."
+        }
+      ]
+    },
+    {
+      "type": "0x1d",
+      "container": "0x1b",
+      "kind": "bits",
+      "value_type": "bits",
+      "bits": [
+        {
+          "bit": 0,
+          "coordinate": "0xd8",
+          "label": "CondenserInletAirTempErr",
+          "set_label": "Error",
+          "clear_label": "Normal",
+          "description": "Reported meaning: Subcooler gas-inlet temperature fault."
+        },
+        {
+          "bit": 1,
+          "coordinate": "0xd9",
+          "label": "CondenserInletLiqTempErr",
+          "set_label": "Protection",
+          "clear_label": "Normal",
+          "description": "Reported meaning: Subcooler liquid-inlet temperature fault."
+        },
+        {
+          "bit": 2,
+          "coordinate": "0xda",
+          "label": "ModuTempLowSta",
+          "set_label": "Protection",
+          "clear_label": "Normal",
+          "description": "Reported meaning: Module temperature too low protection."
+        },
+        {
+          "bit": 5,
+          "coordinate": "0xdd",
+          "label": "BoardTradeInletTempErr",
+          "set_label": "Error",
+          "clear_label": "Normal",
+          "description": "Reported meaning: Temperature-sensor fault on the plate heat exchanger inlet pipe."
+        },
+        {
+          "bit": 6,
+          "coordinate": "0xde",
+          "label": "BoardTradeOutletTempErr",
+          "set_label": "Error",
+          "clear_label": "Normal",
+          "description": "Reported meaning: Temperature-sensor fault on the plate heat exchanger outlet pipe."
+        },
+        {
+          "bit": 7,
+          "coordinate": "0xdf",
+          "label": "HeatStoreEXVLeakErr",
+          "set_label": "Error",
+          "clear_label": "Normal",
+          "description": "Reported meaning: Leak fault of the thermal-storage module electronic expansion valve."
+        }
+      ]
+    },
+    {
+      "type": "0x1d",
+      "container": "0x1c",
+      "kind": "bits",
+      "value_type": "bits",
+      "bits": [
+        {
+          "bit": 0,
+          "coordinate": "0xe0",
+          "label": "HeatStoreProtectErr",
+          "set_label": "Error",
+          "clear_label": "Normal",
+          "description": "Reported meaning: Protective-stop fault of the thermal-storage module."
+        },
+        {
+          "bit": 1,
+          "coordinate": "0xe1",
+          "label": "ExpandCommErr",
+          "set_label": "Error",
+          "clear_label": "Normal",
+          "description": "Reported meaning: Communication fault with the extension board."
+        }
+      ]
+    },
+    {
+      "type": "0x1e",
+      "container": "0x00",
+      "kind": "bits",
+      "value_type": "bits",
+      "bits": [
+        {
+          "bit": 0,
+          "coordinate": "0x00",
+          "label": "IDUTotalSta",
+          "set_label": "Error",
+          "clear_label": "Normal",
+          "note": "General indoor-unit fault flag. It is not defined as the OR of every fault bit.",
+          "description": "Reported meaning: Overall indoor-unit fault."
+        },
+        {
+          "bit": 1,
+          "coordinate": "0x01",
+          "label": "IDUSta",
+          "set_label": "Error",
+          "clear_label": "Normal",
+          "description": "Reported meaning: Indoor-unit protection."
+        },
+        {
+          "bit": 2,
+          "coordinate": "0x02",
+          "label": "IDUControlPartSta",
+          "set_label": "Error",
+          "clear_label": "Normal",
+          "description": "Reported meaning: Indoor-unit control-component fault."
+        },
+        {
+          "bit": 3,
+          "coordinate": "0x03",
+          "label": "IDUFanSta",
+          "set_label": "Error",
+          "clear_label": "Normal",
+          "description": "Reported meaning: Indoor-fan protection."
+        },
+        {
+          "bit": 4,
+          "coordinate": "0x04",
+          "label": "AidHeaterProtSta",
+          "set_label": "Protection",
+          "clear_label": "Normal",
+          "description": "Reported meaning: Auxiliary-heating protection."
+        },
+        {
+          "bit": 5,
+          "coordinate": "0x05",
+          "label": "WaterOverflowSta",
+          "set_label": "Protection",
+          "clear_label": "Normal",
+          "description": "Reported meaning: Protection against filling with water."
+        },
+        {
+          "bit": 6,
+          "coordinate": "0x06",
+          "label": "PowerOCSta",
+          "set_label": "Protection",
+          "clear_label": "Normal",
+          "description": "Reported meaning: Abnormal power supply of the wired remote controller."
+        },
+        {
+          "bit": 7,
+          "coordinate": "0x07",
+          "label": "FreezeProtectionSta",
+          "set_label": "Protection",
+          "clear_label": "Normal",
+          "description": "Reported meaning: Freeze protection."
+        }
+      ]
+    },
+    {
+      "type": "0x1e",
+      "container": "0x01",
+      "kind": "bits",
+      "value_type": "bits",
+      "bits": [
+        {
+          "bit": 0,
+          "coordinate": "0x08",
+          "label": "ModeConflictSta",
+          "set_label": "Conflicted",
+          "clear_label": "No",
+          "description": "Reported meaning: Mode conflict."
+        },
+        {
+          "bit": 1,
+          "coordinate": "0x09",
+          "label": "IDUBoardSta",
+          "set_label": "Error",
+          "clear_label": "Normal",
+          "description": "Reported meaning: Indoor electronic-board fault."
+        },
+        {
+          "bit": 2,
+          "coordinate": "0x0a",
+          "label": "IDUTsor",
+          "set_label": "Error",
+          "clear_label": "Normal",
+          "description": "Reported meaning: Indoor-unit temperature sensor fault."
+        },
+        {
+          "bit": 3,
+          "coordinate": "0x0b",
+          "label": "EnvTsor",
+          "set_label": "Error",
+          "clear_label": "Normal",
+          "description": "Reported meaning: Ambient temperature sensor fault."
+        },
+        {
+          "bit": 4,
+          "coordinate": "0x0c",
+          "label": "InletTsor",
+          "set_label": "Error",
+          "clear_label": "Normal",
+          "description": "Reported meaning: Inlet-pipe temperature sensor fault."
+        },
+        {
+          "bit": 5,
+          "coordinate": "0x0d",
+          "label": "MidletTsor",
+          "set_label": "Error",
+          "clear_label": "Normal",
+          "description": "Reported meaning: Intermediate-pipe temperature sensor fault."
+        },
+        {
+          "bit": 6,
+          "coordinate": "0x0e",
+          "label": "OutletTsor",
+          "set_label": "Error",
+          "clear_label": "Normal",
+          "description": "Reported meaning: Outlet-pipe temperature sensor fault."
+        },
+        {
+          "bit": 7,
+          "coordinate": "0x0f",
+          "label": "WetBallTsor",
+          "set_label": "Error",
+          "clear_label": "Normal",
+          "description": "Reported meaning: Humidity sensor fault."
+        }
+      ]
+    },
+    {
+      "type": "0x1e",
+      "container": "0x02",
+      "kind": "bits",
+      "value_type": "bits",
+      "bits": [
+        {
+          "bit": 0,
+          "coordinate": "0x10",
+          "label": "WaterTsor",
+          "set_label": "Error",
+          "clear_label": "Normal",
+          "description": "Reported meaning: Water temperature sensor fault."
+        },
+        {
+          "bit": 1,
+          "coordinate": "0x11",
+          "label": "IDUAddrConflictSta",
+          "set_label": "Error",
+          "clear_label": "Normal",
+          "description": "Reported meaning: Indoor-unit address conflict."
+        },
+        {
+          "bit": 2,
+          "coordinate": "0x12",
+          "label": "IDUCommSta",
+          "set_label": "Error",
+          "clear_label": "Normal",
+          "description": "Reported meaning: Indoor-unit communication fault."
+        },
+        {
+          "bit": 3,
+          "coordinate": "0x13",
+          "label": "IDUToODUCommSta",
+          "set_label": "Error",
+          "clear_label": "Normal",
+          "description": "Reported meaning: Communication fault between the indoor and outdoor units."
+        },
+        {
+          "bit": 4,
+          "coordinate": "0x14",
+          "label": "IDUToLineControllerCommSta",
+          "set_label": "Error",
+          "clear_label": "Normal",
+          "description": "Reported meaning: Communication fault between the indoor unit and the wired controller."
+        },
+        {
+          "bit": 5,
+          "coordinate": "0x15",
+          "label": "IDUToReceiverCommSta",
+          "set_label": "Error",
+          "clear_label": "Normal",
+          "description": "Reported meaning: Communication fault between the indoor unit and the light-receiver board."
+        },
+        {
+          "bit": 6,
+          "coordinate": "0x16",
+          "label": "IDUProjectNOSta",
+          "set_label": "Conflicted",
+          "clear_label": "Normal",
+          "description": "Reported meaning: Indoor-unit project-number conflict."
+        },
+        {
+          "bit": 7,
+          "coordinate": "0x17",
+          "label": "MasterIDUAbsence",
+          "set_label": "Error",
+          "clear_label": "Normal",
+          "description": "Reported meaning: There is no main indoor unit."
+        }
+      ]
+    },
+    {
+      "type": "0x1e",
+      "container": "0x03",
+      "kind": "bits",
+      "value_type": "bits",
+      "bits": [
+        {
+          "bit": 0,
+          "coordinate": "0x18",
+          "label": "1VsManyIDUCountSta",
+          "set_label": "Yes",
+          "clear_label": "No",
+          "description": "Reported meaning: Mismatched number of indoor units in one-to-many control."
+        },
+        {
+          "bit": 1,
+          "coordinate": "0x19",
+          "label": "1VsManyIDUSeriesSta",
+          "set_label": "Yes",
+          "clear_label": "No",
+          "description": "Reported meaning: Mismatched indoor-unit series in one-to-many control."
+        },
+        {
+          "bit": 2,
+          "coordinate": "0x1a",
+          "label": "CurrLeakSta",
+          "set_label": "Error",
+          "clear_label": "Normal",
+          "description": "Reported meaning: Current-leakage fault."
+        },
+        {
+          "bit": 3,
+          "coordinate": "0x1b",
+          "label": "ZeroVoltSta",
+          "set_label": "Error",
+          "clear_label": "Normal",
+          "description": "Reported meaning: Missing-voltage error."
+        },
+        {
+          "bit": 4,
+          "coordinate": "0x1c",
+          "label": "PowerInvertPhaseSta",
+          "set_label": "Error",
+          "clear_label": "Normal",
+          "description": "Reported meaning: Supply-reversal error."
+        },
+        {
+          "bit": 5,
+          "coordinate": "0x1d",
+          "label": "PowerDetectSta",
+          "set_label": "Error",
+          "clear_label": "Normal",
+          "description": "Reported meaning: Supply-detection error."
+        },
+        {
+          "bit": 6,
+          "coordinate": "0x1e",
+          "label": "LineControllerBoardSta",
+          "set_label": "Error",
+          "clear_label": "Normal",
+          "description": "Reported meaning: Wired-controller board abnormality."
+        },
+        {
+          "bit": 7,
+          "coordinate": "0x1f",
+          "label": "JumperSta",
+          "set_label": "Error",
+          "clear_label": "Normal",
+          "description": "Reported meaning: Jumper fault."
+        }
+      ]
+    },
+    {
+      "type": "0x1e",
+      "container": "0x04",
+      "kind": "bits",
+      "value_type": "bits",
+      "bits": [
+        {
+          "bit": 0,
+          "coordinate": "0x20",
+          "label": "IDUIpAddrSta",
+          "set_label": "Error",
+          "clear_label": "Normal",
+          "description": "Reported meaning: Indoor-unit network-address abnormality."
+        },
+        {
+          "bit": 1,
+          "coordinate": "0x21",
+          "label": "CapCodeSettingSta",
+          "set_label": "Error",
+          "clear_label": "Normal",
+          "description": "Reported meaning: Abnormal capacity setting by DIP switches."
+        },
+        {
+          "bit": 2,
+          "coordinate": "0x22",
+          "label": "MulMasterLiControllerSta",
+          "set_label": "Error",
+          "clear_label": "Normal",
+          "description": "Reported meaning: Fault: multiple main wired controllers."
+        },
+        {
+          "bit": 3,
+          "coordinate": "0x23",
+          "label": "IDUToODUMismatching",
+          "set_label": "Error",
+          "clear_label": "Normal",
+          "description": "Reported meaning: Mismatch between the indoor-unit and outdoor-unit models."
+        },
+        {
+          "bit": 4,
+          "coordinate": "0x24",
+          "label": "IDUPipeError",
+          "set_label": "Error",
+          "clear_label": "Normal",
+          "description": "Reported meaning: Indoor-unit piping fault."
+        },
+        {
+          "bit": 6,
+          "coordinate": "0x26",
+          "label": "OutletFanTsor",
+          "set_label": "Error",
+          "clear_label": "Normal",
+          "description": "Reported meaning: Indoor-unit outlet-air temperature sensor fault."
+        },
+        {
+          "bit": 7,
+          "coordinate": "0x27",
+          "label": "WTUpperTemperatureSensorError",
+          "set_label": "Error",
+          "clear_label": "Normal",
+          "description": "Reported meaning: Water-tank upper temperature sensor fault."
+        }
+      ]
+    },
+    {
+      "type": "0x1e",
+      "container": "0x05",
+      "kind": "bits",
+      "value_type": "bits",
+      "bits": [
+        {
+          "bit": 0,
+          "coordinate": "0x28",
+          "label": "WTLowerTemperatureSensorError",
+          "set_label": "Error",
+          "clear_label": "Normal",
+          "description": "Reported meaning: Water-tank lower temperature sensor fault."
+        },
+        {
+          "bit": 1,
+          "coordinate": "0x29",
+          "label": "WTReturnWwaterTempeartureSensorError",
+          "set_label": "Error",
+          "clear_label": "Normal",
+          "description": "Reported meaning: Water-tank return-water temperature sensor fault."
+        },
+        {
+          "bit": 3,
+          "coordinate": "0x2b",
+          "label": "SolarPowerTemperatureSensorError",
+          "set_label": "Error",
+          "clear_label": "Normal",
+          "description": "Reported meaning: Solar temperature sensor fault."
+        },
+        {
+          "bit": 4,
+          "coordinate": "0x2c",
+          "label": "HWPInletWaterTemperatureSensorError",
+          "set_label": "Error",
+          "clear_label": "Normal",
+          "description": "Reported meaning: Temperature-sensor fault of the hot-water generator inlet-water pipe."
+        },
+        {
+          "bit": 5,
+          "coordinate": "0x2d",
+          "label": "HWPOutletWaterTemperatureSensorError",
+          "set_label": "Error",
+          "clear_label": "Normal",
+          "description": "Reported meaning: Temperature-sensor fault of the hot-water generator outlet-water pipe."
+        },
+        {
+          "bit": 6,
+          "coordinate": "0x2e",
+          "label": "ECWaterCirculatingPumpError",
+          "set_label": "Error",
+          "clear_label": "Normal",
+          "description": "Reported meaning: EC water circulating pump fault."
+        }
+      ]
+    },
+    {
+      "type": "0x1e",
+      "container": "0x06",
+      "kind": "bits",
+      "value_type": "bits",
+      "bits": [
+        {
+          "bit": 0,
+          "coordinate": "0x30",
+          "label": "WaterflowSwitchError",
+          "set_label": "Error",
+          "clear_label": "Normal",
+          "description": "Reported meaning: Water-flow switch fault."
+        },
+        {
+          "bit": 1,
+          "coordinate": "0x31",
+          "label": "ShuntValveSettingError",
+          "set_label": "Error",
+          "clear_label": "Normal",
+          "description": "Reported meaning: Water-distribution valve setting fault."
+        },
+        {
+          "bit": 2,
+          "coordinate": "0x32",
+          "label": "SwingError",
+          "set_label": "Error",
+          "clear_label": "Normal",
+          "description": "Reported meaning: Air-swing fault."
+        },
+        {
+          "bit": 3,
+          "coordinate": "0x33",
+          "label": "InletTemp2Error",
+          "set_label": "Error",
+          "clear_label": "Normal",
+          "description": "Reported meaning: Inlet pipe 2 temperature sensor fault."
+        },
+        {
+          "bit": 4,
+          "coordinate": "0x34",
+          "label": "OutletTemp2Error",
+          "set_label": "Error",
+          "clear_label": "Normal",
+          "description": "Reported meaning: Outlet pipe 2 temperature sensor fault."
+        },
+        {
+          "bit": 6,
+          "coordinate": "0x36",
+          "label": "WaterTempError",
+          "set_label": "Error",
+          "clear_label": "Normal",
+          "description": "Reported meaning: Water-temperature abnormality."
+        },
+        {
+          "bit": 7,
+          "coordinate": "0x37",
+          "label": "MidletTemp2Error",
+          "set_label": "Error",
+          "clear_label": "Normal",
+          "description": "Reported meaning: Intermediate pipe 2 temperature sensor fault."
+        }
+      ]
+    },
+    {
+      "type": "0x1e",
+      "container": "0x0a",
+      "kind": "bits",
+      "value_type": "bits",
+      "bits": [
+        {
+          "bit": 0,
+          "coordinate": "0x50",
+          "label": "SysMultiMasterSta",
+          "set_label": "Error",
+          "clear_label": "Normal",
+          "description": "Reported meaning: Multiple main controllers fault in the system."
+        },
+        {
+          "bit": 1,
+          "coordinate": "0x51",
+          "label": "SysHaltErrorSta",
+          "set_label": "Error",
+          "clear_label": "Normal",
+          "note": "System fault with shutdown. A distinct flag, not an alias of another fault flag.",
+          "description": "Reported meaning: Fault with the system stopping the complete unit."
+        },
+        {
+          "bit": 2,
+          "coordinate": "0x52",
+          "label": "SysUnHaltErrorSta",
+          "set_label": "Error",
+          "clear_label": "Normal",
+          "note": "System fault without shutdown. A distinct flag, not an alias of another fault flag.",
+          "description": "Reported meaning: Complete-unit fault without the system stopping."
+        },
+        {
+          "bit": 4,
+          "coordinate": "0x54",
+          "label": "PreStartupLPSta",
+          "set_label": "Protection",
+          "clear_label": "Normal",
+          "description": "Reported meaning: Low-pressure protection before startup."
+        },
+        {
+          "bit": 5,
+          "coordinate": "0x55",
+          "label": "SysLowPresRatioSta",
+          "set_label": "Protection",
+          "clear_label": "Normal",
+          "description": "Reported meaning: System pressure-ratio too low protection."
+        },
+        {
+          "bit": 6,
+          "coordinate": "0x56",
+          "label": "SysHighPresRatioSta",
+          "set_label": "Protection",
+          "clear_label": "Normal",
+          "description": "Reported meaning: System pressure-ratio too high protection."
+        }
+      ]
+    },
+    {
+      "type": "0x1e",
+      "container": "0x0b",
+      "kind": "bits",
+      "value_type": "bits",
+      "bits": [
+        {
+          "bit": 0,
+          "coordinate": "0x58",
+          "label": "LocalCommSta",
+          "set_label": "Error",
+          "clear_label": "Normal",
+          "description": "Reported meaning: Communication fault."
+        },
+        {
+          "bit": 1,
+          "coordinate": "0x59",
+          "label": "CapCodeSettingWrong",
+          "set_label": "Yes",
+          "clear_label": "No",
+          "description": "Reported meaning: Incorrect capacity-code setting."
+        },
+        {
+          "bit": 2,
+          "coordinate": "0x5a",
+          "label": "HPSta",
+          "set_label": "Protection",
+          "clear_label": "Normal",
+          "description": "Reported meaning: High-pressure protection."
+        },
+        {
+          "bit": 3,
+          "coordinate": "0x5b",
+          "label": "LPSta",
+          "set_label": "Protection",
+          "clear_label": "Normal",
+          "description": "Reported meaning: Low-pressure protection."
+        },
+        {
+          "bit": 4,
+          "coordinate": "0x5c",
+          "label": "OCSta",
+          "set_label": "Protection",
+          "clear_label": "Normal",
+          "description": "Reported meaning: Overcurrent protection."
+        },
+        {
+          "bit": 5,
+          "coordinate": "0x5d",
+          "label": "CompressorDLTSta",
+          "set_label": "Protection",
+          "clear_label": "Normal",
+          "description": "Reported meaning: Compressor discharge temperature too high protection."
+        },
+        {
+          "bit": 6,
+          "coordinate": "0x5e",
+          "label": "WaterSwitchSta",
+          "set_label": "Protection",
+          "clear_label": "Normal",
+          "description": "Reported meaning: Water-flow contact protection."
+        },
+        {
+          "bit": 7,
+          "coordinate": "0x5f",
+          "label": "RefregantLackSta",
+          "set_label": "Protection",
+          "clear_label": "Normal",
+          "description": "Reported meaning: Refrigerant-shortage protection."
+        }
+      ]
+    },
+    {
+      "type": "0x1e",
+      "container": "0x0c",
+      "kind": "bits",
+      "value_type": "bits",
+      "bits": [
+        {
+          "bit": 0,
+          "coordinate": "0x60",
+          "label": "DLLowTempProtSta",
+          "set_label": "Protection",
+          "clear_label": "Normal",
+          "description": "Reported meaning: Low discharge-temperature protection."
+        },
+        {
+          "bit": 1,
+          "coordinate": "0x61",
+          "label": "LowPresRatioSta",
+          "set_label": "Protection",
+          "clear_label": "Normal",
+          "description": "Reported meaning: Pressure-ratio too low protection."
+        },
+        {
+          "bit": 2,
+          "coordinate": "0x62",
+          "label": "HighPresRatioSta",
+          "set_label": "Protection",
+          "clear_label": "Normal",
+          "description": "Reported meaning: Pressure-ratio too high protection."
+        },
+        {
+          "bit": 3,
+          "coordinate": "0x63",
+          "label": "BoardSta",
+          "set_label": "Exception",
+          "clear_label": "Normal",
+          "description": "Reported meaning: Abnormal operation of the outdoor-unit main board."
+        },
+        {
+          "bit": 4,
+          "coordinate": "0x64",
+          "label": "FourWayValveSta",
+          "set_label": "Protection",
+          "clear_label": "Normal",
+          "description": "Reported meaning: Protection against gas communication through the four-way valve."
+        },
+        {
+          "bit": 5,
+          "coordinate": "0x65",
+          "label": "FFCompressorEmerRunningCodeSta",
+          "set_label": "Error",
+          "clear_label": "Normal",
+          "description": "Reported meaning: Incorrect emergency-operation setting."
+        },
+        {
+          "bit": 6,
+          "coordinate": "0x66",
+          "label": "ODUPipesSta",
+          "set_label": "Exception",
+          "clear_label": "Normal",
+          "description": "Reported meaning: Outdoor-unit piping abnormality."
+        },
+        {
+          "bit": 7,
+          "coordinate": "0x67",
+          "label": "LowHPSta",
+          "set_label": "Protection",
+          "clear_label": "Normal",
+          "description": "Reported meaning: High-pressure too low protection."
+        }
+      ]
+    },
+    {
+      "type": "0x1e",
+      "container": "0x0d",
+      "kind": "bits",
+      "value_type": "bits",
+      "bits": [
+        {
+          "bit": 0,
+          "coordinate": "0x68",
+          "label": "Compressor1DLTsor",
+          "set_label": "Error",
+          "clear_label": "Normal",
+          "description": "Reported meaning: Compressor 1 discharge temperature sensor fault."
+        },
+        {
+          "bit": 1,
+          "coordinate": "0x69",
+          "label": "Compressor2DLTsor",
+          "set_label": "Error",
+          "clear_label": "Normal",
+          "description": "Reported meaning: Compressor 2 discharge temperature sensor fault."
+        },
+        {
+          "bit": 2,
+          "coordinate": "0x6a",
+          "label": "Compressor3DLTsor",
+          "set_label": "Error",
+          "clear_label": "Normal",
+          "description": "Reported meaning: Compressor 3 discharge temperature sensor fault."
+        },
+        {
+          "bit": 3,
+          "coordinate": "0x6b",
+          "label": "Compressor4DLTsor",
+          "set_label": "Error",
+          "clear_label": "Normal",
+          "description": "Reported meaning: Compressor 4 discharge temperature sensor fault."
+        },
+        {
+          "bit": 4,
+          "coordinate": "0x6c",
+          "label": "Compressor1DLTConnectSta",
+          "set_label": "Protection",
+          "clear_label": "Normal",
+          "description": "Reported meaning: Protection against disconnection of the compressor 1 discharge temperature sensor."
+        },
+        {
+          "bit": 5,
+          "coordinate": "0x6d",
+          "label": "Compressor2DLTConnectSta",
+          "set_label": "Protection",
+          "clear_label": "Normal",
+          "description": "Reported meaning: Protection against disconnection of the compressor 2 discharge temperature sensor."
+        },
+        {
+          "bit": 6,
+          "coordinate": "0x6e",
+          "label": "Compressor3DLTConnectSta",
+          "set_label": "Protection",
+          "clear_label": "Normal",
+          "description": "Reported meaning: Protection against disconnection of the compressor 3 discharge temperature sensor."
+        },
+        {
+          "bit": 7,
+          "coordinate": "0x6f",
+          "label": "Compressor4DLTConnectSta",
+          "set_label": "Protection",
+          "clear_label": "Normal",
+          "description": "Reported meaning: Protection against disconnection of the compressor 4 discharge temperature sensor."
+        }
+      ]
+    },
+    {
+      "type": "0x1e",
+      "container": "0x0e",
+      "kind": "bits",
+      "value_type": "bits",
+      "bits": [
+        {
+          "bit": 0,
+          "coordinate": "0x70",
+          "label": "OEnvTsor",
+          "set_label": "Error",
+          "clear_label": "Normal",
+          "description": "Reported meaning: Outdoor ambient temperature sensor fault."
+        },
+        {
+          "bit": 1,
+          "coordinate": "0x71",
+          "label": "AirInlet1Tsor",
+          "set_label": "Error",
+          "clear_label": "Normal",
+          "description": "Reported meaning: Gas-separator inlet-pipe temperature sensor fault."
+        },
+        {
+          "bit": 2,
+          "coordinate": "0x72",
+          "label": "ThawTsor1",
+          "set_label": "Error",
+          "clear_label": "Normal",
+          "description": "Reported meaning: Defrost temperature sensor 1 fault."
+        },
+        {
+          "bit": 3,
+          "coordinate": "0x73",
+          "label": "AirInlet2Tsor",
+          "set_label": "Error",
+          "clear_label": "Normal",
+          "description": "Reported meaning: Gas-separator outlet-pipe temperature sensor fault."
+        },
+        {
+          "bit": 4,
+          "coordinate": "0x74",
+          "label": "CondenserAirOutletTsor",
+          "set_label": "Error",
+          "clear_label": "Normal",
+          "description": "Reported meaning: Subcooler gas-outlet temperature sensor fault."
+        },
+        {
+          "bit": 5,
+          "coordinate": "0x75",
+          "label": "CondenserLiqOutletTsor",
+          "set_label": "Error",
+          "clear_label": "Normal",
+          "description": "Reported meaning: Subcooler liquid-outlet temperature sensor fault."
+        },
+        {
+          "bit": 6,
+          "coordinate": "0x76",
+          "label": "ThawTsor2",
+          "set_label": "Error",
+          "clear_label": "Normal",
+          "description": "Reported meaning: Defrost temperature sensor 2 fault."
+        },
+        {
+          "bit": 7,
+          "coordinate": "0x77",
+          "label": "VFCompressor1ShellTopTsor",
+          "set_label": "Error",
+          "clear_label": "Normal",
+          "description": "Reported meaning: Temperature-sensor fault at the top of the shell of inverter compressor 1."
+        }
+      ]
+    },
+    {
+      "type": "0x1e",
+      "container": "0x0f",
+      "kind": "bits",
+      "value_type": "bits",
+      "bits": [
+        {
+          "bit": 0,
+          "coordinate": "0x78",
+          "label": "VFCompressor1ShellTopTsorConnSta",
+          "set_label": "Protection",
+          "clear_label": "Normal",
+          "description": "Reported meaning: Protection against disconnection of the shell-top temperature sensor of inverter compressor 1."
+        },
+        {
+          "bit": 1,
+          "coordinate": "0x79",
+          "label": "HeatExchangerGsor",
+          "set_label": "Error",
+          "clear_label": "Normal",
+          "description": "Reported meaning: Heat-exchanger gas-outlet temperature sensor fault."
+        },
+        {
+          "bit": 2,
+          "coordinate": "0x7a",
+          "label": "HPTsor",
+          "set_label": "Error",
+          "clear_label": "Normal",
+          "description": "Reported meaning: High-pressure sensor fault."
+        },
+        {
+          "bit": 3,
+          "coordinate": "0x7b",
+          "label": "LPTsor",
+          "set_label": "Error",
+          "clear_label": "Normal",
+          "description": "Reported meaning: Low-pressure sensor fault."
+        },
+        {
+          "bit": 4,
+          "coordinate": "0x7c",
+          "label": "VFDLSta",
+          "set_label": "Protection",
+          "clear_label": "Normal",
+          "description": "Reported meaning: Discharge temperature too high protection of compressor 1."
+        },
+        {
+          "bit": 5,
+          "coordinate": "0x7d",
+          "label": "FF1DLSta",
+          "set_label": "Protection",
+          "clear_label": "Normal",
+          "description": "Reported meaning: Discharge temperature too high protection of compressor 2."
+        },
+        {
+          "bit": 6,
+          "coordinate": "0x7e",
+          "label": "FF2DLSta",
+          "set_label": "Protection",
+          "clear_label": "Normal",
+          "description": "Reported meaning: Discharge temperature too high protection of compressor 3."
+        },
+        {
+          "bit": 7,
+          "coordinate": "0x7f",
+          "label": "FF3DLSta",
+          "set_label": "Protection",
+          "clear_label": "Normal",
+          "description": "Reported meaning: Discharge temperature too high protection of compressor 4."
+        }
+      ]
+    },
+    {
+      "type": "0x1e",
+      "container": "0x10",
+      "kind": "bits",
+      "value_type": "bits",
+      "bits": [
+        {
+          "bit": 0,
+          "coordinate": "0x80",
+          "label": "Compressor1OCSta",
+          "set_label": "Protection",
+          "clear_label": "Normal",
+          "description": "Reported meaning: Compressor 1 overcurrent protection."
+        },
+        {
+          "bit": 1,
+          "coordinate": "0x81",
+          "label": "Compressor2OCSta",
+          "set_label": "Protection",
+          "clear_label": "Normal",
+          "description": "Reported meaning: Compressor 2 overcurrent protection."
+        },
+        {
+          "bit": 2,
+          "coordinate": "0x82",
+          "label": "Compressor3OCSta",
+          "set_label": "Protection",
+          "clear_label": "Normal",
+          "description": "Reported meaning: Compressor 3 overcurrent protection."
+        },
+        {
+          "bit": 3,
+          "coordinate": "0x83",
+          "label": "Compressor4OCSta",
+          "set_label": "Protection",
+          "clear_label": "Normal",
+          "description": "Reported meaning: Compressor 4 overcurrent protection."
+        },
+        {
+          "bit": 4,
+          "coordinate": "0x84",
+          "label": "Compressor5OCSta",
+          "set_label": "Protection",
+          "clear_label": "Normal",
+          "description": "Reported meaning: Compressor 5 overcurrent protection."
+        },
+        {
+          "bit": 5,
+          "coordinate": "0x85",
+          "label": "Compressor6OCSta",
+          "set_label": "Protection",
+          "clear_label": "Normal",
+          "description": "Reported meaning: Compressor 6 overcurrent protection."
+        },
+        {
+          "bit": 6,
+          "coordinate": "0x86",
+          "label": "VFCompressor2ShellTopTsor",
+          "set_label": "Error",
+          "clear_label": "Normal",
+          "description": "Reported meaning: Temperature-sensor fault of the top of the shell of compressor 2."
+        },
+        {
+          "bit": 7,
+          "coordinate": "0x87",
+          "label": "VFCompressor2ShellTopTsorConnSta",
+          "set_label": "Protection",
+          "clear_label": "Normal",
+          "description": "Reported meaning: Protection against disconnection of the shell-top temperature sensor of inverter compressor 2."
+        }
+      ]
+    },
+    {
+      "type": "0x1e",
+      "container": "0x11",
+      "kind": "bits",
+      "value_type": "bits",
+      "bits": [
+        {
+          "bit": 0,
+          "coordinate": "0x88",
+          "label": "Comp1ShellTopHighTempProt",
+          "set_label": "Protection",
+          "clear_label": "Normal",
+          "description": "Reported meaning: High-temperature protection of the top of the shell of compressor 1."
+        },
+        {
+          "bit": 1,
+          "coordinate": "0x89",
+          "label": "SysFreezeProt",
+          "set_label": "Protection",
+          "clear_label": "Normal",
+          "description": "Reported meaning: Anti-freeze protection."
+        },
+        {
+          "bit": 2,
+          "coordinate": "0x8a",
+          "label": "HaltErrorSta",
+          "set_label": "Error",
+          "clear_label": "Normal",
+          "description": "Reported meaning: Stop due to a fault."
+        },
+        {
+          "bit": 3,
+          "coordinate": "0x8b",
+          "label": "UnHaltErrorSta",
+          "set_label": "Error",
+          "clear_label": "Normal",
+          "description": "Reported meaning: Fault without stop."
+        },
+        {
+          "bit": 4,
+          "coordinate": "0x8c",
+          "label": "Compressor5DLTsor",
+          "set_label": "Error",
+          "clear_label": "Normal",
+          "description": "Reported meaning: Compressor 5 discharge temperature sensor fault."
+        },
+        {
+          "bit": 5,
+          "coordinate": "0x8d",
+          "label": "Compressor6DLTsor",
+          "set_label": "Error",
+          "clear_label": "Normal",
+          "description": "Reported meaning: Compressor 6 discharge temperature sensor fault."
+        },
+        {
+          "bit": 6,
+          "coordinate": "0x8e",
+          "label": "Compressor5DLTConnectSta",
+          "set_label": "Unconnected",
+          "clear_label": "Normal",
+          "description": "Reported meaning: Protection against disconnection of the compressor 5 discharge temperature sensor."
+        },
+        {
+          "bit": 7,
+          "coordinate": "0x8f",
+          "label": "Compressor6DLTConnectSta",
+          "set_label": "Unconnected",
+          "clear_label": "Normal",
+          "description": "Reported meaning: Protection against disconnection of the compressor 6 discharge temperature sensor."
+        }
+      ]
+    },
+    {
+      "type": "0x1e",
+      "container": "0x12",
+      "kind": "bits",
+      "value_type": "bits",
+      "bits": [
+        {
+          "bit": 0,
+          "coordinate": "0x90",
+          "label": "PowerPhaseSeqProt",
+          "set_label": "Protection",
+          "clear_label": "Normal",
+          "description": "Reported meaning: Power phase-sequence protection."
+        },
+        {
+          "bit": 1,
+          "coordinate": "0x91",
+          "label": "LowRatedCapRatioSta",
+          "set_label": "Yes",
+          "clear_label": "No",
+          "description": "Reported meaning: The rated-capacity ratio is too low."
+        },
+        {
+          "bit": 2,
+          "coordinate": "0x92",
+          "label": "HighRatedCapRatioSta",
+          "set_label": "Yes",
+          "clear_label": "No",
+          "description": "Reported meaning: The rated-capacity ratio is too high."
+        },
+        {
+          "bit": 3,
+          "coordinate": "0x93",
+          "label": "Comp4CurrTsor",
+          "set_label": "Exception",
+          "clear_label": "Normal",
+          "description": "Reported meaning: Compressor 4 current-sensor abnormality."
+        },
+        {
+          "bit": 4,
+          "coordinate": "0x94",
+          "label": "Comp2CurrTsor",
+          "set_label": "Exception",
+          "clear_label": "Normal",
+          "description": "Reported meaning: Compressor 2 current-sensor abnormality."
+        },
+        {
+          "bit": 5,
+          "coordinate": "0x95",
+          "label": "Comp3CurrTsor",
+          "set_label": "Exception",
+          "clear_label": "Normal",
+          "description": "Reported meaning: Compressor 3 current-sensor abnormality."
+        },
+        {
+          "bit": 6,
+          "coordinate": "0x96",
+          "label": "Comp2ShellTopHighTempProt",
+          "set_label": "Protection",
+          "clear_label": "Normal",
+          "description": "Reported meaning: High-temperature protection of the top of the shell of compressor 2."
+        },
+        {
+          "bit": 7,
+          "coordinate": "0x97",
+          "label": "BackOilsor",
+          "set_label": "Error",
+          "clear_label": "Normal",
+          "description": "Reported meaning: Oil-return temperature sensor 1 fault."
+        }
+      ]
+    },
+    {
+      "type": "0x1e",
+      "container": "0x13",
+      "kind": "bits",
+      "value_type": "bits",
+      "bits": [
+        {
+          "bit": 0,
+          "coordinate": "0x98",
+          "label": "LowVFCompressorDCBusVoltSta",
+          "set_label": "Protection",
+          "clear_label": "Normal",
+          "description": "Reported meaning: DC-bus undervoltage protection of the variable-frequency compressor drive."
+        },
+        {
+          "bit": 1,
+          "coordinate": "0x99",
+          "label": "HighVFCompressorDCBusVoltSta",
+          "set_label": "Protection",
+          "clear_label": "Normal",
+          "description": "Reported meaning: DC-bus overvoltage protection of the variable-frequency compressor drive."
+        },
+        {
+          "bit": 2,
+          "coordinate": "0x9a",
+          "label": "VFCompressorDriverACCurrentSta",
+          "set_label": "Protection",
+          "clear_label": "Normal",
+          "description": "Reported meaning: Abnormal AC input current protection of the variable-frequency compressor drive."
+        },
+        {
+          "bit": 3,
+          "coordinate": "0x9b",
+          "label": "VFCompressorDriverIPMSta",
+          "set_label": "Protection",
+          "clear_label": "Normal",
+          "description": "Reported meaning: IPM module protection of the variable-frequency compressor drive."
+        },
+        {
+          "bit": 4,
+          "coordinate": "0x9c",
+          "label": "VFCompressorDriverPFCSta",
+          "set_label": "Protection",
+          "clear_label": "Normal",
+          "description": "Reported meaning: PFC module protection of the variable-frequency compressor drive."
+        },
+        {
+          "bit": 5,
+          "coordinate": "0x9d",
+          "label": "VFCompressorStartupSta",
+          "set_label": "Yes",
+          "clear_label": "No",
+          "description": "Reported meaning: Failed start of the variable-frequency compressor."
+        },
+        {
+          "bit": 6,
+          "coordinate": "0x9e",
+          "label": "VFCompressorLostPhaseSta",
+          "set_label": "Protection",
+          "clear_label": "Normal",
+          "description": "Reported meaning: Phase-loss protection of the variable-frequency compressor."
+        },
+        {
+          "bit": 7,
+          "coordinate": "0x9f",
+          "label": "VFCompressorDriverResetSta",
+          "set_label": "Yes",
+          "clear_label": "No",
+          "description": "Reported meaning: Reset of the variable-frequency compressor drive module."
+        }
+      ]
+    },
+    {
+      "type": "0x1e",
+      "container": "0x14",
+      "kind": "bits",
+      "value_type": "bits",
+      "bits": [
+        {
+          "bit": 0,
+          "coordinate": "0xa0",
+          "label": "VFCompressorOCSta",
+          "set_label": "Protection",
+          "clear_label": "Normal",
+          "description": "Reported meaning: Overcurrent protection of the variable-frequency compressor."
+        },
+        {
+          "bit": 2,
+          "coordinate": "0xa2",
+          "label": "VFCompressorDriverCurrentDetectCircuitSta",
+          "set_label": "Error",
+          "clear_label": "Normal",
+          "description": "Reported meaning: Current-measurement circuit fault of the variable-frequency compressor drive."
+        },
+        {
+          "bit": 3,
+          "coordinate": "0xa3",
+          "label": "VFCompressorLostStepSta",
+          "set_label": "Protection",
+          "clear_label": "Normal",
+          "description": "Reported meaning: Loss-of-synchronism protection of the variable-frequency compressor."
+        },
+        {
+          "bit": 5,
+          "coordinate": "0xa5",
+          "label": "MasterToVFCompressorDriver1CommSta",
+          "set_label": "Error",
+          "clear_label": "Normal",
+          "description": "Reported meaning: Communication fault between the main controller and the variable-frequency compressor drive."
+        },
+        {
+          "bit": 6,
+          "coordinate": "0xa6",
+          "label": "VFCompressorDriverModuTempSta",
+          "set_label": "Protection",
+          "clear_label": "Normal",
+          "description": "Reported meaning: Overtemperature protection of the variable-frequency compressor drive module."
+        },
+        {
+          "bit": 7,
+          "coordinate": "0xa7",
+          "label": "VFCompressorDriverModuTsor",
+          "set_label": "Error",
+          "clear_label": "Normal",
+          "description": "Reported meaning: Temperature-sensor fault of the variable-frequency compressor drive module."
+        }
+      ]
+    },
+    {
+      "type": "0x1e",
+      "container": "0x15",
+      "kind": "bits",
+      "value_type": "bits",
+      "bits": [
+        {
+          "bit": 0,
+          "coordinate": "0xa8",
+          "label": "CustomBit5",
+          "set_label": "NaN",
+          "clear_label": "NaN",
+          "description": "Reported meaning: User-defined bit 5."
+        },
+        {
+          "bit": 2,
+          "coordinate": "0xaa",
+          "label": "VFCompressorDriverChargeCircuitSta",
+          "set_label": "Error",
+          "clear_label": "Normal",
+          "description": "Reported meaning: Charging-circuit fault of the variable-frequency compressor drive."
+        },
+        {
+          "bit": 3,
+          "coordinate": "0xab",
+          "label": "VFCompressorDriverACVoltSta",
+          "set_label": "Error",
+          "clear_label": "Normal",
+          "description": "Reported meaning: Abnormal AC input voltage protection of the variable-frequency compressor drive."
+        },
+        {
+          "bit": 4,
+          "coordinate": "0xac",
+          "label": "VFCompressorDriverBoxTsor",
+          "set_label": "Error",
+          "clear_label": "Normal",
+          "description": "Reported meaning: Electrical-box temperature-sensor fault of the variable-frequency compressor drive."
+        },
+        {
+          "bit": 5,
+          "coordinate": "0xad",
+          "label": "VFCompressorDriverACZeroSta",
+          "set_label": "Protection",
+          "clear_label": "Normal",
+          "description": "Reported meaning: AC input zero-crossing protection of the variable-frequency compressor drive."
+        },
+        {
+          "bit": 6,
+          "coordinate": "0xae",
+          "label": "CompressorPowerProtectSta",
+          "set_label": "Protection",
+          "clear_label": "Normal",
+          "description": "Reported meaning: Stop by compressor power protection."
+        },
+        {
+          "bit": 7,
+          "coordinate": "0xaf",
+          "label": "ExceedRunningRangeStop",
+          "set_label": "Protection",
+          "clear_label": "Normal",
+          "description": "Reported meaning: Stop on exceeding the operating range."
+        }
+      ]
+    },
+    {
+      "type": "0x1e",
+      "container": "0x16",
+      "kind": "bits",
+      "value_type": "bits",
+      "bits": [
+        {
+          "bit": 0,
+          "coordinate": "0xb0",
+          "label": "MidPressureSensorError",
+          "set_label": "Error",
+          "clear_label": "Normal",
+          "description": "Reported meaning: Stop due to failure of the medium-pressure sensor."
+        },
+        {
+          "bit": 1,
+          "coordinate": "0xb1",
+          "label": "HighPressureSwitch1Protect",
+          "set_label": "Protection",
+          "clear_label": "Normal",
+          "description": "Reported meaning: Protective stop by high-pressure switch 1."
+        },
+        {
+          "bit": 2,
+          "coordinate": "0xb2",
+          "label": "HighPressureSwitch2Protect",
+          "set_label": "Protection",
+          "clear_label": "Normal",
+          "description": "Reported meaning: Protective stop by high-pressure switch 2."
+        }
+      ]
+    },
+    {
+      "type": "0x1e",
+      "container": "0x17",
+      "kind": "bits",
+      "value_type": "bits",
+      "bits": [
+        {
+          "bit": 0,
+          "coordinate": "0xb8",
+          "label": "LowVFFan1DriverDCBusVoltSta",
+          "set_label": "Protection",
+          "clear_label": "Normal",
+          "description": "Reported meaning: DC-bus undervoltage protection of outdoor variable-frequency fan 1 drive."
+        },
+        {
+          "bit": 1,
+          "coordinate": "0xb9",
+          "label": "HighVFFan1DriverDCBusVoltSta",
+          "set_label": "Protection",
+          "clear_label": "Normal",
+          "description": "Reported meaning: DC-bus overvoltage protection of outdoor variable-frequency fan 1 drive."
+        },
+        {
+          "bit": 2,
+          "coordinate": "0xba",
+          "label": "VFFan1ACCurrentSta",
+          "set_label": "Protection",
+          "clear_label": "Normal",
+          "description": "Reported meaning: Abnormal AC input current protection of outdoor variable-frequency fan 1."
+        },
+        {
+          "bit": 3,
+          "coordinate": "0xbb",
+          "label": "VFFan1DriverIPMSta",
+          "set_label": "Protection",
+          "clear_label": "Normal",
+          "description": "Reported meaning: IPM module protection of outdoor variable-frequency fan 1 drive."
+        },
+        {
+          "bit": 4,
+          "coordinate": "0xbc",
+          "label": "VFFan1DriverPFCSta",
+          "set_label": "Protection",
+          "clear_label": "Normal",
+          "description": "Reported meaning: PFC protection of outdoor variable-frequency fan 1 drive."
+        },
+        {
+          "bit": 5,
+          "coordinate": "0xbd",
+          "label": "VFFan1StartupSta",
+          "set_label": "Yes",
+          "clear_label": "No",
+          "description": "Reported meaning: Failed start of outdoor variable-frequency fan 1."
+        },
+        {
+          "bit": 6,
+          "coordinate": "0xbe",
+          "label": "VFFan1LostPhaseSta",
+          "set_label": "Protection",
+          "clear_label": "Normal",
+          "description": "Reported meaning: Phase-loss protection of outdoor variable-frequency fan 1."
+        },
+        {
+          "bit": 7,
+          "coordinate": "0xbf",
+          "label": "VFFan1DriverResetSta",
+          "set_label": "Yes",
+          "clear_label": "No",
+          "description": "Reported meaning: Reset of the outdoor variable-frequency fan 1 drive module."
+        }
+      ]
+    },
+    {
+      "type": "0x1e",
+      "container": "0x18",
+      "kind": "bits",
+      "value_type": "bits",
+      "bits": [
+        {
+          "bit": 0,
+          "coordinate": "0xc0",
+          "label": "VFFan1OCSta",
+          "set_label": "Protection",
+          "clear_label": "Normal",
+          "description": "Reported meaning: Overcurrent protection of outdoor variable-frequency fan 1."
+        },
+        {
+          "bit": 2,
+          "coordinate": "0xc2",
+          "label": "VFFan1DriverCurrentDetectCircuitSta",
+          "set_label": "Error",
+          "clear_label": "Normal",
+          "description": "Reported meaning: Current-measurement circuit fault of outdoor variable-frequency fan 1 drive."
+        },
+        {
+          "bit": 3,
+          "coordinate": "0xc3",
+          "label": "VFFan1LostStepSta",
+          "set_label": "Protection",
+          "clear_label": "Normal",
+          "description": "Reported meaning: Loss-of-synchronism protection of outdoor variable-frequency fan 1."
+        },
+        {
+          "bit": 5,
+          "coordinate": "0xc5",
+          "label": "MasterToVFFan1DriverCommSta",
+          "set_label": "Error",
+          "clear_label": "Normal",
+          "description": "Reported meaning: Communication fault between the main controller and outdoor variable-frequency fan 1 drive."
+        },
+        {
+          "bit": 6,
+          "coordinate": "0xc6",
+          "label": "VFFan1DriverBoxHighTempSta",
+          "set_label": "Protection",
+          "clear_label": "Normal",
+          "description": "Reported meaning: Overtemperature protection of the outdoor variable-frequency fan 1 drive module."
+        },
+        {
+          "bit": 7,
+          "coordinate": "0xc7",
+          "label": "VFFan1DriverModuTsor",
+          "set_label": "Error",
+          "clear_label": "Normal",
+          "description": "Reported meaning: Temperature-sensor fault of the outdoor variable-frequency fan 1 drive module."
+        }
+      ]
+    },
+    {
+      "type": "0x1e",
+      "container": "0x19",
+      "kind": "bits",
+      "value_type": "bits",
+      "bits": [
+        {
+          "bit": 0,
+          "coordinate": "0xc8",
+          "label": "CustomBit6",
+          "set_label": "NaN",
+          "clear_label": "NaN",
+          "description": "Reported meaning: User-defined bit 6."
+        },
+        {
+          "bit": 2,
+          "coordinate": "0xca",
+          "label": "VFFan1DriverChargeCircuitSta",
+          "set_label": "Error",
+          "clear_label": "Normal",
+          "description": "Reported meaning: Charging-circuit fault of outdoor variable-frequency fan 1 drive."
+        },
+        {
+          "bit": 3,
+          "coordinate": "0xcb",
+          "label": "VFFan1DriverACVoltSta",
+          "set_label": "Protection",
+          "clear_label": "Normal",
+          "description": "Reported meaning: Abnormal AC input voltage protection of outdoor variable-frequency fan 1 drive."
+        },
+        {
+          "bit": 4,
+          "coordinate": "0xcc",
+          "label": "VFFan1DriverBoxTsor",
+          "set_label": "Error",
+          "clear_label": "Normal",
+          "description": "Reported meaning: Electrical-box temperature-sensor fault of outdoor variable-frequency fan 1 drive."
+        },
+        {
+          "bit": 5,
+          "coordinate": "0xcd",
+          "label": "VFFan1DriverACZeroSta",
+          "set_label": "Protection",
+          "clear_label": "Normal",
+          "description": "Reported meaning: AC input zero-crossing protection of outdoor variable-frequency fan 1 drive."
+        }
+      ]
+    },
+    {
+      "type": "0x1e",
+      "container": "0x1a",
+      "kind": "bits",
+      "value_type": "bits",
+      "bits": [],
+      "note": "The container is defined without named bits; the raw byte is the only value."
+    },
+    {
+      "type": "0x1e",
+      "container": "0x1b",
+      "kind": "bits",
+      "value_type": "bits",
+      "bits": [
+        {
+          "bit": 0,
+          "coordinate": "0xd8",
+          "label": "LowVFFan2DriverDCBusVoltSta",
+          "set_label": "Protection",
+          "clear_label": "Normal",
+          "description": "Reported meaning: DC-bus undervoltage protection of outdoor variable-frequency fan 2 drive."
+        },
+        {
+          "bit": 1,
+          "coordinate": "0xd9",
+          "label": "HighVFFan2DriverDCBusVoltSta",
+          "set_label": "Protection",
+          "clear_label": "Normal",
+          "description": "Reported meaning: DC-bus overvoltage protection of outdoor variable-frequency fan 2 drive."
+        },
+        {
+          "bit": 2,
+          "coordinate": "0xda",
+          "label": "VFFan2ACCurrentSta",
+          "set_label": "Protection",
+          "clear_label": "Normal",
+          "description": "Reported meaning: Abnormal AC input current protection of outdoor variable-frequency fan 2."
+        },
+        {
+          "bit": 3,
+          "coordinate": "0xdb",
+          "label": "VFFan2DriverIPMSta",
+          "set_label": "Protection",
+          "clear_label": "Normal",
+          "description": "Reported meaning: IPM module protection of outdoor variable-frequency fan 2 drive."
+        },
+        {
+          "bit": 4,
+          "coordinate": "0xdc",
+          "label": "VFFan2DriverPFCSta",
+          "set_label": "Protection",
+          "clear_label": "Normal",
+          "description": "Reported meaning: PFC protection of outdoor variable-frequency fan 2 drive."
+        },
+        {
+          "bit": 5,
+          "coordinate": "0xdd",
+          "label": "VFFan2StartupSta",
+          "set_label": "Yes",
+          "clear_label": "No",
+          "description": "Reported meaning: Failed start of outdoor variable-frequency fan 2."
+        },
+        {
+          "bit": 6,
+          "coordinate": "0xde",
+          "label": "VFFan2LostPhaseSta",
+          "set_label": "Protection",
+          "clear_label": "Normal",
+          "description": "Reported meaning: Phase-loss protection of outdoor variable-frequency fan 2."
+        },
+        {
+          "bit": 7,
+          "coordinate": "0xdf",
+          "label": "VFFan2DriverResetSta",
+          "set_label": "Yes",
+          "clear_label": "No",
+          "description": "Reported meaning: Reset of the outdoor variable-frequency fan 2 drive module."
+        }
+      ]
+    },
+    {
+      "type": "0x1e",
+      "container": "0x1c",
+      "kind": "bits",
+      "value_type": "bits",
+      "bits": [
+        {
+          "bit": 0,
+          "coordinate": "0xe0",
+          "label": "VFFan2OCSta",
+          "set_label": "Protection",
+          "clear_label": "Normal",
+          "description": "Reported meaning: Overcurrent protection of outdoor variable-frequency fan 2."
+        },
+        {
+          "bit": 2,
+          "coordinate": "0xe2",
+          "label": "VFFan2DriverCurrentDetectCircuitSta",
+          "set_label": "Error",
+          "clear_label": "Normal",
+          "description": "Reported meaning: Current-measurement circuit fault of outdoor variable-frequency fan 2 drive."
+        },
+        {
+          "bit": 3,
+          "coordinate": "0xe3",
+          "label": "VFFan2LostStepSta",
+          "set_label": "Protection",
+          "clear_label": "Normal",
+          "description": "Reported meaning: Loss-of-synchronism protection of outdoor variable-frequency fan 2."
+        },
+        {
+          "bit": 5,
+          "coordinate": "0xe5",
+          "label": "MasterToVFFan2DriverCommSta",
+          "set_label": "Error",
+          "clear_label": "Normal",
+          "description": "Reported meaning: Communication fault between the main controller and outdoor variable-frequency fan 2 drive."
+        },
+        {
+          "bit": 6,
+          "coordinate": "0xe6",
+          "label": "VFFan2DriverHighTempSta",
+          "set_label": "Protection",
+          "clear_label": "Normal",
+          "description": "Reported meaning: Overtemperature protection of the outdoor variable-frequency fan 2 drive module."
+        },
+        {
+          "bit": 7,
+          "coordinate": "0xe7",
+          "label": "VFFan2DriverModuTsor",
+          "set_label": "Error",
+          "clear_label": "Normal",
+          "description": "Reported meaning: Temperature-sensor fault of the outdoor variable-frequency fan 2 drive module."
+        }
+      ]
+    },
+    {
+      "type": "0x1e",
+      "container": "0x1d",
+      "kind": "bits",
+      "value_type": "bits",
+      "bits": [
+        {
+          "bit": 0,
+          "coordinate": "0xe8",
+          "label": "CustomBit7",
+          "set_label": "NaN",
+          "clear_label": "NaN",
+          "description": "Reported meaning: User-defined bit 7."
+        },
+        {
+          "bit": 2,
+          "coordinate": "0xea",
+          "label": "VFFan2DriverChargeCircuitSta",
+          "set_label": "Error",
+          "clear_label": "Normal",
+          "description": "Reported meaning: Charging-circuit fault of outdoor variable-frequency fan 2 drive."
+        },
+        {
+          "bit": 3,
+          "coordinate": "0xeb",
+          "label": "VFFan2DriverACVoltSta",
+          "set_label": "Protection",
+          "clear_label": "Normal",
+          "description": "Reported meaning: Abnormal AC input voltage protection of outdoor variable-frequency fan 2 drive."
+        },
+        {
+          "bit": 4,
+          "coordinate": "0xec",
+          "label": "VFFan2DriverBoxTsor",
+          "set_label": "Error",
+          "clear_label": "Normal",
+          "description": "Reported meaning: Electrical-box temperature-sensor fault of outdoor variable-frequency fan 2 drive."
+        },
+        {
+          "bit": 5,
+          "coordinate": "0xed",
+          "label": "VFFan2DriverACZeroSta",
+          "set_label": "Protection",
+          "clear_label": "Normal",
+          "description": "Reported meaning: AC input zero-crossing protection of outdoor variable-frequency fan 2 drive."
+        }
+      ]
+    },
+    {
+      "type": "0x1f",
+      "container": "0x00",
+      "kind": "bits",
+      "value_type": "bits",
+      "bits": [
+        {
+          "bit": 0,
+          "coordinate": "0x00",
+          "label": "PoweronSta",
+          "set_label": "Poweron",
+          "clear_label": "Poweroff",
+          "note": "Power state of the indoor unit. The on/off setting is bit 0 of 6f:00.",
+          "description": "Reported meaning: Switch."
+        },
+        {
+          "bit": 1,
+          "coordinate": "0x01",
+          "label": "IDUMasterSlaveSta",
+          "set_label": "Master",
+          "clear_label": "Slave",
+          "description": "Reported meaning: Indoor-unit master/slave status."
+        },
+        {
+          "bit": 2,
+          "coordinate": "0x02",
+          "label": "HeatingMode",
+          "set_label": "CoolingOnly",
+          "clear_label": "HeatPump",
+          "description": "Reported meaning: Cooling/heating function."
+        },
+        {
+          "bit": 3,
+          "coordinate": "0x03",
+          "label": "IDUEnvTDigital",
+          "set_label": "0.5",
+          "clear_label": "0",
+          "description": "Reported meaning: Indoor ambient temperature 0.5 degrees."
+        },
+        {
+          "bit": 4,
+          "coordinate": "0x04",
+          "label": "IDURunningCap",
+          "set_label": "Has",
+          "clear_label": "None",
+          "note": "The most direct documented indicator that the indoor unit has running capacity. It is not shown to equal thermostat-on or a measured heat delivery.",
+          "description": "Reported meaning: Presence of indoor-unit capacity."
+        },
+        {
+          "bit": 5,
+          "coordinate": "0x05",
+          "label": "SuperFanSpeed",
+          "set_label": "On",
+          "clear_label": "Off",
+          "description": "Reported meaning: Very-high fan-speed step; On; Off."
+        },
+        {
+          "bit": 6,
+          "coordinate": "0x06",
+          "label": "EnergySavingSetting",
+          "set_label": "On",
+          "clear_label": "Off",
+          "description": "Reported meaning: Energy-saving setting."
+        },
+        {
+          "bit": 7,
+          "coordinate": "0x07",
+          "label": "RemoteMaskEnergySaving",
+          "set_label": "Mask",
+          "clear_label": "Unmask",
+          "description": "Reported meaning: Remote lock function for energy saving; Lock; No lock."
+        }
+      ]
+    },
+    {
+      "type": "0x1f",
+      "container": "0x01",
+      "kind": "bits",
+      "value_type": "bits",
+      "bits": [
+        {
+          "bit": 0,
+          "coordinate": "0x08",
+          "label": "RemoteMaskTempSetting",
+          "set_label": "Mask",
+          "clear_label": "Unmask",
+          "description": "Reported meaning: Remote lock function for temperature setting."
+        },
+        {
+          "bit": 1,
+          "coordinate": "0x09",
+          "label": "RemoteMaskModeSetting",
+          "set_label": "Mask",
+          "clear_label": "Unmask",
+          "description": "Reported meaning: Remote lock function for the mode."
+        },
+        {
+          "bit": 2,
+          "coordinate": "0x0a",
+          "label": "RemoteMaksPoweronSetting",
+          "set_label": "Mask",
+          "clear_label": "Unmask",
+          "description": "Reported meaning: Remote lock function for start/stop."
+        },
+        {
+          "bit": 3,
+          "coordinate": "0x0b",
+          "label": "RemoteLock",
+          "set_label": "Mask",
+          "clear_label": "Unmask",
+          "description": "Reported meaning: Remote lock function."
+        },
+        {
+          "bit": 4,
+          "coordinate": "0x0c",
+          "label": "AidHeaterSta",
+          "set_label": "ElectricHeateron",
+          "clear_label": "ElectricHeateroff",
+          "description": "Reported meaning: Auxiliary electric heating."
+        },
+        {
+          "bit": 5,
+          "coordinate": "0x0d",
+          "label": "WaterPump",
+          "set_label": "On",
+          "clear_label": "Off",
+          "description": "Reported meaning: Water pump."
+        },
+        {
+          "bit": 6,
+          "coordinate": "0x0e",
+          "label": "FreshAirValve",
+          "set_label": "On",
+          "clear_label": "Off",
+          "description": "Reported meaning: Fresh-air valve."
+        },
+        {
+          "bit": 7,
+          "coordinate": "0x0f",
+          "label": "HealthFuncSta",
+          "set_label": "On",
+          "clear_label": "Off",
+          "description": "Reported meaning: Health."
+        }
+      ]
+    },
+    {
+      "type": "0x1f",
+      "container": "0x02",
+      "kind": "bits",
+      "value_type": "bits",
+      "bits": [
+        {
+          "bit": 0,
+          "coordinate": "0x10",
+          "label": "IndoorThrottleValveSta",
+          "set_label": "On",
+          "clear_label": "Off",
+          "description": "Reported meaning: Indoor throttling valve."
+        },
+        {
+          "bit": 1,
+          "coordinate": "0x11",
+          "label": "HeatCallbackValveSta",
+          "set_label": "On",
+          "clear_label": "Off",
+          "description": "Reported meaning: Heat-recovery valve."
+        },
+        {
+          "bit": 2,
+          "coordinate": "0x12",
+          "label": "Cleanser",
+          "set_label": "On",
+          "clear_label": "Off",
+          "description": "Reported meaning: Purifier."
+        },
+        {
+          "bit": 3,
+          "coordinate": "0x13",
+          "label": "PlasmGenerator",
+          "set_label": "On",
+          "clear_label": "Off",
+          "description": "Reported meaning: Plasma generator."
+        },
+        {
+          "bit": 4,
+          "coordinate": "0x14",
+          "label": "Wetter",
+          "set_label": "On",
+          "clear_label": "Off",
+          "description": "Reported meaning: Humidifier."
+        },
+        {
+          "bit": 5,
+          "coordinate": "0x15",
+          "label": "WaterValve",
+          "set_label": "On",
+          "clear_label": "Off",
+          "description": "Reported meaning: Water valve."
+        },
+        {
+          "bit": 6,
+          "coordinate": "0x16",
+          "label": "ResetSta",
+          "set_label": "Completed",
+          "clear_label": "Uncompleted",
+          "description": "Reported meaning: Indoor-unit reset finished."
+        },
+        {
+          "bit": 7,
+          "coordinate": "0x17",
+          "label": "MatchingResistor",
+          "set_label": "Has",
+          "clear_label": "None",
+          "description": "Reported meaning: Matching resistor; Present; Absent."
+        }
+      ]
+    },
+    {
+      "type": "0x1f",
+      "container": "0x03",
+      "kind": "bits",
+      "value_type": "bits",
+      "bits": [
+        {
+          "bit": 0,
+          "coordinate": "0x18",
+          "label": "IDUPowerOffMnemonicModeSta",
+          "set_label": "Recover",
+          "clear_label": "WaitingOn",
+          "description": "Reported meaning: Memorizing the indoor-unit state at power interruption."
+        },
+        {
+          "bit": 1,
+          "coordinate": "0x19",
+          "label": "CeilingSetting",
+          "set_label": "High",
+          "clear_label": "Standard",
+          "description": "Reported meaning: High-ceiling installation setting of the cassette-type unit."
+        },
+        {
+          "bit": 2,
+          "coordinate": "0x1a",
+          "label": "VIPIdu",
+          "set_label": "VIPIdu",
+          "clear_label": "Common",
+          "description": "Reported meaning: VIP indoor unit."
+        },
+        {
+          "bit": 3,
+          "coordinate": "0x1b",
+          "label": "EightCeHeatingSta",
+          "set_label": "Yes",
+          "clear_label": "No",
+          "description": "Reported meaning: 8 \u00b0C heating status."
+        },
+        {
+          "bit": 4,
+          "coordinate": "0x1c",
+          "label": "RemindFilterCleanSta",
+          "set_label": "Yes",
+          "clear_label": "No",
+          "description": "Reported meaning: Filter-cleaning warning."
+        },
+        {
+          "bit": 5,
+          "coordinate": "0x1d",
+          "label": "IDUOnlineTestSta",
+          "set_label": "Yes",
+          "clear_label": "No",
+          "description": "Reported meaning: Indoor-unit online-test status."
+        },
+        {
+          "bit": 6,
+          "coordinate": "0x1e",
+          "label": "DryingSta",
+          "set_label": "Yes",
+          "clear_label": "No",
+          "description": "Reported meaning: Drying."
+        },
+        {
+          "bit": 7,
+          "coordinate": "0x1f",
+          "label": "Sleep",
+          "set_label": "Yes",
+          "clear_label": "No",
+          "description": "Reported meaning: Drying."
+        }
+      ]
+    },
+    {
+      "type": "0x1f",
+      "container": "0x04",
+      "kind": "bits",
+      "value_type": "bits",
+      "bits": [
+        {
+          "bit": 0,
+          "coordinate": "0x20",
+          "label": "ExchangeAir",
+          "set_label": "Yes",
+          "clear_label": "No",
+          "description": "Reported meaning: Ventilation."
+        },
+        {
+          "bit": 1,
+          "coordinate": "0x21",
+          "label": "MaskOn",
+          "set_label": "Mask",
+          "clear_label": "Unmask",
+          "description": "Reported meaning: Start lock."
+        },
+        {
+          "bit": 2,
+          "coordinate": "0x22",
+          "label": "MaskOff",
+          "set_label": "Mask",
+          "clear_label": "Unmask",
+          "description": "Reported meaning: Stop lock."
+        },
+        {
+          "bit": 3,
+          "coordinate": "0x23",
+          "label": "MaskTime",
+          "set_label": "Mask",
+          "clear_label": "Unmask",
+          "description": "Reported meaning: Timer lock."
+        },
+        {
+          "bit": 4,
+          "coordinate": "0x24",
+          "label": "HeatingAidHeater",
+          "set_label": "WithoutPermissionOn",
+          "clear_label": "PermissionOn",
+          "description": "Reported meaning: Auxiliary heating in heating mode."
+        },
+        {
+          "bit": 5,
+          "coordinate": "0x25",
+          "label": "LowTempDry",
+          "set_label": "Dry",
+          "clear_label": "NaN",
+          "description": "Reported meaning: Low-temperature dehumidification status."
+        },
+        {
+          "bit": 6,
+          "coordinate": "0x26",
+          "label": "DRYAidHeater",
+          "set_label": "WithoutPermissionOn",
+          "clear_label": "PermissionOn",
+          "description": "Reported meaning: Auxiliary heating for dehumidification."
+        }
+      ]
+    },
+    {
+      "type": "0x1f",
+      "container": "0x05",
+      "kind": "bits",
+      "value_type": "bits",
+      "bits": [],
+      "note": "The container is defined without named bits; the raw byte is the only value."
+    },
+    {
+      "type": "0x1f",
+      "container": "0x06",
+      "kind": "bits",
+      "value_type": "bits",
+      "bits": [
+        {
+          "bit": 5,
+          "coordinate": "0x35",
+          "label": "HeatExFreezeProtectionSta",
+          "set_label": "Protection",
+          "clear_label": "Normal",
+          "description": "Reported meaning: Freeze protection of the secondary heat exchanger."
+        },
+        {
+          "bit": 6,
+          "coordinate": "0x36",
+          "label": "IDUConstantBlowingRateSta",
+          "set_label": "Yes",
+          "clear_label": "No"
+        }
+      ]
+    },
+    {
+      "type": "0x1f",
+      "container": "0x0a",
+      "kind": "bits",
+      "value_type": "bits",
+      "bits": [
+        {
+          "bit": 0,
+          "coordinate": "0x50",
+          "label": "FastTestSta",
+          "set_label": "Yes",
+          "clear_label": "No",
+          "description": "Reported meaning: Quick test; Yes; No."
+        },
+        {
+          "bit": 1,
+          "coordinate": "0x51",
+          "label": "SysCompressorRunningTotalSta",
+          "set_label": "Running",
+          "clear_label": "Stop",
+          "description": "Reported meaning: Overall running indication of the system compressors; Running; Stopped."
+        },
+        {
+          "bit": 2,
+          "coordinate": "0x52",
+          "label": "RefregantEnoughSta",
+          "set_label": "Enough",
+          "clear_label": "Unenough",
+          "description": "Reported meaning: Indication of an adequate refrigerant quantity; Adequate; Insufficient."
+        },
+        {
+          "bit": 3,
+          "coordinate": "0x53",
+          "label": "RemoteEnergySavingSta",
+          "set_label": "Yes",
+          "clear_label": "No",
+          "description": "Reported meaning: Remote energy saving; No."
+        },
+        {
+          "bit": 4,
+          "coordinate": "0x54",
+          "label": "DebugEnterSta",
+          "set_label": "Enter",
+          "clear_label": "No",
+          "description": "Reported meaning: Commissioning-entry indication; Entry."
+        },
+        {
+          "bit": 5,
+          "coordinate": "0x55",
+          "label": "CompressorWarmupSta",
+          "set_label": "Completed",
+          "clear_label": "Uncompleted",
+          "description": "Reported meaning: Compressor preheating finished."
+        },
+        {
+          "bit": 6,
+          "coordinate": "0x56",
+          "label": "RefregantPerfusionMethodSel",
+          "set_label": "Auto",
+          "clear_label": "ManManipulated",
+          "description": "Reported meaning: Operation with automatic charging; Automatic; Manual."
+        },
+        {
+          "bit": 7,
+          "coordinate": "0x57",
+          "label": "RefregantPerfusionMethodConfirmation",
+          "set_label": "Auto",
+          "clear_label": "ManManipulated",
+          "description": "Reported meaning: Confirmation of the refrigerant charging method."
+        }
+      ]
+    },
+    {
+      "type": "0x1f",
+      "container": "0x0b",
+      "kind": "bits",
+      "value_type": "bits",
+      "bits": [
+        {
+          "bit": 0,
+          "coordinate": "0x58",
+          "label": "DebugStartupConfirmationSta",
+          "set_label": "true",
+          "clear_label": "false",
+          "description": "Reported meaning: Confirmation indication of the start of unit commissioning."
+        },
+        {
+          "bit": 1,
+          "coordinate": "0x59",
+          "label": "DebugCompletionSta",
+          "set_label": "Completed",
+          "clear_label": "Uncompleted",
+          "description": "Reported meaning: Commissioning-completion indication."
+        },
+        {
+          "bit": 2,
+          "coordinate": "0x5a",
+          "label": "PowerVIPSta",
+          "set_label": "Yes",
+          "clear_label": "No",
+          "description": "Reported meaning: Activation of the electrical-supply VIP mode."
+        },
+        {
+          "bit": 3,
+          "coordinate": "0x5b",
+          "label": "SysOilBalanceSta",
+          "set_label": "Yes",
+          "clear_label": "No",
+          "description": "Reported meaning: Oil equalization."
+        },
+        {
+          "bit": 4,
+          "coordinate": "0x5c",
+          "label": "SysOilCallbackSta",
+          "set_label": "Yes",
+          "clear_label": "No",
+          "description": "Reported meaning: Oil return."
+        },
+        {
+          "bit": 5,
+          "coordinate": "0x5d",
+          "label": "SysThawSta",
+          "set_label": "Yes",
+          "clear_label": "No",
+          "description": "Reported meaning: Defrost."
+        },
+        {
+          "bit": 6,
+          "coordinate": "0x5e",
+          "label": "SysFreonLackSta",
+          "set_label": "Yes",
+          "clear_label": "No",
+          "description": "Reported meaning: Insufficient refrigerant charge."
+        },
+        {
+          "bit": 7,
+          "coordinate": "0x5f",
+          "label": "SysFreonTooEnoughSta",
+          "set_label": "Yes",
+          "clear_label": "No",
+          "description": "Reported meaning: Excessive refrigerant charge."
+        }
+      ]
+    },
+    {
+      "type": "0x1f",
+      "container": "0x0c",
+      "kind": "bits",
+      "value_type": "bits",
+      "bits": [
+        {
+          "bit": 0,
+          "coordinate": "0x60",
+          "label": "DebugModeSettingEnableSta",
+          "set_label": "Confirm",
+          "clear_label": "Select",
+          "description": "Reported meaning: Permission status for configuring the commissioning mode; Confirmation; Selection."
+        },
+        {
+          "bit": 1,
+          "coordinate": "0x61",
+          "label": "IPLVEnterSta",
+          "set_label": "Enter",
+          "clear_label": "Exit",
+          "description": "Reported meaning: IPLV entry status."
+        },
+        {
+          "bit": 2,
+          "coordinate": "0x62",
+          "label": "IPLVRunningSta",
+          "set_label": "Running",
+          "clear_label": "No",
+          "description": "Reported meaning: IPLV running status."
+        },
+        {
+          "bit": 3,
+          "coordinate": "0x63",
+          "label": "WorkloadOpenSta",
+          "set_label": "Open",
+          "clear_label": "No",
+          "description": "Reported meaning: Operation with the load open; Open."
+        },
+        {
+          "bit": 4,
+          "coordinate": "0x64",
+          "label": "ODUOnlineTestSta",
+          "set_label": "Has",
+          "clear_label": "None",
+          "description": "Reported meaning: Outdoor-unit online-test status."
+        },
+        {
+          "bit": 5,
+          "coordinate": "0x65",
+          "label": "FourWayValveFlag",
+          "set_label": "On",
+          "clear_label": "Off",
+          "description": "Reported meaning: Indication of the unit four-way valve."
+        },
+        {
+          "bit": 6,
+          "coordinate": "0x66",
+          "label": "Can2BusSta",
+          "set_label": "Has",
+          "clear_label": "None",
+          "description": "Reported meaning: Presence of the CAN2 bus."
+        },
+        {
+          "bit": 7,
+          "coordinate": "0x67",
+          "label": "IPAddrSet",
+          "set_label": "Has",
+          "clear_label": "None",
+          "description": "Reported meaning: IP address allocation setting."
+        }
+      ]
+    },
+    {
+      "type": "0x1f",
+      "container": "0x0d",
+      "kind": "bits",
+      "value_type": "bits",
+      "bits": [
+        {
+          "bit": 0,
+          "coordinate": "0x68",
+          "label": "Comperssor1PoweronSta",
+          "set_label": "On",
+          "clear_label": "Off",
+          "description": "Reported meaning: Compressor 1 status."
+        },
+        {
+          "bit": 1,
+          "coordinate": "0x69",
+          "label": "Comperssor2PoweronSta",
+          "set_label": "On",
+          "clear_label": "Off",
+          "description": "Reported meaning: Compressor 2 status."
+        },
+        {
+          "bit": 2,
+          "coordinate": "0x6a",
+          "label": "Comperssor3PoweronSta",
+          "set_label": "On",
+          "clear_label": "Off",
+          "description": "Reported meaning: Compressor 3 status."
+        },
+        {
+          "bit": 3,
+          "coordinate": "0x6b",
+          "label": "Comperssor4PoweronSta",
+          "set_label": "On",
+          "clear_label": "Off",
+          "description": "Reported meaning: Compressor 4."
+        },
+        {
+          "bit": 4,
+          "coordinate": "0x6c",
+          "label": "Comperssor5PoweronSta",
+          "set_label": "On",
+          "clear_label": "Off",
+          "description": "Reported meaning: Compressor 5."
+        },
+        {
+          "bit": 5,
+          "coordinate": "0x6d",
+          "label": "ThawSta",
+          "set_label": "Yes",
+          "clear_label": "No",
+          "description": "Reported meaning: Own-unit defrost indication."
+        },
+        {
+          "bit": 6,
+          "coordinate": "0x6e",
+          "label": "FreonLackSta",
+          "set_label": "Yes",
+          "clear_label": "No",
+          "description": "Reported meaning: Insufficient refrigerant charge of the module."
+        },
+        {
+          "bit": 7,
+          "coordinate": "0x6f",
+          "label": "FreonTooEnoughSta",
+          "set_label": "Yes",
+          "clear_label": "No",
+          "description": "Reported meaning: Excessive refrigerant charge of the module."
+        }
+      ]
+    },
+    {
+      "type": "0x1f",
+      "container": "0x0e",
+      "kind": "bits",
+      "value_type": "bits",
+      "bits": [
+        {
+          "bit": 0,
+          "coordinate": "0x70",
+          "label": "LiqBypassValve1Sta",
+          "set_label": "On",
+          "clear_label": "Off",
+          "description": "Reported meaning: Liquid bypass solenoid valve 1."
+        },
+        {
+          "bit": 1,
+          "coordinate": "0x71",
+          "label": "LiqBypassValve2Sta",
+          "set_label": "On",
+          "clear_label": "Off",
+          "description": "Reported meaning: Liquid bypass solenoid valve 2."
+        },
+        {
+          "bit": 2,
+          "coordinate": "0x72",
+          "label": "LiqBypassValve3Sta",
+          "set_label": "On",
+          "clear_label": "Off",
+          "description": "Reported meaning: Liquid bypass solenoid valve 3."
+        },
+        {
+          "bit": 3,
+          "coordinate": "0x73",
+          "label": "LiqBypassValve4Sta",
+          "set_label": "On",
+          "clear_label": "Off",
+          "description": "Reported meaning: Liquid bypass solenoid valve 4."
+        },
+        {
+          "bit": 4,
+          "coordinate": "0x74",
+          "label": "HPBypassValveSta",
+          "set_label": "On",
+          "clear_label": "Off",
+          "description": "Reported meaning: High-pressure bypass valve."
+        },
+        {
+          "bit": 5,
+          "coordinate": "0x75",
+          "label": "BoardTradeOilReturnValve",
+          "set_label": "On",
+          "clear_label": "Off",
+          "description": "Reported meaning: Oil-return valve for the plate heat exchanger."
+        },
+        {
+          "bit": 6,
+          "coordinate": "0x76",
+          "label": "FFCompressorAidHeaterSta",
+          "set_label": "On",
+          "clear_label": "Off",
+          "description": "Reported meaning: Electric heating belt of compressor 2."
+        },
+        {
+          "bit": 7,
+          "coordinate": "0x77",
+          "label": "VFCompressorAidHeaterSta",
+          "set_label": "On",
+          "clear_label": "Off",
+          "description": "Reported meaning: Electric heating belt of compressor 1."
+        }
+      ]
+    },
+    {
+      "type": "0x1f",
+      "container": "0x0f",
+      "kind": "bits",
+      "value_type": "bits",
+      "bits": [
+        {
+          "bit": 0,
+          "coordinate": "0x78",
+          "label": "FourWayValve1Sta",
+          "set_label": "On",
+          "clear_label": "Off",
+          "description": "Reported meaning: Four-way valve 1."
+        },
+        {
+          "bit": 1,
+          "coordinate": "0x79",
+          "label": "FourWayValve2Sta",
+          "set_label": "On",
+          "clear_label": "Off",
+          "description": "Reported meaning: Four-way valve 2."
+        },
+        {
+          "bit": 2,
+          "coordinate": "0x7a",
+          "label": "AirBypassMagValveSta",
+          "set_label": "On",
+          "clear_label": "Off",
+          "description": "Reported meaning: Gas bypass solenoid valve."
+        },
+        {
+          "bit": 3,
+          "coordinate": "0x7b",
+          "label": "CapillaryMagValveSta",
+          "set_label": "On",
+          "clear_label": "Off",
+          "description": "Reported meaning: Capillary-tube solenoid valve."
+        },
+        {
+          "bit": 4,
+          "coordinate": "0x7c",
+          "label": "WaterPump",
+          "set_label": "On",
+          "clear_label": "Off",
+          "description": "Reported meaning: Water pump."
+        },
+        {
+          "bit": 5,
+          "coordinate": "0x7d",
+          "label": "CoolingFan",
+          "set_label": "On",
+          "clear_label": "Off",
+          "description": "Reported meaning: Cooling fan."
+        },
+        {
+          "bit": 6,
+          "coordinate": "0x7e",
+          "label": "RefregantValveA",
+          "set_label": "On",
+          "clear_label": "Off",
+          "description": "Reported meaning: Refrigerant valve A."
+        },
+        {
+          "bit": 7,
+          "coordinate": "0x7f",
+          "label": "VF2CompressorAidHeaterSta",
+          "set_label": "On",
+          "clear_label": "Off",
+          "description": "Reported meaning: Chassis electric heating belt."
+        }
+      ]
+    },
+    {
+      "type": "0x1f",
+      "container": "0x10",
+      "kind": "bits",
+      "value_type": "bits",
+      "bits": [
+        {
+          "bit": 0,
+          "coordinate": "0x80",
+          "label": "OilCallbackMagValve1Sta",
+          "set_label": "On",
+          "clear_label": "Off",
+          "description": "Reported meaning: Oil-return valve 1 status."
+        },
+        {
+          "bit": 1,
+          "coordinate": "0x81",
+          "label": "OilCallbackMagValve2Sta",
+          "set_label": "On",
+          "clear_label": "Off",
+          "description": "Reported meaning: Oil-return valve 2 status."
+        },
+        {
+          "bit": 2,
+          "coordinate": "0x82",
+          "label": "OilBalanceMagValve1Sta",
+          "set_label": "On",
+          "clear_label": "Off",
+          "description": "Reported meaning: Oil-equalization solenoid valve 1."
+        },
+        {
+          "bit": 3,
+          "coordinate": "0x83",
+          "label": "OilBalanceMagValve2Sta",
+          "set_label": "On",
+          "clear_label": "Off",
+          "description": "Reported meaning: Oil-equalization solenoid valve 2."
+        },
+        {
+          "bit": 4,
+          "coordinate": "0x84",
+          "label": "LPMeasureValveSta",
+          "set_label": "On",
+          "clear_label": "Off",
+          "description": "Reported meaning: Low-pressure measurement valve."
+        },
+        {
+          "bit": 5,
+          "coordinate": "0x85",
+          "label": "Compressor1BalanceValve",
+          "set_label": "On",
+          "clear_label": "Off",
+          "description": "Reported meaning: Compressor 1 equalization valve."
+        },
+        {
+          "bit": 6,
+          "coordinate": "0x86",
+          "label": "Compressor2BalanceValve",
+          "set_label": "On",
+          "clear_label": "Off",
+          "description": "Reported meaning: Compressor 2 equalization valve."
+        },
+        {
+          "bit": 7,
+          "coordinate": "0x87",
+          "label": "2WayValveStatus",
+          "set_label": "On",
+          "clear_label": "Off",
+          "description": "Reported meaning: Two-way valve status."
+        }
+      ]
+    },
+    {
+      "type": "0x1f",
+      "container": "0x11",
+      "kind": "bits",
+      "value_type": "bits",
+      "bits": [
+        {
+          "bit": 0,
+          "coordinate": "0x88",
+          "label": "ResetSta",
+          "set_label": "Completed",
+          "clear_label": "Uncompleted",
+          "description": "Reported meaning: Own-unit reset is completed."
+        },
+        {
+          "bit": 1,
+          "coordinate": "0x89",
+          "label": "CallbackFreonSta",
+          "set_label": "Yes",
+          "clear_label": "No",
+          "description": "Reported meaning: Refrigerant-recovery operation indication."
+        },
+        {
+          "bit": 2,
+          "coordinate": "0x8a",
+          "label": "AutoPerfusionSta",
+          "set_label": "Yes",
+          "clear_label": "No",
+          "description": "Reported meaning: Automatic-charging operation indication."
+        },
+        {
+          "bit": 3,
+          "coordinate": "0x8b",
+          "label": "DLSuperHeatPercControlSta",
+          "set_label": "Yes",
+          "clear_label": "No",
+          "description": "Reported meaning: Own-unit discharge superheat control indication."
+        },
+        {
+          "bit": 4,
+          "coordinate": "0x8c",
+          "label": "ThrottleSolenoidValveStatus",
+          "set_label": "Yes",
+          "clear_label": "No",
+          "description": "Reported meaning: Throttling solenoid valve status."
+        },
+        {
+          "bit": 5,
+          "coordinate": "0x8d",
+          "label": "CompressorEmerRunningSta",
+          "set_label": "Yes",
+          "clear_label": "No",
+          "description": "Reported meaning: Compressor emergency-operation indication."
+        },
+        {
+          "bit": 6,
+          "coordinate": "0x8e",
+          "label": "FanEmerRunningSta",
+          "set_label": "Yes",
+          "clear_label": "No",
+          "description": "Reported meaning: Outdoor-fan emergency-operation indication."
+        },
+        {
+          "bit": 7,
+          "coordinate": "0x8f",
+          "label": "DevEmerRunningSta",
+          "set_label": "Yes",
+          "clear_label": "No",
+          "description": "Reported meaning: Own-unit emergency-operation indication."
+        }
+      ]
+    },
+    {
+      "type": "0x1f",
+      "container": "0x12",
+      "kind": "bits",
+      "value_type": "bits",
+      "bits": [
+        {
+          "bit": 2,
+          "coordinate": "0x92",
+          "label": "VFCompressorAidHeater3Sta",
+          "set_label": "On",
+          "clear_label": "Off",
+          "description": "Reported meaning: Electric heating belt of compressor 3."
+        },
+        {
+          "bit": 3,
+          "coordinate": "0x93",
+          "label": "Compressor3BalanceValve",
+          "set_label": "On",
+          "clear_label": "Off",
+          "description": "Reported meaning: Compressor 3 equalization valve."
+        },
+        {
+          "bit": 4,
+          "coordinate": "0x94",
+          "label": "OilCallbackMagValve3Sta",
+          "set_label": "On",
+          "clear_label": "Off",
+          "description": "Reported meaning: Oil-return valve 3 status."
+        },
+        {
+          "bit": 5,
+          "coordinate": "0x95",
+          "label": "SolenoidValveA",
+          "set_label": "On",
+          "clear_label": "Off",
+          "description": "Reported meaning: Solenoid valve A."
+        },
+        {
+          "bit": 6,
+          "coordinate": "0x96",
+          "label": "SolenoidValveB",
+          "set_label": "On",
+          "clear_label": "Off",
+          "description": "Reported meaning: Solenoid valve B."
+        },
+        {
+          "bit": 7,
+          "coordinate": "0x97",
+          "label": "OilCallbackMagValve4Sta",
+          "set_label": "On",
+          "clear_label": "Off",
+          "description": "Reported meaning: Oil-return valve 4 status."
+        }
+      ]
+    },
+    {
+      "type": "0x1f",
+      "container": "0x13",
+      "kind": "bits",
+      "value_type": "bits",
+      "bits": [
+        {
+          "bit": 0,
+          "coordinate": "0x98",
+          "label": "VFCompressorDriverPFCOnSta",
+          "set_label": "On",
+          "clear_label": "Off",
+          "description": "Reported meaning: PFC switch of the variable-frequency compressor drive."
+        },
+        {
+          "bit": 1,
+          "coordinate": "0x99",
+          "label": "VFCompressorWeakMagSta",
+          "set_label": "Yes",
+          "clear_label": "No",
+          "description": "Reported meaning: Field weakening of the variable-frequency compressor."
+        },
+        {
+          "bit": 2,
+          "coordinate": "0x9a",
+          "label": "VFCompressorDriverModuFreqLimitSta",
+          "set_label": "Yes",
+          "clear_label": "No",
+          "description": "Reported meaning: Frequency limiting of the variable-frequency compressor drive module."
+        },
+        {
+          "bit": 3,
+          "coordinate": "0x9b",
+          "label": "VFCompressorDriverModuFreqDownSta",
+          "set_label": "Yes",
+          "clear_label": "No",
+          "description": "Reported meaning: Frequency reduction of the variable-frequency compressor drive module."
+        },
+        {
+          "bit": 4,
+          "coordinate": "0x9c",
+          "label": "VFCompressorDriverLowACVoltFreqLimitSta",
+          "set_label": "Yes",
+          "clear_label": "No",
+          "description": "Reported meaning: Frequency limiting at low AC input voltage of the variable-frequency compressor drive."
+        },
+        {
+          "bit": 5,
+          "coordinate": "0x9d",
+          "label": "VFCompressorDriverChargeSta",
+          "set_label": "Uncompleted",
+          "clear_label": "Completed",
+          "description": "Reported meaning: Unfinished charging of the variable-frequency compressor drive."
+        },
+        {
+          "bit": 7,
+          "coordinate": "0x9f",
+          "label": "VFCompressorDriverACPowerType",
+          "set_label": "TriPhases",
+          "clear_label": "BiPhases",
+          "description": "Reported meaning: AC supply type at the input of the variable-frequency compressor drive; Three-phase; Two-phase."
+        }
+      ]
+    },
+    {
+      "type": "0x1f",
+      "container": "0x14",
+      "kind": "bits",
+      "value_type": "bits",
+      "bits": [
+        {
+          "bit": 4,
+          "coordinate": "0xa4",
+          "label": "VariableCapacityVal1",
+          "set_label": "On",
+          "clear_label": "Off",
+          "description": "Reported meaning: Variable-capacity solenoid valve 1."
+        },
+        {
+          "bit": 5,
+          "coordinate": "0xa5",
+          "label": "VariableCapacityVal2",
+          "set_label": "On",
+          "clear_label": "Off",
+          "description": "Reported meaning: Variable-capacity solenoid valve 2."
+        },
+        {
+          "bit": 6,
+          "coordinate": "0xa6",
+          "label": "GulpVal1",
+          "set_label": "On",
+          "clear_label": "Off",
+          "description": "Reported meaning: Gas make-up valve 1."
+        },
+        {
+          "bit": 7,
+          "coordinate": "0xa7",
+          "label": "GulpVal2",
+          "set_label": "On",
+          "clear_label": "Off",
+          "description": "Reported meaning: Gas make-up valve 2."
+        }
+      ]
+    },
+    {
+      "type": "0x1f",
+      "container": "0x15",
+      "kind": "bits",
+      "value_type": "bits",
+      "bits": [
+        {
+          "bit": 0,
+          "coordinate": "0xa8",
+          "label": "VFFan1DriverPFCOnSta",
+          "set_label": "On",
+          "clear_label": "Off",
+          "description": "Reported meaning: PFC switch of outdoor variable-frequency fan 1 drive."
+        },
+        {
+          "bit": 1,
+          "coordinate": "0xa9",
+          "label": "VFFan1WeakMagSta",
+          "set_label": "Yes",
+          "clear_label": "No",
+          "description": "Reported meaning: Field weakening of outdoor variable-frequency fan 1."
+        },
+        {
+          "bit": 2,
+          "coordinate": "0xaa",
+          "label": "VFFan1DriverModuHTFreqLimitSta",
+          "set_label": "Yes",
+          "clear_label": "No",
+          "description": "Reported meaning: Frequency limiting at high temperature of the outdoor variable-frequency fan 1 drive module."
+        },
+        {
+          "bit": 3,
+          "coordinate": "0xab",
+          "label": "VFFan1DriverModuHTDownFreqSta",
+          "set_label": "Yes",
+          "clear_label": "No",
+          "description": "Reported meaning: Frequency reduction at high temperature of the outdoor variable-frequency fan 1 drive module."
+        },
+        {
+          "bit": 4,
+          "coordinate": "0xac",
+          "label": "LowVFFan1DriverACVoltFreqLimitSta",
+          "set_label": "Yes",
+          "clear_label": "No",
+          "description": "Reported meaning: Frequency limiting at low AC input voltage of outdoor variable-frequency fan 1 drive."
+        },
+        {
+          "bit": 5,
+          "coordinate": "0xad",
+          "label": "VFFan1DriverChargeSta",
+          "set_label": "Uncompleted",
+          "clear_label": "Completed",
+          "description": "Reported meaning: Unfinished charging of outdoor variable-frequency fan 1 drive."
+        },
+        {
+          "bit": 7,
+          "coordinate": "0xaf",
+          "label": "VFFan1DriverACPowerType",
+          "set_label": "TriPhases",
+          "clear_label": "BiPhases",
+          "description": "Reported meaning: AC supply type at the input of outdoor variable-frequency fan 1 drive."
+        }
+      ]
+    },
+    {
+      "type": "0x1f",
+      "container": "0x16",
+      "kind": "bits",
+      "value_type": "bits",
+      "bits": [
+        {
+          "bit": 0,
+          "coordinate": "0xb0",
+          "label": "SysNoneMasterSta",
+          "set_label": "Error",
+          "clear_label": "Normal",
+          "description": "Reported meaning: Fault: there is no main-control outdoor unit."
+        }
+      ]
+    },
+    {
+      "type": "0x1f",
+      "container": "0x17",
+      "kind": "bits",
+      "value_type": "bits",
+      "bits": [
+        {
+          "bit": 0,
+          "coordinate": "0xb8",
+          "label": "VFFan2DriverPFCOnSta",
+          "set_label": "On",
+          "clear_label": "Off",
+          "description": "Reported meaning: PFC switch of outdoor variable-frequency fan 2 drive."
+        },
+        {
+          "bit": 1,
+          "coordinate": "0xb9",
+          "label": "VFFan2WeakMagSta",
+          "set_label": "Yes",
+          "clear_label": "No",
+          "description": "Reported meaning: Field weakening of outdoor variable-frequency fan 2."
+        },
+        {
+          "bit": 2,
+          "coordinate": "0xba",
+          "label": "VFFan2DriverModuHTFreqLimitSta",
+          "set_label": "Yes",
+          "clear_label": "No",
+          "description": "Reported meaning: Frequency limiting at high temperature of the outdoor variable-frequency fan 2 drive module."
+        },
+        {
+          "bit": 3,
+          "coordinate": "0xbb",
+          "label": "VFFan2DriverModuHTDownFreqSta",
+          "set_label": "Yes",
+          "clear_label": "No",
+          "description": "Reported meaning: Frequency reduction at high temperature of the outdoor variable-frequency fan 2 drive module."
+        },
+        {
+          "bit": 4,
+          "coordinate": "0xbc",
+          "label": "LowVFFan2DriverACVoltFreqLimitSta",
+          "set_label": "Yes",
+          "clear_label": "No",
+          "description": "Reported meaning: Frequency limiting at low AC input voltage of outdoor variable-frequency fan 2 drive."
+        },
+        {
+          "bit": 5,
+          "coordinate": "0xbd",
+          "label": "VFFan2DriverChargeSta",
+          "set_label": "Uncompleted",
+          "clear_label": "Completed",
+          "description": "Reported meaning: Unfinished charging of outdoor variable-frequency fan 2 drive."
+        },
+        {
+          "bit": 7,
+          "coordinate": "0xbf",
+          "label": "VFFan2DriverACPowerType",
+          "set_label": "TriPhases",
+          "clear_label": "BiPhases",
+          "description": "Reported meaning: AC supply type at the input of outdoor variable-frequency fan 2 drive."
+        }
+      ]
+    },
+    {
+      "type": "0x1f",
+      "container": "0x18",
+      "kind": "bits",
+      "value_type": "bits",
+      "bits": [],
+      "note": "The container is defined without named bits; the raw byte is the only value."
+    },
+    {
+      "type": "0x1f",
+      "container": "0x19",
+      "kind": "bits",
+      "value_type": "bits",
+      "bits": [
+        {
+          "bit": 0,
+          "coordinate": "0xc8",
+          "label": "VFCompressor2DriverPFCOnSta",
+          "set_label": "On",
+          "clear_label": "Off",
+          "description": "Reported meaning: PFC switch of variable-frequency compressor 2 drive."
+        },
+        {
+          "bit": 1,
+          "coordinate": "0xc9",
+          "label": "VFCompressor2WeakMagSta",
+          "set_label": "Yes",
+          "clear_label": "No",
+          "description": "Reported meaning: Field weakening of variable-frequency compressor 2."
+        },
+        {
+          "bit": 2,
+          "coordinate": "0xca",
+          "label": "VFCompressor2DriverModuHTFreqLimitSta",
+          "set_label": "Yes",
+          "clear_label": "No",
+          "description": "Reported meaning: Frequency limiting of the variable-frequency compressor 2 drive module."
+        },
+        {
+          "bit": 3,
+          "coordinate": "0xcb",
+          "label": "VFCompressor2DriverModuHTDownFreqSta",
+          "set_label": "Yes",
+          "clear_label": "No",
+          "description": "Reported meaning: Frequency reduction of the variable-frequency compressor 2 drive module."
+        },
+        {
+          "bit": 4,
+          "coordinate": "0xcc",
+          "label": "LowVFCompressor2DriverACVoltFreqLimitSta",
+          "set_label": "Yes",
+          "clear_label": "No",
+          "description": "Reported meaning: Frequency limiting at low AC input voltage of variable-frequency compressor 2 drive."
+        },
+        {
+          "bit": 5,
+          "coordinate": "0xcd",
+          "label": "VFCompressor2DriverChargeSta",
+          "set_label": "Uncompleted",
+          "clear_label": "Completed",
+          "description": "Reported meaning: Unfinished charging of variable-frequency compressor 2 drive."
+        },
+        {
+          "bit": 7,
+          "coordinate": "0xcf",
+          "label": "VFCompressor2DriverACVoltType",
+          "set_label": "TriPhases",
+          "clear_label": "BiPhases",
+          "description": "Reported meaning: AC supply type at the input of variable-frequency compressor 2 drive."
+        }
+      ]
+    },
+    {
+      "type": "0x1f",
+      "container": "0x1d",
+      "kind": "bits",
+      "value_type": "bits",
+      "bits": [
+        {
+          "bit": 0,
+          "coordinate": "0xe8",
+          "label": "FZOILvar1",
+          "set_label": "On",
+          "clear_label": "Off",
+          "description": "Reported meaning: Auxiliary oil-return valve 1."
+        },
+        {
+          "bit": 1,
+          "coordinate": "0xe9",
+          "label": "FZOILvar2",
+          "set_label": "On",
+          "clear_label": "Off",
+          "description": "Reported meaning: Auxiliary oil-return valve 2."
+        },
+        {
+          "bit": 2,
+          "coordinate": "0xea",
+          "label": "PHvar1",
+          "set_label": "On",
+          "clear_label": "Off",
+          "description": "Reported meaning: Vapor-injection solenoid valve 1."
+        },
+        {
+          "bit": 3,
+          "coordinate": "0xeb",
+          "label": "PHvar2",
+          "set_label": "On",
+          "clear_label": "Off",
+          "description": "Reported meaning: Vapor-injection solenoid valve 2."
+        },
+        {
+          "bit": 4,
+          "coordinate": "0xec",
+          "label": "Condenservar",
+          "set_label": "On",
+          "clear_label": "Off",
+          "description": "Reported meaning: Subcooler solenoid valve."
+        },
+        {
+          "bit": 5,
+          "coordinate": "0xed",
+          "label": "deicevalve",
+          "set_label": "On",
+          "clear_label": "Off",
+          "description": "Reported meaning: Hot-gas bypass valve."
+        },
+        {
+          "bit": 6,
+          "coordinate": "0xee",
+          "label": "HPValveSta",
+          "set_label": "On",
+          "clear_label": "Off",
+          "description": "Reported meaning: High-pressure solenoid valve."
+        },
+        {
+          "bit": 7,
+          "coordinate": "0xef",
+          "label": "LPValveSta",
+          "set_label": "On",
+          "clear_label": "Off",
+          "description": "Reported meaning: Low-pressure solenoid valve."
+        }
+      ]
+    },
+    {
+      "type": "0x1f",
+      "container": "0x1e",
+      "kind": "bits",
+      "value_type": "bits",
+      "bits": [
+        {
+          "bit": 0,
+          "coordinate": "0xf0",
+          "label": "LPBypassValveSta",
+          "set_label": "On",
+          "clear_label": "Off",
+          "description": "Reported meaning: Outdoor-unit low-pressure bypass solenoid valve."
+        },
+        {
+          "bit": 1,
+          "coordinate": "0xf1",
+          "label": "OduFanValve",
+          "set_label": "On",
+          "clear_label": "Off",
+          "description": "Reported meaning: Outdoor-fan air damper."
+        }
+      ]
+    },
+    {
+      "type": "0x22",
+      "container": "0x00",
+      "kind": "bits",
+      "value_type": "bits",
+      "bits": [
+        {
+          "bit": 0,
+          "coordinate": "0x00",
+          "label": "LowIDUFanDriverDCBusVoltSta",
+          "set_label": "Protection",
+          "clear_label": "Normal",
+          "description": "Reported meaning: Undervoltage protection on the DC bus of the variable-speed indoor-fan drive."
+        },
+        {
+          "bit": 1,
+          "coordinate": "0x01",
+          "label": "HighIDUFanDriverDCBusVoltSta",
+          "set_label": "Protection",
+          "clear_label": "Normal",
+          "description": "Reported meaning: Overvoltage protection on the DC bus of the variable-speed indoor-fan drive."
+        },
+        {
+          "bit": 2,
+          "coordinate": "0x02",
+          "label": "IDUFanACCurrentSta",
+          "set_label": "Protection",
+          "clear_label": "Normal",
+          "description": "Reported meaning: Abnormal-current protection at the AC input of the variable-speed indoor fan."
+        },
+        {
+          "bit": 3,
+          "coordinate": "0x03",
+          "label": "IDUFanDriverIPMSta",
+          "set_label": "Protection",
+          "clear_label": "Normal",
+          "description": "Reported meaning: IPM-module protection of the variable-speed indoor-fan drive."
+        },
+        {
+          "bit": 4,
+          "coordinate": "0x04",
+          "label": "IDUFanDriverPFCSta",
+          "set_label": "Protection",
+          "clear_label": "Normal",
+          "description": "Reported meaning: PFC protection of the variable-speed indoor-fan drive."
+        },
+        {
+          "bit": 5,
+          "coordinate": "0x05",
+          "label": "IDUFanStartupSta",
+          "set_label": "Yes",
+          "clear_label": "No",
+          "description": "Reported meaning: Variable-speed indoor-fan startup failed."
+        },
+        {
+          "bit": 6,
+          "coordinate": "0x06",
+          "label": "IDUFanLostPhaseSta",
+          "set_label": "Protection",
+          "clear_label": "Normal",
+          "description": "Reported meaning: Phase-loss protection of the variable-speed indoor fan."
+        },
+        {
+          "bit": 7,
+          "coordinate": "0x07",
+          "label": "IDUFanDriverResetSta",
+          "set_label": "Yes",
+          "clear_label": "No",
+          "description": "Reported meaning: Reset of the variable-speed indoor-fan drive module."
+        }
+      ]
+    },
+    {
+      "type": "0x22",
+      "container": "0x01",
+      "kind": "bits",
+      "value_type": "bits",
+      "bits": [
+        {
+          "bit": 0,
+          "coordinate": "0x08",
+          "label": "IDUFanOCSta",
+          "set_label": "Protection",
+          "clear_label": "Normal",
+          "description": "Reported meaning: Overcurrent protection of the variable-speed indoor fan."
+        },
+        {
+          "bit": 2,
+          "coordinate": "0x0a",
+          "label": "IDUFanDriverCurrentDetectCircuitSta",
+          "set_label": "Error",
+          "clear_label": "Normal",
+          "description": "Reported meaning: Fault of the current-measurement circuit of the variable-speed indoor-fan drive."
+        },
+        {
+          "bit": 3,
+          "coordinate": "0x0b",
+          "label": "IDUFanLostStepSta",
+          "set_label": "Protection",
+          "clear_label": "Normal",
+          "description": "Reported meaning: Loss-of-synchronism protection of the variable-speed indoor fan."
+        },
+        {
+          "bit": 5,
+          "coordinate": "0x0d",
+          "label": "MasterToIDUFanDriverCommSta",
+          "set_label": "Error",
+          "clear_label": "Normal",
+          "description": "Reported meaning: Communication fault between the main controller and the variable-speed indoor-fan drive."
+        },
+        {
+          "bit": 6,
+          "coordinate": "0x0e",
+          "label": "IDUFanDriverHighTempSta",
+          "set_label": "Protection",
+          "clear_label": "Normal",
+          "description": "Reported meaning: Overtemperature protection of the variable-speed indoor-fan drive module."
+        },
+        {
+          "bit": 7,
+          "coordinate": "0x0f",
+          "label": "IDUFanDriverModuTsor",
+          "set_label": "Error",
+          "clear_label": "Normal",
+          "description": "Reported meaning: Fault of the temperature sensor of the variable-speed indoor-fan drive module."
+        }
+      ]
+    },
+    {
+      "type": "0x22",
+      "container": "0x02",
+      "kind": "bits",
+      "value_type": "bits",
+      "bits": [
+        {
+          "bit": 0,
+          "coordinate": "0x10",
+          "label": "CustomBit7",
+          "set_label": "NaN",
+          "clear_label": "NaN",
+          "description": "Reported meaning: User-defined bit 7."
+        },
+        {
+          "bit": 2,
+          "coordinate": "0x12",
+          "label": "IDUFanDriverChargeCircuitSta",
+          "set_label": "Error",
+          "clear_label": "Normal",
+          "description": "Reported meaning: Fault of the charge circuit of the variable-speed indoor-fan drive."
+        },
+        {
+          "bit": 3,
+          "coordinate": "0x13",
+          "label": "IDUFanDriverACVoltSta",
+          "set_label": "Protection",
+          "clear_label": "Normal",
+          "description": "Reported meaning: Abnormal-voltage protection at the AC input of the variable-speed indoor-fan drive."
+        },
+        {
+          "bit": 4,
+          "coordinate": "0x14",
+          "label": "IDUFanDriverBoxTsor",
+          "set_label": "Error",
+          "clear_label": "Normal",
+          "description": "Reported meaning: Fault of the electrical-box temperature sensor of the variable-speed indoor-fan drive."
+        },
+        {
+          "bit": 5,
+          "coordinate": "0x15",
+          "label": "IDUFanDriverACZeroSta",
+          "set_label": "Protection",
+          "clear_label": "Normal",
+          "description": "Reported meaning: Zero-crossing protection of the AC input of the variable-speed indoor-fan drive."
+        }
+      ]
+    },
+    {
+      "type": "0x23",
+      "container": "0x00",
+      "kind": "bits",
+      "value_type": "bits",
+      "bits": [
+        {
+          "bit": 0,
+          "coordinate": "0x00",
+          "label": "IDUFanWeakMagSta",
+          "set_label": "Yes",
+          "clear_label": "No",
+          "description": "Reported meaning: Field-weakening status of the variable-speed indoor fan."
+        },
+        {
+          "bit": 1,
+          "coordinate": "0x01",
+          "label": "IDUFanDriverFreqLimitSta",
+          "set_label": "Yes",
+          "clear_label": "No",
+          "description": "Reported meaning: Frequency limiting of the variable-speed indoor-fan drive."
+        },
+        {
+          "bit": 2,
+          "coordinate": "0x02",
+          "label": "IDUFanDriverFreqDownSta",
+          "set_label": "Yes",
+          "clear_label": "No",
+          "description": "Reported meaning: Frequency reduction of the variable-speed indoor-fan drive."
+        },
+        {
+          "bit": 3,
+          "coordinate": "0x03",
+          "label": "IDUFanDriverChargeSta",
+          "set_label": "Uncompleted",
+          "clear_label": "Completed",
+          "description": "Reported meaning: Charge status of the variable-speed indoor-fan drive."
+        },
+        {
+          "bit": 4,
+          "coordinate": "0x04",
+          "label": "IDUFanDriverACPowerType",
+          "set_label": "TriPhases",
+          "clear_label": "BiPhases",
+          "description": "Reported meaning: AC supply type at the input of the variable-speed indoor-fan drive; three-phase; two-phase."
+        }
+      ]
+    },
+    {
+      "type": "0x29",
+      "container": "0x00",
+      "kind": "bits",
+      "value_type": "bits",
+      "bits": [
+        {
+          "bit": 4,
+          "coordinate": "0x04",
+          "label": "SmartOffline",
+          "set_label": "Offline",
+          "clear_label": "Normal",
+          "description": "Reported meaning: Smart offline state."
+        }
+      ]
+    },
+    {
+      "type": "0x33",
+      "container": "0x00",
+      "kind": "bits",
+      "value_type": "bits",
+      "bits": [
+        {
+          "bit": 0,
+          "coordinate": "0x00",
+          "label": "EHeating1Func",
+          "set_label": "On",
+          "clear_label": "Off",
+          "description": "Reported meaning: Electric heating 1 function."
+        },
+        {
+          "bit": 1,
+          "coordinate": "0x01",
+          "label": "EHeating2Func",
+          "set_label": "On",
+          "clear_label": "Off",
+          "description": "Reported meaning: Electric heating 2 function."
+        },
+        {
+          "bit": 2,
+          "coordinate": "0x02",
+          "label": "EHeating3Func",
+          "set_label": "On",
+          "clear_label": "Off",
+          "description": "Reported meaning: Electric heating 3 function."
+        },
+        {
+          "bit": 3,
+          "coordinate": "0x03",
+          "label": "Wetter1Func",
+          "set_label": "On",
+          "clear_label": "Off",
+          "description": "Reported meaning: Humidifier 1 function."
+        },
+        {
+          "bit": 4,
+          "coordinate": "0x04",
+          "label": "Wetter2Func",
+          "set_label": "On",
+          "clear_label": "Off",
+          "description": "Reported meaning: Humidifier 2 function."
+        },
+        {
+          "bit": 5,
+          "coordinate": "0x05",
+          "label": "Wetter3Func",
+          "set_label": "On",
+          "clear_label": "Off",
+          "description": "Reported meaning: Humidifier 3 function."
+        },
+        {
+          "bit": 6,
+          "coordinate": "0x06",
+          "label": "HandleMode",
+          "set_label": "On",
+          "clear_label": "Off",
+          "description": "Reported meaning: Manual mode."
+        }
+      ]
+    },
+    {
+      "type": "0x33",
+      "container": "0x01",
+      "kind": "bits",
+      "value_type": "bits",
+      "bits": [
+        {
+          "bit": 1,
+          "coordinate": "0x09",
+          "label": "DryReinforce",
+          "set_label": "On",
+          "clear_label": "Off",
+          "description": "Reported meaning: Intensified dehumidification."
+        },
+        {
+          "bit": 2,
+          "coordinate": "0x0a",
+          "label": "InWaterValve",
+          "set_label": "On",
+          "clear_label": "Off",
+          "description": "Reported meaning: Water-supply valve."
+        },
+        {
+          "bit": 3,
+          "coordinate": "0x0b",
+          "label": "DrainWaterValve",
+          "set_label": "On",
+          "clear_label": "Off",
+          "description": "Reported meaning: Water-drain valve."
+        },
+        {
+          "bit": 4,
+          "coordinate": "0x0c",
+          "label": "GroupControlSetting",
+          "set_label": "On",
+          "clear_label": "Off",
+          "description": "Reported meaning: Group-control setting."
+        },
+        {
+          "bit": 5,
+          "coordinate": "0x0d",
+          "label": "EHeating1Sta",
+          "set_label": "On",
+          "clear_label": "Off",
+          "description": "Reported meaning: Electric heating 1 state."
+        },
+        {
+          "bit": 6,
+          "coordinate": "0x0e",
+          "label": "EHeating2Sta",
+          "set_label": "On",
+          "clear_label": "Off",
+          "description": "Reported meaning: Electric heating 2 state."
+        },
+        {
+          "bit": 7,
+          "coordinate": "0x0f",
+          "label": "EHeating3Sta",
+          "set_label": "On",
+          "clear_label": "Off",
+          "description": "Reported meaning: Electric heating 3 state."
+        }
+      ]
+    },
+    {
+      "type": "0x33",
+      "container": "0x02",
+      "kind": "bits",
+      "value_type": "bits",
+      "bits": [
+        {
+          "bit": 0,
+          "coordinate": "0x10",
+          "label": "Wetter1Sta",
+          "set_label": "On",
+          "clear_label": "Off",
+          "description": "Reported meaning: Humidifier 1 state."
+        },
+        {
+          "bit": 1,
+          "coordinate": "0x11",
+          "label": "Wetter2Sta",
+          "set_label": "On",
+          "clear_label": "Off",
+          "description": "Reported meaning: Humidifier 2 state."
+        },
+        {
+          "bit": 2,
+          "coordinate": "0x12",
+          "label": "Wetter3Sta",
+          "set_label": "On",
+          "clear_label": "Off",
+          "description": "Reported meaning: Humidifier 3 state."
+        }
+      ]
+    },
+    {
+      "type": "0x36",
+      "container": "0x00",
+      "kind": "bits",
+      "value_type": "bits",
+      "bits": [
+        {
+          "bit": 0,
+          "coordinate": "0x00",
+          "label": "NaN",
+          "set_label": "Error",
+          "clear_label": "Normal",
+          "description": "Reported meaning: Water-drain fault."
+        }
+      ]
+    },
+    {
+      "type": "0x36",
+      "container": "0x01",
+      "kind": "bits",
+      "value_type": "bits",
+      "bits": [
+        {
+          "bit": 3,
+          "coordinate": "0x0b",
+          "label": "DrainWaterErr",
+          "set_label": "Error",
+          "clear_label": "Normal",
+          "description": "Reported meaning: Water-drain fault."
+        },
+        {
+          "bit": 4,
+          "coordinate": "0x0c",
+          "label": "InfraredWetterProt",
+          "set_label": "Protection",
+          "clear_label": "Normal",
+          "description": "Reported meaning: Infrared humidifier protection."
+        },
+        {
+          "bit": 5,
+          "coordinate": "0x0d",
+          "label": "EHeatProt",
+          "set_label": "Protection",
+          "clear_label": "Normal",
+          "description": "Reported meaning: Electric-heating protection."
+        },
+        {
+          "bit": 6,
+          "coordinate": "0x0e",
+          "label": "LowWindPressureProt",
+          "set_label": "Protection",
+          "clear_label": "Normal",
+          "description": "Reported meaning: Low air-pressure protection."
+        },
+        {
+          "bit": 7,
+          "coordinate": "0x0f",
+          "label": "IDUConnectStopErr",
+          "set_label": "Error",
+          "clear_label": "Normal",
+          "description": "Reported meaning: Indoor-unit external-stop fault."
+        }
+      ]
+    },
+    {
+      "type": "0x36",
+      "container": "0x02",
+      "kind": "bits",
+      "value_type": "bits",
+      "bits": [
+        {
+          "bit": 0,
+          "coordinate": "0x10",
+          "label": "WetterWaterLevelErr",
+          "set_label": "Error",
+          "clear_label": "Normal",
+          "description": "Reported meaning: High water level in the humidifier."
+        },
+        {
+          "bit": 1,
+          "coordinate": "0x11",
+          "label": "SoakProt",
+          "set_label": "Protection",
+          "clear_label": "Normal",
+          "description": "Reported meaning: Flood protection."
+        },
+        {
+          "bit": 2,
+          "coordinate": "0x12",
+          "label": "WetterLowCurrentErr",
+          "set_label": "Error",
+          "clear_label": "Normal",
+          "description": "Reported meaning: Humidifier low current."
+        }
+      ]
+    }
+  ]
+}

@@ -354,7 +354,103 @@ func acquired(raw []byte, roles roweval.Roles) roweval.Acquired[Selector] {
 		BindingID:       &binding, SourceEpochID: &epoch, DriverGeneration: &generation, Evidence: evidence,
 		Origin: semreg.OriginRef{OriginID: "origin.synthetic", Kind: semreg.OriginNativeObservation, SourceID: &source, SourceEpochID: &epoch, BindingID: &binding, Evidence: evidence},
 	}
-	return roweval.Acquired[Selector]{Template: template, Roles: roles, Receipt: roweval.Receipt{ReceivedAt: received, Monotonic: mono}, Payload: raw[8:]}
+	return roweval.Acquired[Selector]{Template: template, Roles: roles, Receipt: roweval.Receipt{ReceivedAt: received, Monotonic: mono}, Payload: raw[8:],
+		Coordinates: map[string]string{packSlot: "pack.site-a"}}
+}
+
+// TestSOHAboveStorageBoundKeepsNativeAndWithholdsCandidate pins that a valid
+// SOH of 101 keeps its native value and validity while no storage candidate is
+// produced: the storage pack bounds storage.state.soh at one.
+func TestSOHAboveStorageBoundKeepsNativeAndWithholdsCandidate(t *testing.T) {
+	roles := storageRoles(t)
+	table := V104Table()
+	raw := vector{Identifier: 0x313, DLC: 8, Data: "FF9CFF9CFF3864E5"}.record(t)
+	frame, err := canbus.DecodeSocketCANRecord(raw)
+	if err != nil {
+		t.Fatal(err)
+	}
+	evals, reason, err := EvaluateFrame(table, frame, acquired(raw, roles))
+	if err != nil || reason != "" {
+		t.Fatalf("admitted frame: reason %q err %v", reason, err)
+	}
+	soh := evals[Profile+".soh"]
+	if soh.Native == nil || soh.Native.Reason != "" || soh.Native.Value == nil || !decimalEquals(soh.Native.Value.Quantity.Number, "101") {
+		t.Fatalf("native SOH lost its value: %+v", soh.Native)
+	}
+	valid := evals[Profile+".soh_valid"]
+	if valid.Native == nil || valid.Native.Value == nil || !decimalEquals(valid.Native.Value.Quantity.Number, "1") {
+		t.Fatalf("native SOH validity lost: %+v", valid.Native)
+	}
+	if soh.Candidate != nil || soh.Reason != roweval.ReasonOutsideDomain {
+		t.Fatalf("SOH 101 gave candidate %+v reason %q", soh.Candidate, soh.Reason)
+	}
+}
+
+// TestPackFactKeyCarriesConfiguredPackResource pins that the fact key of a pack
+// candidate names the configured pack resource, and that two configured packs
+// give two distinct keys for the same fact.
+func TestPackFactKeyCarriesConfiguredPackResource(t *testing.T) {
+	roles := storageRoles(t)
+	table := V104Table()
+	raw := vector{Identifier: 0x313, DLC: 8, Data: "FF9CFF9CFF3864E2"}.record(t)
+	frame, err := canbus.DecodeSocketCANRecord(raw)
+	if err != nil {
+		t.Fatal(err)
+	}
+	keyText := func(resource string) string {
+		a := acquired(raw, roles)
+		a.Coordinates = map[string]string{packSlot: resource}
+		evals, reason, err := EvaluateFrame(table, frame, a)
+		if err != nil || reason != "" {
+			t.Fatalf("admitted frame: reason %q err %v", reason, err)
+		}
+		c := evals[Profile+".soc"].Candidate
+		if c == nil || len(c.Key.Dimensions) != 1 || c.Key.Dimensions[0].Value.Text == nil {
+			t.Fatalf("SOC candidate has no pack dimension: %+v", c)
+		}
+		return *c.Key.Dimensions[0].Value.Text
+	}
+	siteA, siteB := keyText("pack.site-a"), keyText("pack.site-b")
+	if siteA != "pack.site-a" || siteB != "pack.site-b" {
+		t.Fatalf("pack keys name %q and %q, want the configured resources", siteA, siteB)
+	}
+}
+
+// TestUnresolvedPackKeepsNativeRowsAndEvidence pins that a well-formed frame
+// whose pack resource is not supplied keeps every native row, its raw evidence
+// and its native signed values, and produces no storage candidate.
+func TestUnresolvedPackKeepsNativeRowsAndEvidence(t *testing.T) {
+	roles := storageRoles(t)
+	table := V104Table()
+	raw := vector{Identifier: 0x313, DLC: 8, Data: "FF9CFF9CFF3864E2"}.record(t)
+	frame, err := canbus.DecodeSocketCANRecord(raw)
+	if err != nil {
+		t.Fatal(err)
+	}
+	a := acquired(raw, roles)
+	a.Coordinates = nil
+	evals, reason, err := EvaluateFrame(table, frame, a)
+	if err != nil {
+		t.Fatalf("unresolved pack returned an error and discarded the frame: %v", err)
+	}
+	if reason != "" || len(evals) != 6 {
+		t.Fatalf("admitted frame: reason %q, %d native rows, want 6", reason, len(evals))
+	}
+	for id, ev := range evals {
+		if ev.Native == nil || ev.Native.Reason != "" || !reflect.DeepEqual(ev.Native.Evidence, a.Template.Evidence) {
+			t.Fatalf("%s: native evaluation or evidence lost: %+v", id, ev.Native)
+		}
+		if ev.Candidate != nil {
+			t.Fatalf("%s: unresolved pack produced candidate %+v", id, ev.Candidate)
+		}
+	}
+	if !decimalEquals(evals[Profile+".pack_current"].Native.Value.Quantity.Number, "-100") ||
+		!decimalEquals(evals[Profile+".maximum_cell_temperature"].Native.Value.Quantity.Number, "-200") {
+		t.Fatalf("signed native values changed when the pack is unresolved")
+	}
+	if evals[Profile+".pack_current"].Reason != unresolvedSlot {
+		t.Fatalf("pack_current reason %q, want %q", evals[Profile+".pack_current"].Reason, unresolvedSlot)
+	}
 }
 
 // storageRoles reads the storage pack's service, capability and fact

@@ -1,6 +1,7 @@
 package bms
 
 import (
+	"errors"
 	"fmt"
 	"math/bits"
 	"strconv"
@@ -32,9 +33,13 @@ type signalSlice struct {
 }
 
 const (
-	bigEndian     = "big-endian"
-	bitSlice      = "bit-slice"
-	packRole      = "pack"
+	bigEndian = "big-endian"
+	bitSlice  = "bit-slice"
+	packRole  = "pack"
+	// packSlot names the coordinate slot that carries the configured pack
+	// resource. The fact key takes its dimension from this slot, never from
+	// the role name, so two configured packs give two keys.
+	packSlot      = "pack-resource"
 	packDimension = "storage.dimension.pack"
 	receivePolicy = "policy.can.example"
 	sohValidBit   = 63
@@ -72,7 +77,7 @@ func packRead(name, ref string, fact, unit semreg.DefinitionID, divisor int64, h
 	return roweval.BindingRow{NativeID: Profile + "." + name, SubjectRole: packRole, SpecRef: ref,
 		Service: storageRef("storage.service.pack"), Capability: storageRef("storage.capability.read.pack"),
 		Read: &roweval.ReadRow{Fact: storageRef(fact), Unit: unit, Policy: receivePolicy,
-			Dimensions: map[semreg.DefinitionID]string{packDimension: packRole},
+			Dimensions: map[semreg.DefinitionID]string{packDimension: packSlot},
 			ToRegistry: roweval.Convert{Numeric: &roweval.Affine{Num: 1, Den: divisor}, Hook: hook}}}
 }
 
@@ -181,8 +186,29 @@ func evaluateRow(table roweval.Table[Selector], frame canbus.Frame, row roweval.
 	a.Selector = Selector{Identifier: frame.ID().Value(), Extended: frame.ID().Extended(), DLC: frame.DLC(), RawDLC: frame.RawDLC(), Slice: row.At.Slice}
 	a.Payload = frame.Data()
 	a.Descriptors = V104Descriptors()
-	return roweval.Evaluate(table, a)
+	ev, err := roweval.Evaluate(table, a)
+	var inputErr *roweval.InputError
+	if errors.As(err, &inputErr) {
+		// An unresolved role or pack slot withholds only the candidate. The
+		// native evaluation the evaluator computed is kept with the reason.
+		switch inputErr.Kind {
+		case roweval.InputUnresolvedRole:
+			ev.Reason = roweval.ReasonUnresolvedRole
+		case roweval.InputUnresolvedSlot:
+			ev.Reason = unresolvedSlot
+		default:
+			return ev, err
+		}
+		ev.Candidate, ev.Subject = nil, nil
+		ev.Detail = inputErr.Detail
+		return ev, nil
+	}
+	return ev, err
 }
+
+// unresolvedSlot is the reason of a binding whose pack resource slot is not
+// supplied by the caller.
+const unresolvedSlot roweval.Reason = "unresolved_slot"
 
 // admitPackFrame is the frozen growattV104Valid rule for 0x312: both count
 // bytes (B4 and B7) in 1 through 254.
@@ -215,11 +241,15 @@ func nonNegativeVoltage(_ roweval.DetachedInputs, _ roweval.RowID, _ roweval.Dir
 }
 
 // sohValidity admits the SOH candidate only when the frame's validity bit (B7
-// bit 7) is set. The native SOH row is kept regardless.
+// bit 7) is set and the SOH value is within the storage ratio bound of 1
+// (SOH 0 through 100). The native SOH row is kept regardless.
 func sohValidity(inputs roweval.DetachedInputs, _ roweval.RowID, _ roweval.Direction, value roweval.TypedValue) (roweval.DerivedValue, roweval.Reason) {
 	payload := inputs.Inputs()[0].Payload
 	if payload[sohValidBit/8]&(1<<(sohValidBit%8)) == 0 {
 		return roweval.DerivedValue{}, "not valid"
+	}
+	if payload[7]&0x7f > 100 {
+		return roweval.DerivedValue{}, roweval.ReasonOutsideDomain
 	}
 	return roweval.DerivedValue{Value: value}, ""
 }

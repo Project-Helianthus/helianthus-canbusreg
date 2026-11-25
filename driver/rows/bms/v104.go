@@ -11,6 +11,9 @@ import (
 	"github.com/Project-Helianthus/helianthus-semreg/semreg/v1/roweval"
 )
 
+// rowName returns the native row name without the profile prefix.
+func rowName(id string) string { return strings.TrimPrefix(id, Profile+".") }
+
 // Profile is the profile identifier of the V1.04 low-voltage BMS CAN profile.
 const Profile = "growatt.bms.low_voltage.can.v1_04"
 
@@ -41,6 +44,10 @@ const (
 	// row is evaluated; the hooks are a second check on the same rule.
 	packFrameHook = "pack-frame-admission"
 	socFrameHook  = "soc-frame-admission"
+	// voltageHook withholds a negative pack voltage from the storage candidate:
+	// the pinned storage catalog gives storage.pack.voltage a zero lower bound.
+	// The native signed row keeps the value.
+	voltageHook = "pack-voltage-nonnegative"
 )
 
 func nativeRow(id uint32, name string, slice signalSlice, unit string) roweval.NativeRow[Selector] {
@@ -105,7 +112,7 @@ func V104Table() roweval.Table[Selector] {
 		Native: rows,
 		Bindings: []roweval.BindingRow{
 			packRead("pack_current", "CAN 0x313", "storage.pack.current", "unit.ampere", 10, ""),
-			packRead("pack_voltage", "CAN 0x313", "storage.pack.voltage", "unit.volt", 100, ""),
+			packRead("pack_voltage", "CAN 0x313", "storage.pack.voltage", "unit.volt", 100, voltageHook),
 			packRead("soc", "CAN 0x313", "storage.state.soc", "unit.ratio", 100, ""),
 			packRead("soh", "CAN 0x313", "storage.state.soh", "unit.ratio", 100, "soh-validity"),
 		},
@@ -113,6 +120,7 @@ func V104Table() roweval.Table[Selector] {
 			"soh-validity": sohValidity,
 			packFrameHook:  admitPackFrame,
 			socFrameHook:   admitSOCFrame,
+			voltageHook:    nonNegativeVoltage,
 		},
 	}
 }
@@ -166,6 +174,10 @@ func EvaluateFrame(table roweval.Table[Selector], frame canbus.Frame, a roweval.
 }
 
 func evaluateRow(table roweval.Table[Selector], frame canbus.Frame, row roweval.NativeRow[Selector], a roweval.Acquired[Selector]) (roweval.Evaluation, error) {
+	// Each row of a frame may produce its own candidate; the candidate identity
+	// is the template's identity extended by the row, so the candidates of one
+	// frame are distinct within a batch.
+	a.Template.CandidateID = semreg.CandidateID(string(a.Template.CandidateID) + "." + rowName(row.ID))
 	a.Selector = Selector{Identifier: frame.ID().Value(), Extended: frame.ID().Extended(), DLC: frame.DLC(), RawDLC: frame.RawDLC(), Slice: row.At.Slice}
 	a.Payload = frame.Data()
 	a.Descriptors = V104Descriptors()
@@ -188,6 +200,16 @@ func admitSOCFrame(inputs roweval.DetachedInputs, _ roweval.RowID, _ roweval.Dir
 	p := inputs.Inputs()[0].Payload
 	if len(p) < 8 || p[6] > 100 {
 		return roweval.DerivedValue{}, "not valid"
+	}
+	return roweval.DerivedValue{Value: value}, ""
+}
+
+// nonNegativeVoltage withholds a negative pack voltage from the storage
+// candidate. The catalog bound of storage.pack.voltage is zero, so the
+// candidate would be rejected at batch validation; the native row is unchanged.
+func nonNegativeVoltage(_ roweval.DetachedInputs, _ roweval.RowID, _ roweval.Direction, value roweval.TypedValue) (roweval.DerivedValue, roweval.Reason) {
+	if value.Quantity != nil && strings.HasPrefix(value.Quantity.Number.Coefficient, "-") {
+		return roweval.DerivedValue{}, roweval.ReasonOutsideDomain
 	}
 	return roweval.DerivedValue{Value: value}, ""
 }

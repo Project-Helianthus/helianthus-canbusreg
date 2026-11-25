@@ -9,7 +9,6 @@ import (
 	"math/big"
 	"os"
 	"reflect"
-	"strings"
 	"testing"
 
 	"github.com/Project-Helianthus/helianthus-canbus"
@@ -82,9 +81,6 @@ func readVectors(t *testing.T) []vector {
 	return out
 }
 
-// rowName returns the native row name without the profile prefix.
-func rowName(id string) string { return strings.TrimPrefix(id, Profile+".") }
-
 func TestV104VectorsMatchTheirExpectations(t *testing.T) {
 	roles := storageRoles(t)
 	table := V104Table()
@@ -133,6 +129,7 @@ func TestV104VectorsMatchTheirExpectations(t *testing.T) {
 func checkAdmitted(t *testing.T, v vector, table roweval.Table[Selector], frame canbus.Frame, a roweval.Acquired[Selector], evals map[string]roweval.Evaluation) {
 	t.Helper()
 	seenFact := map[string]bool{}
+	seenID := map[semreg.CandidateID]bool{}
 	rows := 0
 	for _, row := range table.Native {
 		if row.At.Identifier != frame.ID().Value() {
@@ -168,6 +165,10 @@ func checkAdmitted(t *testing.T, v vector, table roweval.Table[Selector], frame 
 			!decimalEquals(c.Value.Quantity.Number, f.Value) || string(c.Value.Quantity.Unit) != f.Unit {
 			t.Fatalf("%s: want candidate %s = %s %s, got %+v reason %q", name, factFor(name), f.Value, f.Unit, c, ev.Reason)
 		}
+		if seenID[c.CandidateID] {
+			t.Fatalf("%s: candidate identity %q is shared within one frame", name, c.CandidateID)
+		}
+		seenID[c.CandidateID] = true
 		if ev.Subject == nil || string(ev.Subject.Role) != f.Subject {
 			t.Fatalf("%s: candidate subject %+v, want %s", name, ev.Subject, f.Subject)
 		}
@@ -182,6 +183,30 @@ func checkAdmitted(t *testing.T, v vector, table roweval.Table[Selector], frame 
 		if !seenFact[fact] {
 			t.Fatalf("expected fact %s was not emitted", fact)
 		}
+	}
+}
+
+// TestNegativePackVoltageKeepsNativeAndWithholdsCandidate pins that a negative
+// pack voltage keeps its signed native value while no storage candidate is
+// produced: the pinned storage catalog bounds storage.pack.voltage at zero.
+func TestNegativePackVoltageKeepsNativeAndWithholdsCandidate(t *testing.T) {
+	roles := storageRoles(t)
+	table := V104Table()
+	raw := vector{Identifier: 0x313, DLC: 8, Data: "FF9CFF9CFF3864E2"}.record(t)
+	frame, err := canbus.DecodeSocketCANRecord(raw)
+	if err != nil {
+		t.Fatal(err)
+	}
+	evals, reason, err := EvaluateFrame(table, frame, acquired(raw, roles))
+	if err != nil || reason != "" {
+		t.Fatalf("admitted frame: reason %q err %v", reason, err)
+	}
+	ev := evals[Profile+".pack_voltage"]
+	if ev.Native == nil || ev.Native.Reason != "" || ev.Native.Value == nil || !decimalEquals(ev.Native.Value.Quantity.Number, "-100") {
+		t.Fatalf("native pack voltage lost its signed value: %+v", ev.Native)
+	}
+	if ev.Candidate != nil || ev.Reason != roweval.ReasonOutsideDomain {
+		t.Fatalf("negative pack voltage gave candidate %+v reason %q", ev.Candidate, ev.Reason)
 	}
 }
 

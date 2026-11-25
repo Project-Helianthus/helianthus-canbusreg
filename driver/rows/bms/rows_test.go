@@ -175,6 +175,12 @@ func checkAdmitted(t *testing.T, v vector, table roweval.Table[Selector], frame 
 		if !reflect.DeepEqual(c.Quality, a.Template.Quality) || !reflect.DeepEqual(c.Evidence, a.Template.Evidence) {
 			t.Fatalf("%s: candidate lost its quality or evidence", name)
 		}
+		if !reflect.DeepEqual(c.FreshnessPolicy, a.Template.FreshnessPolicy) || !reflect.DeepEqual(c.Times, a.Template.Times) {
+			t.Fatalf("%s: candidate lost its freshness policy or times", name)
+		}
+		if len(c.Key.Dimensions) != 1 || c.Key.Dimensions[0].Value.Text == nil || *c.Key.Dimensions[0].Value.Text != a.Coordinates[packSlot] {
+			t.Fatalf("%s: candidate key %+v does not name the configured pack", name, c.Key)
+		}
 	}
 	if rows != len(v.Native) {
 		t.Fatalf("vector lists %d native values, the frame has %d rows", len(v.Native), rows)
@@ -413,6 +419,68 @@ func TestPackFactKeyCarriesConfiguredPackResource(t *testing.T) {
 	siteA, siteB := keyText("pack.site-a"), keyText("pack.site-b")
 	if siteA != "pack.site-a" || siteB != "pack.site-b" {
 		t.Fatalf("pack keys name %q and %q, want the configured resources", siteA, siteB)
+	}
+}
+
+// TestHostFreshnessPolicyYieldsCandidates pins that the candidates follow the
+// freshness policy of the caller's template, not the exemplar's synthetic
+// identifier: a host with its own policy gets the same native rows and
+// candidates as the exemplar policy gives.
+func TestHostFreshnessPolicyYieldsCandidates(t *testing.T) {
+	roles := storageRoles(t)
+	table := V104Table()
+	raw := vector{Identifier: 0x313, DLC: 8, Data: "1388006400C864E2"}.record(t)
+	frame, err := canbus.DecodeSocketCANRecord(raw)
+	if err != nil {
+		t.Fatal(err)
+	}
+	a := acquired(raw, roles)
+	a.Template.FreshnessPolicy.PolicyID = "policy.host.configured"
+	evals, reason, err := EvaluateFrame(table, frame, a)
+	if err != nil || reason != "" {
+		t.Fatalf("admitted frame: reason %q err %v", reason, err)
+	}
+	for _, id := range []string{"pack_voltage", "pack_current", "soc", "soh"} {
+		ev := evals[Profile+"."+id]
+		if ev.Native == nil || ev.Native.Reason != "" {
+			t.Fatalf("%s: native evaluation lost: %+v", id, ev.Native)
+		}
+		if ev.Candidate == nil || ev.Reason != "" {
+			t.Fatalf("%s: host policy withheld the candidate: reason %q detail %q", id, ev.Reason, ev.Detail)
+		}
+		if ev.Candidate.FreshnessPolicy.PolicyID != "policy.host.configured" {
+			t.Fatalf("%s: candidate policy %q, want the host policy", id, ev.Candidate.FreshnessPolicy.PolicyID)
+		}
+	}
+}
+
+// TestEmptyPackCoordinateIsUnresolved pins that a pack coordinate present with
+// an empty value is treated as unresolved: no candidate carries an empty pack
+// dimension, and the native rows and raw evidence stay available.
+func TestEmptyPackCoordinateIsUnresolved(t *testing.T) {
+	roles := storageRoles(t)
+	table := V104Table()
+	raw := vector{Identifier: 0x313, DLC: 8, Data: "FF9CFF9CFF3864E2"}.record(t)
+	frame, err := canbus.DecodeSocketCANRecord(raw)
+	if err != nil {
+		t.Fatal(err)
+	}
+	a := acquired(raw, roles)
+	a.Coordinates = map[string]string{packSlot: ""}
+	evals, reason, err := EvaluateFrame(table, frame, a)
+	if err != nil || reason != "" {
+		t.Fatalf("admitted frame: reason %q err %v", reason, err)
+	}
+	for id, ev := range evals {
+		if ev.Candidate != nil {
+			t.Fatalf("%s: empty pack coordinate produced candidate %+v", id, ev.Candidate)
+		}
+		if ev.Native == nil || ev.Native.Reason != "" || !reflect.DeepEqual(ev.Native.Evidence, a.Template.Evidence) {
+			t.Fatalf("%s: native evaluation or evidence lost: %+v", id, ev.Native)
+		}
+	}
+	if evals[Profile+".soc"].Reason != unresolvedSlot {
+		t.Fatalf("soc reason %q, want %q", evals[Profile+".soc"].Reason, unresolvedSlot)
 	}
 }
 

@@ -1,5 +1,43 @@
 [
   {
+    "name": "positive-pack-voltage-and-current-convert-exactly",
+    "identifier": 787,
+    "extended": false,
+    "dlc": 8,
+    "data_hex": "1388006400C864E2",
+    "frame": "admitted",
+    "native": {
+      "pack_voltage": 5000,
+      "pack_current": 100,
+      "maximum_cell_temperature": 200,
+      "soc": 100,
+      "soh": 98,
+      "soh_valid": 1
+    },
+    "facts": {
+      "storage.pack.voltage": {
+        "value": "50.00",
+        "unit": "unit.volt",
+        "subject": "pack"
+      },
+      "storage.pack.current": {
+        "value": "10.0",
+        "unit": "unit.ampere",
+        "subject": "pack"
+      },
+      "storage.state.soc": {
+        "value": "1.00",
+        "unit": "unit.ratio",
+        "subject": "pack"
+      },
+      "storage.state.soh": {
+        "value": "0.98",
+        "unit": "unit.ratio",
+        "subject": "pack"
+      }
+    }
+  },
+  {
     "name": "negative-current-and-soc-100-admitted",
     "identifier": 787,
     "extended": false,

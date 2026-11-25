@@ -41,17 +41,17 @@ const (
 	// the role name, so two configured packs give two keys.
 	packSlot      = "pack-resource"
 	packDimension = "storage.dimension.pack"
-	receivePolicy = "policy.can.example"
 	sohValidBit   = 63
 
-	// packFrameHook and socFrameHook name the per-row admission hooks of
-	// frames 0x312 and 0x313. FrameDisposition gates the whole frame before any
-	// row is evaluated; the hooks are a second check on the same rule.
-	packFrameHook = "pack-frame-admission"
-	socFrameHook  = "soc-frame-admission"
-	// voltageHook withholds a negative pack voltage from the storage candidate:
-	// the pinned storage catalog gives storage.pack.voltage a zero lower bound.
-	// The native signed row keeps the value.
+	// sohValidityHook is the validity-bit gate of the SOH binding, the same
+	// hook the EX03 exemplar signs. Frame admission is FrameDisposition, not a
+	// row hook.
+	sohValidityHook = "soh-validity"
+	// voltageHook and the SOH bound of sohValidity keep a candidate-only
+	// domain: the storage catalog bounds storage.pack.voltage below at zero and
+	// storage.state.soh above at one. No signed row pattern expresses a
+	// candidate-only bound, so these two hooks are an open stop item (see the
+	// report of this package); the native rows keep the signed values.
 	voltageHook = "pack-voltage-nonnegative"
 )
 
@@ -76,9 +76,42 @@ func storageRef(id semreg.DefinitionID) semreg.DefinitionRef {
 func packRead(name, ref string, fact, unit semreg.DefinitionID, divisor int64, hook string) roweval.BindingRow {
 	return roweval.BindingRow{NativeID: Profile + "." + name, SubjectRole: packRole, SpecRef: ref,
 		Service: storageRef("storage.service.pack"), Capability: storageRef("storage.capability.read.pack"),
-		Read: &roweval.ReadRow{Fact: storageRef(fact), Unit: unit, Policy: receivePolicy,
+		Read: &roweval.ReadRow{Fact: storageRef(fact), Unit: unit,
 			Dimensions: map[semreg.DefinitionID]string{packDimension: packSlot},
 			ToRegistry: roweval.Convert{Numeric: &roweval.Affine{Num: 1, Den: divisor}, Hook: hook}}}
+}
+
+// withPolicy returns the table with every read row bound to the freshness
+// policy of the caller's template, the source policy the host applies. The
+// table itself names no policy.
+func withPolicy(t roweval.Table[Selector], policy semreg.PolicyID) roweval.Table[Selector] {
+	bindings := make([]roweval.BindingRow, len(t.Bindings))
+	for i, b := range t.Bindings {
+		if b.Read != nil {
+			r := *b.Read
+			r.Policy = policy
+			b.Read = &r
+		}
+		bindings[i] = b
+	}
+	t.Bindings = bindings
+	return t
+}
+
+// withoutEmptyPackSlot removes a pack coordinate that is present with an empty
+// value, so the evaluator reports the pack as unresolved instead of emitting a
+// fact key with an empty pack dimension.
+func withoutEmptyPackSlot(c map[string]string) map[string]string {
+	if c[packSlot] != "" {
+		return c
+	}
+	out := make(map[string]string, len(c))
+	for k, v := range c {
+		if k != packSlot {
+			out[k] = v
+		}
+	}
+	return out
 }
 
 // V104Table returns the native rows of frames 0x311 to 0x313 and the bindings
@@ -105,27 +138,17 @@ func V104Table() roweval.Table[Selector] {
 		nativeRow(0x313, "soh", signalSlice{56, 7, bitSlice, false}, "native.percent"),
 		nativeRow(0x313, "soh_valid", signalSlice{63, 1, bitSlice, false}, "native.flag"),
 	}
-	for i := range rows {
-		switch rows[i].At.Identifier {
-		case 0x312:
-			rows[i].Decode.Hook = packFrameHook
-		case 0x313:
-			rows[i].Decode.Hook = socFrameHook
-		}
-	}
 	return roweval.Table[Selector]{
 		Native: rows,
 		Bindings: []roweval.BindingRow{
 			packRead("pack_current", "CAN 0x313", "storage.pack.current", "unit.ampere", 10, ""),
 			packRead("pack_voltage", "CAN 0x313", "storage.pack.voltage", "unit.volt", 100, voltageHook),
 			packRead("soc", "CAN 0x313", "storage.state.soc", "unit.ratio", 100, ""),
-			packRead("soh", "CAN 0x313", "storage.state.soh", "unit.ratio", 100, "soh-validity"),
+			packRead("soh", "CAN 0x313", "storage.state.soh", "unit.ratio", 100, sohValidityHook),
 		},
 		Hooks: map[string]roweval.RowHook{
-			"soh-validity": sohValidity,
-			packFrameHook:  admitPackFrame,
-			socFrameHook:   admitSOCFrame,
-			voltageHook:    nonNegativeVoltage,
+			sohValidityHook: sohValidity,
+			voltageHook:     nonNegativeVoltage,
 		},
 	}
 }
@@ -164,6 +187,8 @@ func EvaluateFrame(table roweval.Table[Selector], frame canbus.Frame, a roweval.
 	if reason := FrameDisposition(frame); reason != "" {
 		return nil, reason, nil
 	}
+	table = withPolicy(table, a.Template.FreshnessPolicy.PolicyID)
+	a.Coordinates = withoutEmptyPackSlot(a.Coordinates)
 	out := make(map[string]roweval.Evaluation)
 	for _, row := range table.Native {
 		if row.At.Identifier != frame.ID().Value() {
@@ -210,29 +235,9 @@ func evaluateRow(table roweval.Table[Selector], frame canbus.Frame, row roweval.
 // supplied by the caller.
 const unresolvedSlot roweval.Reason = "unresolved_slot"
 
-// admitPackFrame is the frozen growattV104Valid rule for 0x312: both count
-// bytes (B4 and B7) in 1 through 254.
-func admitPackFrame(inputs roweval.DetachedInputs, _ roweval.RowID, _ roweval.Direction, value roweval.TypedValue) (roweval.DerivedValue, roweval.Reason) {
-	p := inputs.Inputs()[0].Payload
-	if len(p) < 8 || p[4] < 1 || p[4] > 254 || p[7] < 1 || p[7] > 254 {
-		return roweval.DerivedValue{}, "not valid"
-	}
-	return roweval.DerivedValue{Value: value}, ""
-}
-
-// admitSOCFrame is the frozen growattV104Valid rule for 0x313: SOC (B6) at
-// most 100.
-func admitSOCFrame(inputs roweval.DetachedInputs, _ roweval.RowID, _ roweval.Direction, value roweval.TypedValue) (roweval.DerivedValue, roweval.Reason) {
-	p := inputs.Inputs()[0].Payload
-	if len(p) < 8 || p[6] > 100 {
-		return roweval.DerivedValue{}, "not valid"
-	}
-	return roweval.DerivedValue{Value: value}, ""
-}
-
 // nonNegativeVoltage withholds a negative pack voltage from the storage
-// candidate. The catalog bound of storage.pack.voltage is zero, so the
-// candidate would be rejected at batch validation; the native row is unchanged.
+// candidate. The catalog bound of storage.pack.voltage is zero; the native
+// signed row is unchanged.
 func nonNegativeVoltage(_ roweval.DetachedInputs, _ roweval.RowID, _ roweval.Direction, value roweval.TypedValue) (roweval.DerivedValue, roweval.Reason) {
 	if value.Quantity != nil && strings.HasPrefix(value.Quantity.Number.Coefficient, "-") {
 		return roweval.DerivedValue{}, roweval.ReasonOutsideDomain

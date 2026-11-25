@@ -1,0 +1,16 @@
+[
+ [33,0,false,1,32,2,"terminal_unit","thermal.mode.terminal_unit","thermal.mode.terminal_unit.cool",0],
+ [30,1,true,2,32,2,"terminal_unit","thermal.status.terminal_unit_fault","thermal.status.terminal_unit_fault.present",0],
+ [31,4,true,16,32,2,"terminal_unit","thermal.status.terminal_unit_operation","thermal.status.terminal_unit_operation.active",0],
+ [32,0,false,123,32,2,"zone","thermal.measurement.air_temperature","29615",-2],
+ [115,0,false,230,32,2,"zone","thermal.setpoint.temperature_setpoint","29615",-2],
+ [32,9,false,156,32,2,"zone","thermal.measurement.humidity","56",-2],
+ [32,24,false,142,32,2,"zone","thermal.measurement.humidity","42",-2],
+ [33,81,false,5,8,1,"system","thermal.mode.system","thermal.mode.system.heat",0],
+ [31,81,true,2,8,1,"system","thermal.status.operation","thermal.status.operation.active",0],
+ [30,81,true,2,8,1,"system","thermal.status.fault","thermal.status.fault.present",0],
+ [30,138,true,4,9,1,"heat_generator","thermal.status.heat_generator_fault","thermal.status.heat_generator_fault.present",0],
+ [49,145,false,2467,9,1,"refrigerant_circuit","thermal.measurement.refrigerant_high_side_pressure","2467",3],
+ [49,147,false,345,9,1,"refrigerant_circuit","thermal.measurement.refrigerant_low_side_pressure","345",3],
+ [32,80,false,95,8,1,"system","thermal.measurement.outdoor_air_temperature","26815",-2]
+]

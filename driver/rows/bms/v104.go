@@ -48,19 +48,50 @@ const (
 	// names carries it, as the catalog's own references do.
 	storageDefinitionVersion = "1.1.0"
 
+	// opaqueCodec names the codec of a raw span with no qualified integer
+	// interpretation. It never yields a number: the row keeps the bytes.
+	opaqueCodec = "opaque"
+
 	// sohValidityHook is the validity-bit gate of the SOH binding, the same
 	// hook the EX03 exemplar signs. Frame admission is FrameDisposition, not a
 	// row hook.
 	sohValidityHook = "soh-validity"
 )
 
+// Reasons of rows that produce no value. A raw span with no qualified integer
+// interpretation is opaque; a storage fact the pinned catalog refuses is
+// refused, and its native value and evidence stay published.
+const (
+	reasonOpaque    roweval.Reason = "opaque_bytes"
+	catalogRefused  roweval.Reason = "catalog_refused"
+	opaqueDetailTxt                = "opaque raw bytes: the page leaves the integer byte order unqualified"
+)
+
+// errOpaque is the decode error of the opaque codec, mapped to reasonOpaque.
+var errOpaque = errors.New(opaqueDetailTxt)
+
+// opaqueRow is the native row of a raw span the page leaves without a
+// qualified integer byte order. The row keeps the bytes and has no value.
+func opaqueRow(id uint32, name string, slice signalSlice, unit string) roweval.NativeRow[Selector] {
+	r := nativeRow(id, name, slice, unit)
+	r.Wire.Codec = opaqueCodec
+	return r
+}
+
 func nativeRow(id uint32, name string, slice signalSlice, unit string) roweval.NativeRow[Selector] {
+	return nativeRowIn(Profile, id, name, slice, unit)
+}
+
+// nativeRowIn is the native row of one field of the named profile. The
+// selector is the standard identifier with DLC 8 and raw DLC 8 for every
+// profile of this package.
+func nativeRowIn(profile string, id uint32, name string, slice signalSlice, unit string) roweval.NativeRow[Selector] {
 	codec := "unsigned"
 	if slice.signed {
 		codec = "signed"
 	}
 	return roweval.NativeRow[Selector]{
-		ID:      Profile + "." + name,
+		ID:      profile + "." + name,
 		Unit:    unit,
 		SpecRef: fmt.Sprintf("CAN %#x", id),
 		At:      Selector{Identifier: id, DLC: 8, RawDLC: 8, Slice: slice},
@@ -91,7 +122,13 @@ func storageRef(id semreg.DefinitionID) semreg.DefinitionRef {
 }
 
 func packRead(name, ref string, fact, unit semreg.DefinitionID, divisor int64, hook string) roweval.BindingRow {
-	return roweval.BindingRow{NativeID: Profile + "." + name, SubjectRole: packRole, SpecRef: ref,
+	return packReadIn(Profile, name, ref, fact, unit, divisor, hook)
+}
+
+// packReadIn binds the named native row of the profile to a pack fact. The
+// binding declares no write: no command of the page sets the value.
+func packReadIn(profile, name, ref string, fact, unit semreg.DefinitionID, divisor int64, hook string) roweval.BindingRow {
+	return roweval.BindingRow{NativeID: profile + "." + name, SubjectRole: packRole, SpecRef: ref,
 		Service: storageRef("storage.service.pack"), Capability: storageRef("storage.capability.read.pack"),
 		Read: &roweval.ReadRow{Fact: storageRef(fact), Unit: unit,
 			Dimensions: map[semreg.DefinitionID]string{packDimension: packSlot},
@@ -225,7 +262,7 @@ func v104NamedRows() []roweval.NativeRow[Selector] {
 		nativeRow(0x320, "manufacturer_identity", signalSlice{0, 16, bigEndian, false}, "native.raw"),
 		nativeRow(0x320, "hardware_version", signalSlice{16, 8, bitSlice, false}, "native.version"),
 		nativeRow(0x320, "software_version", signalSlice{24, 8, bitSlice, false}, "native.version"),
-		nativeRow(0x320, "build_date_time", signalSlice{32, 32, bitSlice, false}, "native.raw"),
+		opaqueRow(0x320, "build_date_time", signalSlice{32, 32, bitSlice, false}, "native.raw"),
 	)
 	// 0x321: update state and progress; the bytes the page leaves unnamed stay raw.
 	rows = append(rows,
@@ -233,7 +270,7 @@ func v104NamedRows() []roweval.NativeRow[Selector] {
 		nativeRow(0x321, "pack_progress", signalSlice{8, 8, bitSlice, false}, "native.raw"),
 		nativeRow(0x321, "programming_pack_id", signalSlice{16, 8, bitSlice, false}, "native.index"),
 		nativeRow(0x321, "successful_update_count", signalSlice{24, 8, bitSlice, false}, "native.count"),
-		nativeRow(0x321, "reserved_bytes", signalSlice{32, 32, bitSlice, false}, "native.raw"),
+		opaqueRow(0x321, "reserved_bytes", signalSlice{32, 32, bitSlice, false}, "native.raw"),
 	)
 	return rows
 }
@@ -274,6 +311,12 @@ func EvaluateFrame(table roweval.Table[Selector], frame canbus.Frame, a roweval.
 	if reason := FrameDisposition(frame); reason != "" {
 		return nil, reason, nil
 	}
+	return evaluateAdmitted(table, frame, a)
+}
+
+// evaluateAdmitted evaluates every native row of an admitted frame and its
+// bindings, for a table whose frame gate the caller has already run.
+func evaluateAdmitted(table roweval.Table[Selector], frame canbus.Frame, a roweval.Acquired[Selector]) (map[string]roweval.Evaluation, roweval.Reason, error) {
 	table = withPolicy(table, a.Template.FreshnessPolicy.PolicyID)
 	a.Coordinates = withoutEmptyPackSlot(a.Coordinates)
 	out := make(map[string]roweval.Evaluation)
@@ -290,7 +333,27 @@ func EvaluateFrame(table roweval.Table[Selector], frame canbus.Frame, a roweval.
 	return out, "", nil
 }
 
+// evaluateRow evaluates one native row and its binding, then withholds the
+// candidate the catalog bounds of its fact refuse (bindings.go). The refusal is explicit: the
+// evaluation keeps the native value, its evidence and the refusal detail, and
+// the candidate of every other row of the frame stays publishable, so one
+// refused value cannot reject a batch that carries valid siblings.
 func evaluateRow(table roweval.Table[Selector], frame canbus.Frame, row roweval.NativeRow[Selector], a roweval.Acquired[Selector]) (roweval.Evaluation, error) {
+	ev, err := evaluateUnchecked(table, frame, row, a)
+	if err != nil {
+		return ev, err
+	}
+	if row.Wire.Codec == opaqueCodec && ev.Native != nil && ev.Native.Reason == roweval.ReasonDecode {
+		ev.Native.Reason = reasonOpaque
+		ev.Reason = reasonOpaque
+	}
+	refuseUncatalogued(&ev)
+	return ev, nil
+}
+
+// evaluateUnchecked evaluates one native row and its binding without the
+// storage catalog check.
+func evaluateUnchecked(table roweval.Table[Selector], frame canbus.Frame, row roweval.NativeRow[Selector], a roweval.Acquired[Selector]) (roweval.Evaluation, error) {
 	// Each row of a frame may produce its own candidate; the candidate identity
 	// is the template's identity extended by the row, so the candidates of one
 	// frame are distinct within a batch.
@@ -346,13 +409,22 @@ func V104Descriptors() roweval.Descriptors[Selector] {
 		return uint64(bits.ReverseBytes16(uint16(raw))), nil
 	}
 	return roweval.Descriptors[Selector]{
-		Codecs: map[string]roweval.Codec{"signed": integerCodec(true), "unsigned": integerCodec(false)},
+		Codecs: map[string]roweval.Codec{"signed": integerCodec(true), "unsigned": integerCodec(false), opaqueCodec: opaqueCodecOf()},
 		ByteOrders: map[string]roweval.Order{
 			bigEndian: {Decode: swap16, Encode: swap16}, bitSlice: {Decode: identity, Encode: identity},
 		},
 		BitOrders:  map[string]roweval.Order{"lsb0": {Decode: identity, Encode: identity}},
 		WordOrders: map[string]roweval.Order{"single": {Decode: identity, Encode: identity}},
 		Extent:     func(at Selector) (int, bool) { return int(at.DLC), true },
+	}
+}
+
+// opaqueCodecOf is the codec of a raw span: it refuses every integer reading,
+// so the evaluator gives the row no value and the bytes stay evidence only.
+func opaqueCodecOf() roweval.Codec {
+	return roweval.Codec{
+		Decode: func(uint64, uint16) (semreg.Decimal, error) { return semreg.Decimal{}, errOpaque },
+		Encode: func(semreg.Decimal, uint16) (uint64, error) { return 0, errOpaque },
 	}
 }
 

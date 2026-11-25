@@ -67,13 +67,11 @@
         "value": "0.98",
         "unit": "unit.ratio",
         "subject": "pack"
-      },
-      "storage.pack.voltage": {
-        "value": "-1.00",
-        "unit": "unit.volt",
-        "subject": "pack"
       }
-    }
+    },
+    "refused": [
+      "storage.pack.voltage"
+    ]
   },
   {
     "name": "positive-current-and-zero-soc",
@@ -105,13 +103,11 @@
         "value": "0.98",
         "unit": "unit.ratio",
         "subject": "pack"
-      },
-      "storage.pack.voltage": {
-        "value": "-1.00",
-        "unit": "unit.volt",
-        "subject": "pack"
       }
-    }
+    },
+    "refused": [
+      "storage.pack.voltage"
+    ]
   },
   {
     "name": "soh-without-validity-keeps-native-value",
@@ -138,13 +134,11 @@
         "value": "-10.0",
         "unit": "unit.ampere",
         "subject": "pack"
-      },
-      "storage.pack.voltage": {
-        "value": "-1.00",
-        "unit": "unit.volt",
-        "subject": "pack"
       }
-    }
+    },
+    "refused": [
+      "storage.pack.voltage"
+    ]
   },
   {
     "name": "soh-with-validity-yields-candidate",
@@ -176,13 +170,11 @@
         "value": "1.00",
         "unit": "unit.ratio",
         "subject": "pack"
-      },
-      "storage.pack.voltage": {
-        "value": "-1.00",
-        "unit": "unit.volt",
-        "subject": "pack"
       }
-    }
+    },
+    "refused": [
+      "storage.pack.voltage"
+    ]
   },
   {
     "name": "soc-101-withholds-the-whole-frame",
@@ -473,10 +465,12 @@
     "native": {
       "manufacturer_identity": 16706,
       "hardware_version": 3,
-      "software_version": 5,
-      "build_date_time": 2018915346
+      "software_version": 5
     },
-    "facts": {}
+    "facts": {},
+    "raw": {
+      "build_date_time": "12345678"
+    }
   },
   {
     "name": "update-state-and-reserved-bytes-of-0x321",
@@ -489,8 +483,40 @@
       "update_state": 1,
       "pack_progress": 64,
       "programming_pack_id": 3,
-      "successful_update_count": 2,
-      "reserved_bytes": 4022250974
+      "successful_update_count": 2
+    },
+    "facts": {},
+    "raw": {
+      "reserved_bytes": "DEADBEEF"
+    }
+  },
+  {
+    "name": "cells-five-to-eight-of-0x316",
+    "identifier": 790,
+    "extended": false,
+    "dlc": 8,
+    "data_hex": "0CE80CE90CEA0CEB",
+    "frame": "admitted",
+    "native": {
+      "cell_voltage_5": 3304,
+      "cell_voltage_6": 3305,
+      "cell_voltage_7": 3306,
+      "cell_voltage_8": 3307
+    },
+    "facts": {}
+  },
+  {
+    "name": "cells-nine-to-twelve-of-0x317",
+    "identifier": 791,
+    "extended": false,
+    "dlc": 8,
+    "data_hex": "0CF40CF50CF60CF7",
+    "frame": "admitted",
+    "native": {
+      "cell_voltage_9": 3316,
+      "cell_voltage_10": 3317,
+      "cell_voltage_11": 3318,
+      "cell_voltage_12": 3319
     },
     "facts": {}
   }

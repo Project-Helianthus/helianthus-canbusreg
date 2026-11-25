@@ -293,7 +293,7 @@ func TestEvaluateFrameRefusesRowsOfAnotherProfile(t *testing.T) {
 // EX03 exemplar registers, carries no hook on a native row, and validates
 // against the pinned catalog.
 func TestEveryRowOfTheTablesUsesOnlyIntegerPatternsAndByteOrders(t *testing.T) {
-	roles := storageRoles(t)
+	roles := cellStorageRoles(t)
 	if n := len(V104Descriptors().Codecs); n != 2 {
 		t.Fatalf("the package registers %d codecs, want the signed and unsigned integer codecs only", n)
 	}
@@ -438,9 +438,10 @@ func TestMonitorFramesBindOnlyTheirOwnPackAndAddress(t *testing.T) {
 
 // TestMonitorNativeOnlyFieldsGiveNoCandidate pins that the monitor fields the
 // page leaves without a binding here keep their native values and give no
-// candidate: the maximum cell temperature (no cell subject is resolved), the
-// usable state of charge (its unit is not stated by the decoder), and the cell
-// voltage of a module frame (no cell subject is bound).
+// candidate: the usable state of charge (its unit is not stated by the decoder)
+// and the cell voltage of a module frame (no cell subject is bound). The cell
+// extrema and the maximum cell temperature of their own families are bound
+// only for a resolved cell; rows_cells_test.go pins them.
 func TestMonitorNativeOnlyFieldsGiveNoCandidate(t *testing.T) {
 	roles := storageRoles(t)
 	cases := []struct {
@@ -449,7 +450,6 @@ func TestMonitorNativeOnlyFieldsGiveNoCandidate(t *testing.T) {
 		name  string
 		value string
 	}{
-		{0x04030005, "8A022C0103000500", "maximum_cell_temperature", "25"},
 		{0x04040005, "2003000000000000", "usoc", "80"},
 		{0x08010029, "E50CE60CDA0CD80C", "cell_voltage_5", "3301"},
 	}

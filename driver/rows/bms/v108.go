@@ -153,9 +153,10 @@ func v108Rows() []roweval.NativeRow[Selector] {
 // bindings declare no write; the V1.08 page documents no command that sets
 // these values.
 //
-// The protection and warning symbols, the device limits and the cell
-// extremes and temperatures have no binding here, as in the V1.04 table: they
-// are listed in the package report.
+// The cell voltage extrema of 0x319 are bound to the cell subject by cellBindings
+// when the host resolves a cell; the 0x322 cell temperatures stay native. The protection and
+// warning symbols and the device limits have no binding here, as in the V1.04
+// table: they are listed in the package report.
 func V108Table() roweval.Table[Selector] {
 	average := packReadIn(V108Profile, "average_temperature", "CAN 0x313", "storage.temperature.pack", "unit.kelvin", 10, "")
 	average.Read.ToRegistry.Numeric = &roweval.Affine{Num: 1, Den: 10, Add: kelvinOffset}
@@ -221,5 +222,5 @@ func EvaluateV108Frame(frame canbus.Frame, a roweval.Acquired[Selector]) (map[st
 	if reason := V108FrameDisposition(frame); reason != "" {
 		return nil, reason, nil
 	}
-	return evaluateAdmitted(V108Table(), frame, a)
+	return evaluateAdmitted(withCellBindings(V108Table()), frame, a)
 }

@@ -1,0 +1,177 @@
+[
+  {
+    "name": "resolved-voltage-v104-0x319",
+    "profile": "v104",
+    "identifier": 793,
+    "extended": false,
+    "data_hex": "000CE50CDA030901",
+    "cell_role": true,
+    "cell_resource": "cell.site-a.3",
+    "rows": {
+      "maximum_cell_voltage": {"native": "3301", "candidate": {"fact": "storage.cell.voltage_maximum", "unit": "unit.volt", "value": "3.301", "cell": "cell.site-a.3"}},
+      "minimum_cell_voltage": {"native": "3290", "candidate": {"fact": "storage.cell.voltage_minimum", "unit": "unit.volt", "value": "3.290", "cell": "cell.site-a.3"}}
+    }
+  },
+  {
+    "name": "unresolved-voltage-v104-0x319-no-role",
+    "profile": "v104",
+    "identifier": 793,
+    "extended": false,
+    "data_hex": "000CE50CDA030901",
+    "cell_role": false,
+    "cell_resource": "cell.site-a.3",
+    "rows": {
+      "maximum_cell_voltage": {"native": "3301", "candidate": null, "reason": "unresolved_role"},
+      "minimum_cell_voltage": {"native": "3290", "candidate": null, "reason": "unresolved_role"}
+    }
+  },
+  {
+    "name": "unresolved-voltage-v104-0x319-no-slot",
+    "profile": "v104",
+    "identifier": 793,
+    "extended": false,
+    "data_hex": "000CE50CDA030901",
+    "cell_role": true,
+    "cell_resource": null,
+    "rows": {
+      "maximum_cell_voltage": {"native": "3301", "candidate": null, "reason": "unresolved_slot"},
+      "minimum_cell_voltage": {"native": "3290", "candidate": null, "reason": "unresolved_slot"}
+    }
+  },
+  {
+    "name": "resolved-voltage-v108-0x319",
+    "profile": "v108",
+    "identifier": 793,
+    "extended": false,
+    "data_hex": "000CE50CDA030901",
+    "cell_role": true,
+    "cell_resource": "cell.site-a.3",
+    "rows": {
+      "maximum_cell_voltage": {"native": "3301", "candidate": {"fact": "storage.cell.voltage_maximum", "unit": "unit.volt", "value": "3.301", "cell": "cell.site-a.3"}},
+      "minimum_cell_voltage": {"native": "3290", "candidate": {"fact": "storage.cell.voltage_minimum", "unit": "unit.volt", "value": "3.290", "cell": "cell.site-a.3"}}
+    }
+  },
+  {
+    "name": "unresolved-voltage-v108-0x319-no-role",
+    "profile": "v108",
+    "identifier": 793,
+    "extended": false,
+    "data_hex": "000CE50CDA030901",
+    "cell_role": false,
+    "cell_resource": "cell.site-a.3",
+    "rows": {
+      "maximum_cell_voltage": {"native": "3301", "candidate": null, "reason": "unresolved_role"},
+      "minimum_cell_voltage": {"native": "3290", "candidate": null, "reason": "unresolved_role"}
+    }
+  },
+  {
+    "name": "resolved-voltage-monitor-04020000",
+    "profile": "monitor",
+    "identifier": 67239936,
+    "extended": true,
+    "data_hex": "E50CDA0C03000900",
+    "cell_role": true,
+    "cell_resource": "cell.site-a.3",
+    "rows": {
+      "maximum_cell_voltage": {"native": "3.301", "candidate": {"fact": "storage.cell.voltage_maximum", "unit": "unit.volt", "value": "3.301", "cell": "cell.site-a.3"}},
+      "minimum_cell_voltage": {"native": "3.290", "candidate": {"fact": "storage.cell.voltage_minimum", "unit": "unit.volt", "value": "3.290", "cell": "cell.site-a.3"}}
+    }
+  },
+  {
+    "name": "unresolved-voltage-monitor-04020000-no-role",
+    "profile": "monitor",
+    "identifier": 67239936,
+    "extended": true,
+    "data_hex": "E50CDA0C03000900",
+    "cell_role": false,
+    "cell_resource": "cell.site-a.3",
+    "rows": {
+      "maximum_cell_voltage": {"native": "3.301", "candidate": null, "reason": "unresolved_role"},
+      "minimum_cell_voltage": {"native": "3.290", "candidate": null, "reason": "unresolved_role"}
+    }
+  },
+  {
+    "name": "temperature-v104-0x313-positive-25C",
+    "profile": "v104",
+    "identifier": 787,
+    "extended": false,
+    "data_hex": "1388FF9C00FA6400",
+    "cell_role": true,
+    "cell_resource": "cell.site-a.1",
+    "rows": {
+      "maximum_cell_temperature": {"native": "250", "candidate": {"fact": "storage.temperature.cell", "unit": "unit.kelvin", "value": "298.15", "cell": "cell.site-a.1"}}
+    }
+  },
+  {
+    "name": "temperature-v104-0x313-negative-minus20C",
+    "profile": "v104",
+    "identifier": 787,
+    "extended": false,
+    "data_hex": "1388FF9CFF386400",
+    "cell_role": true,
+    "cell_resource": "cell.site-a.1",
+    "rows": {
+      "maximum_cell_temperature": {"native": "-200", "candidate": {"fact": "storage.temperature.cell", "unit": "unit.kelvin", "value": "253.15", "cell": "cell.site-a.1"}}
+    }
+  },
+  {
+    "name": "unresolved-temperature-v104-0x313-no-slot",
+    "profile": "v104",
+    "identifier": 787,
+    "extended": false,
+    "data_hex": "1388FF9CFF386400",
+    "cell_role": true,
+    "cell_resource": null,
+    "rows": {
+      "maximum_cell_temperature": {"native": "-200", "candidate": null, "reason": "unresolved_slot"}
+    }
+  },
+  {
+    "name": "unresolved-temperature-v104-0x313-no-role",
+    "profile": "v104",
+    "identifier": 787,
+    "extended": false,
+    "data_hex": "1388FF9CFF386400",
+    "cell_role": false,
+    "cell_resource": "cell.site-a.1",
+    "rows": {
+      "maximum_cell_temperature": {"native": "-200", "candidate": null, "reason": "unresolved_role"}
+    }
+  },
+  {
+    "name": "temperature-monitor-04030000-positive-25C",
+    "profile": "monitor",
+    "identifier": 67305472,
+    "extended": true,
+    "data_hex": "8A02900105000200",
+    "cell_role": true,
+    "cell_resource": "cell.site-a.5",
+    "rows": {
+      "maximum_cell_temperature": {"native": "25", "candidate": {"fact": "storage.temperature.cell", "unit": "unit.kelvin", "value": "298.15", "cell": "cell.site-a.5"}}
+    }
+  },
+  {
+    "name": "temperature-monitor-04030000-negative-minus2C",
+    "profile": "monitor",
+    "identifier": 67305472,
+    "extended": true,
+    "data_hex": "7C01900107000200",
+    "cell_role": true,
+    "cell_resource": "cell.site-a.7",
+    "rows": {
+      "maximum_cell_temperature": {"native": "-2", "candidate": {"fact": "storage.temperature.cell", "unit": "unit.kelvin", "value": "271.15", "cell": "cell.site-a.7"}}
+    }
+  },
+  {
+    "name": "unresolved-temperature-monitor-04030000-no-slot",
+    "profile": "monitor",
+    "identifier": 67305472,
+    "extended": true,
+    "data_hex": "8A02900105000200",
+    "cell_role": true,
+    "cell_resource": null,
+    "rows": {
+      "maximum_cell_temperature": {"native": "25", "candidate": null, "reason": "unresolved_slot"}
+    }
+  }
+]

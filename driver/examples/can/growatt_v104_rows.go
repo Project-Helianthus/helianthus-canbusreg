@@ -36,7 +36,6 @@ const (
 	packRole      = "pack"
 	packDimension = "storage.dimension.pack"
 	receivePolicy = "policy.can.example"
-	sohValidBit   = 63
 )
 
 func field(id uint32, extended bool, slice signalSlice, name, unit string) roweval.NativeRow[Selector] {
@@ -64,7 +63,7 @@ func scale(divisor int64) roweval.Convert {
 	return roweval.Convert{Numeric: &roweval.Affine{Num: 1, Den: divisor}}
 }
 
-func v104Rows() roweval.Table[Selector] {
+func v104Rows(descriptors roweval.Descriptors[Selector]) roweval.Table[Selector] {
 	soh := field(0x313, false, signalSlice{56, 7, bitSlice, false}, "state_of_health", "native.percent")
 	soh.Decode.Hook = "soh-validity"
 	return roweval.Table[Selector]{
@@ -87,16 +86,29 @@ func v104Rows() roweval.Table[Selector] {
 			packRead("state_of_charge", "CAN 0x313", "storage.state.soc", "unit.ratio", 100),
 			packRead("state_of_health", "CAN 0x313", "storage.state.soh", "unit.ratio", 100),
 		},
-		Hooks: map[string]roweval.RowHook{"soh-validity": sohValidity},
+		Hooks: map[string]roweval.RowHook{"soh-validity": sohValidity(descriptors)},
 	}
 }
 
-func sohValidity(inputs roweval.DetachedInputs, _ roweval.RowID, _ roweval.Direction, value roweval.TypedValue) (roweval.DerivedValue, roweval.Reason) {
-	payload := inputs.Inputs()[0].Payload
-	if payload[sohValidBit/8]&(1<<(sohValidBit%8)) == 0 {
-		return roweval.DerivedValue{}, "not valid"
+func sohValidity(descriptors roweval.Descriptors[Selector]) roweval.RowHook {
+	validity := field(0x313, false, signalSlice{63, 1, bitSlice, false}, "state_of_health_valid", "native.raw")
+	validity.Wire.Sentinels = map[uint64]string{0: "not valid"}
+	table := roweval.Table[Selector]{Native: []roweval.NativeRow[Selector]{validity}}
+	return func(inputs roweval.DetachedInputs, _ roweval.RowID, _ roweval.Direction, value roweval.TypedValue) (roweval.DerivedValue, roweval.Reason) {
+		ev, err := roweval.Evaluate(table, roweval.Acquired[Selector]{
+			Selector: validity.At, Payload: inputs.Inputs()[0].Payload, Descriptors: descriptors,
+		})
+		if err != nil || ev.Native == nil {
+			return roweval.DerivedValue{}, roweval.ReasonDecode
+		}
+		if ev.Native.Reason == roweval.ReasonSentinel {
+			return roweval.DerivedValue{}, roweval.Reason(ev.Native.Disposition)
+		}
+		if ev.Native.Reason != "" {
+			return roweval.DerivedValue{}, ev.Native.Reason
+		}
+		return roweval.DerivedValue{Value: value}, ""
 	}
-	return roweval.DerivedValue{Value: value}, ""
 }
 
 func canDescriptors() roweval.Descriptors[Selector] {
@@ -193,7 +205,7 @@ func evaluateV104(record receiver.Record, a roweval.Acquired[Selector]) (map[str
 	if reason := v104Disposition(e.Frame); reason != "" {
 		return nil, reason, nil
 	}
-	table := v104Rows()
+	table := v104Rows(canDescriptors())
 	out := make(map[string]roweval.Evaluation)
 	for _, row := range table.Native {
 		if row.At.Identifier != e.Frame.ID().Value() {

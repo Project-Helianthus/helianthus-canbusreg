@@ -29,10 +29,10 @@ type RelationRow struct {
 	Basis       semreg.RelationBasis
 }
 
-// BMSResourceRows returns the resource kinds of the BMS family: the battery,
+// ResourceRows returns the resource kinds of the BMS family: the battery,
 // its modules and its cells. The family publishes them unconditionally; the
 // function takes no switch and returns a fresh slice on every call.
-func BMSResourceRows() []ResourceRow {
+func ResourceRows() []ResourceRow {
 	return []ResourceRow{
 		{Kind: "resource.battery", Anchor: semreg.AnchorEquipment},
 		{Kind: "resource.battery_module", Anchor: semreg.AnchorComponent},
@@ -40,11 +40,11 @@ func BMSResourceRows() []ResourceRow {
 	}
 }
 
-// BMSRelationRows returns the three storage relations that connect the storage
+// RelationRows returns the three storage relations that connect the storage
 // system, the battery, the pack and the pack interface. The family publishes
 // them unconditionally; the function takes no switch and returns a fresh slice
 // on every call.
-func BMSRelationRows() []RelationRow {
+func RelationRows() []RelationRow {
 	return []RelationRow{
 		{
 			Definition:  storageRelation("storage.relation.system_battery"),

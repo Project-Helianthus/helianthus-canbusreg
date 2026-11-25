@@ -137,7 +137,7 @@ func graphRowGaps(resources []ResourceRow, relations []RelationRow) []string {
 }
 
 func TestBMSResourceRowsDeclareBatteryModuleAndCell(t *testing.T) {
-	rows := BMSResourceRows()
+	rows := ResourceRows()
 	elements := pinnedCatalog(t)
 	if len(rows) != len(wantResourceKinds) {
 		t.Fatalf("resource rows = %d, want %d", len(rows), len(wantResourceKinds))
@@ -167,7 +167,7 @@ func TestBMSRelationRowsUseTheCatalogDefinitionsAndBasis(t *testing.T) {
 		t.Fatalf("storage pack = %+v, want %+v", storage.Metadata().Pack, storagePack)
 	}
 	elements := pinnedCatalog(t)
-	rows := BMSRelationRows()
+	rows := RelationRows()
 	if len(rows) != len(wantRelationIDs) {
 		t.Fatalf("relation rows = %d, want %d", len(rows), len(wantRelationIDs))
 	}
@@ -202,29 +202,29 @@ func TestBMSRelationRowsUseTheCatalogDefinitionsAndBasis(t *testing.T) {
 }
 
 func TestBMSRelationRowsAreAlwaysPublishedWithNoSwitch(t *testing.T) {
-	var _ func() []ResourceRow = BMSResourceRows
-	var _ func() []RelationRow = BMSRelationRows
-	first := BMSRelationRows()
-	if gaps := graphRowGaps(BMSResourceRows(), first); len(gaps) != 0 {
+	var _ = (func() []ResourceRow)(ResourceRows)
+	var _ = (func() []RelationRow)(RelationRows)
+	first := RelationRows()
+	if gaps := graphRowGaps(ResourceRows(), first); len(gaps) != 0 {
 		t.Fatalf("published graph is incomplete: %v", gaps)
 	}
 	// Each call returns a fresh slice, so an edit of one result never changes the
 	// rows a later call publishes.
 	first[0].From = "resource.other"
 	first[0].Basis = semreg.RelationGateRule
-	again := BMSRelationRows()
+	again := RelationRows()
 	if again[0].From != "resource.storage_system" || again[0].Basis != semreg.RelationConfiguration {
 		t.Fatalf("second call returned an edited row: %+v", again[0])
 	}
-	resources := BMSResourceRows()
+	resources := ResourceRows()
 	resources[0].Kind = "resource.other"
-	if got := BMSResourceRows()[0].Kind; got != "resource.battery" {
+	if got := ResourceRows()[0].Kind; got != "resource.battery" {
 		t.Fatalf("second resource call returned an edited row: %s", got)
 	}
 }
 
 func TestBMSResourceAndRelationRowsFailWhenDeleted(t *testing.T) {
-	resources, relations := BMSResourceRows(), BMSRelationRows()
+	resources, relations := ResourceRows(), RelationRows()
 	if gaps := graphRowGaps(resources, relations); len(gaps) != 0 {
 		t.Fatalf("complete graph reports gaps: %v", gaps)
 	}

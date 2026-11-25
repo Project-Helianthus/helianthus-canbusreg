@@ -119,8 +119,10 @@ func Relation(name string, from, to driver.NodeRef, class semreg.RelationBasis, 
 	switch name {
 	case "air_supply":
 		allowed = class == semreg.RelationConfiguration
-	case "system_member", "refrigerant_circuit_member":
+	case "system_member":
 		allowed = class == semreg.RelationConfiguration || class == semreg.RelationGateRule
+	case "refrigerant_circuit_member":
+		allowed = class == semreg.RelationNativeObservation
 	case "generator_compressor":
 		allowed = class == semreg.RelationGateRule
 	}

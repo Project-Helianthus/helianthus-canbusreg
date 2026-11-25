@@ -78,10 +78,11 @@ func rawBitPattern(bytes []byte, bigEndianRow bool) uint64 {
 
 // v108Renamed maps a row name to the frozen report's field name where the two
 // differ: the pack fields, the average temperature, the lifetime alarm and the
-// frame number of 0x324, whose row name is distinct from that of 0x325.
+// frame number and battery identifier of 0x324, whose row names are distinct
+// from those of 0x325. The serial fragment has the report's own name.
 var v108Renamed = map[string]string{
 	"pack_voltage": "voltage", "pack_current": "current", "average_temperature": "average_battery_temperature",
-	"lifetime_alarm": "life_warning", "serial_frame_number": "frame_number",
+	"lifetime_alarm": "life_warning", "serial_frame_number": "frame_number", "serial_battery_id": "battery_id",
 }
 
 // v108Unnamed are the V1.08 rows the frozen report names no field for: the raw
@@ -156,10 +157,12 @@ func TestV108TableMatchesTheFrozenReportOnEveryIdentifierAndPattern(t *testing.T
 			if !admitted {
 				continue
 			}
+			layout := map[string]string{serialLayoutQualifier: serialLayoutOf(frame.Bytes()[0])}
 			for _, row := range table.Native {
-				if row.At.Identifier == id {
-					checkV108RowAgainstReport(t, row, evals[row.ID], fields)
+				if row.At.Identifier != id || len(rowsAppliedTo([]roweval.NativeRow[Selector]{row}, layout)) == 0 {
+					continue
 				}
+				checkV108RowAgainstReport(t, row, evals[row.ID], fields)
 			}
 		}
 	}

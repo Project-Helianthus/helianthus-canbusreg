@@ -403,23 +403,27 @@ func TestMonitorFamiliesMatchOnlyTheirOwnAddressedRows(t *testing.T) {
 				t.Fatalf("%s: row %s belongs to another family", v.name, id)
 			}
 		}
-		// The same bytes at another address: the BCU is the low byte of both
-		// forms, the BMU the bits 20 to 23 of the module form.
-		other := v
-		if v.id>>24 == 0x04 {
-			other.id ^= 0x1 // system form: the BCU is the low byte
-		} else {
-			other.id ^= 0x00100000 // module form: the BMU is bits 20 to 23
+		// The same bytes at another address. The BCU is the low byte of both
+		// forms and is varied for every frame; the BMU (bits 20 to 23) is varied
+		// for the module form too. Each variant must keep the family and must not
+		// give the frame any row through the table of the other address.
+		flips := []uint32{0x1} // the BCU, the low byte of both forms
+		if v.id>>24 != 0x04 {
+			flips = append(flips, 0x00100000) // the BMU, bits 20 to 23 of the module form
 		}
-		otherBase, ok := monitorBase(other.id)
-		if !ok || otherBase != base {
-			t.Fatalf("%s: other address %#x leaves the family", v.name, other.id)
-		}
-		if got := evaluateSelectorTable(t, v, MonitorTable(other.id), roles); len(got) != 0 {
-			t.Fatalf("%s: the table of address %#x evaluated a frame of %#x: %d rows", v.name, other.id, v.id, len(got))
-		}
-		if got := evaluateSelectorTable(t, other, MonitorTable(other.id), roles); len(got) != len(own) {
-			t.Fatalf("%s: the table of its own address gives %d rows, want %d", v.name, len(got), len(own))
+		for _, flip := range flips {
+			other := v
+			other.id ^= flip
+			otherBase, ok := monitorBase(other.id)
+			if !ok || otherBase != base {
+				t.Fatalf("%s: other address %#x leaves the family", v.name, other.id)
+			}
+			if got := evaluateSelectorTable(t, v, MonitorTable(other.id), roles); len(got) != 0 {
+				t.Fatalf("%s: the table of address %#x evaluated a frame of %#x: %d rows", v.name, other.id, v.id, len(got))
+			}
+			if got := evaluateSelectorTable(t, other, MonitorTable(other.id), roles); len(got) != len(own) {
+				t.Fatalf("%s: the table of its own address gives %d rows, want %d", v.name, len(got), len(own))
+			}
 		}
 		for _, row := range MonitorTable(v.id).Native {
 			if row.At.Identifier != v.id {

@@ -258,6 +258,14 @@ func rowNamesOf(profile string, evals map[string]roweval.Evaluation) []string {
 	return names
 }
 
+// rowMatches reports whether the row id is evaluated to a native value on the
+// frame. An evaluation with a reason, or a row whose selector did not match, is
+// not a match.
+func rowMatches(evals map[string]roweval.Evaluation, id string) bool {
+	ev, ok := evals[id]
+	return ok && ev.Native != nil && ev.Native.Reason == "" && ev.Native.Value != nil
+}
+
 // sameNames reports whether two name lists hold the same names, in any order.
 func sameNames(a, b []string) bool {
 	x := append([]string(nil), a...)
@@ -771,7 +779,8 @@ func TestEveryNativeRowIsNeededByAnIndependentVector(t *testing.T) {
 		}
 		prefix := selectorProfilePrefixes[v.profile]
 		full := fullSelectorTable(v.profile, v.scope, v.id)
-		if got := rowNamesOf(v.profile, evaluateSelectorTable(t, v, full, roles)); !sameNames(got, v.rows) {
+		fullEvals := evaluateSelectorTable(t, v, full, roles)
+		if got := rowNamesOf(v.profile, fullEvals); !sameNames(got, v.rows) {
 			t.Fatalf("%s: the live table evaluates rows %v, the frame declares %v", v.name, got, v.rows)
 		}
 		for _, name := range v.rows {
@@ -782,6 +791,9 @@ func TestEveryNativeRowIsNeededByAnIndependentVector(t *testing.T) {
 			}
 			if !found {
 				t.Errorf("%s: declared row %s is missing from the live table", v.name, id)
+			}
+			if !rowMatches(fullEvals, id) {
+				t.Errorf("%s: declared row %s gives no value on its admitted frame", v.name, id)
 			}
 		}
 		// Every live definition of the table is removed alone, by its position:
@@ -794,7 +806,10 @@ func TestEveryNativeRowIsNeededByAnIndependentVector(t *testing.T) {
 			reduced.Native = make([]roweval.NativeRow[Selector], 0, len(full.Native)-1)
 			reduced.Native = append(reduced.Native, full.Native[:i]...)
 			reduced.Native = append(reduced.Native, full.Native[i+1:]...)
-			if !sameNames(rowNamesOf(v.profile, evaluateSelectorTable(t, v, reduced, roles)), v.rows) {
+			// A witness must be a row that matches this admitted frame. A selector
+			// miss keeps its key in the evaluation map, so the key alone is not
+			// evidence that the removed row covers the frame.
+			if rowMatches(fullEvals, row.ID) && !sameNames(rowNamesOf(v.profile, evaluateSelectorTable(t, v, reduced, roles)), v.rows) {
 				witnessed[key] = true
 			}
 			removed++
@@ -840,4 +855,45 @@ func admittedStandardIdentifiers(t *testing.T, profile string) map[uint32]bool {
 		}
 	}
 	return ids
+}
+
+// TestDeletionWitnessNeedsAFrameThatMatchesTheRow pins the witness rule of the
+// deletion test: a row whose raw-DLC selector no longer matches an admitted
+// frame keeps its key in the evaluation, but it gives no value there and cannot
+// witness its own removal. The V1.08 reserved byte 7 row is moved to raw DLC 9
+// in a copy of the live table; the admitted vector that declares it must then
+// stop giving it a value.
+func TestDeletionWitnessNeedsAFrameThatMatchesTheRow(t *testing.T) {
+	roles := storageRoles(t)
+	const name = "v108-0x312-pack-count-1-and-byte-7-not-gated"
+	var vector selectorVector
+	found := false
+	for _, v := range readSelectorVectors(t) {
+		if v.name == name {
+			vector, found = v, true
+		}
+	}
+	if !found {
+		t.Fatalf("vector %s is not in the vector file", name)
+	}
+	id := V108Profile + ".reserved_byte_7"
+	live := V108Table()
+	if !rowMatches(evaluateSelectorTable(t, vector, live, roles), id) {
+		t.Fatalf("%s: the live row %s gives no value on its admitted frame", name, id)
+	}
+	mutated := V108Table()
+	mutated.Native = append([]roweval.NativeRow[Selector](nil), mutated.Native...)
+	moved := 0
+	for i := range mutated.Native {
+		if mutated.Native[i].ID == id {
+			mutated.Native[i].At.RawDLC = 9
+			moved++
+		}
+	}
+	if moved != 1 {
+		t.Fatalf("expected one live definition of %s, found %d", id, moved)
+	}
+	if rowMatches(evaluateSelectorTable(t, vector, mutated, roles), id) {
+		t.Fatalf("%s: the row with raw DLC 9 still gives a value on a raw DLC 8 frame", name)
+	}
 }

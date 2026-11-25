@@ -40,8 +40,9 @@ type vector struct {
 	Data       string           `json:"data_hex"`
 	Frame      string           `json:"frame"`
 	Native     map[string]int64 `json:"native"`
-	// Raw is the expected byte content, hex, of each opaque native row: a raw
-	// span with no qualified integer reading, which has no value.
+	// Raw is the expected byte content, hex in frame order, of each raw native
+	// row: a span the page leaves without a qualified byte order. The row's native
+	// raw is the bit pattern of those bytes and it produces no candidate.
 	Raw   map[string]string `json:"raw"`
 	Facts map[string]fact   `json:"facts"`
 	// Refused names the storage facts the pinned catalog refuses for this
@@ -160,8 +161,8 @@ func checkAdmitted(t *testing.T, v vector, table roweval.Table[Selector], frame 
 		if !ok || ev.Native == nil || ev.Native.RowID != row.ID {
 			t.Fatalf("%s: no native evaluation", name)
 		}
-		if row.Wire.Codec == opaqueCodec {
-			checkOpaque(t, v, name, row, frame, a, ev)
+		if _, raw := v.Raw[name]; raw {
+			checkRaw(t, v, name, row, frame, a, ev)
 			continue
 		}
 		want, listed := v.Native[name]
@@ -227,26 +228,45 @@ func checkAdmitted(t *testing.T, v vector, table roweval.Table[Selector], frame 
 	}
 }
 
-// checkOpaque compares an opaque row with the vector's bytes: the row has no
-// value and no candidate, its evidence is the raw source record, and the bytes
-// it keeps are the bytes of its slice, not a number read from them.
-func checkOpaque(t *testing.T, v vector, name string, row roweval.NativeRow[Selector], frame canbus.Frame, a roweval.Acquired[Selector], ev roweval.Evaluation) {
+// checkRaw compares a raw row with the vector's bytes. The evaluator's own
+// native output must carry the bytes of the slice: Native.Raw is the extracted
+// bit pattern, which for these four-byte bit slices is the little-endian integer
+// of the bytes in frame order. The row makes no candidate, and its evidence is
+// the raw source record.
+func checkRaw(t *testing.T, v vector, name string, row roweval.NativeRow[Selector], frame canbus.Frame, a roweval.Acquired[Selector], ev roweval.Evaluation) {
 	t.Helper()
 	want, listed := v.Raw[name]
 	if !listed {
 		t.Fatalf("%s: admitted frame has no expected raw bytes", name)
 	}
 	n := ev.Native
-	if n.Reason != reasonOpaque || n.Value != nil || ev.Candidate != nil {
-		t.Fatalf("%s: opaque row gave reason %q value %+v candidate %+v, want reason %q and no value", name, n.Reason, n.Value, ev.Candidate, reasonOpaque)
+	if n == nil || n.Reason != "" || n.Value == nil {
+		t.Fatalf("%s: raw row gave native %+v, want the bit pattern of its bytes", name, n)
+	}
+	if ev.Candidate != nil {
+		t.Fatalf("%s: raw row produced a candidate %+v", name, ev.Candidate)
 	}
 	if !reflect.DeepEqual(n.Evidence, a.Template.Evidence) {
 		t.Fatalf("%s: native evaluation lost the raw source record", name)
 	}
 	from := int(row.Wire.BitOffset) / 8
 	to := from + int(row.Wire.Width)/8
+	wantBytes, err := hex.DecodeString(want)
+	if err != nil || len(wantBytes) != to-from {
+		t.Fatalf("%s: vector bytes %q do not fill the %d-byte slice", name, want, to-from)
+	}
 	if got := hex.EncodeToString(frame.Data()[from:to]); got != strings.ToLower(want) {
-		t.Fatalf("%s: opaque bytes %s, want %s", name, got, strings.ToLower(want))
+		t.Fatalf("%s: frame bytes %s, want %s", name, got, strings.ToLower(want))
+	}
+	var bitPattern uint64
+	for i, b := range wantBytes {
+		bitPattern |= uint64(b) << (8 * uint(i))
+	}
+	if n.Raw != bitPattern {
+		t.Fatalf("%s: native raw %#x, want %#x from bytes %s", name, n.Raw, bitPattern, want)
+	}
+	if !decimalEquals(n.Value.Quantity.Number, fmt.Sprint(bitPattern)) {
+		t.Fatalf("%s: native value %+v, want the bit pattern %d", name, n.Value.Quantity.Number, bitPattern)
 	}
 }
 

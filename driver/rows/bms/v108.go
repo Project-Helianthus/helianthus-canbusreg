@@ -26,12 +26,22 @@ func v108BitRows(id uint32, byteIdx int, names ...string) []roweval.NativeRow[Se
 	return rows
 }
 
-// v108Rows are the native rows of the V1.08 frames 0x311 to 0x313. The shared
-// fields sit at the V1.04 slices; the divergent fields are the status word
-// with its states in bits 0 to 9, the derating bytes of 0x312 and the average
-// temperature and lifetime alarm of 0x313, as the frozen V1.08 report decoder
-// names them.
-// Bits 10 and 11 of the status word are reserved and stay in the raw word.
+// withDomain returns the row with its native value bounded to [lo, hi]. A value
+// outside the bounds gives the row no value, as the frozen decoder gives none.
+func withDomain(r roweval.NativeRow[Selector], lo, hi string) roweval.NativeRow[Selector] {
+	r.Domain = roweval.Bounds{Min: &semreg.Decimal{Coefficient: lo}, Max: &semreg.Decimal{Coefficient: hi}}
+	return r
+}
+
+// v108Rows are the native rows of the V1.08 frames 0x311 to 0x325 that the
+// frozen V1.08 report decoder emits. The shared fields sit at the V1.04 slices;
+// the divergent fields are the status word with its states in bits 0 to 9, the
+// derating bytes of 0x312, the average temperature and lifetime alarm of 0x313,
+// the identity, version and update fields and the cell extremes of the later
+// frames. Bits 10 and 11 of the status word are reserved and stay in the raw word.
+// The frames 0x324 and 0x325 carry the serial and history records; their rows
+// are the fields whose position the frame itself fixes (see the package report
+// for the conditional fields that have no row).
 func v108Rows() []roweval.NativeRow[Selector] {
 	rows := []roweval.NativeRow[Selector]{
 		nativeRowIn(V108Profile, 0x311, "charge_voltage_limit", signalSlice{0, 16, bigEndian, false}, "native.decivolt"),
@@ -49,7 +59,7 @@ func v108Rows() []roweval.NativeRow[Selector] {
 		nativeRowIn(V108Profile, 0x312, "protection_flags", signalSlice{0, 16, bigEndian, false}, "native.raw"),
 		nativeRowIn(V108Profile, 0x312, "warning_flags", signalSlice{16, 16, bigEndian, false}, "native.raw"),
 		nativeRowIn(V108Profile, 0x312, "pack_count", signalSlice{32, 8, bitSlice, false}, "native.count"),
-		opaqueRowIn(V108Profile, 0x312, "derating_reason", signalSlice{40, 16, bitSlice, false}, "native.raw"),
+		nativeRowIn(V108Profile, 0x312, "derating_reason", signalSlice{40, 16, bitSlice, false}, "native.raw"),
 		nativeRowIn(V108Profile, 0x312, "reserved_byte_7", signalSlice{56, 8, bitSlice, false}, "native.raw"),
 	)
 	rows = append(rows, v108BitRows(0x312, 0, "protection_soft_start_failure", "protection_module_undervoltage", "protection_module_overvoltage", "protection_cell_undervoltage", "protection_cell_overvoltage", "protection_short_circuit_discharge", "protection_charge_overcurrent", "protection_discharge_overcurrent")...)
@@ -69,15 +79,70 @@ func v108Rows() []roweval.NativeRow[Selector] {
 		nativeRowIn(V108Profile, 0x313, "soh", signalSlice{56, 7, bitSlice, false}, "native.percent"),
 		nativeRowIn(V108Profile, 0x313, "lifetime_alarm", signalSlice{63, 1, bitSlice, false}, "native.flag"),
 	)
-	return rows
-}
 
-// opaqueRowIn is the opaque native row of the named profile: a raw span with
-// no qualified integer reading.
-func opaqueRowIn(profile string, id uint32, name string, slice signalSlice, unit string) roweval.NativeRow[Selector] {
-	r := nativeRowIn(profile, id, name, slice, unit)
-	r.Wire.Codec = opaqueCodec
-	return r
+	// 0x314 to 0x318: the same layout as the V1.04 profile.
+	rows = append(rows, cellFrameRows(V108Profile)...)
+
+	// 0x319: the battery type code 3 is not a type the decoder names, so the
+	// row is bounded to 0 through 2 and gives no value for it.
+	rows = append(rows, withDomain(nativeRowIn(V108Profile, 0x319, "battery_type", signalSlice{0, 2, bitSlice, false}, "native.state"), "0", "2"))
+	rows = append(rows, v108BitRows(0x319, 0, "", "", "", "", "", "force_charge_request", "discharge_enable", "charge_enable")...)
+	rows = append(rows,
+		nativeRowIn(V108Profile, 0x319, "maximum_cell_voltage", signalSlice{8, 16, bigEndian, false}, "native.millivolt"),
+		nativeRowIn(V108Profile, 0x319, "minimum_cell_voltage", signalSlice{24, 16, bigEndian, false}, "native.millivolt"),
+		nativeRowIn(V108Profile, 0x319, "maximum_cell_index", signalSlice{40, 8, bitSlice, false}, "native.index"),
+		nativeRowIn(V108Profile, 0x319, "minimum_cell_index", signalSlice{48, 8, bitSlice, false}, "native.index"),
+		nativeRowIn(V108Profile, 0x319, "protected_pack_id", signalSlice{56, 8, bitSlice, false}, "native.index"),
+	)
+
+	// 0x320: manufacturer and hardware bytes, the little-endian software versions.
+	rows = append(rows,
+		nativeRowIn(V108Profile, 0x320, "manufacturer", signalSlice{0, 16, bigEndian, false}, "native.raw"),
+		nativeRowIn(V108Profile, 0x320, "hardware_version", signalSlice{16, 8, bitSlice, false}, "native.version"),
+		nativeRowIn(V108Profile, 0x320, "software_version", signalSlice{24, 16, littleEndian, false}, "native.version"),
+		nativeRowIn(V108Profile, 0x320, "highest_parallel_software_version", signalSlice{40, 16, littleEndian, false}, "native.version"),
+	)
+
+	// 0x321: update status and progress; the bytes the decoder names no field for
+	// stay raw.
+	rows = append(rows,
+		nativeRowIn(V108Profile, 0x321, "update_status", signalSlice{0, 8, bitSlice, false}, "native.raw"),
+		nativeRowIn(V108Profile, 0x321, "pack_progress", signalSlice{8, 8, bitSlice, false}, "native.percent"),
+		nativeRowIn(V108Profile, 0x321, "pack_programming_status", signalSlice{16, 8, bitSlice, false}, "native.state"),
+		nativeRowIn(V108Profile, 0x321, "reserved_bytes", signalSlice{24, 40, bitSlice, false}, "native.raw"),
+	)
+
+	// 0x322: the highest and lowest cell temperatures in 0.1 degree, their cell
+	// indices and the state of charge at each extreme. The frame names the cells
+	// by index; no binding resolves them to a cell subject.
+	rows = append(rows,
+		nativeRowIn(V108Profile, 0x322, "highest_cell_temperature", signalSlice{0, 16, bigEndian, true}, "native.decicelsius"),
+		nativeRowIn(V108Profile, 0x322, "lowest_cell_temperature", signalSlice{16, 16, bigEndian, true}, "native.decicelsius"),
+		nativeRowIn(V108Profile, 0x322, "highest_temperature_index", signalSlice{32, 8, bitSlice, false}, "native.index"),
+		nativeRowIn(V108Profile, 0x322, "lowest_temperature_index", signalSlice{40, 8, bitSlice, false}, "native.index"),
+		nativeRowIn(V108Profile, 0x322, "highest_soc", signalSlice{48, 8, bitSlice, false}, "native.percent"),
+		nativeRowIn(V108Profile, 0x322, "lowest_soc", signalSlice{56, 8, bitSlice, false}, "native.percent"),
+	)
+
+	// 0x323: the cell count, and the protection and warning bits the decoder
+	// names; the other bits of bytes 6 and 7 are reserved and have no row.
+	rows = append(rows, nativeRowIn(V108Profile, 0x323, "total_cell_count", signalSlice{0, 8, bitSlice, false}, "native.count"))
+	rows = append(rows, v108BitRows(0x323, 4, "protection_charge_overpower", "protection_discharge_overpower", "protection_external_communication_fault", "protection_precharge_failure", "protection_hardware_fault", "protection_analog_front_end_communication_fault", "protection_cell_lost", "protection_total_current_sample_fault")...)
+	rows = append(rows, v108BitRows(0x323, 5, "protection_total_voltage_sample_fault", "protection_load_side_voltage_sample_fault", "protection_calibration_parameter_load_fault", "protection_bus_reverse_connection", "protection_hardware_overvoltage", "protection_hardware_overcurrent", "protection_parallel_fault", "protection_primary_secondary_voltage_difference")...)
+	rows = append(rows, v108BitRows(0x323, 6, "protection_hardware_discharge_overcurrent", "protection_charge_limit_failure", "protection_discharge_limit_failure", "protection_main_path_open")...)
+	rows = append(rows, v108BitRows(0x323, 7, "warning_charge_overpower", "warning_discharge_overpower", "warning_internal_charge_circulation", "warning_internal_discharge_circulation")...)
+
+	// 0x324 and 0x325: the frame number. The battery number and the serial
+	// fragment of 0x324 depend on the frame number's value, which no row
+	// condition expresses, so they have no row (see the package report). The
+	// history bytes of 0x325 sit at a fixed position and stay raw.
+	rows = append(rows, nativeRowIn(V108Profile, 0x324, "serial_frame_number", signalSlice{0, 8, bitSlice, false}, "native.raw"))
+	rows = append(rows,
+		nativeRowIn(V108Profile, 0x325, "frame_number", signalSlice{0, 8, bitSlice, false}, "native.raw"),
+		nativeRowIn(V108Profile, 0x325, "battery_id", signalSlice{8, 8, bitSlice, false}, "native.index"),
+		nativeRowIn(V108Profile, 0x325, "history_bytes", signalSlice{16, 48, bitSlice, false}, "native.raw"),
+	)
+	return rows
 }
 
 // V108Table returns the native rows and the bindings of the V1.08 profile. The
@@ -88,8 +153,9 @@ func opaqueRowIn(profile string, id uint32, name string, slice signalSlice, unit
 // bindings declare no write; the V1.08 page documents no command that sets
 // these values.
 //
-// The protection and warning symbols and the device limits have no binding
-// here, as in the V1.04 table: they are listed in the package report.
+// The protection and warning symbols, the device limits and the cell
+// extremes and temperatures have no binding here, as in the V1.04 table: they
+// are listed in the package report.
 func V108Table() roweval.Table[Selector] {
 	average := packReadIn(V108Profile, "average_temperature", "CAN 0x313", "storage.temperature.pack", "unit.kelvin", 10, "")
 	average.Read.ToRegistry.Numeric = &roweval.Affine{Num: 1, Den: 10, Add: kelvinOffset}
@@ -105,23 +171,42 @@ func V108Table() roweval.Table[Selector] {
 	}
 }
 
-// V108FrameDisposition is the frame gate of the V1.08 profile, the frozen
-// growattV108Valid rule for frames 0x311 to 0x313: the count byte 4 of 0x312 is
+// V108FrameDisposition is the frame gate of the V1.08 profile: the frozen
+// growattV108Valid rule for the frames it admits. Count byte 4 of 0x312 is
 // admitted at 1 through 254 and byte 7 is not a count in this revision; the SOC
-// of 0x313 is admitted at 100 or less.
+// of 0x313 is admitted at 100 or less; the software version field of 0x320 is
+// admitted at 1 through 9 in byte 2; the SOC pair of 0x322 at 100 or less; the
+// cell count of 0x323 at 1 through 254; and the 0x321 progress byte at 100 or
+// less. The other admitted frames are admitted by identifier and geometry.
 func V108FrameDisposition(frame canbus.Frame) roweval.Reason {
 	if frame.ID().Extended() || frame.DLC() != 8 || frame.RawDLC() != 8 {
 		return roweval.ReasonNoMatch
 	}
 	p := frame.Bytes()
 	switch frame.ID().Value() {
-	case 0x311:
+	case 0x311, 0x314, 0x315, 0x316, 0x317, 0x318, 0x319, 0x324, 0x325:
 	case 0x312:
 		if p[4] < 1 || p[4] > 254 {
 			return "not valid"
 		}
 	case 0x313:
 		if p[6] > 100 {
+			return "not valid"
+		}
+	case 0x320:
+		if p[2] < 1 || p[2] > 9 {
+			return "not valid"
+		}
+	case 0x321:
+		if p[1] > 100 {
+			return "not valid"
+		}
+	case 0x322:
+		if p[6] > 100 || p[7] > 100 {
+			return "not valid"
+		}
+	case 0x323:
+		if p[0] < 1 || p[0] > 254 {
 			return "not valid"
 		}
 	default:

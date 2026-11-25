@@ -6,6 +6,7 @@ import (
 	"strconv"
 	"strings"
 
+	"github.com/Project-Helianthus/helianthus-canbus"
 	"github.com/Project-Helianthus/helianthus-semreg/semreg/v1"
 	"github.com/Project-Helianthus/helianthus-semreg/semreg/v1/roweval"
 )
@@ -35,11 +36,11 @@ const (
 	receivePolicy = "policy.can.example"
 	sohValidBit   = 63
 
-	// admit0x312 and admit0x313 are the frame admission hooks. They sit on
-	// every native row of their frame, so a frame that fails admission gives
-	// no decoded value and no binding candidate from any of its rows.
-	admit0x312 = "admit-0x312"
-	admit0x313 = "admit-0x313"
+	// packFrameHook and socFrameHook name the per-row admission hooks of
+	// frames 0x312 and 0x313. FrameDisposition gates the whole frame before any
+	// row is evaluated; the hooks are a second check on the same rule.
+	packFrameHook = "pack-frame-admission"
+	socFrameHook  = "soc-frame-admission"
 )
 
 func nativeRow(id uint32, name string, slice signalSlice, unit string) roweval.NativeRow[Selector] {
@@ -95,9 +96,9 @@ func V104Table() roweval.Table[Selector] {
 	for i := range rows {
 		switch rows[i].At.Identifier {
 		case 0x312:
-			rows[i].Decode.Hook = admit0x312
+			rows[i].Decode.Hook = packFrameHook
 		case 0x313:
-			rows[i].Decode.Hook = admit0x313
+			rows[i].Decode.Hook = socFrameHook
 		}
 	}
 	return roweval.Table[Selector]{
@@ -110,15 +111,70 @@ func V104Table() roweval.Table[Selector] {
 		},
 		Hooks: map[string]roweval.RowHook{
 			"soh-validity": sohValidity,
-			admit0x312:     admitFrame0x312,
-			admit0x313:     admitFrame0x313,
+			packFrameHook:  admitPackFrame,
+			socFrameHook:   admitSOCFrame,
 		},
 	}
 }
 
-// admitFrame0x312 is the frozen growattV104Valid rule for 0x312: both count
+// FrameDisposition is the frame-level admission of the V1.04 profile. It runs
+// before any native row of the frame is evaluated, so a rejected frame gives no
+// extracted field, no value and no candidate. A frame that matches no row gives
+// roweval.ReasonNoMatch; a frame of a listed identifier that fails the frozen
+// growattV104Valid rule gives "not valid".
+func FrameDisposition(frame canbus.Frame) roweval.Reason {
+	if frame.ID().Extended() || frame.DLC() != 8 || frame.RawDLC() != 8 {
+		return roweval.ReasonNoMatch
+	}
+	p := frame.Bytes()
+	switch frame.ID().Value() {
+	case 0x311:
+	case 0x312:
+		if p[4] < 1 || p[4] > 254 || p[7] < 1 || p[7] > 254 {
+			return "not valid"
+		}
+	case 0x313:
+		if p[6] > 100 {
+			return "not valid"
+		}
+	default:
+		return roweval.ReasonNoMatch
+	}
+	return ""
+}
+
+// EvaluateFrame gates the frame with FrameDisposition and, only when it is
+// admitted, evaluates every native row of the frame and its bindings. A
+// rejected frame returns the rejection and no evaluation: no sibling slice is
+// extracted from it.
+func EvaluateFrame(table roweval.Table[Selector], frame canbus.Frame, a roweval.Acquired[Selector]) (map[string]roweval.Evaluation, roweval.Reason, error) {
+	if reason := FrameDisposition(frame); reason != "" {
+		return nil, reason, nil
+	}
+	out := make(map[string]roweval.Evaluation)
+	for _, row := range table.Native {
+		if row.At.Identifier != frame.ID().Value() {
+			continue
+		}
+		ev, err := evaluateRow(table, frame, row, a)
+		if err != nil {
+			return nil, "", err
+		}
+		out[row.ID] = ev
+	}
+	return out, "", nil
+}
+
+func evaluateRow(table roweval.Table[Selector], frame canbus.Frame, row roweval.NativeRow[Selector], a roweval.Acquired[Selector]) (roweval.Evaluation, error) {
+	a.Selector = Selector{Identifier: frame.ID().Value(), Extended: frame.ID().Extended(), DLC: frame.DLC(), RawDLC: frame.RawDLC(), Slice: row.At.Slice}
+	a.Payload = frame.Data()
+	a.Descriptors = V104Descriptors()
+	return roweval.Evaluate(table, a)
+}
+
+// admitPackFrame is the frozen growattV104Valid rule for 0x312: both count
 // bytes (B4 and B7) in 1 through 254.
-func admitFrame0x312(inputs roweval.DetachedInputs, _ roweval.RowID, _ roweval.Direction, value roweval.TypedValue) (roweval.DerivedValue, roweval.Reason) {
+func admitPackFrame(inputs roweval.DetachedInputs, _ roweval.RowID, _ roweval.Direction, value roweval.TypedValue) (roweval.DerivedValue, roweval.Reason) {
 	p := inputs.Inputs()[0].Payload
 	if len(p) < 8 || p[4] < 1 || p[4] > 254 || p[7] < 1 || p[7] > 254 {
 		return roweval.DerivedValue{}, "not valid"
@@ -126,9 +182,9 @@ func admitFrame0x312(inputs roweval.DetachedInputs, _ roweval.RowID, _ roweval.D
 	return roweval.DerivedValue{Value: value}, ""
 }
 
-// admitFrame0x313 is the frozen growattV104Valid rule for 0x313: SOC (B6) at
+// admitSOCFrame is the frozen growattV104Valid rule for 0x313: SOC (B6) at
 // most 100.
-func admitFrame0x313(inputs roweval.DetachedInputs, _ roweval.RowID, _ roweval.Direction, value roweval.TypedValue) (roweval.DerivedValue, roweval.Reason) {
+func admitSOCFrame(inputs roweval.DetachedInputs, _ roweval.RowID, _ roweval.Direction, value roweval.TypedValue) (roweval.DerivedValue, roweval.Reason) {
 	p := inputs.Inputs()[0].Payload
 	if len(p) < 8 || p[6] > 100 {
 		return roweval.DerivedValue{}, "not valid"

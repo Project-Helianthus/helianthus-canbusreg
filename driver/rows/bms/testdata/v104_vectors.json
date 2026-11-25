@@ -67,6 +67,11 @@
         "value": "0.98",
         "unit": "unit.ratio",
         "subject": "pack"
+      },
+      "storage.pack.voltage": {
+        "value": "-1.00",
+        "unit": "unit.volt",
+        "subject": "pack"
       }
     }
   },
@@ -100,6 +105,11 @@
         "value": "0.98",
         "unit": "unit.ratio",
         "subject": "pack"
+      },
+      "storage.pack.voltage": {
+        "value": "-1.00",
+        "unit": "unit.volt",
+        "subject": "pack"
       }
     }
   },
@@ -127,6 +137,11 @@
       "storage.pack.current": {
         "value": "-10.0",
         "unit": "unit.ampere",
+        "subject": "pack"
+      },
+      "storage.pack.voltage": {
+        "value": "-1.00",
+        "unit": "unit.volt",
         "subject": "pack"
       }
     }
@@ -161,6 +176,11 @@
         "value": "1.00",
         "unit": "unit.ratio",
         "subject": "pack"
+      },
+      "storage.pack.voltage": {
+        "value": "-1.00",
+        "unit": "unit.volt",
+        "subject": "pack"
       }
     }
   },
@@ -180,11 +200,38 @@
     "data_hex": "00000000FE0000FE",
     "frame": "admitted",
     "native": {
-      "protection_flags": 0,
-      "warning_flags": 0,
-      "pack_count": 254,
       "manufacturer": 0,
-      "total_cell_count": 254
+      "pack_count": 254,
+      "protection_cell_overvoltage": 0,
+      "protection_cell_undervoltage": 0,
+      "protection_charge_overcurrent": 0,
+      "protection_charge_overtemperature": 0,
+      "protection_charge_undertemperature": 0,
+      "protection_delta_voltage_failure": 0,
+      "protection_discharge_overcurrent": 0,
+      "protection_discharge_overtemperature": 0,
+      "protection_discharge_undertemperature": 0,
+      "protection_flags": 0,
+      "protection_module_overvoltage": 0,
+      "protection_module_undervoltage": 0,
+      "protection_short_circuit_discharge": 0,
+      "protection_soft_start_failure": 0,
+      "protection_system_error": 0,
+      "total_cell_count": 254,
+      "warning_before_shutdown": 0,
+      "warning_cell_overvoltage": 0,
+      "warning_cell_undervoltage": 0,
+      "warning_charge_overcurrent": 0,
+      "warning_charge_overtemperature": 0,
+      "warning_charge_undertemperature": 0,
+      "warning_delta_voltage_failure": 0,
+      "warning_discharge_overcurrent": 0,
+      "warning_discharge_overtemperature": 0,
+      "warning_discharge_undertemperature": 0,
+      "warning_flags": 0,
+      "warning_internal_communication_failure": 0,
+      "warning_module_overvoltage": 0,
+      "warning_module_undervoltage": 0
     }
   },
   {
@@ -221,7 +268,7 @@
   },
   {
     "name": "neighbouring-identifier-is-not-matched",
-    "identifier": 788,
+    "identifier": 784,
     "extended": false,
     "dlc": 8,
     "data_hex": "FF9CFF9CFF3864E2",
@@ -269,11 +316,182 @@
     "data_hex": "0000000000000003",
     "frame": "admitted",
     "native": {
-      "charge_voltage_limit": 0,
+      "battery_terminal_open": 0,
+      "cell_balance": 0,
       "charge_current_limit": 0,
+      "charge_output": 0,
+      "charge_voltage_limit": 0,
       "discharge_current_limit": 0,
+      "discharge_output": 0,
+      "error_byte_valid": 0,
+      "master_operation_mode": 0,
+      "operating_state": 3,
+      "sleep": 0,
       "status_word": 3,
-      "operating_state": 3
+      "storage_system_state": 0
     }
+  },
+  {
+    "name": "named-protection-and-warning-bits-follow-their-byte",
+    "identifier": 786,
+    "extended": false,
+    "dlc": 8,
+    "data_hex": "8144028002000003",
+    "frame": "admitted",
+    "native": {
+      "protection_flags": 33092,
+      "warning_flags": 640,
+      "pack_count": 2,
+      "manufacturer": 0,
+      "total_cell_count": 3,
+      "protection_soft_start_failure": 1,
+      "protection_module_undervoltage": 0,
+      "protection_module_overvoltage": 0,
+      "protection_cell_undervoltage": 0,
+      "protection_cell_overvoltage": 0,
+      "protection_short_circuit_discharge": 0,
+      "protection_charge_overcurrent": 0,
+      "protection_discharge_overcurrent": 1,
+      "protection_delta_voltage_failure": 1,
+      "protection_system_error": 0,
+      "protection_charge_undertemperature": 0,
+      "protection_discharge_undertemperature": 0,
+      "protection_charge_overtemperature": 1,
+      "protection_discharge_overtemperature": 0,
+      "warning_module_undervoltage": 1,
+      "warning_module_overvoltage": 0,
+      "warning_cell_undervoltage": 0,
+      "warning_cell_overvoltage": 0,
+      "warning_charge_overcurrent": 0,
+      "warning_discharge_overcurrent": 0,
+      "warning_internal_communication_failure": 0,
+      "warning_before_shutdown": 0,
+      "warning_delta_voltage_failure": 0,
+      "warning_charge_undertemperature": 0,
+      "warning_discharge_undertemperature": 0,
+      "warning_charge_overtemperature": 0,
+      "warning_discharge_overtemperature": 1
+    },
+    "facts": {}
+  },
+  {
+    "name": "named-status-bits-and-operating-state-of-0x311",
+    "identifier": 785,
+    "extended": false,
+    "dlc": 8,
+    "data_hex": "0230006400320DFE",
+    "frame": "admitted",
+    "native": {
+      "charge_voltage_limit": 560,
+      "charge_current_limit": 100,
+      "discharge_current_limit": 50,
+      "status_word": 3582,
+      "operating_state": 2,
+      "error_byte_valid": 1,
+      "cell_balance": 1,
+      "sleep": 1,
+      "discharge_output": 1,
+      "charge_output": 1,
+      "battery_terminal_open": 1,
+      "master_operation_mode": 1,
+      "storage_system_state": 3
+    },
+    "facts": {}
+  },
+  {
+    "name": "capacity-spread-and-cycle-count-of-0x314",
+    "identifier": 788,
+    "extended": false,
+    "dlc": 8,
+    "data_hex": "0064010000050123",
+    "frame": "admitted",
+    "native": {
+      "remaining_capacity": 100,
+      "full_charge_capacity": 256,
+      "cell_voltage_spread": 5,
+      "cycle_count": 291
+    },
+    "facts": {}
+  },
+  {
+    "name": "cells-one-to-four-of-0x315",
+    "identifier": 789,
+    "extended": false,
+    "dlc": 8,
+    "data_hex": "0CE40CE50CE60CE7",
+    "frame": "admitted",
+    "native": {
+      "cell_voltage_1": 3300,
+      "cell_voltage_2": 3301,
+      "cell_voltage_3": 3302,
+      "cell_voltage_4": 3303
+    },
+    "facts": {}
+  },
+  {
+    "name": "cells-thirteen-to-sixteen-of-0x318",
+    "identifier": 792,
+    "extended": false,
+    "dlc": 8,
+    "data_hex": "0CEE0CEF0CF00CF1",
+    "frame": "admitted",
+    "native": {
+      "cell_voltage_13": 3310,
+      "cell_voltage_14": 3311,
+      "cell_voltage_15": 3312,
+      "cell_voltage_16": 3313
+    },
+    "facts": {}
+  },
+  {
+    "name": "cell-extrema-and-request-byte-of-0x319",
+    "identifier": 793,
+    "extended": false,
+    "dlc": 8,
+    "data_hex": "A20CF40CE8070C02",
+    "frame": "admitted",
+    "native": {
+      "battery_chemistry_code": 2,
+      "force_charge_request": 1,
+      "discharge_enable": 0,
+      "charge_enable": 1,
+      "maximum_cell_voltage": 3316,
+      "minimum_cell_voltage": 3304,
+      "maximum_cell_index": 7,
+      "minimum_cell_index": 12,
+      "protected_pack_id": 2
+    },
+    "facts": {}
+  },
+  {
+    "name": "identity-and-version-of-0x320",
+    "identifier": 800,
+    "extended": false,
+    "dlc": 8,
+    "data_hex": "4142030512345678",
+    "frame": "admitted",
+    "native": {
+      "manufacturer_identity": 16706,
+      "hardware_version": 3,
+      "software_version": 5,
+      "build_date_time": 2018915346
+    },
+    "facts": {}
+  },
+  {
+    "name": "update-state-and-reserved-bytes-of-0x321",
+    "identifier": 801,
+    "extended": false,
+    "dlc": 8,
+    "data_hex": "01400302DEADBEEF",
+    "frame": "admitted",
+    "native": {
+      "update_state": 1,
+      "pack_progress": 64,
+      "programming_pack_id": 3,
+      "successful_update_count": 2,
+      "reserved_bytes": 4022250974
+    },
+    "facts": {}
   }
 ]

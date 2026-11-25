@@ -5,6 +5,7 @@ import (
 	"encoding/binary"
 	"encoding/hex"
 	"encoding/json"
+	"errors"
 	"fmt"
 	"math/big"
 	"os"
@@ -14,6 +15,7 @@ import (
 	"github.com/Project-Helianthus/helianthus-canbus"
 	"github.com/Project-Helianthus/helianthus-canbusreg"
 	"github.com/Project-Helianthus/helianthus-semreg/semreg/v1"
+	"github.com/Project-Helianthus/helianthus-semreg/semreg/v1/packs/storage"
 	"github.com/Project-Helianthus/helianthus-semreg/semreg/v1/roweval"
 )
 
@@ -192,10 +194,12 @@ func checkAdmitted(t *testing.T, v vector, table roweval.Table[Selector], frame 
 	}
 }
 
-// TestNegativePackVoltageKeepsNativeAndWithholdsCandidate pins that a negative
-// pack voltage keeps its signed native value while no storage candidate is
-// produced: the pinned storage catalog bounds storage.pack.voltage at zero.
-func TestNegativePackVoltageKeepsNativeAndWithholdsCandidate(t *testing.T) {
+// TestNegativePackVoltageKeepsNativeAndIsRejectedAtIngestion pins that a
+// negative pack voltage keeps its signed native value and the signed pattern
+// gives the candidate with no hook. The pinned storage catalog bounds
+// storage.pack.voltage at zero, so the validator refuses that fact: the bound
+// is a stop item of the package report, not a hook of the table.
+func TestNegativePackVoltageKeepsNativeAndIsRejectedAtIngestion(t *testing.T) {
 	roles := storageRoles(t)
 	table := V104Table()
 	raw := vector{Identifier: 0x313, DLC: 8, Data: "FF9CFF9CFF3864E2"}.record(t)
@@ -211,33 +215,67 @@ func TestNegativePackVoltageKeepsNativeAndWithholdsCandidate(t *testing.T) {
 	if ev.Native == nil || ev.Native.Reason != "" || ev.Native.Value == nil || !decimalEquals(ev.Native.Value.Quantity.Number, "-100") {
 		t.Fatalf("native pack voltage lost its signed value: %+v", ev.Native)
 	}
-	if ev.Candidate != nil || ev.Reason != roweval.ReasonOutsideDomain {
-		t.Fatalf("negative pack voltage gave candidate %+v reason %q", ev.Candidate, ev.Reason)
+	if ev.Candidate == nil || ev.Reason != "" || !decimalEquals(ev.Candidate.Value.Quantity.Number, "-1.00") {
+		t.Fatalf("negative pack voltage candidate %+v reason %q, want the signed -1.00 V", ev.Candidate, ev.Reason)
+	}
+	assertRejectedAtIngestion(t, ev.Candidate, semreg.BoundsExceeded)
+}
+
+// TestV104TableHooksAreOnlyTheSignedSOHGate pins that the table names one hook,
+// the EX03 validity gate of the SOH binding, and no catalog-bound hook.
+func TestV104TableHooksAreOnlyTheSignedSOHGate(t *testing.T) {
+	table := V104Table()
+	if len(table.Hooks) != 1 || table.Hooks[sohValidityHook] == nil {
+		t.Fatalf("table hooks %v, want only %q", reflect.ValueOf(table.Hooks).MapKeys(), sohValidityHook)
+	}
+	for _, b := range table.Bindings {
+		if b.Read != nil && b.Read.ToRegistry.Hook != "" && b.Read.ToRegistry.Hook != sohValidityHook {
+			t.Fatalf("%s binds hook %q", b.NativeID, b.Read.ToRegistry.Hook)
+		}
 	}
 }
 
-// checkDecoderParity runs the frozen canbusreg V1.04 decoder on the same bytes,
-// with the other two frames of the profile in valid fixed form, and compares
-// its output with the vector. A frame the decoder rejects yields no projection.
+// decoderUnnamed lists the native rows the frozen decoder names no field for.
+// The page leaves bytes 4 to 7 of frame 0x321 unnamed: they stay raw rows and
+// their expectation is the byte value of the vector alone.
+var decoderUnnamed = map[string]bool{"reserved_bytes": true}
+
+// checkDecoderParity runs the frozen canbusreg decoders on the same bytes and
+// compares their output with the vector. The V1.04 profile gives frames 0x311
+// to 0x313 (fed with the other two frames in valid fixed form); the V1.04 report
+// decoder gives the named bits and the fields of frames 0x311 to 0x321. A frame
+// a decoder rejects yields no projection or report.
 func checkDecoderParity(t *testing.T, v vector, frame canbus.Frame) {
 	t.Helper()
 	if v.DecoderParity != nil && !*v.DecoderParity {
 		return
 	}
 	projection, ok := decoderProjection(t, frame)
+	report, reportOK := reportFields(t, frame)
 	id := frame.ID().Value()
 	switch v.Frame {
 	case "admitted":
-		if !ok {
-			t.Fatalf("frozen decoder gives no projection for an admitted frame")
+		if !reportOK {
+			t.Fatalf("frozen report decoder gives no fields for an admitted frame")
+		}
+		fields := report
+		for name, got := range projection {
+			fields[name] = got
 		}
 		for name, want := range v.Native {
-			if got := projection[name]; got != want {
+			got, named := fields[name]
+			if !named {
+				if decoderUnnamed[name] {
+					continue
+				}
+				t.Fatalf("frozen decoders name no field %s", name)
+			}
+			if got != want {
 				t.Fatalf("frozen decoder %s = %d, vector %d", name, got, want)
 			}
 		}
 	case "rejected":
-		if ok {
+		if ok || reportOK {
 			t.Fatalf("frozen decoder admits a frame the gate rejects")
 		}
 	case "no_match":
@@ -245,6 +283,60 @@ func checkDecoderParity(t *testing.T, v vector, frame canbus.Frame) {
 			t.Fatalf("frozen decoder admits a frame the table does not match")
 		}
 	}
+}
+
+// reportFields returns the fields the frozen V1.04 report decoder gives for one
+// frame, keyed by the row name the table uses for the same field. A raw field
+// is its bytes read big-endian for a two-byte span and little-endian for a
+// four-byte span, the integer the raw row extracts. The capacities are counts
+// of 10 mAh in the decoder and raw counts in the table.
+func reportFields(t *testing.T, target canbus.Frame) (map[string]int64, bool) {
+	t.Helper()
+	iface, err := canbus.NewInterfaceIdentity("can0", 1)
+	if err != nil {
+		t.Fatal(err)
+	}
+	profile, err := canbusreg.NewGrowattBMSProfile(iface, canbusreg.BMSRevisionV104)
+	if err != nil {
+		t.Fatal(err)
+	}
+	report, ok := profile.Classify(canbusreg.Evidence{Frame: target, Interface: iface, Sequence: 1}).Projection.(canbusreg.GrowattBMSReport)
+	if !ok {
+		return map[string]int64{}, false
+	}
+	out := make(map[string]int64, len(report.Fields))
+	for name, f := range report.Fields {
+		out[reportRowName(target.ID().Value(), name)] = reportValue(name, f)
+	}
+	return out, true
+}
+
+// reportRowName maps a report field name to the table's row name. The 0x320
+// manufacturer bytes carry the identity row, not the 0x312 manufacturer row.
+func reportRowName(id uint32, name string) string {
+	switch {
+	case id == 0x320 && name == "manufacturer":
+		return "manufacturer_identity"
+	case name == "voltage":
+		return "pack_voltage"
+	case name == "current":
+		return "pack_current"
+	}
+	return name
+}
+
+// reportValue is the integer the table's raw row extracts for one report field.
+func reportValue(name string, f canbusreg.GrowattReportField) int64 {
+	switch len(f.Raw) {
+	case 2:
+		return int64(binary.BigEndian.Uint16(f.Raw))
+	case 4:
+		return int64(binary.LittleEndian.Uint32(f.Raw))
+	}
+	if name == "remaining_capacity" || name == "full_charge_capacity" {
+		return f.Numerator / 10
+	}
+	return f.Numerator
 }
 
 // siblingData are fixed valid bytes for the two frames of the profile that the
@@ -364,10 +456,11 @@ func acquired(raw []byte, roles roweval.Roles) roweval.Acquired[Selector] {
 		Coordinates: map[string]string{packSlot: "pack.site-a"}}
 }
 
-// TestSOHAboveStorageBoundKeepsNativeAndWithholdsCandidate pins that a valid
-// SOH of 101 keeps its native value and validity while no storage candidate is
-// produced: the storage pack bounds storage.state.soh at one.
-func TestSOHAboveStorageBoundKeepsNativeAndWithholdsCandidate(t *testing.T) {
+// TestSOHAboveStorageBoundKeepsNativeAndIsRejectedAtIngestion pins that a valid
+// SOH of 101 keeps its native value and validity, and that the signed validity
+// gate gives the candidate. The storage pack bounds storage.state.soh at one,
+// so the validator refuses that fact; the bound is a stop item of the report.
+func TestSOHAboveStorageBoundKeepsNativeAndIsRejectedAtIngestion(t *testing.T) {
 	roles := storageRoles(t)
 	table := V104Table()
 	raw := vector{Identifier: 0x313, DLC: 8, Data: "FF9CFF9CFF3864E5"}.record(t)
@@ -387,9 +480,10 @@ func TestSOHAboveStorageBoundKeepsNativeAndWithholdsCandidate(t *testing.T) {
 	if valid.Native == nil || valid.Native.Value == nil || !decimalEquals(valid.Native.Value.Quantity.Number, "1") {
 		t.Fatalf("native SOH validity lost: %+v", valid.Native)
 	}
-	if soh.Candidate != nil || soh.Reason != roweval.ReasonOutsideDomain {
-		t.Fatalf("SOH 101 gave candidate %+v reason %q", soh.Candidate, soh.Reason)
+	if soh.Candidate == nil || soh.Reason != "" || !decimalEquals(soh.Candidate.Value.Quantity.Number, "1.01") {
+		t.Fatalf("SOH 101 candidate %+v reason %q, want the signed 1.01", soh.Candidate, soh.Reason)
 	}
+	assertRejectedAtIngestion(t, soh.Candidate, semreg.BoundsExceeded)
 }
 
 // TestPackFactKeyCarriesConfiguredPackResource pins that the fact key of a pack
@@ -521,47 +615,29 @@ func TestUnresolvedPackKeepsNativeRowsAndEvidence(t *testing.T) {
 	}
 }
 
-// storageRoles reads the storage pack's service, capability and fact
-// definitions from the element catalog of this repository.
+// storageRoles returns the role bindings of the synthetic pack and the catalog
+// the host supplies: the definitions of the pinned storage pack, as its own
+// validator lists them. The references the table names must resolve there.
 func storageRoles(t *testing.T) roweval.Roles {
 	t.Helper()
-	type catalogRef struct {
-		ID    semreg.DefinitionID
-		Owner struct{ Pack semreg.PackRef }
-	}
-	raw, err := os.ReadFile("../../../driverdata/families/mapping-gates/element-catalog.json")
-	if err != nil {
-		t.Fatal(err)
-	}
-	var catalog struct {
-		Elements []struct {
-			Ref        catalogRef
-			Kind       string `json:"element_kind"`
-			Attributes struct {
-				FactKeyDimension catalogRef `json:"fact_key_dimension"`
-			}
-		}
-	}
-	if err := json.Unmarshal(raw, &catalog); err != nil {
-		t.Fatal(err)
-	}
-	index := semreg.DefinitionIndex{Pack: semreg.PackRef{ID: "helianthus.pack.storage", Version: "1.1.0"}}
-	for _, e := range catalog.Elements {
-		if e.Ref.Owner.Pack != index.Pack {
-			continue
-		}
-		ref := semreg.DefinitionRef{Pack: index.Pack, ID: e.Ref.ID}
-		switch e.Kind {
-		case "service":
-			if e.Ref.ID == "storage.service.pack" {
-				index.Services = append(index.Services, ref)
-			}
-		case "capability":
-			index.Capabilities = append(index.Capabilities, ref)
-		case "fact":
-			index.Fields = append(index.Fields, ref)
-		}
-	}
 	capability := semreg.CapabilityInstanceID("capability.synthetic.pack")
-	return roweval.Roles{Subjects: map[string]roweval.RoleBinding{"pack": {ServiceInstance: "service.synthetic.pack", CapabilityInstance: &capability}}, Catalog: []semreg.DefinitionIndex{index}}
+	return roweval.Roles{
+		Subjects: map[string]roweval.RoleBinding{"pack": {ServiceInstance: "service.synthetic.pack", CapabilityInstance: &capability}},
+		Catalog:  []semreg.DefinitionIndex{storage.New().Definitions()},
+	}
+}
+
+// assertRejectedAtIngestion pins that the pinned storage validator refuses the
+// candidate's fact: a value outside the catalog bound is not admitted as a
+// fact, whatever the row that produced it.
+func assertRejectedAtIngestion(t *testing.T, c *semreg.FactCandidate, want semreg.ErrorID) {
+	t.Helper()
+	if c == nil || c.Value == nil {
+		t.Fatalf("no candidate value to validate")
+	}
+	err := storage.New().ValidateFact(c.Key, c.Value)
+	var e *semreg.Error
+	if !errors.As(err, &e) || e.ID != want {
+		t.Fatalf("storage validator error %v, want %s", err, want)
+	}
 }

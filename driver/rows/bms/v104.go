@@ -43,16 +43,15 @@ const (
 	packDimension = "storage.dimension.pack"
 	sohValidBit   = 63
 
+	// storageDefinitionVersion is the version of the storage pack definitions
+	// the pinned SemReg module carries. Every definition reference the table
+	// names carries it, as the catalog's own references do.
+	storageDefinitionVersion = "1.1.0"
+
 	// sohValidityHook is the validity-bit gate of the SOH binding, the same
 	// hook the EX03 exemplar signs. Frame admission is FrameDisposition, not a
 	// row hook.
 	sohValidityHook = "soh-validity"
-	// voltageHook and the SOH bound of sohValidity keep a candidate-only
-	// domain: the storage catalog bounds storage.pack.voltage below at zero and
-	// storage.state.soh above at one. No signed row pattern expresses a
-	// candidate-only bound, so these two hooks are an open stop item (see the
-	// report of this package); the native rows keep the signed values.
-	voltageHook = "pack-voltage-nonnegative"
 )
 
 func nativeRow(id uint32, name string, slice signalSlice, unit string) roweval.NativeRow[Selector] {
@@ -69,8 +68,26 @@ func nativeRow(id uint32, name string, slice signalSlice, unit string) roweval.N
 	}
 }
 
+// bitRow is the native row of one bit: bit of the byte at byteIdx.
+func bitRow(id uint32, byteIdx, bit int, name string) roweval.NativeRow[Selector] {
+	return nativeRow(id, name, signalSlice{offset: uint16(8*byteIdx + bit), width: 1, order: bitSlice}, "native.flag")
+}
+
+// bitRows returns one native row per named bit of the byte at byteIdx, bit
+// index i being names[i]. An empty name is a reserved or unnamed bit: it has
+// no row and stays inside the raw word rows.
+func bitRows(id uint32, byteIdx int, names ...string) []roweval.NativeRow[Selector] {
+	var rows []roweval.NativeRow[Selector]
+	for bit, name := range names {
+		if name != "" {
+			rows = append(rows, bitRow(id, byteIdx, bit, name))
+		}
+	}
+	return rows
+}
+
 func storageRef(id semreg.DefinitionID) semreg.DefinitionRef {
-	return semreg.DefinitionRef{Pack: semreg.PackRef{ID: "helianthus.pack.storage", Version: "1.1.0"}, ID: id}
+	return semreg.DefinitionRef{Pack: semreg.PackRef{ID: "helianthus.pack.storage", Version: storageDefinitionVersion}, ID: id, Version: storageDefinitionVersion}
 }
 
 func packRead(name, ref string, fact, unit semreg.DefinitionID, divisor int64, hook string) roweval.BindingRow {
@@ -114,11 +131,16 @@ func withoutEmptyPackSlot(c map[string]string) map[string]string {
 	return out
 }
 
-// V104Table returns the native rows of frames 0x311 to 0x313 and the bindings
-// that feed storage elements from them. The table enforces frame admission
-// itself: a 0x312 frame whose count bytes are outside 1 through 254, or a 0x313
-// frame whose SOC is above 100, yields its native rows with a reason and no
-// value, and no candidate.
+// V104Table returns the native rows of the V1.04 frames 0x311 to 0x321 and the
+// bindings that feed storage elements from frames 0x311 to 0x313. The table
+// enforces frame admission itself: a 0x312 frame whose count bytes are outside
+// 1 through 254, or a 0x313 frame whose SOC is above 100, yields no rows.
+//
+// The bindings are the signed EX03 patterns and their pack-voltage sibling.
+// Values with no signed pattern are not bound here and are listed in the
+// package report as stop items: the protection, warning and interlock symbols,
+// the operating-state symbols, the device limits, the power product, the cell
+// extrema and the resource and relation rows.
 func V104Table() roweval.Table[Selector] {
 	rows := []roweval.NativeRow[Selector]{
 		nativeRow(0x311, "charge_voltage_limit", signalSlice{0, 16, bigEndian, false}, "native.decivolt"),
@@ -138,19 +160,82 @@ func V104Table() roweval.Table[Selector] {
 		nativeRow(0x313, "soh", signalSlice{56, 7, bitSlice, false}, "native.percent"),
 		nativeRow(0x313, "soh_valid", signalSlice{63, 1, bitSlice, false}, "native.flag"),
 	}
+	rows = append(rows, v104NamedRows()...)
 	return roweval.Table[Selector]{
 		Native: rows,
 		Bindings: []roweval.BindingRow{
 			packRead("pack_current", "CAN 0x313", "storage.pack.current", "unit.ampere", 10, ""),
-			packRead("pack_voltage", "CAN 0x313", "storage.pack.voltage", "unit.volt", 100, voltageHook),
+			packRead("pack_voltage", "CAN 0x313", "storage.pack.voltage", "unit.volt", 100, ""),
 			packRead("soc", "CAN 0x313", "storage.state.soc", "unit.ratio", 100, ""),
 			packRead("soh", "CAN 0x313", "storage.state.soh", "unit.ratio", 100, sohValidityHook),
 		},
 		Hooks: map[string]roweval.RowHook{
 			sohValidityHook: sohValidity,
-			voltageHook:     nonNegativeVoltage,
 		},
 	}
+}
+
+// v104NamedRows returns the native rows of the named status bits, the
+// 0x314 to 0x321 fields and the raw spans of the V1.04 frames, with the slice
+// and codec the frozen report decoder names for each (DD03, V1.04 report).
+func v104NamedRows() []roweval.NativeRow[Selector] {
+	var rows []roweval.NativeRow[Selector]
+	// 0x311: byte 7 bits 0 and 1 are operating_state; bits 2 to 7 are named.
+	rows = append(rows, bitRows(0x311, 7, "", "", "error_byte_valid", "cell_balance", "sleep", "discharge_output", "charge_output", "battery_terminal_open")...)
+	rows = append(rows,
+		nativeRow(0x311, "master_operation_mode", signalSlice{48, 2, bitSlice, false}, "native.state"),
+		nativeRow(0x311, "storage_system_state", signalSlice{50, 2, bitSlice, false}, "native.state"),
+	)
+	// 0x312: the protection and warning bytes, one row per named bit. Bits the
+	// page leaves reserved (byte 1 bits 0 and 1, byte 2 bits 0 and 5, byte 3
+	// bit 3) have no row and stay in the raw word rows.
+	rows = append(rows, bitRows(0x312, 0, "protection_soft_start_failure", "protection_module_undervoltage", "protection_module_overvoltage", "protection_cell_undervoltage", "protection_cell_overvoltage", "protection_short_circuit_discharge", "protection_charge_overcurrent", "protection_discharge_overcurrent")...)
+	rows = append(rows, bitRows(0x312, 1, "", "", "protection_delta_voltage_failure", "protection_system_error", "protection_charge_undertemperature", "protection_discharge_undertemperature", "protection_charge_overtemperature", "protection_discharge_overtemperature")...)
+	rows = append(rows, bitRows(0x312, 2, "", "warning_module_undervoltage", "warning_module_overvoltage", "warning_cell_undervoltage", "warning_cell_overvoltage", "", "warning_charge_overcurrent", "warning_discharge_overcurrent")...)
+	rows = append(rows, bitRows(0x312, 3, "warning_internal_communication_failure", "warning_before_shutdown", "warning_delta_voltage_failure", "", "warning_charge_undertemperature", "warning_discharge_undertemperature", "warning_charge_overtemperature", "warning_discharge_overtemperature")...)
+	// 0x314: capacities are counts of 10 mAh; the cell voltage spread is in mV.
+	rows = append(rows,
+		nativeRow(0x314, "remaining_capacity", signalSlice{0, 16, bigEndian, false}, "native.decamilliampere_hour"),
+		nativeRow(0x314, "full_charge_capacity", signalSlice{16, 16, bigEndian, false}, "native.decamilliampere_hour"),
+		nativeRow(0x314, "cell_voltage_spread", signalSlice{32, 16, bigEndian, false}, "native.millivolt"),
+		nativeRow(0x314, "cycle_count", signalSlice{48, 16, bigEndian, false}, "native.count"),
+	)
+	// 0x315 to 0x318: cells 1 to 16, four big-endian words per frame.
+	for id := uint32(0x315); id <= 0x318; id++ {
+		for i := 0; i < 4; i++ {
+			cell := 4*(id-0x315) + uint32(i) + 1
+			rows = append(rows, nativeRow(id, fmt.Sprintf("cell_voltage_%d", cell), signalSlice{uint16(16 * i), 16, bigEndian, false}, "native.millivolt"))
+		}
+	}
+	// 0x319: the request byte, the cell extrema and the protected pack.
+	rows = append(rows,
+		nativeRow(0x319, "battery_chemistry_code", signalSlice{0, 2, bitSlice, false}, "native.code"),
+		bitRow(0x319, 0, 5, "force_charge_request"),
+		bitRow(0x319, 0, 6, "discharge_enable"),
+		bitRow(0x319, 0, 7, "charge_enable"),
+		nativeRow(0x319, "maximum_cell_voltage", signalSlice{8, 16, bigEndian, false}, "native.millivolt"),
+		nativeRow(0x319, "minimum_cell_voltage", signalSlice{24, 16, bigEndian, false}, "native.millivolt"),
+		nativeRow(0x319, "maximum_cell_index", signalSlice{40, 8, bitSlice, false}, "native.index"),
+		nativeRow(0x319, "minimum_cell_index", signalSlice{48, 8, bitSlice, false}, "native.index"),
+		nativeRow(0x319, "protected_pack_id", signalSlice{56, 8, bitSlice, false}, "native.index"),
+	)
+	// 0x320: identity and version; the packed build date and time stay raw
+	// because the page leaves their field positions and byte order unspecified.
+	rows = append(rows,
+		nativeRow(0x320, "manufacturer_identity", signalSlice{0, 16, bigEndian, false}, "native.raw"),
+		nativeRow(0x320, "hardware_version", signalSlice{16, 8, bitSlice, false}, "native.version"),
+		nativeRow(0x320, "software_version", signalSlice{24, 8, bitSlice, false}, "native.version"),
+		nativeRow(0x320, "build_date_time", signalSlice{32, 32, bitSlice, false}, "native.raw"),
+	)
+	// 0x321: update state and progress; the bytes the page leaves unnamed stay raw.
+	rows = append(rows,
+		nativeRow(0x321, "update_state", signalSlice{0, 8, bitSlice, false}, "native.state"),
+		nativeRow(0x321, "pack_progress", signalSlice{8, 8, bitSlice, false}, "native.raw"),
+		nativeRow(0x321, "programming_pack_id", signalSlice{16, 8, bitSlice, false}, "native.index"),
+		nativeRow(0x321, "successful_update_count", signalSlice{24, 8, bitSlice, false}, "native.count"),
+		nativeRow(0x321, "reserved_bytes", signalSlice{32, 32, bitSlice, false}, "native.raw"),
+	)
+	return rows
 }
 
 // FrameDisposition is the frame-level admission of the V1.04 profile. It runs
@@ -173,6 +258,8 @@ func FrameDisposition(frame canbus.Frame) roweval.Reason {
 		if p[6] > 100 {
 			return "not valid"
 		}
+	case 0x314, 0x315, 0x316, 0x317, 0x318, 0x319, 0x320, 0x321:
+		// The frozen V1.04 rule admits these frames by geometry alone.
 	default:
 		return roweval.ReasonNoMatch
 	}
@@ -235,26 +322,15 @@ func evaluateRow(table roweval.Table[Selector], frame canbus.Frame, row roweval.
 // supplied by the caller.
 const unresolvedSlot roweval.Reason = "unresolved_slot"
 
-// nonNegativeVoltage withholds a negative pack voltage from the storage
-// candidate. The catalog bound of storage.pack.voltage is zero; the native
-// signed row is unchanged.
-func nonNegativeVoltage(_ roweval.DetachedInputs, _ roweval.RowID, _ roweval.Direction, value roweval.TypedValue) (roweval.DerivedValue, roweval.Reason) {
-	if value.Quantity != nil && strings.HasPrefix(value.Quantity.Number.Coefficient, "-") {
-		return roweval.DerivedValue{}, roweval.ReasonOutsideDomain
-	}
-	return roweval.DerivedValue{Value: value}, ""
-}
-
 // sohValidity admits the SOH candidate only when the frame's validity bit (B7
-// bit 7) is set and the SOH value is within the storage ratio bound of 1
-// (SOH 0 through 100). The native SOH row is kept regardless.
+// bit 7) is set. It is the signed EX03 gate and nothing more: a valid SOH above
+// the catalog bound of storage.state.soh is not withheld here. The pinned
+// storage validator refuses that fact at ingestion, and the report lists it.
+// The native SOH row is kept regardless of the bit.
 func sohValidity(inputs roweval.DetachedInputs, _ roweval.RowID, _ roweval.Direction, value roweval.TypedValue) (roweval.DerivedValue, roweval.Reason) {
 	payload := inputs.Inputs()[0].Payload
 	if payload[sohValidBit/8]&(1<<(sohValidBit%8)) == 0 {
 		return roweval.DerivedValue{}, "not valid"
-	}
-	if payload[7]&0x7f > 100 {
-		return roweval.DerivedValue{}, roweval.ReasonOutsideDomain
 	}
 	return roweval.DerivedValue{Value: value}, ""
 }

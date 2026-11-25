@@ -135,9 +135,10 @@ func monitorNativeRow(id uint32, f monitorField) roweval.NativeRow[Selector] {
 // of another. A monitor identifier whose base has no layout gives an empty table.
 //
 // The bindings are the internal pack voltage and the internal pack current of
-// the first family only. The cell extrema, the cell temperature, the usable
-// state of charge and health, the protection words, the device limits and the
-// cumulative counters are not bound here; see the package report.
+// the first family. The cell extrema of the second family and the maximum cell
+// temperature of the third family are bound by cellBindings, to a resolved cell
+// only. The usable state of charge and health, the protection words, the device
+// limits and the cumulative counters are not bound here; see the package report.
 func MonitorTable(identifier uint32) roweval.Table[Selector] {
 	base, ok := monitorBase(identifier)
 	if !ok {
@@ -152,7 +153,8 @@ func MonitorTable(identifier uint32) roweval.Table[Selector] {
 		rows = append(rows, monitorNativeRow(identifier, f))
 	}
 	t := roweval.Table[Selector]{Native: rows}
-	if base == 0x04010000 {
+	switch base {
+	case 0x04010000:
 		t.Bindings = []roweval.BindingRow{
 			packReadIn(MonitorProfile, "internal_pack_voltage", "addressed monitor 0x04010000", "storage.pack.voltage", "unit.volt", 1, ""),
 			packReadIn(MonitorProfile, "current", "addressed monitor 0x04010000", "storage.pack.current", "unit.ampere", 1, ""),
@@ -167,7 +169,7 @@ func EvaluateMonitorFrame(frame canbus.Frame, a roweval.Acquired[Selector]) (map
 	if reason := MonitorFrameDisposition(frame); reason != "" {
 		return nil, reason, nil
 	}
-	return evaluateAdmitted(MonitorTable(frame.ID().Value()), frame, a)
+	return evaluateAdmitted(withCellBindings(MonitorTable(frame.ID().Value())), frame, a)
 }
 
 // monitorLayouts are the live fields of the addressed monitor families, keyed by the

@@ -116,6 +116,17 @@ func packReadIn(profile, name, ref string, fact, unit semreg.DefinitionID, divis
 			ToRegistry: roweval.Convert{Numeric: &roweval.Affine{Num: 1, Den: divisor}, Hook: hook}}}
 }
 
+// cellReadIn binds the named native row of the profile to a cell fact of the
+// cell subject role. The conversion is the affine the caller states, applied to
+// the decoded native value. The binding declares no write.
+func cellReadIn(profile, name, ref string, fact, unit semreg.DefinitionID, conv roweval.Affine) roweval.BindingRow {
+	return roweval.BindingRow{NativeID: profile + "." + name, SubjectRole: cellRole, SpecRef: ref,
+		Service: storageRef("storage.service.cell"), Capability: storageRef("storage.capability.read.cell"),
+		Read: &roweval.ReadRow{Fact: storageRef(fact), Unit: unit,
+			Dimensions: map[semreg.DefinitionID]string{cellDimension: cellSlot},
+			ToRegistry: roweval.Convert{Numeric: &conv}}}
+}
+
 // withPolicy returns the table with every read row bound to the freshness
 // policy of the caller's template, the source policy the host applies. The
 // table itself names no policy.
@@ -133,18 +144,19 @@ func withPolicy(t roweval.Table[Selector], policy semreg.PolicyID) roweval.Table
 	return t
 }
 
-// withoutEmptyPackSlot removes a pack coordinate that is present with an empty
-// value, so the evaluator reports the pack as unresolved instead of emitting a
-// fact key with an empty pack dimension.
-func withoutEmptyPackSlot(c map[string]string) map[string]string {
-	if c[packSlot] != "" {
+// withoutEmptySlots removes a pack or cell coordinate that is present with an
+// empty value, so the evaluator reports the subject as unresolved instead of
+// emitting a fact key with an empty dimension.
+func withoutEmptySlots(c map[string]string) map[string]string {
+	if c[packSlot] != "" && c[cellSlot] != "" {
 		return c
 	}
 	out := make(map[string]string, len(c))
 	for k, v := range c {
-		if k != packSlot {
-			out[k] = v
+		if (k == packSlot || k == cellSlot) && v == "" {
+			continue
 		}
+		out[k] = v
 	}
 	return out
 }
@@ -154,11 +166,13 @@ func withoutEmptyPackSlot(c map[string]string) map[string]string {
 // enforces frame admission itself: a 0x312 frame whose count bytes are outside
 // 1 through 254, or a 0x313 frame whose SOC is above 100, yields no rows.
 //
-// The bindings are the signed EX03 patterns and their pack-voltage sibling.
-// Values with no signed pattern are not bound here and are listed in the
-// package report as stop items: the protection, warning and interlock symbols,
-// the operating-state symbols, the device limits, the power product, the cell
-// extrema and the resource and relation rows.
+// The bindings are the signed EX03 patterns and the pack-voltage sibling. The
+// cell bindings (cellBindings) are not in this table: they are added at
+// evaluation, so the table validates against the pack role alone. Values with
+// no signed pattern are not bound here and are listed in the package report as
+// stop items: the protection, warning and interlock symbols, the operating-state
+// symbols, the device limits, the power product, and the resource and relation
+// rows.
 func V104Table() roweval.Table[Selector] {
 	rows := []roweval.NativeRow[Selector]{
 		nativeRow(0x311, "charge_voltage_limit", signalSlice{0, 16, bigEndian, false}, "native.decivolt"),
@@ -305,7 +319,7 @@ func EvaluateFrame(table roweval.Table[Selector], frame canbus.Frame, a roweval.
 	if reason := FrameDisposition(frame); reason != "" {
 		return nil, reason, nil
 	}
-	return evaluateAdmitted(table, frame, a)
+	return evaluateAdmitted(withCellBindings(table), frame, a)
 }
 
 // tableOfProfile reports whether a table is non-empty and every native row and
@@ -332,7 +346,7 @@ func tableOfProfile(t roweval.Table[Selector], profile string) bool {
 // bindings, for a table whose frame gate the caller has already run.
 func evaluateAdmitted(table roweval.Table[Selector], frame canbus.Frame, a roweval.Acquired[Selector]) (map[string]roweval.Evaluation, roweval.Reason, error) {
 	table = withPolicy(table, a.Template.FreshnessPolicy.PolicyID)
-	a.Coordinates = withoutEmptyPackSlot(a.Coordinates)
+	a.Coordinates = withoutEmptySlots(a.Coordinates)
 	out := make(map[string]roweval.Evaluation)
 	for _, row := range table.Native {
 		if row.At.Identifier != frame.ID().Value() {

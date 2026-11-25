@@ -1,0 +1,112 @@
+[
+  {"name": "common-member-positive-current", "table": "common_member", "identifier": 787, "extended": false, "data_hex": "0e10006400fa505a",
+   "rows": {
+     "pack_voltage": {"candidate": {"fact": "storage.pack.voltage", "unit": "unit.volt", "value": "36.00", "subject": "pack", "quality": "candidate"}},
+     "pack_current": {"candidate": {"fact": "storage.pack.current", "unit": "unit.ampere", "value": "10.0", "subject": "pack", "quality": "candidate"}},
+     "soc": {"candidate": {"fact": "storage.state.soc", "unit": "unit.ratio", "value": "0.80", "subject": "pack", "quality": "candidate"}},
+     "soh": {"candidate": {"fact": "storage.state.soh", "unit": "unit.ratio", "value": "0.90", "subject": "pack", "quality": "candidate"}}
+   }},
+  {"name": "common-aggregate-positive-current", "table": "common_aggregate", "identifier": 787, "extended": false, "data_hex": "0e10006400fa505a",
+   "rows": {
+     "pack_voltage": {"candidate": {"fact": "storage.pack.voltage", "unit": "unit.volt", "value": "36.00", "subject": "pack", "quality": "candidate"}},
+     "pack_current": {"candidate": {"fact": "storage.pack.current", "unit": "unit.ampere", "value": "10.0", "subject": "pack", "quality": "candidate"}},
+     "soc": {"candidate": {"fact": "storage.state.soc", "unit": "unit.ratio", "value": "0.80", "subject": "pack", "quality": "candidate"}},
+     "soh": {"candidate": {"fact": "storage.state.soh", "unit": "unit.ratio", "value": "0.90", "subject": "pack", "quality": "candidate"}}
+   }},
+  {"name": "common-member-negative-current", "table": "common_member", "identifier": 787, "extended": false, "data_hex": "0e10ff9cff386432",
+   "rows": {
+     "pack_voltage": {"candidate": {"fact": "storage.pack.voltage", "unit": "unit.volt", "value": "36.00", "subject": "pack", "quality": "candidate"}},
+     "pack_current": {"candidate": {"fact": "storage.pack.current", "unit": "unit.ampere", "value": "-10.0", "subject": "pack", "quality": "candidate"}},
+     "soc": {"candidate": {"fact": "storage.state.soc", "unit": "unit.ratio", "value": "1.00", "subject": "pack", "quality": "candidate"}},
+     "soh": {"candidate": {"fact": "storage.state.soh", "unit": "unit.ratio", "value": "0.50", "subject": "pack", "quality": "candidate"}}
+   }},
+  {"name": "common-aggregate-negative-current", "table": "common_aggregate", "identifier": 787, "extended": false, "data_hex": "0e10ff9cff386432",
+   "rows": {
+     "pack_voltage": {"candidate": {"fact": "storage.pack.voltage", "unit": "unit.volt", "value": "36.00", "subject": "pack", "quality": "candidate"}},
+     "pack_current": {"candidate": {"fact": "storage.pack.current", "unit": "unit.ampere", "value": "-10.0", "subject": "pack", "quality": "candidate"}},
+     "soc": {"candidate": {"fact": "storage.state.soc", "unit": "unit.ratio", "value": "1.00", "subject": "pack", "quality": "candidate"}},
+     "soh": {"candidate": {"fact": "storage.state.soh", "unit": "unit.ratio", "value": "0.50", "subject": "pack", "quality": "candidate"}}
+   }},
+  {"name": "soc-common-member-100", "table": "common_member", "identifier": 787, "extended": false, "data_hex": "0e10ff9cff386432",
+   "rows": {
+     "pack_voltage": {"candidate": {"fact": "storage.pack.voltage", "unit": "unit.volt", "value": "36.00", "subject": "pack", "quality": "candidate"}},
+     "pack_current": {"candidate": {"fact": "storage.pack.current", "unit": "unit.ampere", "value": "-10.0", "subject": "pack", "quality": "candidate"}},
+     "soc": {"native": "100", "candidate": {"fact": "storage.state.soc", "unit": "unit.ratio", "value": "1.00", "subject": "pack", "quality": "candidate"}},
+     "soh": {"candidate": {"fact": "storage.state.soh", "unit": "unit.ratio", "value": "0.50", "subject": "pack", "quality": "candidate"}}
+   }},
+  {"name": "soc-common-member-101", "table": "common_member", "identifier": 787, "extended": false, "data_hex": "0e10ff9cff386532",
+   "rows": {
+     "pack_voltage": {"candidate": {"fact": "storage.pack.voltage", "unit": "unit.volt", "value": "36.00", "subject": "pack", "quality": "candidate"}},
+     "pack_current": {"candidate": {"fact": "storage.pack.current", "unit": "unit.ampere", "value": "-10.0", "subject": "pack", "quality": "candidate"}},
+     "soc": {"native": "101", "reason": "catalog_refused"},
+     "soh": {"candidate": {"fact": "storage.state.soh", "unit": "unit.ratio", "value": "0.50", "subject": "pack", "quality": "candidate"}}
+   }},
+  {"name": "soc-common-aggregate-100", "table": "common_aggregate", "identifier": 787, "extended": false, "data_hex": "0e10ff9cff386432",
+   "rows": {
+     "pack_voltage": {"candidate": {"fact": "storage.pack.voltage", "unit": "unit.volt", "value": "36.00", "subject": "pack", "quality": "candidate"}},
+     "pack_current": {"candidate": {"fact": "storage.pack.current", "unit": "unit.ampere", "value": "-10.0", "subject": "pack", "quality": "candidate"}},
+     "soc": {"native": "100", "candidate": {"fact": "storage.state.soc", "unit": "unit.ratio", "value": "1.00", "subject": "pack", "quality": "candidate"}},
+     "soh": {"candidate": {"fact": "storage.state.soh", "unit": "unit.ratio", "value": "0.50", "subject": "pack", "quality": "candidate"}}
+   }},
+  {"name": "soc-common-aggregate-101", "table": "common_aggregate", "identifier": 787, "extended": false, "data_hex": "0e10ff9cff386532",
+   "rows": {
+     "pack_voltage": {"candidate": {"fact": "storage.pack.voltage", "unit": "unit.volt", "value": "36.00", "subject": "pack", "quality": "candidate"}},
+     "pack_current": {"candidate": {"fact": "storage.pack.current", "unit": "unit.ampere", "value": "-10.0", "subject": "pack", "quality": "candidate"}},
+     "soc": {"native": "101", "reason": "catalog_refused"},
+     "soh": {"candidate": {"fact": "storage.state.soh", "unit": "unit.ratio", "value": "0.50", "subject": "pack", "quality": "candidate"}}
+   }},
+  {"name": "soc-v104-100", "table": "v104", "identifier": 787, "extended": false, "data_hex": "0e10ff9cff386432",
+   "rows": {
+     "pack_voltage": {"candidate": {"fact": "storage.pack.voltage", "unit": "unit.volt", "value": "36.00", "subject": "pack", "quality": "candidate"}},
+     "pack_current": {"candidate": {"fact": "storage.pack.current", "unit": "unit.ampere", "value": "-10.0", "subject": "pack", "quality": "candidate"}},
+     "soc": {"native": "100", "candidate": {"fact": "storage.state.soc", "unit": "unit.ratio", "value": "1.00", "subject": "pack", "quality": "candidate"}},
+     "soh": {"native": "50", "reason": "not valid"}
+   }},
+  {"name": "soc-v104-101", "table": "v104", "identifier": 787, "extended": false, "data_hex": "0e10ff9cff386532", "gate": "rejected", "rows": {}},
+  {"name": "v104-positive-current", "table": "v104", "identifier": 787, "extended": false, "data_hex": "0e10006400fa505a",
+   "rows": {
+     "pack_voltage": {"candidate": {"fact": "storage.pack.voltage", "unit": "unit.volt", "value": "36.00", "subject": "pack", "quality": "candidate"}},
+     "pack_current": {"candidate": {"fact": "storage.pack.current", "unit": "unit.ampere", "value": "10.0", "subject": "pack", "quality": "candidate"}},
+     "soc": {"candidate": {"fact": "storage.state.soc", "unit": "unit.ratio", "value": "0.80", "subject": "pack", "quality": "candidate"}},
+     "soh": {"native": "90", "reason": "not valid"}
+   }},
+  {"name": "v104-soh-invalid-0x50", "table": "v104", "identifier": 787, "extended": false, "data_hex": "0e10006400fa5050",
+   "rows": {
+     "soh": {"native": "80", "reason": "not valid"}
+   }},
+  {"name": "v104-soh-valid-0xD0", "table": "v104", "identifier": 787, "extended": false, "data_hex": "0e10006400fa50d0",
+   "rows": {
+     "soh": {"native": "80", "candidate": {"fact": "storage.state.soh", "unit": "unit.ratio", "value": "0.80", "subject": "pack", "quality": "candidate"}}
+   }},
+  {"name": "monitor-positive-current", "table": "monitor", "identifier": 67174400, "extended": true, "data_hex": "100e947500000000",
+   "rows": {
+     "internal_pack_voltage": {"candidate": {"fact": "storage.pack.voltage", "unit": "unit.volt", "value": "360.0", "subject": "pack", "quality": "candidate"}},
+     "current": {"candidate": {"fact": "storage.pack.current", "unit": "unit.ampere", "value": "10.0", "subject": "pack", "quality": "candidate"}}
+   }},
+  {"name": "monitor-negative-current", "table": "monitor", "identifier": 67174400, "extended": true, "data_hex": "100ecc7400000000",
+   "rows": {
+     "internal_pack_voltage": {"candidate": {"fact": "storage.pack.voltage", "unit": "unit.volt", "value": "360.0", "subject": "pack", "quality": "candidate"}},
+     "current": {"candidate": {"fact": "storage.pack.current", "unit": "unit.ampere", "value": "-10.0", "subject": "pack", "quality": "candidate"}}
+   }},
+  {"name": "v108-negative-temperature", "table": "v108", "identifier": 787, "extended": false, "data_hex": "0e10ff9cff385050",
+   "rows": {
+     "pack_voltage": {"candidate": {"fact": "storage.pack.voltage", "unit": "unit.volt", "value": "36.00", "subject": "pack", "quality": "candidate"}},
+     "pack_current": {"candidate": {"fact": "storage.pack.current", "unit": "unit.ampere", "value": "-10.0", "subject": "pack", "quality": "candidate"}},
+     "soc": {"candidate": {"fact": "storage.state.soc", "unit": "unit.ratio", "value": "0.80", "subject": "pack", "quality": "candidate"}},
+     "soh": {"candidate": {"fact": "storage.state.soh", "unit": "unit.ratio", "value": "0.80", "subject": "pack", "quality": "candidate"}},
+     "average_temperature": {"candidate": {"fact": "storage.temperature.pack", "unit": "unit.kelvin", "value": "253.15", "subject": "pack", "quality": "candidate"}}
+   }},
+  {"name": "v108-lifetime-alarm-set", "table": "v108", "identifier": 787, "extended": false, "data_hex": "0e10ff9cff3850d0",
+   "rows": {
+     "soh": {"candidate": {"fact": "storage.state.soh", "unit": "unit.ratio", "value": "0.80", "subject": "pack", "quality": "candidate"}},
+     "average_temperature": {"candidate": {"fact": "storage.temperature.pack", "unit": "unit.kelvin", "value": "253.15", "subject": "pack", "quality": "candidate"}}
+   }},
+  {"name": "v108-positive-temperature", "table": "v108", "identifier": 787, "extended": false, "data_hex": "0e10006400fa5050",
+   "rows": {
+     "pack_voltage": {"candidate": {"fact": "storage.pack.voltage", "unit": "unit.volt", "value": "36.00", "subject": "pack", "quality": "candidate"}},
+     "pack_current": {"candidate": {"fact": "storage.pack.current", "unit": "unit.ampere", "value": "10.0", "subject": "pack", "quality": "candidate"}},
+     "soc": {"candidate": {"fact": "storage.state.soc", "unit": "unit.ratio", "value": "0.80", "subject": "pack", "quality": "candidate"}},
+     "soh": {"candidate": {"fact": "storage.state.soh", "unit": "unit.ratio", "value": "0.80", "subject": "pack", "quality": "candidate"}},
+     "average_temperature": {"candidate": {"fact": "storage.temperature.pack", "unit": "unit.kelvin", "value": "298.15", "subject": "pack", "quality": "candidate"}}
+   }}
+]

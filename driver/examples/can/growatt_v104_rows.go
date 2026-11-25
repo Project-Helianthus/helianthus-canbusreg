@@ -14,8 +14,8 @@ import (
 	"github.com/Project-Helianthus/helianthus-semreg/semreg/v1/roweval"
 )
 
-// CANSelector identifies a field within a CAN data frame, not a transport record.
-type CANSelector struct {
+// Selector identifies a field within a CAN data frame, not a transport record.
+type Selector struct {
 	Identifier  uint32
 	Extended    bool
 	DLC, RawDLC uint8
@@ -39,13 +39,13 @@ const (
 	sohValidBit   = 63
 )
 
-func field(id uint32, extended bool, slice signalSlice, name, unit string) roweval.NativeRow[CANSelector] {
+func field(id uint32, extended bool, slice signalSlice, name, unit string) roweval.NativeRow[Selector] {
 	codec := "unsigned"
 	if slice.signed {
 		codec = "signed"
 	}
-	return roweval.NativeRow[CANSelector]{ID: name, Unit: unit, SpecRef: fmt.Sprintf("CAN %#x", id),
-		At:   CANSelector{Identifier: id, Extended: extended, DLC: 8, RawDLC: 8, Slice: slice},
+	return roweval.NativeRow[Selector]{ID: name, Unit: unit, SpecRef: fmt.Sprintf("CAN %#x", id),
+		At:   Selector{Identifier: id, Extended: extended, DLC: 8, RawDLC: 8, Slice: slice},
 		Wire: roweval.Layout{BitOffset: slice.offset, Width: slice.width, Codec: codec, ByteOrder: slice.order, BitOrder: "lsb0", WordOrder: "single"}}
 }
 
@@ -64,11 +64,11 @@ func scale(divisor int64) roweval.Convert {
 	return roweval.Convert{Numeric: &roweval.Affine{Num: 1, Den: divisor}}
 }
 
-func v104Rows() roweval.Table[CANSelector] {
+func v104Rows() roweval.Table[Selector] {
 	soh := field(0x313, false, signalSlice{56, 7, bitSlice, false}, "state_of_health", "native.percent")
 	soh.Decode.Hook = "soh-validity"
-	return roweval.Table[CANSelector]{
-		Native: []roweval.NativeRow[CANSelector]{
+	return roweval.Table[Selector]{
+		Native: []roweval.NativeRow[Selector]{
 			field(0x311, false, signalSlice{0, 16, bigEndian, false}, "charge_voltage_limit", "native.decivolt"),
 			field(0x311, false, signalSlice{16, 16, bigEndian, false}, "charge_current_limit", "native.deciampere"),
 			field(0x311, false, signalSlice{32, 16, bigEndian, false}, "discharge_current_limit", "native.deciampere"),
@@ -99,7 +99,7 @@ func sohValidity(inputs roweval.DetachedInputs, _ roweval.RowID, _ roweval.Direc
 	return roweval.DerivedValue{Value: value}, ""
 }
 
-func canDescriptors() roweval.Descriptors[CANSelector] {
+func canDescriptors() roweval.Descriptors[Selector] {
 	identity := func(raw uint64, _ uint16) (uint64, error) { return raw, nil }
 	swap16 := func(raw uint64, width uint16) (uint64, error) {
 		if width != 16 {
@@ -107,14 +107,14 @@ func canDescriptors() roweval.Descriptors[CANSelector] {
 		}
 		return uint64(bits.ReverseBytes16(uint16(raw))), nil
 	}
-	return roweval.Descriptors[CANSelector]{
+	return roweval.Descriptors[Selector]{
 		Codecs: map[string]roweval.Codec{"signed": integerCodec(true), "unsigned": integerCodec(false)},
 		ByteOrders: map[string]roweval.Order{
 			bigEndian: {Decode: swap16, Encode: swap16}, littleEndian: {Decode: identity, Encode: identity}, bitSlice: {Decode: identity, Encode: identity},
 		},
 		BitOrders:  map[string]roweval.Order{"lsb0": {Decode: identity, Encode: identity}},
 		WordOrders: map[string]roweval.Order{"single": {Decode: identity, Encode: identity}},
-		Extent:     func(at CANSelector) (int, bool) { return int(at.DLC), true },
+		Extent:     func(at Selector) (int, bool) { return int(at.DLC), true },
 	}
 }
 
@@ -157,8 +157,8 @@ func decodeRecord(record receiver.Record) (canbusreg.Evidence, error) {
 	return e, err
 }
 
-func evaluateSlice(table roweval.Table[CANSelector], frame canbus.Frame, slice signalSlice, a roweval.Acquired[CANSelector]) (roweval.Evaluation, error) {
-	a.Selector = CANSelector{Identifier: frame.ID().Value(), Extended: frame.ID().Extended(), DLC: frame.DLC(), RawDLC: frame.RawDLC(), Slice: slice}
+func evaluateSlice(table roweval.Table[Selector], frame canbus.Frame, slice signalSlice, a roweval.Acquired[Selector]) (roweval.Evaluation, error) {
+	a.Selector = Selector{Identifier: frame.ID().Value(), Extended: frame.ID().Extended(), DLC: frame.DLC(), RawDLC: frame.RawDLC(), Slice: slice}
 	a.Payload = frame.Data()
 	a.Descriptors = canDescriptors()
 	return roweval.Evaluate(table, a)
@@ -185,7 +185,7 @@ func v104Disposition(frame canbus.Frame) roweval.Reason {
 	return ""
 }
 
-func evaluateV104(record receiver.Record, a roweval.Acquired[CANSelector]) (map[string]roweval.Evaluation, roweval.Reason, error) {
+func evaluateV104(record receiver.Record, a roweval.Acquired[Selector]) (map[string]roweval.Evaluation, roweval.Reason, error) {
 	e, err := decodeRecord(record)
 	if err != nil {
 		return nil, roweval.ReasonNoMatch, nil

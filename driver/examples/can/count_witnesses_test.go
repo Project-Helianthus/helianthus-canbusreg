@@ -38,7 +38,7 @@ type nativeWitness struct {
 
 func compareIndexedWitnesses(t *testing.T) {
 	t.Helper()
-	witnesses := readFixture[[]witness](t, "testdata/qq01-count-witnesses.json")
+	witnesses := readFixture[[]witness](t, "testdata/count-witnesses.json")
 	roles := exampleRoles(t)
 	byCase := make(map[string]map[string]witness)
 	for _, w := range witnesses {

@@ -175,9 +175,9 @@ func checkVectors(t *testing.T, group string) {
 	}
 }
 
-func assertNoWrite(t *testing.T, table roweval.Table[CANSelector], row string, want roweval.Reason) {
+func assertNoWrite(t *testing.T, table roweval.Table[Selector], row string, want roweval.Reason) {
 	t.Helper()
-	got, err := roweval.Invert(table, roweval.Writing[CANSelector]{NativeID: row, SubjectRole: "pack", Descriptors: canDescriptors()})
+	got, err := roweval.Invert(table, roweval.Writing[Selector]{NativeID: row, SubjectRole: "pack", Descriptors: canDescriptors()})
 	if err != nil || got.Reason != want || got.Payload != nil || got.Target != "" {
 		t.Fatalf("%s: write %+v: %v", row, got, err)
 	}
@@ -197,7 +197,7 @@ func decimalEquals(number semreg.Decimal, text string) bool {
 	return ok && valid && got.Cmp(want) == 0
 }
 
-func assertFact(t *testing.T, ev roweval.Evaluation, name, text string, a roweval.Acquired[CANSelector]) {
+func assertFact(t *testing.T, ev roweval.Evaluation, name, text string, a roweval.Acquired[Selector]) {
 	t.Helper()
 	fields := map[string]struct{ id, unit semreg.DefinitionID }{
 		"current": {"storage.pack.current", "unit.ampere"}, "state_of_charge": {"storage.state.soc", "unit.ratio"},
@@ -222,7 +222,7 @@ func assertFact(t *testing.T, ev roweval.Evaluation, name, text string, a roweva
 	}
 }
 
-func acquired(r receiver.Record, roles roweval.Roles) roweval.Acquired[CANSelector] {
+func acquired(r receiver.Record, roles roweval.Roles) roweval.Acquired[Selector] {
 	source, epoch, binding := semreg.SourceID("source.synthetic"), semreg.SourceEpochID("epoch.synthetic"), semreg.NativeBindingID("binding.synthetic")
 	generation := semreg.Uint64("2")
 	evidence := []semreg.EvidenceRef{{Owner: "driver.synthetic", Kind: "evidence.can.frame", Digest: semreg.Digest(fmt.Sprintf("sha256:%x", sha256.Sum256(r.Raw))), Contract: "native.can/v1", Access: semreg.EvidenceAccessPublic, Redaction: semreg.RedactionNone}}
@@ -237,7 +237,7 @@ func acquired(r receiver.Record, roles roweval.Roles) roweval.Acquired[CANSelect
 		BindingID:       &binding, SourceEpochID: &epoch, DriverGeneration: &generation, Evidence: evidence,
 		Origin: semreg.OriginRef{OriginID: "origin.synthetic", Kind: semreg.OriginNativeObservation, SourceID: &source, SourceEpochID: &epoch, BindingID: &binding, Evidence: evidence},
 	}
-	return roweval.Acquired[CANSelector]{Template: template, Roles: roles, Receipt: roweval.Receipt{ReceivedAt: received, Monotonic: mono}}
+	return roweval.Acquired[Selector]{Template: template, Roles: roles, Receipt: roweval.Receipt{ReceivedAt: received, Monotonic: mono}}
 }
 
 func exampleRoles(t *testing.T) roweval.Roles {

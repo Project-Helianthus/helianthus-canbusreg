@@ -353,15 +353,33 @@ func TestEveryProfileRejectsNeighbouringIdentifierWrongDLCWrongRawDLCAndExtended
 		wrongDLC.dlc = 7
 		wrongRawDLC := base
 		wrongRawDLC.rawDLC = 9 // the wire DLC of an eight-byte frame that is not eight
-		for _, m := range []struct {
+		type mutation struct {
 			field string
 			v     selectorVector
-		}{
+		}
+		cases := []mutation{
 			{"neighbouring identifier", neighbour},
 			{"wrong DLC", wrongDLC},
 			{"wrong raw DLC", wrongRawDLC},
 			{"identifier form", form},
-		} {
+		}
+		if base.profile != "monitor" {
+			// The frames directly before and after the base identifier. An
+			// adjacent identifier the profile itself defines is another frame
+			// with its own vectors; any other adjacent identifier is a negative
+			// case, which catches a gate that admits a frame of another revision
+			// or of the common projection (for example 0x314 on common).
+			defined := admittedStandardIdentifiers(t, base.profile)
+			for _, adj := range []uint32{base.id - 1, base.id + 1} {
+				if defined[adj] {
+					continue
+				}
+				next := base
+				next.id = adj
+				cases = append(cases, mutation{"adjacent identifier", next})
+			}
+		}
+		for _, m := range cases {
 			mutated := m.v
 			mutated.name = base.name + " with " + m.field
 			mutated.frame = "no_match"
@@ -808,4 +826,18 @@ func admittedVectors(vectors []selectorVector) int {
 		}
 	}
 	return n
+}
+
+// admittedStandardIdentifiers returns the standard identifiers that the admitted
+// vectors of one profile carry. An adjacent identifier in this set is another
+// frame of the profile and is not a negative case.
+func admittedStandardIdentifiers(t *testing.T, profile string) map[uint32]bool {
+	t.Helper()
+	ids := map[uint32]bool{}
+	for _, v := range readSelectorVectors(t) {
+		if v.frame == "admitted" && v.profile == profile && !v.extended {
+			ids[v.id] = true
+		}
+	}
+	return ids
 }

@@ -1,0 +1,268 @@
+[
+  {
+    "name": "negative-current-valid-soh",
+    "group": "signed",
+    "identifier": 787,
+    "extended": false,
+    "rtr": false,
+    "dlc": 8,
+    "raw_dlc": 8,
+    "data_hex": "FF9CFF9CFF3864E2",
+    "expectation": "V1.04 measurement layout and exact scale arithmetic",
+    "native": {
+      "voltage": -100,
+      "current": -100,
+      "maximum_cell_temperature": -200,
+      "state_of_charge": 100,
+      "state_of_health": 98
+    },
+    "facts": {
+      "current": "-10.0",
+      "state_of_charge": "1.00",
+      "state_of_health": "0.98"
+    }
+  },
+  {
+    "name": "positive-current-zero-soc",
+    "group": "signed",
+    "identifier": 787,
+    "extended": false,
+    "rtr": false,
+    "dlc": 8,
+    "raw_dlc": 8,
+    "data_hex": "FF9C0064FF3800E2",
+    "expectation": "V1.04 measurement layout and exact scale arithmetic",
+    "native": {
+      "voltage": -100,
+      "current": 100,
+      "maximum_cell_temperature": -200,
+      "state_of_charge": 0,
+      "state_of_health": 98
+    },
+    "facts": {
+      "current": "10.0",
+      "state_of_charge": "0.00",
+      "state_of_health": "0.98"
+    }
+  },
+  {
+    "name": "soh-validity-is-slice-local",
+    "group": "validity",
+    "identifier": 787,
+    "extended": false,
+    "rtr": false,
+    "dlc": 8,
+    "raw_dlc": 8,
+    "data_hex": "FF9CFF9CFF386462",
+    "expectation": "V1.04 measurement layout and exact scale arithmetic",
+    "native": {
+      "voltage": -100,
+      "current": -100,
+      "maximum_cell_temperature": -200,
+      "state_of_charge": 100
+    },
+    "facts": {
+      "current": "-10.0",
+      "state_of_charge": "1.00"
+    },
+    "unknown": {
+      "state_of_health": {
+        "reason": "not valid",
+        "raw": 98
+      }
+    }
+  },
+  {
+    "name": "soc-101-rejects-signed-current-and-siblings",
+    "group": "validity",
+    "identifier": 787,
+    "extended": false,
+    "rtr": false,
+    "dlc": 8,
+    "raw_dlc": 8,
+    "data_hex": "FF9CFF9CFF3865E2",
+    "expectation": "V1.04 measurement layout and exact scale arithmetic",
+    "reason": "not valid"
+  },
+  {
+    "name": "dlc-7",
+    "group": "validity",
+    "identifier": 787,
+    "extended": false,
+    "rtr": false,
+    "dlc": 7,
+    "raw_dlc": 7,
+    "data_hex": "FF9CFF9CFF3864",
+    "expectation": "V1.04 measurement layout and exact scale arithmetic",
+    "reason": "no_match"
+  },
+  {
+    "name": "raw-dlc-9",
+    "group": "validity",
+    "identifier": 787,
+    "extended": false,
+    "rtr": false,
+    "dlc": 8,
+    "raw_dlc": 9,
+    "data_hex": "FF9CFF9CFF3864E2",
+    "expectation": "V1.04 measurement layout and exact scale arithmetic",
+    "reason": "no_match"
+  },
+  {
+    "name": "extended-313",
+    "group": "validity",
+    "identifier": 787,
+    "extended": true,
+    "rtr": false,
+    "dlc": 8,
+    "raw_dlc": 8,
+    "data_hex": "FF9CFF9CFF3864E2",
+    "expectation": "V1.04 measurement layout and exact scale arithmetic",
+    "reason": "no_match"
+  },
+  {
+    "name": "standard-rtr-313",
+    "group": "validity",
+    "identifier": 787,
+    "extended": false,
+    "rtr": true,
+    "dlc": 8,
+    "raw_dlc": 8,
+    "data_hex": "0000000000000000",
+    "expectation": "V1.04 measurement layout and exact scale arithmetic",
+    "reason": "no_match"
+  },
+  {
+    "name": "pack-0",
+    "group": "count",
+    "identifier": 786,
+    "extended": false,
+    "rtr": false,
+    "dlc": 8,
+    "raw_dlc": 8,
+    "data_hex": "0000000000000001",
+    "expectation": "V1.04 count range, page 5; D27 historical comparison",
+    "reason": "not valid",
+    "gateway_accepts": false
+  },
+  {
+    "name": "pack-1",
+    "group": "count",
+    "identifier": 786,
+    "extended": false,
+    "rtr": false,
+    "dlc": 8,
+    "raw_dlc": 8,
+    "data_hex": "0000000001000001",
+    "expectation": "V1.04 count range, page 5; D27 historical comparison",
+    "native": {
+      "pack_count": 1,
+      "total_cell_count": 1
+    },
+    "gateway_accepts": true
+  },
+  {
+    "name": "pack-254",
+    "group": "count",
+    "identifier": 786,
+    "extended": false,
+    "rtr": false,
+    "dlc": 8,
+    "raw_dlc": 8,
+    "data_hex": "00000000FE000001",
+    "expectation": "V1.04 count range, page 5; D27 historical comparison",
+    "native": {
+      "pack_count": 254,
+      "total_cell_count": 1
+    },
+    "gateway_accepts": true
+  },
+  {
+    "name": "pack-255",
+    "group": "count",
+    "identifier": 786,
+    "extended": false,
+    "rtr": false,
+    "dlc": 8,
+    "raw_dlc": 8,
+    "data_hex": "00000000FF000001",
+    "expectation": "V1.04 count range, page 5; D27 historical comparison",
+    "reason": "not valid",
+    "gateway_accepts": true
+  },
+  {
+    "name": "cells-0",
+    "group": "count",
+    "identifier": 786,
+    "extended": false,
+    "rtr": false,
+    "dlc": 8,
+    "raw_dlc": 8,
+    "data_hex": "0000000001000000",
+    "expectation": "V1.04 count range, page 5; D27 historical comparison",
+    "reason": "not valid",
+    "gateway_accepts": false
+  },
+  {
+    "name": "cells-1",
+    "group": "count",
+    "identifier": 786,
+    "extended": false,
+    "rtr": false,
+    "dlc": 8,
+    "raw_dlc": 8,
+    "data_hex": "0000000001000001",
+    "expectation": "V1.04 count range, page 5; D27 historical comparison",
+    "native": {
+      "pack_count": 1,
+      "total_cell_count": 1
+    },
+    "gateway_accepts": true
+  },
+  {
+    "name": "cells-254",
+    "group": "count",
+    "identifier": 786,
+    "extended": false,
+    "rtr": false,
+    "dlc": 8,
+    "raw_dlc": 8,
+    "data_hex": "00000000010000FE",
+    "expectation": "V1.04 count range, page 5; D27 historical comparison",
+    "native": {
+      "pack_count": 1,
+      "total_cell_count": 254
+    },
+    "gateway_accepts": true
+  },
+  {
+    "name": "cells-255",
+    "group": "count",
+    "identifier": 786,
+    "extended": false,
+    "rtr": false,
+    "dlc": 8,
+    "raw_dlc": 8,
+    "data_hex": "0080000001AABBFF",
+    "expectation": "V1.04 count range, page 5; D27 historical comparison",
+    "reason": "not valid",
+    "gateway_accepts": true
+  },
+  {
+    "name": "advertised-limits-have-no-write",
+    "group": "limits",
+    "identifier": 785,
+    "extended": false,
+    "rtr": false,
+    "dlc": 8,
+    "raw_dlc": 8,
+    "data_hex": "F23480FA81F40043",
+    "expectation": "V1.04 limit and status word layout",
+    "native": {
+      "charge_voltage_limit": 62004,
+      "charge_current_limit": 33018,
+      "discharge_current_limit": 33268,
+      "status_word": 67
+    }
+  }
+]

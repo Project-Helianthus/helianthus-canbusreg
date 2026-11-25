@@ -606,6 +606,34 @@ func TestV108StatusWordBitsTenAndElevenStayRaw(t *testing.T) {
 	if !nativeEquals(clearedEvals[word], 3) || !nativeEquals(setEvals[word], 3075) {
 		t.Fatalf("status word raw %+v and %+v, want 3 and 3075 (0x0C03)", clearedEvals[word].Native, setEvals[word].Native)
 	}
+	// Only bits 10 and 11 set (0x0C00): the raw word stays 3072 and every row,
+	// the two-bit operating state included, gives the value the all-clear word
+	// 0x0000 gives.
+	onlyTop := selectorByName(t, "v108-0x311-bits-10-and-11-only")
+	allClear := selectorByName(t, "v108-0x311-status-all-clear")
+	topEvals, reasonT := onlyTop.evaluate(t, roles)
+	clearEvals, reasonA := allClear.evaluate(t, roles)
+	if reasonT != "" || reasonA != "" {
+		t.Fatalf("reasons %q and %q", reasonT, reasonA)
+	}
+	if len(topEvals) != len(clearEvals) {
+		t.Fatalf("%d rows with only bits 10 and 11 set and %d with the word cleared", len(topEvals), len(clearEvals))
+	}
+	for id, ev := range clearEvals {
+		other, ok := topEvals[id]
+		if !ok {
+			t.Fatalf("row %s is missing with only bits 10 and 11 set", id)
+		}
+		if id == word {
+			continue
+		}
+		if nativeKey(ev) != nativeKey(other) {
+			t.Fatalf("row %s differs with only bits 10 and 11 set: %s and %s", id, nativeKey(other), nativeKey(ev))
+		}
+	}
+	if !nativeEquals(topEvals[word], 3072) || !nativeEquals(clearEvals[word], 0) {
+		t.Fatalf("status word raw %+v and %+v, want 3072 (0x0C00) and 0", topEvals[word].Native, clearEvals[word].Native)
+	}
 	// Bits 10 and 11 of the big-endian status word are bits 2 and 3 of byte 6
 	// (frame offsets 50 and 51). Only the raw word row may read them.
 	for _, row := range V108Table().Native {
@@ -713,6 +741,8 @@ func TestEveryNativeRowIsNeededByAnIndependentVector(t *testing.T) {
 		}
 	}
 	removed := 0
+	live := map[string]bool{}
+	witnessed := map[string]bool{}
 	for _, v := range vectors {
 		if v.frame != "admitted" {
 			continue
@@ -725,31 +755,44 @@ func TestEveryNativeRowIsNeededByAnIndependentVector(t *testing.T) {
 		for _, name := range v.rows {
 			id := prefix + name
 			found := false
-			reduced := full
-			reduced.Native = nil
 			for _, row := range full.Native {
-				// A row ID can appear under more than one layout condition: removing
-				// the row removes every entry of that ID.
-				if row.ID == id {
-					found = true
-					continue
-				}
-				reduced.Native = append(reduced.Native, row)
+				found = found || row.ID == id
 			}
 			if !found {
 				t.Errorf("%s: declared row %s is missing from the live table", v.name, id)
-				continue
 			}
-			if sameNames(rowNamesOf(v.profile, evaluateSelectorTable(t, v, reduced, roles)), v.rows) {
-				t.Errorf("deleting native row %s leaves %s passing", id, v.name)
+		}
+		// Every live definition of the table is removed alone, by its position:
+		// a row ID may stand for several definitions under different layout
+		// conditions, and removing one of them must not take the others with it.
+		for i, row := range full.Native {
+			key := definitionKey(v.profile, row)
+			live[key] = true
+			reduced := full
+			reduced.Native = make([]roweval.NativeRow[Selector], 0, len(full.Native)-1)
+			reduced.Native = append(reduced.Native, full.Native[:i]...)
+			reduced.Native = append(reduced.Native, full.Native[i+1:]...)
+			if !sameNames(rowNamesOf(v.profile, evaluateSelectorTable(t, v, reduced, roles)), v.rows) {
+				witnessed[key] = true
 			}
 			removed++
+		}
+	}
+	for key := range live {
+		if !witnessed[key] {
+			t.Errorf("no admitted vector fails when the live native row definition %s is removed", key)
 		}
 	}
 	if removed == 0 {
 		t.Fatal("no native row was removed")
 	}
 	t.Logf("%d declared native rows removed in turn; %d admitted vectors", removed, admittedVectors(vectors))
+}
+
+// definitionKey identifies one native row definition of a table: the profile,
+// the row ID, the identifier, slice and layout condition the definition carries.
+func definitionKey(profile string, row roweval.NativeRow[Selector]) string {
+	return fmt.Sprintf("%s|%s|%+v|%+v", profile, row.ID, row.At, row.When)
 }
 
 // admittedVectors counts the admitted frames of the file.

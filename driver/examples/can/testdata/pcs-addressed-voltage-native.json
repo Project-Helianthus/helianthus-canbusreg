@@ -1,0 +1,59 @@
+{
+  "bank": "ordinary",
+  "endpoint": "participant",
+  "epoch": 1,
+  "fields": {
+    "current": {
+      "denominator": 10,
+      "grade": "Hypothesis",
+      "meaning": "positive charging",
+      "numerator": 0,
+      "physical_qualified": false,
+      "status": "accepted",
+      "unit": "A"
+    },
+    "pack_voltage": {
+      "denominator": 10,
+      "grade": "Hypothesis",
+      "meaning": "pack voltage",
+      "numerator": 4660,
+      "physical_qualified": false,
+      "status": "accepted",
+      "unit": "V"
+    },
+    "port_voltage": {
+      "denominator": 10,
+      "grade": "Hypothesis",
+      "meaning": "port voltage",
+      "numerator": 22136,
+      "physical_qualified": false,
+      "status": "accepted",
+      "unit": "V"
+    },
+    "soc": {
+      "denominator": 10,
+      "grade": "Hypothesis",
+      "meaning": "SOC",
+      "numerator": 500,
+      "physical_qualified": false,
+      "status": "accepted",
+      "unit": "percent"
+    }
+  },
+  "frame": {
+    "data_hex": "341210277856F401",
+    "dlc": 8,
+    "extended": true,
+    "identifier": 419623426,
+    "raw_dlc": 8
+  },
+  "group": "2",
+  "interface_index": 1,
+  "interface_name": "synthetic",
+  "physical_qualified": false,
+  "scope": "local",
+  "sequence": 1,
+  "slot": "2",
+  "socketcan_le_hex": "02F2029908000000341210277856F401",
+  "status": "accepted"
+}

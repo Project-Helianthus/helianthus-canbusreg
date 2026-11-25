@@ -121,7 +121,7 @@ func TestGrowattV104CountBound(t *testing.T) {
 }
 func TestGrowattV104NoWayBack(t *testing.T) {
 	checkVectors(t, "limits")
-	table := v104Rows()
+	table := v104Rows(canDescriptors())
 	for _, row := range table.Native {
 		if row.At.Identifier == 0x311 {
 			assertNoWrite(t, table, row.ID, roweval.ReasonNoMatch)
@@ -133,7 +133,7 @@ func checkVectors(t *testing.T, group string) {
 	t.Helper()
 	vectors := readFixture[[]canVector](t, "testdata/growatt_v104_vectors.json")
 	roles := exampleRoles(t)
-	if err := roweval.ValidateTable(v104Rows(), canDescriptors(), roles); err != nil {
+	if err := roweval.ValidateTable(v104Rows(canDescriptors()), canDescriptors(), roles); err != nil {
 		t.Fatal(err)
 	}
 	matches := 0

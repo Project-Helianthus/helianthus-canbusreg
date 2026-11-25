@@ -3,7 +3,9 @@
 package can
 
 import (
+	"bytes"
 	"crypto/sha256"
+	"encoding/hex"
 	"encoding/json"
 	"fmt"
 	"reflect"
@@ -17,22 +19,59 @@ import (
 
 type witness struct{ Path, Case, Payload string }
 
+type gatewayStep struct {
+	Frame struct {
+		wireVector
+		PayloadLength uint8 `json:"payload_length"`
+		DLCOverride   uint8 `json:"len8_dlc"`
+	}
+	Valid, Listed bool
+	DLC           uint8
+	RawDLC        uint8 `json:"raw_dlc"`
+}
+
 type nativeWitness struct {
 	Steps []struct {
 		Frame         wireVector
 		Valid, Listed bool
-		DLC           uint8
-		RawDLC        uint8 `json:"raw_dlc"`
 	}
 	Result struct {
 		Profile    string
 		Projection *canbusreg.GrowattLowVoltageBMSV104Projection
-		Snapshot   *struct {
-			Status struct {
-				Pack  uint8 `json:"pack_count"`
-				Cells uint8 `json:"total_cell_count"`
-			}
-		}
+	}
+}
+
+type gatewayWitness struct {
+	Steps  []gatewayStep
+	Result struct {
+		Snapshot *gatewaySnapshot
+	}
+}
+
+type gatewaySnapshot struct {
+	Admitted        bool
+	OutboundAllowed bool `json:"outbound_allowed"`
+	Profile         string
+	Limits          struct {
+		ChargeVoltageDecivolts   uint16 `json:"charge_voltage_decivolts"`
+		ChargeCurrentDeciamps    uint16 `json:"charge_current_deciamps"`
+		DischargeCurrentDeciamps uint16 `json:"discharge_current_deciamps"`
+		RawStatus                uint16 `json:"raw_status"`
+	}
+	Status struct {
+		Protection     [2]byte
+		Warning        [2]byte
+		PackCount      uint8 `json:"pack_count"`
+		Manufacturer   [2]byte
+		TotalCellCount uint8 `json:"total_cell_count"`
+	}
+	Measurements struct {
+		VoltageCentivolts           int16 `json:"voltage_centivolts"`
+		CurrentDeciamps             int16 `json:"current_deciamps"`
+		MaximumCellTemperatureDeciC int16 `json:"maximum_cell_temperature_decic"`
+		SOCPercent                  uint8 `json:"soc_percent"`
+		SOHValue                    uint8 `json:"soh_value"`
+		SOHValid                    bool  `json:"soh_valid"`
 	}
 }
 
@@ -59,7 +98,7 @@ func compareIndexedWitnesses(t *testing.T) {
 		t.Run(name, func(t *testing.T) {
 			parts := byCase[name]
 			native := unpackWitness[nativeWitness](t, parts["canbusreg"])
-			gateway := unpackWitness[nativeWitness](t, parts["gateway"])
+			gateway := unpackWitness[gatewayWitness](t, parts["gateway"])
 			if len(native.Steps) == 0 || len(gateway.Steps) != len(native.Steps) {
 				t.Fatal("missing paired observations")
 			}
@@ -69,7 +108,7 @@ func compareIndexedWitnesses(t *testing.T) {
 				v := step.Frame
 				v.DLC = uint8(len(v.Data) / 2)
 				v.RawDLC = v.DLC
-				if gw := gateway.Steps[i]; gw.Frame != step.Frame || gw.Listed != step.Listed || gw.DLC != v.DLC || gw.RawDLC != v.RawDLC {
+				if gw := gateway.Steps[i]; gw.Frame.wireVector != step.Frame || gw.Listed != step.Listed || gw.DLC != v.DLC || gw.RawDLC != v.RawDLC {
 					t.Fatal("donor operands differ", step, gw)
 				}
 				if step.Valid != gateway.Steps[i].Valid {
@@ -92,6 +131,7 @@ func compareIndexedWitnesses(t *testing.T) {
 				if err != nil {
 					t.Fatal(err)
 				}
+				assertWitnessEvidence(t, e, record, gateway.Steps[i])
 				last = classifier.Classify(e)
 				a := acquired(record, roles)
 				rows, reason, err := evaluateV104(record, a)
@@ -108,7 +148,7 @@ func compareIndexedWitnesses(t *testing.T) {
 				}
 				if !step.Valid && gateway.Steps[i].Valid {
 					p := e.Frame.Bytes()
-					if gateway.Result.Snapshot == nil || gateway.Result.Snapshot.Status.Pack != p[4] || gateway.Result.Snapshot.Status.Cells != p[7] {
+					if gateway.Result.Snapshot == nil || gateway.Result.Snapshot.Status.PackCount != p[4] || gateway.Result.Snapshot.Status.TotalCellCount != p[7] {
 						t.Fatal("missing historical native count values")
 					}
 					t.Logf("%s spec/selector rejects, frozen gateway accepts: pack=%d cells=%d", frames[i].Data, p[4], p[7])
@@ -118,8 +158,9 @@ func compareIndexedWitnesses(t *testing.T) {
 				t.Fatalf("native classification = %q; want %q", last.Profile, native.Result.Profile)
 			}
 			if native.Result.Profile != "" {
-				compareNativeProjection(t, last, native.Result.Projection, results, records, roles)
+				compareNativeProjection(t, last, native.Result.Projection, records, gateway.Steps)
 			}
+			compareGatewaySnapshot(t, last, gateway.Result.Snapshot, divergentCount, results, records, gateway.Steps, roles)
 			switch name {
 			case "can-312-count4-eq-1-byte7-eq-255":
 				spec := unpackWitness[struct {
@@ -188,32 +229,96 @@ func unpackWitness[T any](t *testing.T, w witness) T {
 	return d
 }
 
-func compareNativeProjection(t *testing.T, last canbusreg.Classification, want *canbusreg.GrowattLowVoltageBMSV104Projection, rows map[uint32]map[string]roweval.Evaluation, records []receiver.Record, roles roweval.Roles) {
+func assertWitnessEvidence(t *testing.T, got canbusreg.Evidence, record receiver.Record, donor gatewayStep) {
+	t.Helper()
+	wire := donor.Frame.wireVector
+	wire.DLC, wire.RawDLC = donor.DLC, donor.RawDLC
+	payload, err := hex.DecodeString(wire.Data)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if got.Frame.ID().Value() != wire.Identifier || got.Frame.ID().Extended() != wire.Extended ||
+		got.Frame.DLC() != donor.DLC || got.Frame.RawDLC() != donor.RawDLC || got.RawRecord[4] != donor.Frame.PayloadLength ||
+		got.RawRecord[7] != donor.Frame.DLCOverride || !bytes.Equal(got.Frame.Data(), payload) ||
+		!bytes.Equal(got.RawRecord[:], wire.record(t)) {
+		t.Fatalf("destination wire evidence %+v differs from emitted donor frame %+v", got, donor)
+	}
+	if got.Interface != record.Interface || got.Sequence != record.Sequence || got.Monotonic != record.Monotonic {
+		t.Fatalf("destination lost receiver metadata: %+v", got)
+	}
+}
+
+func compareNativeProjection(t *testing.T, last canbusreg.Classification, want *canbusreg.GrowattLowVoltageBMSV104Projection, records []receiver.Record, wire []gatewayStep) {
 	t.Helper()
 	p, ok := last.Projection.(canbusreg.GrowattLowVoltageBMSV104Projection)
 	if !ok || want == nil || p.Limits != want.Limits || p.Status != want.Status || p.Measurements != want.Measurements {
 		t.Fatalf("donor native values differ: %+v, want %+v", p, want)
 	}
-	for _, c := range []struct {
+	for i, c := range []struct {
 		got, want canbusreg.Evidence
-		native    map[string]int64
 	}{
-		{p.LimitsEvidence, want.LimitsEvidence, map[string]int64{"charge_voltage_limit": int64(p.Limits.ChargeVoltageDecivolts), "charge_current_limit": int64(p.Limits.ChargeCurrentDeciamps), "discharge_current_limit": int64(p.Limits.DischargeCurrentDeciamps), "status_word": int64(p.Limits.RawStatus)}},
-		{p.StatusEvidence, want.StatusEvidence, map[string]int64{"pack_count": int64(p.Status.PackCount), "total_cell_count": int64(p.Status.TotalCellCount)}},
-		{p.MeasurementsEvidence, want.MeasurementsEvidence, map[string]int64{"voltage": int64(p.Measurements.VoltageCentivolts), "current": int64(p.Measurements.CurrentDeciamps), "maximum_cell_temperature": int64(p.Measurements.MaximumCellTemperatureDeciC), "state_of_charge": int64(p.Measurements.SOCPercent), "state_of_health": int64(p.Measurements.SOHValue)}},
+		{p.LimitsEvidence, want.LimitsEvidence}, {p.StatusEvidence, want.StatusEvidence}, {p.MeasurementsEvidence, want.MeasurementsEvidence},
 	} {
-		if c.got.Sequence != c.want.Sequence || c.got.Sequence == 0 || int(c.got.Sequence) > len(records) {
-			t.Fatal("donor evidence ordinal differs")
+		seq := c.want.Sequence
+		if seq == 0 || seq > uint64(len(records)) || wire[seq-1].Frame.Identifier != uint32(0x311+i) || c.got.Sequence != seq || p.Interface != c.got.Interface {
+			t.Fatalf("donor evidence ordinal or destination interface differs: got %d want %d", c.got.Sequence, seq)
 		}
-		r := records[c.got.Sequence-1]
-		e, err := decodeRecord(r)
-		if err != nil || e != c.got {
-			t.Fatal("native decoder lost received evidence", err)
+		// The canbusreg donor emits the ordinal, but not a usable Frame or RawRecord.
+		// The paired gateway witness emits the wire fields for that same ordinal.
+		assertWitnessEvidence(t, c.got, records[seq-1], wire[seq-1])
+	}
+}
+
+func compareGatewaySnapshot(t *testing.T, last canbusreg.Classification, want *gatewaySnapshot, divergent bool, rows map[uint32]map[string]roweval.Evaluation, records []receiver.Record, wire []gatewayStep, roles roweval.Roles) {
+	t.Helper()
+	p, projected := last.Projection.(canbusreg.GrowattLowVoltageBMSV104Projection)
+	if want == nil {
+		if projected {
+			t.Fatal("destination projected a tuple not admitted by the gateway witness")
 		}
+		return
+	}
+	if !want.Admitted || want.OutboundAllowed || want.Profile != "growatt.bms.low_voltage.can.v1_04" || projected == divergent {
+		t.Fatalf("destination and donor dispositions differ beyond the known count divergence: %+v", want)
+	}
+	limits := canbusreg.GrowattLowVoltageBMSV104Limits(want.Limits)
+	status := canbusreg.GrowattLowVoltageBMSV104Status(want.Status)
+	measurements := canbusreg.GrowattLowVoltageBMSV104Measurements(want.Measurements)
+	if projected && (last.Profile != want.Profile || p.Limits != limits || p.Status != status || p.Measurements != measurements) {
+		t.Fatalf("gateway native output differs: got %+v, want %+v", p, want)
+	}
+	for i, r := range records {
+		// Every expected value below comes from the emitted snapshot, not a second
+		// decode of the destination. The receive metadata comes from the local receiver.
+		at := wire[i].Frame.Identifier
 		a := acquired(r, roles)
-		for name, n := range c.native {
-			assertNative(t, rows[e.Frame.ID().Value()][name], name, fmt.Sprint(n), a.Template)
+		switch at {
+		case 0x311:
+			assertGatewayRows(t, rows[at], a, map[string]int64{"charge_voltage_limit": int64(limits.ChargeVoltageDecivolts), "charge_current_limit": int64(limits.ChargeCurrentDeciamps), "discharge_current_limit": int64(limits.DischargeCurrentDeciamps), "status_word": int64(limits.RawStatus)})
+		case 0x312:
+			if divergent {
+				if len(rows[at]) != 0 {
+					t.Fatal("255 admitted a destination status row")
+				}
+				continue
+			}
+			assertGatewayRows(t, rows[at], a, map[string]int64{"pack_count": int64(status.PackCount), "total_cell_count": int64(status.TotalCellCount)})
+		case 0x313:
+			assertGatewayRows(t, rows[at], a, map[string]int64{"voltage": int64(measurements.VoltageCentivolts), "current": int64(measurements.CurrentDeciamps), "maximum_cell_temperature": int64(measurements.MaximumCellTemperatureDeciC), "state_of_charge": int64(measurements.SOCPercent)})
+			soh := rows[at]["state_of_health"]
+			if want.Measurements.SOHValid {
+				assertNative(t, soh, "state_of_health", fmt.Sprint(measurements.SOHValue), a.Template)
+			} else if soh.Reason != "not valid" || soh.Native == nil || soh.Native.Value != nil || soh.Native.Raw != uint64(measurements.SOHValue) || soh.Candidate != nil {
+				t.Fatalf("invalid gateway SOH became a destination value: %+v", soh)
+			}
 		}
+	}
+}
+
+func assertGatewayRows(t *testing.T, got map[string]roweval.Evaluation, a roweval.Acquired[Selector], want map[string]int64) {
+	t.Helper()
+	for name, value := range want {
+		assertNative(t, got[name], name, fmt.Sprint(value), a.Template)
 	}
 }
 

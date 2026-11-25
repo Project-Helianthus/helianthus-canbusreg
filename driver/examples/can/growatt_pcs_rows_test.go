@@ -3,12 +3,16 @@
 package can
 
 import (
+	"bytes"
 	"crypto/sha256"
+	"encoding/binary"
+	"encoding/hex"
 	"fmt"
 	"os"
 	"testing"
 
 	"github.com/Project-Helianthus/helianthus-canbus"
+	"github.com/Project-Helianthus/helianthus-canbus/receiver"
 	"github.com/Project-Helianthus/helianthus-canbusreg"
 	"github.com/Project-Helianthus/helianthus-semreg/semreg/v1/roweval"
 )
@@ -18,6 +22,52 @@ type pcsSignalVector struct {
 	LastByte  uint16 `json:"last_byte"`
 	Counts    int64
 	Volts     string
+}
+
+type pcsFrozenField struct {
+	Numerator, Denominator       int64
+	Unit, Meaning, Grade, Status string
+	PhysicalQualified            bool `json:"physical_qualified"`
+}
+
+type pcsFrozenResult struct {
+	Frame                         wireVector
+	Status, Scope, Bank, Endpoint string
+	Group, Slot                   string
+	Epoch, Sequence               uint64
+	InterfaceName                 string `json:"interface_name"`
+	InterfaceIndex                int    `json:"interface_index"`
+	SocketCAN                     string `json:"socketcan_le_hex"`
+	PhysicalQualified             bool   `json:"physical_qualified"`
+	Fields                        map[string]pcsFrozenField
+}
+
+func comparePCSFrozen(t *testing.T, got canbusreg.NativeResult, r receiver.Record, s canbusreg.Selection, want pcsFrozenResult) {
+	t.Helper()
+	raw, err := hex.DecodeString(want.SocketCAN)
+	if err != nil || len(raw) != canbus.SocketCANRecordSize {
+		t.Fatalf("bad frozen wire evidence: %q (%v)", want.SocketCAN, err)
+	}
+	binary.NativeEndian.PutUint32(raw, binary.LittleEndian.Uint32(raw))
+	frame := got.Evidence.Frame
+	if !bytes.Equal(raw, want.Frame.record(t)) || !bytes.Equal(raw, got.Evidence.RawRecord[:]) || !bytes.Equal(raw, r.Raw) ||
+		frame.ID().Value() != want.Frame.Identifier || frame.ID().Extended() != want.Frame.Extended ||
+		frame.DLC() != want.Frame.DLC || frame.RawDLC() != want.Frame.RawDLC || !bytes.Equal(frame.Data(), raw[8:]) ||
+		!bytes.Equal(got.Raw[:], raw[8:]) || got.Evidence.Interface.Name() != want.InterfaceName || got.Evidence.Interface.Index() != want.InterfaceIndex ||
+		got.Evidence.Interface != r.Interface || got.Evidence.Sequence != want.Sequence || got.Evidence.Sequence != r.Sequence || got.Evidence.Monotonic != r.Monotonic {
+		t.Fatalf("frozen and received evidence differ: %+v", got.Evidence)
+	}
+	if got.Selection != s || got.Status != want.Status || got.Epoch != want.Epoch || got.PhysicalQualified != want.PhysicalQualified || len(got.Fields) != len(want.Fields) {
+		t.Fatalf("frozen native disposition differs: %+v", got)
+	}
+	for name, f := range want.Fields {
+		actual, ok := got.Fields[name]
+		if !ok || (pcsFrozenField{actual.Numerator, actual.Denominator, actual.Unit, actual.Meaning, actual.Grade, actual.Status, actual.PhysicalQualified}) != f ||
+			actual.Raw != got.Raw || actual.Evidence != got.Evidence || actual.Epoch != want.Epoch || actual.Scope != want.Scope ||
+			actual.Bank != want.Bank || actual.Endpoint != want.Endpoint || actual.Group != want.Group || actual.Slot != want.Slot || actual.Age != 0 {
+			t.Fatalf("frozen native %s: got %+v, want %+v", name, actual, f)
+		}
+	}
 }
 
 func TestGrowattPCSAddressedPackVoltage(t *testing.T) {
@@ -34,6 +84,7 @@ func TestGrowattPCSAddressedPackVoltage(t *testing.T) {
 		t.Fatal(err)
 	}
 	t.Logf("binding operand SHA-256 %x", sha256.Sum256(operand))
+	frozen := readFixture[pcsFrozenResult](t, "testdata/pcs-addressed-voltage-native.json")
 	roles := exampleRoles(t)
 	table := pcsVoltageRows()
 	if err := roweval.ValidateTable(table, canDescriptors(), roles); err != nil {
@@ -55,31 +106,28 @@ func TestGrowattPCSAddressedPackVoltage(t *testing.T) {
 			t.Fatal(err)
 		}
 		for _, field := range []struct {
-			name, meaning string
-			operand       pcsSignalVector
-			slice         signalSlice
+			name    string
+			operand pcsSignalVector
+			slice   signalSlice
 		}{
-			{"pack_voltage", "pack voltage", v.Pack, packSlice}, {"port_voltage", "port voltage", v.Port, portSlice},
+			{"pack_voltage", v.Pack, packSlice}, {"port_voltage", v.Port, portSlice},
 		} {
 			ev, native, err := evaluatePCSVoltage(r, s, input, field.slice, a)
 			if err != nil {
 				t.Fatal(err)
 			}
 			assertNative(t, ev, field.name, field.operand.Volts, a.Template)
-			f := native.Fields[field.name]
-			if native.Status != "accepted" || native.PhysicalQualified || native.Selection != s || f.Status != "accepted" || f.Grade != "Hypothesis" || f.PhysicalQualified || f.Meaning != field.meaning || f.Unit != "V" || f.Numerator != field.operand.Counts || f.Denominator != 10 || uint64(f.Numerator) != ev.Native.Raw {
-				t.Fatalf("frozen native %s differs: %+v", field.name, f)
-			}
-			e, err := decodeRecord(r)
-			if err != nil || native.Raw != e.Frame.Bytes() || f.Raw != native.Raw || f.Evidence != e || native.Evidence != e || f.Epoch != input.Epoch || f.Scope != input.Scope || f.Bank != input.Bank || f.Endpoint != input.Endpoint || f.Group != input.Group || f.Slot != input.Slot || f.Age != input.FieldAge {
-				t.Fatalf("%s: lost native evidence %+v", field.name, f)
+			comparePCSFrozen(t, native, r, s, frozen)
+			f := frozen.Fields[field.name]
+			if f.Numerator != field.operand.Counts || f.Denominator != 10 || uint64(f.Numerator) != ev.Native.Raw {
+				t.Fatalf("frozen %s slice differs from the independent operand: %+v", field.name, f)
 			}
 			if field.name == "pack_voltage" {
 				assertFact(t, ev, field.name, field.operand.Volts, a)
 			} else if ev.Candidate != nil || ev.Subject != nil || ev.Reason != roweval.ReasonNoBinding {
 				t.Fatal("port voltage entered the binding", ev)
 			}
-			t.Logf("%s: %d/%d %s (%s), raw %X", field.name, f.Numerator, f.Denominator, f.Unit, f.Grade, f.Evidence.RawRecord)
+			t.Logf("%s: %d/%d %s (%s), raw %s", field.name, f.Numerator, f.Denominator, f.Unit, f.Grade, frozen.SocketCAN)
 		}
 	})
 	for _, tc := range []struct {

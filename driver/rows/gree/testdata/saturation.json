@@ -1,0 +1,14 @@
+{
+  "temperatures": [
+    {"start": 81, "unit": 8, "raw": 145, "celsius": 45, "field": "thermal.measurement.refrigerant_condensing_temperature", "coefficient": "31815"},
+    {"start": 82, "unit": 8, "raw": 95, "celsius": -5, "field": "thermal.measurement.refrigerant_evaporating_temperature", "coefficient": "26815"},
+    {"start": 105, "unit": 9, "raw": 138, "celsius": 38, "field": "thermal.measurement.refrigerant_condensing_temperature", "coefficient": "31115"},
+    {"start": 106, "unit": 10, "raw": 103, "celsius": 3, "field": "thermal.measurement.refrigerant_evaporating_temperature", "coefficient": "27615"}
+  ],
+  "averages": [
+    {"start": 83, "unit": 8, "raw": 141, "celsius": 41},
+    {"start": 84, "unit": 8, "raw": 97, "celsius": -3},
+    {"start": 107, "unit": 9, "raw": 136, "celsius": 36},
+    {"start": 108, "unit": 10, "raw": 101, "celsius": 1}
+  ]
+}

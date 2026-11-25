@@ -71,7 +71,7 @@ func enum(c Coordinate, class reg.GreeVRFDeviceClass, subject string, field semr
 func ReadRows() []ReadBinding {
 	return []ReadBinding{
 		enum(Coordinate{0x21, 0, bytePoint}, indoor, terminal, "thermal.mode.terminal_unit", false, "setting.71:00", "", "cool", "dry", "fan_only", "heat"),
-		enum(Coordinate{0x1e, 1, bitPoint}, indoor, terminal, "thermal.status.terminal_unit_fault", false, "", "clear", "present"),
+		enum(Coordinate{0x1e, 0, bitPoint}, indoor, terminal, "thermal.status.terminal_unit_fault", false, "", "clear", "present"),
 		enum(Coordinate{0x1f, 4, bitPoint}, indoor, terminal, "thermal.status.terminal_unit_operation", false, "", "idle", "active"),
 		{Coordinate{0x20, 0, bytePoint}, indoor, zone, "thermal.measurement.air_temperature", kelvin, false, "", temperature()},
 		{setTemperature, indoor, zone, setpoint, kelvin, false, "setting.73:00", temperature()},
@@ -84,6 +84,10 @@ func ReadRows() []ReadBinding {
 		{Coordinate{0x31, 0x91, bytePoint}, outdoor, circuit, "thermal.measurement.refrigerant_high_side_pressure", "unit.pascal", false, "", numeric(1000, 1)},
 		{Coordinate{0x31, 0x93, bytePoint}, outdoor, circuit, "thermal.measurement.refrigerant_low_side_pressure", "unit.pascal", false, "", numeric(1000, 1)},
 		{Coordinate{0x20, 0x50, bytePoint}, outdoor, system, "thermal.measurement.outdoor_air_temperature", kelvin, true, "", temperature()},
+		{Coordinate{0x20, 0x51, bytePoint}, outdoor, circuit, "thermal.measurement.refrigerant_condensing_temperature", kelvin, true, "", temperature()},
+		{Coordinate{0x20, 0x52, bytePoint}, outdoor, circuit, "thermal.measurement.refrigerant_evaporating_temperature", kelvin, true, "", temperature()},
+		{Coordinate{0x20, 0x69, bytePoint}, outdoor, circuit, "thermal.measurement.refrigerant_condensing_temperature", kelvin, false, "", temperature()},
+		{Coordinate{0x20, 0x6a, bytePoint}, outdoor, circuit, "thermal.measurement.refrigerant_evaporating_temperature", kelvin, false, "", temperature()},
 	}
 }
 

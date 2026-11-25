@@ -33,15 +33,72 @@ func withDomain(r roweval.NativeRow[Selector], lo, hi string) roweval.NativeRow[
 	return r
 }
 
+// serialLayoutQualifier is the qualifier the V1.08 frame evaluation sets for a
+// 0x324 frame from its byte 0: the frame number zero, whose layout carries the
+// battery identifier, or a later frame number, whose layout carries seven serial
+// characters.
+const (
+	serialLayoutQualifier = "serial_layout"
+	serialLayoutZero      = "frame_zero"
+	serialLayoutLater     = "later_frame"
+)
+
+// serialRows are the native rows of the serial response 0x324 that depend on the
+// frame number: the battery identifier of frame 0 at byte 1, and the serial
+// characters, bytes 2 to 7 in frame 0 and bytes 1 to 7 in later frames. The two
+// fragment rows share one name and differ in their layouts and conditions.
+func serialRows() []roweval.NativeRow[Selector] {
+	battery := nativeRowIn(V108Profile, 0x324, "serial_battery_id", signalSlice{8, 8, bitSlice, false}, "native.index")
+	battery.When = serialWhen(serialLayoutZero)
+	zero := nativeRowIn(V108Profile, 0x324, "serial_fragment", signalSlice{16, 48, bitSlice, false}, "native.raw")
+	zero.When = serialWhen(serialLayoutZero)
+	later := nativeRowIn(V108Profile, 0x324, "serial_fragment", signalSlice{8, 56, bitSlice, false}, "native.raw")
+	later.When = serialWhen(serialLayoutLater)
+	return []roweval.NativeRow[Selector]{battery, zero, later}
+}
+
+func serialWhen(layout string) roweval.When {
+	return roweval.When{Equal: map[string]string{serialLayoutQualifier: layout}}
+}
+
+// serialLayoutOf is the layout qualifier of a 0x324 frame: frame number zero
+// selects the frame 0 layout, any other frame number the later layout.
+func serialLayoutOf(frameNumber byte) string {
+	if frameNumber == 0 {
+		return serialLayoutZero
+	}
+	return serialLayoutLater
+}
+
+// rowsAppliedTo returns the rows whose equal-value conditions the qualifiers
+// meet. The evaluation keys its output by row identifier, so a row of another
+// layout of the same name must not reach it; every V1.08 condition is an
+// equal-value condition.
+func rowsAppliedTo(rows []roweval.NativeRow[Selector], values map[string]string) []roweval.NativeRow[Selector] {
+	var out []roweval.NativeRow[Selector]
+	for _, r := range rows {
+		applies := true
+		for k, v := range r.When.Equal {
+			if values[k] != v {
+				applies = false
+			}
+		}
+		if applies {
+			out = append(out, r)
+		}
+	}
+	return out
+}
+
 // v108Rows are the native rows of the V1.08 frames 0x311 to 0x325 that the
 // frozen V1.08 report decoder emits. The shared fields sit at the V1.04 slices;
 // the divergent fields are the status word with its states in bits 0 to 9, the
 // derating bytes of 0x312, the average temperature and lifetime alarm of 0x313,
 // the identity, version and update fields and the cell extremes of the later
 // frames. Bits 10 and 11 of the status word are reserved and stay in the raw word.
-// The frames 0x324 and 0x325 carry the serial and history records; their rows
-// are the fields whose position the frame itself fixes (see the package report
-// for the conditional fields that have no row).
+// Frame 0x324 carries the serial record: its battery identifier and serial
+// fragment have one row per layout, selected by the frame number (serialRows).
+// The history bytes of 0x325 stay raw.
 func v108Rows() []roweval.NativeRow[Selector] {
 	rows := []roweval.NativeRow[Selector]{
 		nativeRowIn(V108Profile, 0x311, "charge_voltage_limit", signalSlice{0, 16, bigEndian, false}, "native.decivolt"),
@@ -133,10 +190,11 @@ func v108Rows() []roweval.NativeRow[Selector] {
 	rows = append(rows, v108BitRows(0x323, 7, "warning_charge_overpower", "warning_discharge_overpower", "warning_internal_charge_circulation", "warning_internal_discharge_circulation")...)
 
 	// 0x324 and 0x325: the frame number. The battery number and the serial
-	// fragment of 0x324 depend on the frame number's value, which no row
-	// condition expresses, so they have no row (see the package report). The
-	// history bytes of 0x325 sit at a fixed position and stay raw.
+	// fragment of 0x324 have one layout in frame 0 and another in later frames,
+	// selected by the layout qualifier (serialRows). The history bytes of 0x325
+	// sit at a fixed position and stay raw.
 	rows = append(rows, nativeRowIn(V108Profile, 0x324, "serial_frame_number", signalSlice{0, 8, bitSlice, false}, "native.raw"))
+	rows = append(rows, serialRows()...)
 	rows = append(rows,
 		nativeRowIn(V108Profile, 0x325, "frame_number", signalSlice{0, 8, bitSlice, false}, "native.raw"),
 		nativeRowIn(V108Profile, 0x325, "battery_id", signalSlice{8, 8, bitSlice, false}, "native.index"),
@@ -222,5 +280,15 @@ func EvaluateV108Frame(frame canbus.Frame, a roweval.Acquired[Selector]) (map[st
 	if reason := V108FrameDisposition(frame); reason != "" {
 		return nil, reason, nil
 	}
-	return evaluateAdmitted(withCellBindings(V108Table()), frame, a)
+	table := withCellBindings(V108Table())
+	if frame.ID().Value() == 0x324 && !frame.ID().Extended() {
+		values := make(map[string]string, len(a.Qualifiers.Values)+1)
+		for k, v := range a.Qualifiers.Values {
+			values[k] = v
+		}
+		values[serialLayoutQualifier] = serialLayoutOf(frame.Bytes()[0])
+		a.Qualifiers.Values = values
+		table.Native = rowsAppliedTo(table.Native, values)
+	}
+	return evaluateAdmitted(table, frame, a)
 }

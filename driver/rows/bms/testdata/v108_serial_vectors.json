@@ -1,0 +1,30 @@
+[
+  {
+    "name": "frame zero with battery identifier 165 and serial characters 1 to 6",
+    "frame_number": 0,
+    "data_hex": "00A5313233343536",
+    "battery_id": 165,
+    "serial_fragment_hex": "313233343536"
+  },
+  {
+    "name": "frame zero with battery identifier 127 and serial characters Z to O",
+    "frame_number": 0,
+    "data_hex": "007F5A4B4C4D4E4F",
+    "battery_id": 127,
+    "serial_fragment_hex": "5A4B4C4D4E4F"
+  },
+  {
+    "name": "later frame 2 with seven serial characters and no battery identifier",
+    "frame_number": 2,
+    "data_hex": "0241424344454647",
+    "battery_id": null,
+    "serial_fragment_hex": "41424344454647"
+  },
+  {
+    "name": "later frame 255 with seven serial characters and no battery identifier",
+    "frame_number": 255,
+    "data_hex": "FF00010203040506",
+    "battery_id": null,
+    "serial_fragment_hex": "00010203040506"
+  }
+]

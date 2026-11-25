@@ -6,6 +6,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"os"
+	"sort"
 	"strconv"
 	"strings"
 	"testing"
@@ -33,11 +34,15 @@ type selectorRecord struct {
 	Reason     string           `json:"reason"`
 	Native     map[string]int64 `json:"native"`
 	Absent     []string         `json:"absent"`
+	Rows       []string         `json:"rows"`
 }
 
 // selectorVector is one frame of the selector tests: the identifier, the
 // extended flag, the DLC and raw DLC, and the eight data bytes of the record.
-// Mutated copies of a vector vary one of these fields at a time.
+// Mutated copies of a vector vary one of these fields at a time. rows is the
+// complete list of native row names an admitted frame must evaluate, without
+// the profile prefix: a row missing from the live table, or a row evaluated on
+// a frame of another identifier, changes that list and fails the vector.
 type selectorVector struct {
 	name, profile, scope string
 	id                   uint32
@@ -47,6 +52,7 @@ type selectorVector struct {
 	frame, reason        string
 	native               map[string]int64
 	absent               []string
+	rows                 []string
 }
 
 // selectorProfilePrefixes maps each profile of the vector file to the prefix of
@@ -91,6 +97,9 @@ func readSelectorVectors(t *testing.T) []selectorVector {
 		}
 		switch r.Frame {
 		case "admitted":
+			if len(r.Rows) == 0 {
+				t.Fatalf("%s: an admitted frame declares no rows", r.Name)
+			}
 		case "rejected":
 			if r.Reason == "" {
 				t.Fatalf("%s: a rejected frame names its reason", r.Name)
@@ -100,7 +109,7 @@ func readSelectorVectors(t *testing.T) []selectorVector {
 			t.Fatalf("%s: unknown frame disposition %q", r.Name, r.Frame)
 		}
 		out = append(out, selectorVector{name: r.Name, profile: r.Profile, scope: r.Scope, id: uint32(id), extended: r.Extended,
-			dlc: r.DLC, rawDLC: r.RawDLC, data: data, frame: r.Frame, reason: r.Reason, native: r.Native, absent: r.Absent})
+			dlc: r.DLC, rawDLC: r.RawDLC, data: data, frame: r.Frame, reason: r.Reason, native: r.Native, absent: r.Absent, rows: r.Rows})
 	}
 	return out
 }
@@ -237,6 +246,27 @@ func nativeKey(ev roweval.Evaluation) string {
 	return fmt.Sprintf("%s e%d", n.Coefficient, n.Exponent10)
 }
 
+// rowNamesOf returns the sorted row names of the evaluations, without the
+// profile prefix; a row of another profile keeps its full identifier.
+func rowNamesOf(profile string, evals map[string]roweval.Evaluation) []string {
+	prefix := selectorProfilePrefixes[profile]
+	names := make([]string, 0, len(evals))
+	for id := range evals {
+		names = append(names, strings.TrimPrefix(id, prefix))
+	}
+	sort.Strings(names)
+	return names
+}
+
+// sameNames reports whether two name lists hold the same names, in any order.
+func sameNames(a, b []string) bool {
+	x := append([]string(nil), a...)
+	y := append([]string(nil), b...)
+	sort.Strings(x)
+	sort.Strings(y)
+	return strings.Join(x, "\x00") == strings.Join(y, "\x00")
+}
+
 // checkSelectorOutcome compares the gate outcome and the row values of one
 // vector with its expectation.
 func checkSelectorOutcome(t *testing.T, v selectorVector, evals map[string]roweval.Evaluation, reason roweval.Reason) {
@@ -259,6 +289,14 @@ func checkSelectorOutcome(t *testing.T, v selectorVector, evals map[string]rowev
 		for _, name := range v.absent {
 			if _, ok := evals[prefix+name]; ok {
 				t.Fatalf("%s: row %s evaluated on a frame it does not apply to", v.name, name)
+			}
+		}
+		// The vector file declares the row list of every admitted frame it holds
+		// (readSelectorVectors). A frame built in code carries no list and is
+		// checked by its values only.
+		if v.rows != nil {
+			if got := rowNamesOf(v.profile, evals); !sameNames(got, v.rows) {
+				t.Fatalf("%s: evaluated rows %v, the frame declares %v", v.name, got, v.rows)
 			}
 		}
 	case "rejected":
@@ -652,30 +690,17 @@ func TestV108ParallelFailureBitIsNamedOnlyInV108(t *testing.T) {
 	}
 }
 
-// TestEveryNativeRowIsNeededByAnIndependentVector removes each native row of each
-// table in turn and requires a vector to fail. A vector fails when a row it
-// evaluates with the full table is no longer evaluated without that row. Every
-// row needs at least one such vector, and the table path must give the same rows
-// as the profile's entry point for every vector.
+// TestEveryNativeRowIsNeededByAnIndependentVector removes each native row that
+// the vectors declare, one at a time, from the live table, and requires a vector
+// to fail. The inventory is the row list each admitted vector declares, not the
+// live table: a declared row the live table no longer has is an error, and a
+// row removed from the table must change the rows an admitted vector evaluates.
+// The live table must also give, for every admitted vector, exactly the rows the
+// vector declares, so a row the table adds, or evaluates on another identifier,
+// is caught as well.
 func TestEveryNativeRowIsNeededByAnIndependentVector(t *testing.T) {
 	roles := storageRoles(t)
 	vectors := readSelectorVectors(t)
-	type unit struct {
-		profile, scope string
-		id             uint32
-	}
-	units := map[unit][]selectorVector{}
-	var order []unit
-	for _, v := range vectors {
-		if v.frame != "admitted" {
-			continue
-		}
-		u := unit{v.profile, v.scope, v.id}
-		if _, ok := units[u]; !ok {
-			order = append(order, u)
-		}
-		units[u] = append(units[u], v)
-	}
 	for base := range monitorLayouts {
 		covered := false
 		for _, v := range vectors {
@@ -687,45 +712,44 @@ func TestEveryNativeRowIsNeededByAnIndependentVector(t *testing.T) {
 			t.Errorf("monitor family %#x has no admitted vector", base)
 		}
 	}
-	rows := 0
-	for _, u := range order {
-		full := fullSelectorTable(u.profile, u.scope, u.id)
-		members := units[u]
-		for i, row := range full.Native {
-			if row.At.Identifier != u.id {
-				continue
-			}
-			rows++
+	removed := 0
+	for _, v := range vectors {
+		if v.frame != "admitted" {
+			continue
+		}
+		prefix := selectorProfilePrefixes[v.profile]
+		full := fullSelectorTable(v.profile, v.scope, v.id)
+		if got := rowNamesOf(v.profile, evaluateSelectorTable(t, v, full, roles)); !sameNames(got, v.rows) {
+			t.Fatalf("%s: the live table evaluates rows %v, the frame declares %v", v.name, got, v.rows)
+		}
+		for _, name := range v.rows {
+			id := prefix + name
+			found := false
 			reduced := full
-			reduced.Native = append(append([]roweval.NativeRow[Selector]{}, full.Native[:i]...), full.Native[i+1:]...)
-			caught := false
-			for _, v := range members {
-				fullEvals := evaluateSelectorTable(t, v, full, roles)
-				entryEvals, reason := v.evaluate(t, roles)
-				if reason != "" || len(entryEvals) != len(fullEvals) {
-					t.Fatalf("%s: table path gives %d rows, entry point %d (reason %q)", v.name, len(fullEvals), len(entryEvals), reason)
-				}
-				for id := range entryEvals {
-					if _, ok := fullEvals[id]; !ok {
-						t.Fatalf("%s: table path lacks row %s", v.name, id)
-					}
-				}
-				if _, applies := fullEvals[row.ID]; !applies {
+			reduced.Native = nil
+			for _, row := range full.Native {
+				// A row ID can appear under more than one layout condition: removing
+				// the row removes every entry of that ID.
+				if row.ID == id {
+					found = true
 					continue
 				}
-				if _, still := evaluateSelectorTable(t, v, reduced, roles)[row.ID]; !still {
-					caught = true
-				}
+				reduced.Native = append(reduced.Native, row)
 			}
-			if !caught {
-				t.Errorf("deleting native row %s (table %s, index %d) leaves every vector passing", row.ID, u.profile, i)
+			if !found {
+				t.Errorf("%s: declared row %s is missing from the live table", v.name, id)
+				continue
 			}
+			if sameNames(rowNamesOf(v.profile, evaluateSelectorTable(t, v, reduced, roles)), v.rows) {
+				t.Errorf("deleting native row %s leaves %s passing", id, v.name)
+			}
+			removed++
 		}
 	}
-	if rows == 0 {
-		t.Fatal("no native row was checked")
+	if removed == 0 {
+		t.Fatal("no native row was removed")
 	}
-	t.Logf("%d native rows removed in turn; %d admitted vectors, %d table units", rows, admittedVectors(vectors), len(order))
+	t.Logf("%d declared native rows removed in turn; %d admitted vectors", removed, admittedVectors(vectors))
 }
 
 // admittedVectors counts the admitted frames of the file.

@@ -20,6 +20,12 @@ import (
 // canEFFFlag is the socketcan extended-frame flag of the record identifier.
 const canEFFFlag = 0x80000000
 
+// vector is one synthetic frame and its independent expectation. Frame is
+// "admitted" (every native row of the frame is listed in Native, and the facts
+// of the bound elements are listed in Facts), "rejected" (the frame is listed
+// and fails admission: every native row of the frame carries the rejection
+// and its evidence, and no value or candidate), or "no_match" (no native row
+// of the table applies to the frame).
 type vector struct {
 	Name       string            `json:"name"`
 	Identifier uint32            `json:"identifier"`
@@ -29,7 +35,6 @@ type vector struct {
 	Frame      string            `json:"frame"`
 	Native     map[string]int64  `json:"native"`
 	Facts      map[string]string `json:"facts"`
-	Withheld   []string          `json:"withheld"`
 }
 
 // record builds the 16-byte socketcan record the canbus decoder reads.
@@ -66,8 +71,8 @@ func readVectors(t *testing.T) []vector {
 
 func TestV104VectorsMatchTheirExpectations(t *testing.T) {
 	roles := storageRoles(t)
-	table := v104Rows()
-	if err := roweval.ValidateTable(table, canDescriptors(), roles); err != nil {
+	table := V104Table()
+	if err := roweval.ValidateTable(table, V104Descriptors(), roles); err != nil {
 		t.Fatal(err)
 	}
 	for _, v := range readVectors(t) {
@@ -77,61 +82,96 @@ func TestV104VectorsMatchTheirExpectations(t *testing.T) {
 			if err != nil {
 				t.Fatal(err)
 			}
-			listed, admitted := v104Admitted(frame)
-			switch v.Frame {
-			case "no_match":
-				if listed && !admitted {
-					t.Fatalf("frame is listed")
-				}
-				if len(v.Native) != 0 {
-					t.Fatalf("no-match vector names native values")
-				}
-				return
-			case "not_valid":
-				if !listed || admitted {
-					t.Fatalf("frame must be listed and not admitted")
-				}
-				return
-			}
-			if !listed || !admitted {
-				t.Fatalf("frame must be admitted")
-			}
 			a := acquired(raw, roles)
+			seenNative := map[string]bool{}
+			seenFact := map[string]bool{}
 			for _, row := range table.Native {
-				if row.At.Identifier != frame.ID().Value() {
-					continue
-				}
 				name := strings.TrimPrefix(row.ID, Profile+".")
 				ev, err := evaluateRow(table, frame, row, a)
 				if err != nil {
 					t.Fatal(err)
 				}
-				want, listedNative := v.Native[name]
-				if !listedNative {
+				belongs := row.At.Identifier == frame.ID().Value() && row.At.Extended == frame.ID().Extended() &&
+					row.At.DLC == frame.DLC() && row.At.RawDLC == frame.RawDLC()
+				if v.Frame == "no_match" {
+					if ev.Reason != roweval.ReasonNoMatch || ev.Native != nil || ev.Candidate != nil {
+						t.Fatalf("%s: frame must not match any row: reason %q native %+v candidate %+v", name, ev.Reason, ev.Native, ev.Candidate)
+					}
 					continue
 				}
-				n := ev.Native
-				if n == nil || n.RowID != row.ID || n.Value == nil || n.Value.Quantity == nil || !decimalEquals(n.Value.Quantity.Number, fmt.Sprint(want)) {
-					t.Fatalf("native %s: want %d, got %+v", name, want, n)
+				if !belongs {
+					// Another frame's row: its slice may coincide with this one, so
+					// the row is checked on its own frame only.
+					continue
 				}
-				if !reflect.DeepEqual(n.Evidence, a.Template.Evidence) {
-					t.Fatalf("native %s lost its wire evidence", name)
+				if ev.Native == nil || ev.Native.RowID != row.ID {
+					t.Fatalf("%s: no native evaluation: %+v", name, ev)
 				}
-				if fact, ok := v.Facts[factFor(name)]; ok {
-					if ev.Candidate == nil || ev.Candidate.Key.FactID != semreg.DefinitionID(factFor(name)) || !decimalEquals(ev.Candidate.Value.Quantity.Number, fact) {
-						t.Fatalf("%s: candidate %+v reason %q", name, ev.Candidate, ev.Reason)
+				if !reflect.DeepEqual(ev.Native.Evidence, a.Template.Evidence) {
+					t.Fatalf("%s: native evaluation lost the raw source record", name)
+				}
+				if v.Frame == "rejected" {
+					if ev.Native.Reason != "not valid" || ev.Native.Value != nil || ev.Reason != "not valid" || ev.Candidate != nil {
+						t.Fatalf("%s: rejected frame gave value %+v reason %q candidate %+v", name, ev.Native.Value, ev.Reason, ev.Candidate)
 					}
-				} else if ev.Candidate != nil {
-					t.Fatalf("%s: unexpected candidate %+v", name, ev.Candidate)
+					continue
+				}
+				if v.Frame != "admitted" {
+					t.Fatalf("unknown frame disposition %q", v.Frame)
+				}
+				want, listed := v.Native[name]
+				if !listed {
+					t.Fatalf("%s: admitted frame has no expected native value", name)
+				}
+				seenNative[name] = true
+				n := ev.Native
+				if n.Reason != "" || n.Value == nil || n.Value.Quantity == nil || !decimalEquals(n.Value.Quantity.Number, fmt.Sprint(want)) {
+					t.Fatalf("%s: want native %d, got reason %q value %+v", name, want, n.Reason, n.Value)
+				}
+				fact, bound := v.Facts[factFor(name)]
+				if !bound {
+					if ev.Candidate != nil {
+						t.Fatalf("%s: unexpected candidate %+v", name, ev.Candidate)
+					}
+					continue
+				}
+				seenFact[factFor(name)] = true
+				c := ev.Candidate
+				if c == nil || c.Key.FactID != semreg.DefinitionID(factFor(name)) || c.Value == nil || c.Value.Quantity == nil ||
+					!decimalEquals(c.Value.Quantity.Number, fact) || c.Value.Quantity.Unit != bindingUnit(table, row.ID) {
+					t.Fatalf("%s: want candidate %s = %s, got %+v reason %q", name, factFor(name), fact, c, ev.Reason)
+				}
+				if ev.Subject == nil || ev.Subject.Role != packRole {
+					t.Fatalf("%s: candidate subject %+v", name, ev.Subject)
+				}
+				if !reflect.DeepEqual(c.Quality, a.Template.Quality) || !reflect.DeepEqual(c.Evidence, a.Template.Evidence) {
+					t.Fatalf("%s: candidate lost its quality or evidence", name)
 				}
 			}
-			for _, name := range v.Withheld {
-				if _, ok := v.Native[name]; !ok {
-					t.Fatalf("withheld %s has no native value", name)
+			if v.Frame == "admitted" {
+				for name := range v.Native {
+					if !seenNative[name] {
+						t.Fatalf("expected native %s was not evaluated", name)
+					}
+				}
+				for fact := range v.Facts {
+					if !seenFact[fact] {
+						t.Fatalf("expected fact %s was not emitted", fact)
+					}
 				}
 			}
 		})
 	}
+}
+
+// bindingUnit is the unit the binding of a native row declares for its fact.
+func bindingUnit(table roweval.Table[Selector], nativeID string) semreg.DefinitionID {
+	for _, b := range table.Bindings {
+		if b.NativeID == nativeID && b.Read != nil {
+			return b.Read.Unit
+		}
+	}
+	return ""
 }
 
 // factFor maps a native row name to the storage fact it feeds. Rows without a
@@ -153,7 +193,7 @@ func factFor(name string) string {
 func evaluateRow(table roweval.Table[Selector], frame canbus.Frame, row roweval.NativeRow[Selector], a roweval.Acquired[Selector]) (roweval.Evaluation, error) {
 	a.Selector = Selector{Identifier: frame.ID().Value(), Extended: frame.ID().Extended(), DLC: frame.DLC(), RawDLC: frame.RawDLC(), Slice: row.At.Slice}
 	a.Payload = frame.Data()
-	a.Descriptors = canDescriptors()
+	a.Descriptors = V104Descriptors()
 	return roweval.Evaluate(table, a)
 }
 

@@ -6,7 +6,6 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/Project-Helianthus/helianthus-canbus"
 	"github.com/Project-Helianthus/helianthus-semreg/semreg/v1"
 	"github.com/Project-Helianthus/helianthus-semreg/semreg/v1/roweval"
 )
@@ -35,6 +34,12 @@ const (
 	packDimension = "storage.dimension.pack"
 	receivePolicy = "policy.can.example"
 	sohValidBit   = 63
+
+	// admit0x312 and admit0x313 are the frame admission hooks. They sit on
+	// every native row of their frame, so a frame that fails admission gives
+	// no decoded value and no binding candidate from any of its rows.
+	admit0x312 = "admit-0x312"
+	admit0x313 = "admit-0x313"
 )
 
 func nativeRow(id uint32, name string, slice signalSlice, unit string) roweval.NativeRow[Selector] {
@@ -63,36 +68,72 @@ func packRead(name, ref string, fact, unit semreg.DefinitionID, divisor int64, h
 			ToRegistry: roweval.Convert{Numeric: &roweval.Affine{Num: 1, Den: divisor}, Hook: hook}}}
 }
 
-// v104Rows returns the native rows of frames 0x311 to 0x313 and the bindings
-// that feed storage elements from them.
-func v104Rows() roweval.Table[Selector] {
+// V104Table returns the native rows of frames 0x311 to 0x313 and the bindings
+// that feed storage elements from them. The table enforces frame admission
+// itself: a 0x312 frame whose count bytes are outside 1 through 254, or a 0x313
+// frame whose SOC is above 100, yields its native rows with a reason and no
+// value, and no candidate.
+func V104Table() roweval.Table[Selector] {
+	rows := []roweval.NativeRow[Selector]{
+		nativeRow(0x311, "charge_voltage_limit", signalSlice{0, 16, bigEndian, false}, "native.decivolt"),
+		nativeRow(0x311, "charge_current_limit", signalSlice{16, 16, bigEndian, false}, "native.deciampere"),
+		nativeRow(0x311, "discharge_current_limit", signalSlice{32, 16, bigEndian, false}, "native.deciampere"),
+		nativeRow(0x311, "status_word", signalSlice{48, 16, bigEndian, false}, "native.raw"),
+		nativeRow(0x311, "operating_state", signalSlice{56, 2, bitSlice, false}, "native.state"),
+		nativeRow(0x312, "protection_flags", signalSlice{0, 16, bigEndian, false}, "native.raw"),
+		nativeRow(0x312, "warning_flags", signalSlice{16, 16, bigEndian, false}, "native.raw"),
+		nativeRow(0x312, "pack_count", signalSlice{32, 8, bitSlice, false}, "native.count"),
+		nativeRow(0x312, "manufacturer", signalSlice{40, 16, bigEndian, false}, "native.raw"),
+		nativeRow(0x312, "total_cell_count", signalSlice{56, 8, bitSlice, false}, "native.count"),
+		nativeRow(0x313, "pack_voltage", signalSlice{0, 16, bigEndian, true}, "native.centivolt"),
+		nativeRow(0x313, "pack_current", signalSlice{16, 16, bigEndian, true}, "native.deciampere"),
+		nativeRow(0x313, "maximum_cell_temperature", signalSlice{32, 16, bigEndian, true}, "native.decicelsius"),
+		nativeRow(0x313, "soc", signalSlice{48, 8, bitSlice, false}, "native.percent"),
+		nativeRow(0x313, "soh", signalSlice{56, 7, bitSlice, false}, "native.percent"),
+		nativeRow(0x313, "soh_valid", signalSlice{63, 1, bitSlice, false}, "native.flag"),
+	}
+	for i := range rows {
+		switch rows[i].At.Identifier {
+		case 0x312:
+			rows[i].Decode.Hook = admit0x312
+		case 0x313:
+			rows[i].Decode.Hook = admit0x313
+		}
+	}
 	return roweval.Table[Selector]{
-		Native: []roweval.NativeRow[Selector]{
-			nativeRow(0x311, "charge_voltage_limit", signalSlice{0, 16, bigEndian, false}, "native.decivolt"),
-			nativeRow(0x311, "charge_current_limit", signalSlice{16, 16, bigEndian, false}, "native.deciampere"),
-			nativeRow(0x311, "discharge_current_limit", signalSlice{32, 16, bigEndian, false}, "native.deciampere"),
-			nativeRow(0x311, "status_word", signalSlice{48, 16, bigEndian, false}, "native.raw"),
-			nativeRow(0x311, "operating_state", signalSlice{56, 2, bitSlice, false}, "native.state"),
-			nativeRow(0x312, "protection_flags", signalSlice{0, 16, bigEndian, false}, "native.raw"),
-			nativeRow(0x312, "warning_flags", signalSlice{16, 16, bigEndian, false}, "native.raw"),
-			nativeRow(0x312, "pack_count", signalSlice{32, 8, bitSlice, false}, "native.count"),
-			nativeRow(0x312, "manufacturer", signalSlice{40, 16, bigEndian, false}, "native.raw"),
-			nativeRow(0x312, "total_cell_count", signalSlice{56, 8, bitSlice, false}, "native.count"),
-			nativeRow(0x313, "pack_voltage", signalSlice{0, 16, bigEndian, true}, "native.centivolt"),
-			nativeRow(0x313, "pack_current", signalSlice{16, 16, bigEndian, true}, "native.deciampere"),
-			nativeRow(0x313, "maximum_cell_temperature", signalSlice{32, 16, bigEndian, true}, "native.decicelsius"),
-			nativeRow(0x313, "soc", signalSlice{48, 8, bitSlice, false}, "native.percent"),
-			nativeRow(0x313, "soh", signalSlice{56, 7, bitSlice, false}, "native.percent"),
-			nativeRow(0x313, "soh_valid", signalSlice{63, 1, bitSlice, false}, "native.flag"),
-		},
+		Native: rows,
 		Bindings: []roweval.BindingRow{
 			packRead("pack_current", "CAN 0x313", "storage.pack.current", "unit.ampere", 10, ""),
 			packRead("pack_voltage", "CAN 0x313", "storage.pack.voltage", "unit.volt", 100, ""),
 			packRead("soc", "CAN 0x313", "storage.state.soc", "unit.ratio", 100, ""),
 			packRead("soh", "CAN 0x313", "storage.state.soh", "unit.ratio", 100, "soh-validity"),
 		},
-		Hooks: map[string]roweval.RowHook{"soh-validity": sohValidity},
+		Hooks: map[string]roweval.RowHook{
+			"soh-validity": sohValidity,
+			admit0x312:     admitFrame0x312,
+			admit0x313:     admitFrame0x313,
+		},
 	}
+}
+
+// admitFrame0x312 is the frozen growattV104Valid rule for 0x312: both count
+// bytes (B4 and B7) in 1 through 254.
+func admitFrame0x312(inputs roweval.DetachedInputs, _ roweval.RowID, _ roweval.Direction, value roweval.TypedValue) (roweval.DerivedValue, roweval.Reason) {
+	p := inputs.Inputs()[0].Payload
+	if len(p) < 8 || p[4] < 1 || p[4] > 254 || p[7] < 1 || p[7] > 254 {
+		return roweval.DerivedValue{}, "not valid"
+	}
+	return roweval.DerivedValue{Value: value}, ""
+}
+
+// admitFrame0x313 is the frozen growattV104Valid rule for 0x313: SOC (B6) at
+// most 100.
+func admitFrame0x313(inputs roweval.DetachedInputs, _ roweval.RowID, _ roweval.Direction, value roweval.TypedValue) (roweval.DerivedValue, roweval.Reason) {
+	p := inputs.Inputs()[0].Payload
+	if len(p) < 8 || p[6] > 100 {
+		return roweval.DerivedValue{}, "not valid"
+	}
+	return roweval.DerivedValue{Value: value}, ""
 }
 
 // sohValidity admits the SOH candidate only when the frame's validity bit (B7
@@ -105,7 +146,9 @@ func sohValidity(inputs roweval.DetachedInputs, _ roweval.RowID, _ roweval.Direc
 	return roweval.DerivedValue{Value: value}, ""
 }
 
-func canDescriptors() roweval.Descriptors[Selector] {
+// V104Descriptors returns the codecs and byte, bit and word orders the V1.04
+// table names.
+func V104Descriptors() roweval.Descriptors[Selector] {
 	identity := func(raw uint64, _ uint16) (uint64, error) { return raw, nil }
 	swap16 := func(raw uint64, width uint16) (uint64, error) {
 		if width != 16 {
@@ -154,25 +197,4 @@ func integerCodec(signed bool) roweval.Codec {
 			return strconv.ParseUint(s, 10, int(width))
 		},
 	}
-}
-
-// v104Admitted is the frame admission of the V1.04 profile (frozen
-// growattV104Valid): a standard 8-byte frame, and for 0x312 both count bytes in
-// 1 through 254, for 0x313 SOC at most 100. Other identifiers are not listed.
-func v104Admitted(frame canbus.Frame) (listed, admitted bool) {
-	id := frame.ID().Value()
-	if frame.ID().Extended() || id < 0x311 || id > 0x321 {
-		return false, false
-	}
-	if frame.DLC() != 8 || frame.RawDLC() != 8 {
-		return true, false
-	}
-	p := frame.Bytes()
-	switch id {
-	case 0x312:
-		return true, p[4] >= 1 && p[4] <= 254 && p[7] >= 1 && p[7] <= 254
-	case 0x313:
-		return true, p[6] <= 100
-	}
-	return true, true
 }

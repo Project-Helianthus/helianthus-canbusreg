@@ -1,0 +1,77 @@
+{
+ "source": "V1.08 contract page, Frame map 0x212 and 0x324 and section 0x212 request and response; witnesses written by hand from the documented byte table",
+ "query": [
+  {
+   "name": "battery 1",
+   "battery_id": 1,
+   "identifier": "0x212",
+   "payload": "0101000000000000"
+  },
+  {
+   "name": "battery 0",
+   "battery_id": 0,
+   "identifier": "0x212",
+   "payload": "0100000000000000"
+  },
+  {
+   "name": "battery 255",
+   "battery_id": 255,
+   "identifier": "0x212",
+   "payload": "01ff000000000000"
+  }
+ ],
+ "response": [
+  {
+   "name": "standard: frame 0 and one continuation",
+   "battery_id": 1,
+   "frames": [
+    "0001414243444546",
+    "0147484950515253"
+   ],
+   "serial": "41424344454647484950515253"
+  },
+  {
+   "name": "frame 0 only",
+   "battery_id": 2,
+   "frames": [
+    "0002414243444546"
+   ],
+   "serial": "414243444546"
+  },
+  {
+   "name": "extended: frame 0 and four continuations",
+   "battery_id": 3,
+   "frames": [
+    "0003000102030405",
+    "0106070809101112",
+    "0213141516171819",
+    "0320212223242526",
+    "0427282930313233"
+   ],
+   "serial": "00010203040506070809101112131415161718192021222324252627282930313233"
+  }
+ ],
+ "not_response": [
+  {
+   "name": "wrong battery id in frame 0",
+   "battery_id": 1,
+   "frames": [
+    "0002414243444546"
+   ]
+  },
+  {
+   "name": "continuation before frame 0",
+   "battery_id": 1,
+   "frames": [
+    "0101414243444546"
+   ]
+  },
+  {
+   "name": "frame 0 naming the battery in B0 position",
+   "battery_id": 1,
+   "frames": [
+    "0100414243444546"
+   ]
+  }
+ ]
+}

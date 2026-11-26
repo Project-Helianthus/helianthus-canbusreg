@@ -298,6 +298,24 @@ func TestGaugeRowsMatchDecoder(t *testing.T) {
 	}
 }
 
+// TestGaugeSingleLayoutCellRowsCarryNoLayoutToken requires the 0x316 cell rows of
+// contract groups L0 and L1 to take the plain field identifier: their field name
+// is unique within the frame, so no layout token belongs between frame and field.
+func TestGaugeSingleLayoutCellRowsCarryNoLayoutToken(t *testing.T) {
+	rows := gaugeRowsByID()
+	for _, k := range []string{"5", "6", "7", "8"} {
+		want := "growatt.bms.pcs.standard.316.cell_" + k
+		if _, ok := rows[want]; !ok {
+			t.Errorf("row %s is not declared", want)
+		}
+	}
+	for id := range rows {
+		if strings.Contains(id, ".316.early.") {
+			t.Errorf("row %s carries a layout token its field does not need", id)
+		}
+	}
+}
+
 func TestGaugeRowIDsAreUnique(t *testing.T) {
 	seen := make(map[string]bool)
 	for _, s := range gaugeSpecs() {

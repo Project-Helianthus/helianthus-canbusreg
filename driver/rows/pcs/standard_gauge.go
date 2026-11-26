@@ -251,10 +251,10 @@ func gaugeSpecs() []gaugeSpec {
 	// cycles; the L6 raw fields at the L2 byte positions; the L3 and L4 words;
 	// the L5 and L7 bytes; the L8 capacity and cycles; the other words.
 	add(
-		gaugeRow(frame316, "early", branchEarly, "cell_5", bigWord(0), "mV", 1, qGaugeCell+"5"),
-		gaugeRow(frame316, "early", branchEarly, "cell_6", bigWord(16), "mV", 1, qGaugeCell+"6"),
-		gaugeRow(frame316, "early", branchEarly, "cell_7", bigWord(32), "mV", 1, qGaugeCell+"7"),
-		gaugeRow(frame316, "early", branchEarly, "cell_8", bigWord(48), "mV", 1, qGaugeCell+"8"),
+		gaugeRow(frame316, "", branchEarly, "cell_5", bigWord(0), "mV", 1, qGaugeCell+"5"),
+		gaugeRow(frame316, "", branchEarly, "cell_6", bigWord(16), "mV", 1, qGaugeCell+"6"),
+		gaugeRow(frame316, "", branchEarly, "cell_7", bigWord(32), "mV", 1, qGaugeCell+"7"),
+		gaugeRow(frame316, "", branchEarly, "cell_8", bigWord(48), "mV", 1, qGaugeCell+"8"),
 
 		gaugeRow(frame316, "l2", "l2", "accumulator", bigWord(0), "", 1, qGaugeValid),
 		gaugeRow(frame316, "l2", "l2", "initial_accumulator", bigWord(0), "", 1, qGaugeInitial),

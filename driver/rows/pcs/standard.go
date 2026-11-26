@@ -4,6 +4,7 @@ import (
 	"math/big"
 	"strconv"
 
+	"github.com/Project-Helianthus/helianthus-canbus"
 	"github.com/Project-Helianthus/helianthus-canbusreg"
 	"github.com/Project-Helianthus/helianthus-semreg/semreg/v1/roweval"
 )
@@ -283,4 +284,80 @@ func extremaQualifiers(s canbusreg.Selection, in canbusreg.PCSStandardPCSInput) 
 	v[qGatewayMeasured] = boolText(gateway && in.MeasurementValid)
 	v[qFixedAggregateLocation] = boolText(fixedAggregate && s.SelectionGroup() != "" && in.IndexValid && in.IndexScope == c.Scope)
 	return q
+}
+
+// extremaFrameDisposition admits only the standard identifier with DLC 8 and raw
+// DLC 8 of the three extrema frames.
+func extremaFrameDisposition(frame canbus.Frame) roweval.Reason {
+	if frame.ID().Extended() || frame.DLC() != 8 || frame.RawDLC() != 8 {
+		return roweval.ReasonNoMatch
+	}
+	switch frame.ID().Value() {
+	case 0x319, 0x322, 0x330:
+		return ""
+	}
+	return roweval.ReasonNoMatch
+}
+
+// EvaluateExtrema runs the decoder and the extrema rows on one observation. A
+// frame the decoder refuses gives the decoder's status and no rows.
+func EvaluateExtrema(s canbusreg.Selection, in canbusreg.PCSStandardPCSInput) (Result, roweval.Reason, error) {
+	res := Result{
+		Evidence:    in.Evidence,
+		Attribution: Attribution{Scope: in.Scope, Bank: in.Bank, Group: in.Group, Slot: in.Slot, HasGroup: in.Group != "", HasSlot: in.Slot != ""},
+	}
+	decoded := canbusreg.DecodePCSStandard(s, in)
+	res.Diagnostics = decoded.Diagnostics
+	if decoded.Status != "decoded" {
+		return res, roweval.Reason(decoded.Status), nil
+	}
+	frame := in.Evidence.Frame
+	if reason := extremaFrameDisposition(frame); reason != "" {
+		return res, reason, nil
+	}
+	t := extremaTable()
+	raw := extremaRawIDs()
+	q := extremaQualifiers(s, in)
+	out := make(map[string]roweval.Evaluation)
+	for _, row := range t.Native {
+		if row.At.Identifier != frame.ID().Value() {
+			continue
+		}
+		a := roweval.Acquired[Selector]{Selector: frameSelector(frame, row.At.Slice), Payload: frame.Data(), Qualifiers: q, Descriptors: Descriptors()}
+		ev, err := roweval.Evaluate(t, a)
+		if err != nil {
+			return res, "", err
+		}
+		if ev.Native != nil {
+			if ev.Native.Reason != "" {
+				ev.Native.Value = nil
+				ev.Native.Unit = ""
+			}
+			ev.Native.Disposition = disposition(ev.Native, raw[ev.Native.RowID])
+			out[ev.Native.RowID] = ev
+		} else if ev.Reason != roweval.ReasonNoMatch {
+			out[row.ID] = ev
+		}
+	}
+	for _, row := range t.Native {
+		if row.At.Identifier == frame.ID().Value() {
+			if _, ok := out[row.ID]; !ok {
+				out[row.ID] = roweval.Evaluation{Reason: roweval.ReasonNoMatch}
+			}
+		}
+	}
+	res.Rows = out
+	return res, "", nil
+}
+
+// extremaRawIDs returns the identifiers of the extrema rows the decoder never
+// interprets.
+func extremaRawIDs() map[string]bool {
+	raw := make(map[string]bool)
+	for _, s := range extremaSpecs() {
+		if s.raw {
+			raw[nativeRow(s.rowSpec).ID] = true
+		}
+	}
+	return raw
 }

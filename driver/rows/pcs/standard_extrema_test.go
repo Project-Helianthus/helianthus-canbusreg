@@ -62,82 +62,6 @@ func buildExtrema(t *testing.T, c extremaCase) (canbusreg.Selection, canbusreg.P
 	return s, in, frame
 }
 
-// extremaFrameDisposition admits only the standard identifier with DLC 8 and raw
-// DLC 8 of the three extrema frames.
-func extremaFrameDisposition(frame canbus.Frame) roweval.Reason {
-	if frame.ID().Extended() || frame.DLC() != 8 || frame.RawDLC() != 8 {
-		return roweval.ReasonNoMatch
-	}
-	switch frame.ID().Value() {
-	case 0x319, 0x322, 0x330:
-		return ""
-	}
-	return roweval.ReasonNoMatch
-}
-
-// evaluateExtrema runs the decoder and the extrema rows on one observation. A
-// frame the decoder refuses gives the decoder's status and no rows.
-func evaluateExtrema(s canbusreg.Selection, in canbusreg.PCSStandardPCSInput) (Result, roweval.Reason, error) {
-	res := Result{
-		Evidence:    in.Evidence,
-		Attribution: Attribution{Scope: in.Scope, Bank: in.Bank, Group: in.Group, Slot: in.Slot, HasGroup: in.Group != "", HasSlot: in.Slot != ""},
-	}
-	decoded := canbusreg.DecodePCSStandard(s, in)
-	res.Diagnostics = decoded.Diagnostics
-	if decoded.Status != "decoded" {
-		return res, roweval.Reason(decoded.Status), nil
-	}
-	frame := in.Evidence.Frame
-	if reason := extremaFrameDisposition(frame); reason != "" {
-		return res, reason, nil
-	}
-	t := extremaTable()
-	raw := extremaRawIDs()
-	q := extremaQualifiers(s, in)
-	out := make(map[string]roweval.Evaluation)
-	for _, row := range t.Native {
-		if row.At.Identifier != frame.ID().Value() {
-			continue
-		}
-		a := roweval.Acquired[Selector]{Selector: frameSelector(frame, row.At.Slice), Payload: frame.Data(), Qualifiers: q, Descriptors: Descriptors()}
-		ev, err := roweval.Evaluate(t, a)
-		if err != nil {
-			return res, "", err
-		}
-		if ev.Native != nil {
-			if ev.Native.Reason != "" {
-				ev.Native.Value = nil
-				ev.Native.Unit = ""
-			}
-			ev.Native.Disposition = disposition(ev.Native, raw[ev.Native.RowID])
-			out[ev.Native.RowID] = ev
-		} else if ev.Reason != roweval.ReasonNoMatch {
-			out[row.ID] = ev
-		}
-	}
-	for _, row := range t.Native {
-		if row.At.Identifier == frame.ID().Value() {
-			if _, ok := out[row.ID]; !ok {
-				out[row.ID] = roweval.Evaluation{Reason: roweval.ReasonNoMatch}
-			}
-		}
-	}
-	res.Rows = out
-	return res, "", nil
-}
-
-// extremaRawIDs and extremaGated describe the rows of the extrema table: the rows
-// the decoder never interprets, and the rows that name a gate.
-func extremaRawIDs() map[string]bool {
-	raw := make(map[string]bool)
-	for _, s := range extremaSpecs() {
-		if s.raw {
-			raw[nativeRow(s.rowSpec).ID] = true
-		}
-	}
-	return raw
-}
-
 func extremaGated() map[string]bool {
 	gated := make(map[string]bool)
 	for _, s := range extremaSpecs() {
@@ -153,7 +77,7 @@ func checkExtremaCase(t *testing.T, c extremaCase) map[string]bool {
 	t.Helper()
 	s, in, frame := buildExtrema(t, c)
 	r := canbusreg.DecodePCSStandard(s, in)
-	res, reason, err := evaluateExtrema(s, in)
+	res, reason, err := EvaluateExtrema(s, in)
 	if err != nil {
 		t.Fatalf("%s: %v", c.Name, err)
 	}
@@ -246,7 +170,7 @@ func TestStandardExtremaIndexRowsFollowIndexValidity(t *testing.T) {
 		}
 		checkExtremaCase(t, c)
 		s, in, _ := buildExtrema(t, c)
-		res, _, _ := evaluateExtrema(s, in)
+		res, _, _ := EvaluateExtrema(s, in)
 		r := canbusreg.DecodePCSStandard(s, in)
 		for id, ev := range res.Rows {
 			if ev.Native == nil || !indexFields[fieldOf(id)] {
@@ -311,7 +235,7 @@ func TestStandardExtremaRowsRefuseNeighbouringIdentifierAndWrongLength(t *testin
 		}
 		in.Evidence.Frame = frame
 		r := canbusreg.DecodePCSStandard(s, in)
-		res, reason, err := evaluateExtrema(s, in)
+		res, reason, err := EvaluateExtrema(s, in)
 		if err != nil {
 			t.Fatalf("%s: %v", tc.name, err)
 		}

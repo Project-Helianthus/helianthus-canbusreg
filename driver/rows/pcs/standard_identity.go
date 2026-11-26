@@ -3,9 +3,11 @@ package pcs
 import (
 	"fmt"
 	"math/bits"
+	"strconv"
 
 	"github.com/Project-Helianthus/helianthus-canbus"
 	"github.com/Project-Helianthus/helianthus-canbusreg"
+	"github.com/Project-Helianthus/helianthus-semreg/semreg/v1"
 	"github.com/Project-Helianthus/helianthus-semreg/semreg/v1/roweval"
 )
 
@@ -20,6 +22,10 @@ import (
 // takes its placeholder path for the frame: the aggregate gateway for 0x321,
 // 0x324 and 0x325, and the two projects that name 0x324 a placeholder.
 const qPlaceholderPath = "placeholder-path"
+
+// qGatewayHigh is the qualifier that carries byte 3 of 0x323, the high byte of the
+// aggregate gateway configuration count (B0 + 256 x B3, as DecodePCSIdentity reads it).
+const qGatewayHigh = "identity-byte-3"
 
 // gateIdentityPrefix prefixes the gate qualifier of one identity row; the row
 // identifier follows.
@@ -117,6 +123,9 @@ type identitySpec struct {
 	raw, zero     bool
 	gate          func(identityCtx) bool
 	cond          []string
+	// sum marks the aggregate count of 0x323: B0 + 256 x B3, the high byte read
+	// from the qualifier qGatewayHigh.
+	sum bool
 }
 
 // bigDWord is the big-endian 32-bit word of four bytes from a bit offset.
@@ -162,6 +171,7 @@ func identitySpecs() []identitySpec {
 	// 0x323: configuration count, parameter, threshold and synthesized bytes.
 	specs = append(specs,
 		identitySpec{frame: 0x323, field: "count", slice: byteAt(0), gate: sel, cond: []string{"gateway", "false"}},
+		identitySpec{frame: 0x323, layout: "gateway", field: "count", slice: byteAt(0), sum: true, gate: func(c identityCtx) bool { return c.gateway }, cond: []string{"gateway", "true"}},
 		identitySpec{frame: 0x323, field: "parameter", slice: bigWord(8), raw: true},
 		identitySpec{frame: 0x323, field: "separate_3", slice: byteAt(24), raw: true},
 		identitySpec{frame: 0x323, field: "synthesized_4", slice: byteAt(32), gate: sel},
@@ -202,6 +212,29 @@ func identityGateKey(sp identitySpec) string {
 	return gateIdentityPrefix + identityRowID(sp)
 }
 
+// gatewayCountHook adds the high byte of the aggregate gateway count to the
+// value of its low byte, as DecodePCSIdentity does. The base hook withholds the
+// value under the same rules as every other identity row.
+func gatewayCountHook(base roweval.RowHook) roweval.RowHook {
+	return func(in roweval.DetachedInputs, id roweval.RowID, dir roweval.Direction, v roweval.TypedValue) (roweval.DerivedValue, roweval.Reason) {
+		dv, reason := base(in, id, dir, v)
+		if reason != "" {
+			return dv, reason
+		}
+		high, err := strconv.ParseUint(in.Qualifiers().Values[qGatewayHigh], 10, 8)
+		if err != nil || v.Kind != semreg.ValueQuantity || v.Quantity == nil || v.Quantity.Number.Exponent10 != 0 {
+			return roweval.DerivedValue{}, roweval.ReasonConversion
+		}
+		low, err := strconv.ParseUint(v.Quantity.Number.Coefficient, 10, 8)
+		if err != nil {
+			return roweval.DerivedValue{}, roweval.ReasonConversion
+		}
+		sum := strconv.FormatUint(low+256*high, 10)
+		value := semreg.Value{Kind: semreg.ValueQuantity, Quantity: &semreg.Quantity{Number: semreg.Decimal{Coefficient: sum}, Unit: v.Quantity.Unit}}
+		return roweval.DerivedValue{Value: value, Citations: dv.Citations}, ""
+	}
+}
+
 // identityRow builds one native row of an identity frame: the frame's identifier
 // with DLC 8 and raw DLC 8, the slice of the field, the layout of its selection and
 // the exact conversion. A zero row reads the field's byte and scales it by zero;
@@ -234,7 +267,11 @@ func identityRows() ([]roweval.NativeRow[Selector], map[string]roweval.RowHook, 
 	for _, sp := range specs {
 		row := identityRow(sp)
 		rows = append(rows, row)
-		hooks[row.Decode.Hook] = rowHook(sp.field, identityGateKey(sp))
+		hook := rowHook(sp.field, identityGateKey(sp))
+		if sp.sum {
+			hook = gatewayCountHook(hook)
+		}
+		hooks[row.Decode.Hook] = hook
 		if sp.raw {
 			raw[row.ID] = true
 		}
@@ -283,6 +320,7 @@ func identityQualifiers(s canbusreg.Selection, in canbusreg.PCSIdentityPCSInput)
 	q := Qualifiers(s, in.PCSStandardPCSInput)
 	c := newIdentityCtx(s, in)
 	q.Values[qPlaceholderPath] = boolText(c.placeholderPath(in.Evidence.Frame.ID().Value()))
+	q.Values[qGatewayHigh] = strconv.Itoa(int(c.payload[3]))
 	for _, sp := range identitySpecs() {
 		if sp.gate != nil {
 			q.Values[identityGateKey(sp)] = boolText(sp.gate(c))

@@ -119,6 +119,42 @@ func zeroRow(id string) bool {
 	return strings.HasSuffix(id, ".placeholder") || fieldOf(id) == "family_omitted" || fieldOf(id) == "placeholder"
 }
 
+// sumRow reports whether a row is the aggregate gateway count, whose value is the
+// sum of its low byte and the high byte, so its raw word is the low byte alone.
+func sumRow(id string) bool {
+	return strings.HasSuffix(id, ".gateway.count")
+}
+
+// TestGatewayCountRowAddsHighByteAndKeepsBothBytes checks the aggregate gateway
+// count of 0x323: the gateway row gives B0 + 256 x B3, its raw word is B0, the
+// direct count row does not apply, and B3 stays its own raw row.
+func TestGatewayCountRowAddsHighByteAndKeepsBothBytes(t *testing.T) {
+	sel := vectorSelection{Project: "QCAA", Release: "0001", Flavor: "pcs-standard", Bank: "ordinary", Scope: "aggregate", Endpoint: "gateway", Group: "", Slot: ""}
+	payload := []byte{0x03, 0x00, 0x0a, 0x02, 0x11, 0x22, 0x33, 0x44}
+	s, in, _ := buildIdentity(t, sel, "0x323", payload, identityVectorInput{}, 7, 9*time.Second)
+	res, reason, err := EvaluateIdentity(s, in)
+	if err != nil || reason != "" {
+		t.Fatalf("reason %q err %v", reason, err)
+	}
+	gw, ok := res.Rows["growatt.bms.pcs.standard.323.gateway.count"]
+	if !ok || gw.Native == nil {
+		t.Fatalf("gateway count row missing")
+	}
+	if gw.Native.Disposition != dispositionAccepted || gw.Native.Raw != 3 || gw.Native.Value == nil || gw.Native.Value.Quantity == nil {
+		t.Fatalf("gateway count: disposition %q raw %d, want accepted raw 3 with a value", gw.Native.Disposition, gw.Native.Raw)
+	}
+	if got := decimalRat(t, gw.Native.Value.Quantity.Number).RatString(); got != "515" {
+		t.Errorf("gateway count value %s, want 515", got)
+	}
+	if direct, ok := res.Rows["growatt.bms.pcs.standard.323.count"]; ok && direct.Native != nil {
+		t.Errorf("direct count row applies to the aggregate gateway")
+	}
+	high, ok := res.Rows["growatt.bms.pcs.standard.323.separate_3"]
+	if !ok || high.Native == nil || high.Native.Raw != 2 || high.Native.Disposition != dispositionRaw {
+		t.Errorf("B3 is not kept as its own raw row")
+	}
+}
+
 // TestIdentityRowsMatchDecoder checks every identity vector: each field the decoder
 // emits has exactly one applicable row with the same status, raw word and value,
 // and every applicable row is a field the decoder emits. The expectations are the
@@ -159,7 +195,7 @@ func TestIdentityRowsMatchDecoder(t *testing.T) {
 				if df.Status != exp.Status {
 					t.Errorf("%s: decoder status %q, want %q", name, df.Status, exp.Status)
 				}
-				if !zeroRow(ids[0]) && row.Raw != uint64(df.Numerator) {
+				if !zeroRow(ids[0]) && !sumRow(ids[0]) && row.Raw != uint64(df.Numerator) {
 					t.Errorf("%s: raw %d, decoder numerator %d", ids[0], row.Raw, df.Numerator)
 				}
 				if exp.Value != "" {

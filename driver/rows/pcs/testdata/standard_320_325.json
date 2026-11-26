@@ -197,6 +197,56 @@
         "byte_7": {"status": "raw", "value": "0"},
         "placeholder": {"status": "accepted", "value": "0"}
       }
+    },
+    {
+      "name": "identity-323-gateway-aggregate-count-high-byte",
+      "identifier": "0x323",
+      "payload": "03000a0211223344",
+      "selection": {
+        "project": "QCAA",
+        "release": "0001",
+        "flavor": "pcs-standard",
+        "bank": "ordinary",
+        "scope": "aggregate",
+        "endpoint": "gateway",
+        "group": "",
+        "slot": ""
+      },
+      "input": {},
+      "expect": {
+        "count": {
+          "status": "accepted",
+          "value": "515"
+        },
+        "parameter": {
+          "status": "raw",
+          "value": "10"
+        },
+        "separate_3": {
+          "status": "raw",
+          "value": "2"
+        },
+        "synthesized_4": {
+          "status": "raw",
+          "value": ""
+        },
+        "synthesized_5": {
+          "status": "raw",
+          "value": ""
+        },
+        "synthesized_6": {
+          "status": "raw",
+          "value": ""
+        },
+        "synthesized_7": {
+          "status": "raw",
+          "value": ""
+        },
+        "threshold": {
+          "status": "raw",
+          "value": ""
+        }
+      }
     }
   ]
 }

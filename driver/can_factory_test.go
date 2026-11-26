@@ -442,3 +442,20 @@ func TestTwoInstancesOfOneProfileShareNothing(t *testing.T) {
 		t.Fatalf("second instance saw %d frames of the first interface", n)
 	}
 }
+
+func TestPlanClaimsNothingForAnotherDriversRecord(t *testing.T) {
+	f := NewFactory()
+	foreign := config("other", `{"address":"192.0.2.1:502"}`, `{"kind":"ebusreg"}`)
+	plans, err := f.Plan(foreign)
+	if err != nil || len(plans) != 0 {
+		t.Fatalf("foreign record: plans=%d err=%v", len(plans), err)
+	}
+	own := config("a", `{"interface":"can0"}`, `{"profile":"growatt-bms-can-v104"}`)
+	plans, err = f.Plan(own)
+	if err != nil || len(plans) != 1 {
+		t.Fatalf("own record beside foreign: plans=%d err=%v", len(plans), err)
+	}
+	if _, err := f.Plan(config("b", `{"interface":"can0"}`, `{"profile":"growatt-bms-can-v109"}`)); err == nil {
+		t.Fatal("owned invalid record not reported")
+	}
+}

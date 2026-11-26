@@ -6,6 +6,7 @@ import (
 	"errors"
 	"fmt"
 	"io"
+	"strings"
 
 	"github.com/Project-Helianthus/helianthus-canbus"
 	"github.com/Project-Helianthus/helianthus-canbus/receiver"
@@ -94,6 +95,26 @@ func decodeStrict(raw json.RawMessage, into any) error {
 		return errors.New("trailing data after the operand")
 	}
 	return nil
+}
+
+// Owns reports whether a configuration record is addressed to this driver: its
+// transport operand names a CAN interface, or its options name a profile of
+// this driver. A record of another driver is not owned and is claimed by no
+// plan; an owned record that is invalid is still reported by ParseConfig.
+func Owns(transport, options json.RawMessage) bool {
+	var t map[string]json.RawMessage
+	if json.Unmarshal(transport, &t) == nil {
+		if _, ok := t["interface"]; ok {
+			return true
+		}
+	}
+	var o struct {
+		Profile string `json:"profile"`
+	}
+	if json.Unmarshal(options, &o) == nil {
+		return strings.HasPrefix(o.Profile, "growatt-bms-can-")
+	}
+	return false
 }
 
 // ParseConfig decodes and validates the transport and options operands of one

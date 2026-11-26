@@ -50,6 +50,9 @@ func (f *Factory) Plan(c semdriver.Config) ([]semdriver.InstancePlan, error) {
 	if !c.Enabled {
 		return nil, nil
 	}
+	if !Owns(c.Transport, c.Options) {
+		return nil, nil
+	}
 	config, err := ParseConfig(c.Transport, c.Options)
 	if err != nil {
 		return nil, err

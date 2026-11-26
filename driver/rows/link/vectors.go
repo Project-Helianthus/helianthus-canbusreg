@@ -11,24 +11,24 @@ import (
 )
 
 const (
-	kindCells         = "cells"
-	kindTemperatures  = "temperatures"
-	qGroupPresent     = "group-present"
-	qMeanStatus       = "mean-status"
-	positionPrefix    = "position-"
-	enablePrefix      = "enable-"
-	cellVoltageField  = "cell_voltage_"
-	temperatureField  = "temperature_"
-	balanceEnableName = "enable_"
-	cellMeanField     = "mean"
-	cellMeanFrame     = 0x1806
-	balanceFrame      = 0x1801
-	temperatureFrame  = 0x1830
-	cellFrameFirst    = 0x1810
-	cellFrameLast     = 0x1813
-	cellCapacity      = 16
-	sensorCapacity    = 4
-	sensorInvalidWord = 65535
+	kindCells           = "cells"
+	kindTemperatures    = "temperatures"
+	qVectorGroupPresent = "group-present"
+	qMeanStatus         = "mean-status"
+	positionPrefix      = "position-"
+	enablePrefix        = "enable-"
+	cellVoltageField    = "cell_voltage_"
+	temperatureField    = "temperature_"
+	balanceEnableName   = "enable_"
+	cellMeanField       = "mean"
+	cellMeanFrame       = 0x1806
+	balanceFrame        = 0x1801
+	temperatureFrame    = 0x1830
+	cellFrameFirst      = 0x1810
+	cellFrameLast       = 0x1813
+	cellCapacity        = 16
+	sensorCapacity      = 4
+	sensorInvalidWord   = 65535
 )
 
 // VectorState is the independent count assertion a vector is decoded under: the
@@ -55,7 +55,7 @@ func vectorSpecs() []vectorSpec {
 		frame := uint16(cellFrameFirst + (n-1)/4)
 		out = append(out, vectorSpec{
 			rowSpec: rowSpec{frame: frame, field: fmt.Sprintf("%s%d", cellVoltageField, n), slice: littleWord(uint16(((n - 1) % 4) * 2)), unit: "mV", divisor: 1,
-				extra: map[string]string{qGroupPresent: "true"}},
+				extra: map[string]string{qVectorGroupPresent: "true"}},
 			statusKey: fmt.Sprintf("%s%d", positionPrefix, n),
 		})
 	}
@@ -63,12 +63,12 @@ func vectorSpecs() []vectorSpec {
 	for n := 1; n <= sensorCapacity; n++ {
 		out = append(out, vectorSpec{
 			rowSpec: rowSpec{frame: temperatureFrame, field: fmt.Sprintf("%s%d", temperatureField, n), slice: littleWord(uint16((n - 1) * 2)), unit: "C", divisor: 8, add: celsiusBias,
-				extra: map[string]string{qGroupPresent: "true"}},
+				extra: map[string]string{qVectorGroupPresent: "true"}},
 			statusKey: fmt.Sprintf("%s%d", positionPrefix, n),
 		})
 	}
 	out = append(out, vectorSpec{
-		rowSpec:   rowSpec{frame: cellMeanFrame, field: cellMeanField, slice: littleWord(6), unit: "mV", divisor: 1, extra: map[string]string{qGroupPresent: "true"}},
+		rowSpec:   rowSpec{frame: cellMeanFrame, field: cellMeanField, slice: littleWord(6), unit: "mV", divisor: 1, extra: map[string]string{qVectorGroupPresent: "true"}},
 		statusKey: qMeanStatus,
 	})
 	for n := 1; n <= cellCapacity; n++ {
@@ -226,7 +226,7 @@ func EvaluateVector(s canbusreg.Selection, in canbusreg.LINKInput, st VectorStat
 		return res, roweval.ReasonNoMatch, nil
 	}
 	values := Qualifiers(s, in).Values
-	values[qGroupPresent] = "true"
+	values[qVectorGroupPresent] = "true"
 	res.Grades = make(map[string]string)
 	statuses := make(map[int]string)
 	for j, g := range gates {
@@ -269,7 +269,7 @@ func EvaluateCellMean(s canbusreg.Selection, in canbusreg.LINKInput, g canbusreg
 	decoded := canbusreg.DecodeLINKCellMean(s, in, g, v, fixed16Valid)
 	field := decoded.Fields[cellMeanField]
 	values := Qualifiers(s, in).Values
-	values[qGroupPresent] = "true"
+	values[qVectorGroupPresent] = "true"
 	values[qMeanStatus] = field.Status
 	rows, err := evaluateStatusRows(cellMeanFrame, in, roweval.Qualifiers{Values: values})
 	if err != nil {

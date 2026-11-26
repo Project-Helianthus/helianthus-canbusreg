@@ -15,11 +15,9 @@ const setTemperatureOperation = "thermal.operation.set_temperature"
 
 func temperatureOperation() roweval.BindingRow {
 	id := setTemperature.String()
-	min, max, step := number(0), number(65535), number(1)
 	return roweval.BindingRow{NativeID: id, SubjectRole: zone, SpecRef: id, Service: thermal("thermal.service.zone"), Capability: thermal("thermal.capability.set_temperature"), Write: &roweval.WriteRow{
 		Operation: thermal(setTemperatureOperation), Argument: setpoint, TargetRow: id, ReadbackRow: id,
-		Inverse:      roweval.Convert{Numeric: &roweval.Affine{Num: 10, Den: 1, Add: semreg.Decimal{Coefficient: "-27315", Exponent10: -1}}},
-		NativeBounds: roweval.Bounds{Min: &min, Max: &max, Step: &step},
+		Inverse: roweval.Convert{Numeric: &roweval.Affine{Num: 10, Den: 1, Add: semreg.Decimal{Coefficient: "-27315", Exponent10: -1}}},
 	}}
 }
 
@@ -61,11 +59,39 @@ func (t SettingTarget) setting(raw uint16) reg.GreeVRFAddressedSetting {
 	return reg.GreeVRFAddressedSetting{Key: key, Class: t.Equipment.Class, Coordinate: setTemperature.Start, RawValue: raw}
 }
 
-// EncodeTemperature inverts the kelvin argument for the uniquely resolved owner.
+// TemperatureLimitsState indicates whether the caller supplied operating limits.
+type TemperatureLimitsState string
+
+const (
+	// TemperatureLimitsUnavailable means no minimum, maximum or step was supplied.
+	TemperatureLimitsUnavailable TemperatureLimitsState = "limits_unavailable"
+	// TemperatureLimitsSupplied means the caller provided at least one limit.
+	TemperatureLimitsSupplied TemperatureLimitsState = "limits_supplied"
+)
+
+// TemperatureEncoding holds a frame and its operating-limits state. An encoded
+// frame does not imply that it was sent or that the device applied it.
+type TemperatureEncoding struct {
+	Frame       reg.GreeVRFCommand
+	LimitsState TemperatureLimitsState
+}
+
+// EncodeTemperature returns the frame for the uniquely resolved owner.
 func EncodeTemperature(zoneRef driver.NodeRef, owner driver.AnchorKey, units []SettingTarget, argument semreg.Quantity, limits *driver.ValueLimits) (reg.GreeVRFCommand, error) {
+	result, err := EncodeTemperatureWithLimitsState(zoneRef, owner, units, argument, limits)
+	return result.Frame, err
+}
+
+// EncodeTemperatureWithLimitsState inverts the kelvin argument and reports
+// whether any operating limits were supplied, even if encoding is refused.
+func EncodeTemperatureWithLimitsState(zoneRef driver.NodeRef, owner driver.AnchorKey, units []SettingTarget, argument semreg.Quantity, limits *driver.ValueLimits) (TemperatureEncoding, error) {
+	result := TemperatureEncoding{LimitsState: TemperatureLimitsUnavailable}
+	if limits != nil && (limits.Min != nil || limits.Max != nil || limits.Step != nil) {
+		result.LimitsState = TemperatureLimitsSupplied
+	}
 	target, ok := TemperatureTarget(zoneRef, owner, units)
 	if !ok || argument.Unit != kelvin || argument.Validate() != nil {
-		return reg.GreeVRFCommand{}, fmt.Errorf("no unique temperature target or invalid kelvin argument")
+		return result, fmt.Errorf("no unique temperature target or invalid kelvin argument")
 	}
 	b := temperatureOperation()
 	t := roweval.Table[Coordinate]{Native: []roweval.NativeRow[Coordinate]{{ID: b.NativeID, At: setTemperature, Unit: "native.gree.tenth_celsius", SpecRef: b.SpecRef, Wire: wire(2)}}, Bindings: []roweval.BindingRow{b}}
@@ -78,12 +104,13 @@ func EncodeTemperature(zoneRef driver.NodeRef, owner driver.AnchorKey, units []S
 	}})
 	out, err := roweval.Invert(t, roweval.Writing[Coordinate]{NativeID: b.NativeID, SubjectRole: zone, Operation: b.Write.Operation, Argument: semreg.TypedField{ID: setpoint, Value: quantity(argument.Number, argument.Unit)}, Limits: limits, Descriptors: d})
 	if err != nil {
-		return reg.GreeVRFCommand{}, err
+		return result, err
 	}
 	if out.Reason != "" {
-		return reg.GreeVRFCommand{}, fmt.Errorf("%s: %s", out.Reason, out.Detail)
+		return result, fmt.Errorf("%s: %s", out.Reason, out.Detail)
 	}
-	return EncodeSetting(target.setting(binary.LittleEndian.Uint16(out.Payload)))
+	result.Frame, err = EncodeSetting(target.setting(binary.LittleEndian.Uint16(out.Payload)))
+	return result, err
 }
 
 // SubjectRole selects a resource kind, not an identity or a bus destination.

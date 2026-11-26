@@ -47,7 +47,27 @@ func parallelRowID(identifier, key string) string {
 	if err != nil {
 		panic(err)
 	}
-	return fmt.Sprintf("%s%X.%s", parallelPrefix, uint32(id)&^15, key)
+	return parallelIdentityID(uint32(id)&^15, key)
+}
+
+// TestParallelIdentityTableValidatesAndKeepsReleaseFamilyIdsDistinct pins that
+// the table passes the row-table validator and that the identity rows of the
+// families 0x610 and 0x650 do not reuse the identifiers of the release-11
+// parallel rows of the same fields (mirrored here as literals).
+func TestParallelIdentityTableValidatesAndKeepsReleaseFamilyIdsDistinct(t *testing.T) {
+	table := ParallelIdentityTable()
+	if err := roweval.ValidateTable(table, Descriptors(), roweval.Roles{}); err != nil {
+		t.Fatalf("parallel identity table rejected: %v", err)
+	}
+	release := map[string]bool{}
+	for _, k := range []string{"610.current", "610.soc", "650.maximum_index", "650.zero_1", "650.minimum_index", "650.zero_4", "650.soh"} {
+		release[parallelPrefix+k] = true
+	}
+	for _, r := range table.Native {
+		if release[r.ID] {
+			t.Errorf("identity row %s reuses a release-11 parallel row id", r.ID)
+		}
+	}
 }
 
 func parallelEvaluate(t *testing.T, c parallelIdentityVectorCase) (canbusreg.NativeResult, ParallelResult, roweval.Reason) {

@@ -66,8 +66,19 @@ func parallelContractAdmits(family uint32, group string) bool {
 	return group == "L6" || later
 }
 
+// parallelIdentityID builds a row identifier. The release-11 parallel rows
+// define the fields of the families 0x610 and 0x650 under the same prefix, so
+// the identity rows of those two families carry the layout segment "identity"
+// between family and field and stay distinct from them.
+func parallelIdentityID(family uint32, key string) string {
+	if family == 0x610 || family == 0x650 {
+		return fmt.Sprintf("%s%X.identity.%s", parallelPrefix, family, key)
+	}
+	return fmt.Sprintf("%s%X.%s", parallelPrefix, family, key)
+}
+
 func parallelRowOf(family uint32, key string, slice signalSlice, extra map[string]string, hook roweval.RowHook) parallelRow {
-	id := fmt.Sprintf("%s%X.%s", parallelPrefix, family, key)
+	id := parallelIdentityID(family, key)
 	when := map[string]string{qFlavor: "pcs-parallel", qBank: "parallel", qFamilyAdmitted: "true"}
 	if parallelCoordinator(family) {
 		when[qScope] = "aggregate"

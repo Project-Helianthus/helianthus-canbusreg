@@ -72,7 +72,7 @@ func extremaGated() map[string]bool {
 
 // checkExtremaCase compares every decoder field of a vector with the one row that
 // applies to it, and the expectation of the vector with both. It returns the
-// identifiers of the rows that applied.
+// identifiers of the rows that gave a value (not withheld) under the vector.
 func checkExtremaCase(t *testing.T, c extremaCase) map[string]bool {
 	t.Helper()
 	s, in, frame := buildExtrema(t, c)
@@ -98,12 +98,16 @@ func checkExtremaCase(t *testing.T, c extremaCase) map[string]bool {
 	}
 	gated := extremaGated()
 	applied := make(map[string]bool)
+	valued := make(map[string]bool)
 	byField := make(map[string][]string)
 	for id, ev := range res.Rows {
 		if ev.Reason == roweval.ReasonNoMatch {
 			continue
 		}
 		applied[id] = true
+		if ev.Native != nil && ev.Native.Reason == "" {
+			valued[id] = true
+		}
 		byField[fieldOf(id)] = append(byField[fieldOf(id)], id)
 	}
 	if len(byField) != len(r.Fields) {
@@ -136,7 +140,7 @@ func checkExtremaCase(t *testing.T, c extremaCase) map[string]bool {
 			}
 		}
 	}
-	return applied
+	return valued
 }
 
 // indexFields are the decoder fields that the index validity condition gates.
@@ -146,12 +150,15 @@ var indexFields = map[string]bool{
 	"maximum_location_fixed_aggregate": true, "minimum_location_fixed_aggregate": true,
 }
 
+// TestStandardExtremaRowsMatchDecoder pins that every extrema row gives a value
+// (not a withheld gate) under at least one vector, so a row that is always
+// withheld cannot pass as covered.
 func TestStandardExtremaRowsMatchDecoder(t *testing.T) {
-	applied := make(map[string]bool)
+	valued := make(map[string]bool)
 	n := 0
 	for _, c := range loadExtremaCases(t) {
 		for id := range checkExtremaCase(t, c) {
-			applied[id] = true
+			valued[id] = true
 		}
 		n++
 	}
@@ -159,8 +166,8 @@ func TestStandardExtremaRowsMatchDecoder(t *testing.T) {
 		t.Fatal("no vectors for 319, 322 and 330")
 	}
 	for _, row := range extremaTable().Native {
-		if !applied[row.ID] {
-			t.Errorf("no vector applies to %s", row.ID)
+		if !valued[row.ID] {
+			t.Errorf("no vector gives a value for %s", row.ID)
 		}
 	}
 }

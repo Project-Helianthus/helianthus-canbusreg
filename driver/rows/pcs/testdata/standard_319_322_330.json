@@ -194,6 +194,22 @@
       }
     },
     {
+      "name": "gateway-soc-extrema-in-domain-322",
+      "identifier": "0x322",
+      "payload": "00FAFFF602053250",
+      "selection": {"project": "QCAA", "release": "0001", "flavor": "pcs-standard", "bank": "ordinary", "scope": "aggregate", "endpoint": "coordinator", "group": "0", "slot": "1"},
+      "input": {"measurement_valid": true, "temperature_valid": true, "count_valid": true, "count": 5},
+      "index": {"valid": true, "scope": "aggregate", "minimum": 0, "maximum": 20},
+      "expect": {
+        "temperature_maximum": {"status": "raw", "value": "25"},
+        "temperature_minimum": {"status": "raw", "value": "-1"},
+        "maximum_temperature_index": {"status": "accepted", "value": "2"},
+        "minimum_temperature_index": {"status": "accepted", "value": "5"},
+        "extra_6": {"status": "accepted", "value": "50"},
+        "extra_7": {"status": "accepted", "value": "80"}
+      }
+    },
+    {
       "name": "gateway-soc-extrema-measurement-invalid-322",
       "identifier": "0x322",
       "payload": "00FAFFF602056465",
@@ -222,6 +238,42 @@
         "maximum_index": {"status": "accepted", "value": "4"},
         "minimum_location": {"status": "raw", "value": "2"},
         "minimum_location_fixed_aggregate": {"status": "raw", "value": "2"},
+        "minimum_index": {"status": "accepted", "value": "7"},
+        "maximum_cell": {"status": "raw", "value": "3400"},
+        "minimum_cell": {"status": "raw", "value": "3350"}
+      }
+    },
+    {
+      "name": "local-extrema-330",
+      "identifier": "0x330",
+      "payload": "010402070D480D16",
+      "selection": {"project": "QAAA", "release": "0006", "flavor": "pcs-standard", "bank": "ordinary", "scope": "local", "endpoint": "coordinator", "group": "0", "slot": "1"},
+      "input": {"measurement_valid": true, "temperature_valid": true, "count_valid": true, "count": 2},
+      "index": {"valid": true, "scope": "local", "minimum": 0, "maximum": 20},
+      "expect": {
+        "maximum_location": {"status": "raw", "value": "1"},
+        "maximum_location_fixed_aggregate": {"status": "raw", "value": "1"},
+        "maximum_index": {"status": "accepted", "value": "4"},
+        "minimum_location": {"status": "raw", "value": "2"},
+        "minimum_location_fixed_aggregate": {"status": "raw", "value": "2"},
+        "minimum_index": {"status": "accepted", "value": "7"},
+        "maximum_cell": {"status": "accepted", "value": "3400"},
+        "minimum_cell": {"status": "accepted", "value": "3350"}
+      }
+    },
+    {
+      "name": "fixed-aggregate-minimum-location-one-330",
+      "identifier": "0x330",
+      "payload": "010401070D480D16",
+      "selection": {"project": "QAAB", "release": "0004", "flavor": "pcs-standard", "bank": "ordinary", "scope": "aggregate", "endpoint": "coordinator", "group": "0", "slot": "1"},
+      "input": {"measurement_valid": true, "temperature_valid": true, "count_valid": true, "count": 0},
+      "index": {"valid": true, "scope": "aggregate", "minimum": 0, "maximum": 20},
+      "expect": {
+        "maximum_location": {"status": "raw", "value": "1"},
+        "maximum_location_fixed_aggregate": {"status": "accepted", "value": "1"},
+        "maximum_index": {"status": "accepted", "value": "4"},
+        "minimum_location": {"status": "raw", "value": "1"},
+        "minimum_location_fixed_aggregate": {"status": "accepted", "value": "1"},
         "minimum_index": {"status": "accepted", "value": "7"},
         "maximum_cell": {"status": "raw", "value": "3400"},
         "minimum_cell": {"status": "raw", "value": "3350"}

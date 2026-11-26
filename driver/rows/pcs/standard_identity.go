@@ -2,6 +2,7 @@ package pcs
 
 import (
 	"fmt"
+	"math/big"
 	"math/bits"
 	"strconv"
 
@@ -214,7 +215,9 @@ func identityGateKey(sp identitySpec) string {
 
 // gatewayCountHook adds the high byte of the aggregate gateway count to the
 // value of its low byte, as DecodePCSIdentity does. The base hook withholds the
-// value under the same rules as every other identity row.
+// value under the same rules as every other identity row. The low byte is read as
+// the exact integer its decimal denotes, so a normalized value such as 1 x 10^1
+// for B0 = 10 is summed the same as 10, and the sum is written in normalized form.
 func gatewayCountHook(base roweval.RowHook) roweval.RowHook {
 	return func(in roweval.DetachedInputs, id roweval.RowID, dir roweval.Direction, v roweval.TypedValue) (roweval.DerivedValue, roweval.Reason) {
 		dv, reason := base(in, id, dir, v)
@@ -222,17 +225,52 @@ func gatewayCountHook(base roweval.RowHook) roweval.RowHook {
 			return dv, reason
 		}
 		high, err := strconv.ParseUint(in.Qualifiers().Values[qGatewayHigh], 10, 8)
-		if err != nil || v.Kind != semreg.ValueQuantity || v.Quantity == nil || v.Quantity.Number.Exponent10 != 0 {
+		if err != nil || v.Kind != semreg.ValueQuantity || v.Quantity == nil {
 			return roweval.DerivedValue{}, roweval.ReasonConversion
 		}
-		low, err := strconv.ParseUint(v.Quantity.Number.Coefficient, 10, 8)
-		if err != nil {
+		low, ok := wholeOf(v.Quantity.Number)
+		if !ok {
 			return roweval.DerivedValue{}, roweval.ReasonConversion
 		}
-		sum := strconv.FormatUint(low+256*high, 10)
-		value := semreg.Value{Kind: semreg.ValueQuantity, Quantity: &semreg.Quantity{Number: semreg.Decimal{Coefficient: sum}, Unit: v.Quantity.Unit}}
+		sum := normalizedDecimal(new(big.Int).Add(low, big.NewInt(256*int64(high))))
+		value := semreg.Value{Kind: semreg.ValueQuantity, Quantity: &semreg.Quantity{Number: sum, Unit: v.Quantity.Unit}}
 		return roweval.DerivedValue{Value: value, Citations: dv.Citations}, ""
 	}
+}
+
+// wholeOf is the exact non-negative integer a decimal of a byte denotes, or false
+// when it is not a whole number.
+func wholeOf(d semreg.Decimal) (*big.Int, bool) {
+	n, ok := new(big.Int).SetString(d.Coefficient, 10)
+	if !ok || n.Sign() < 0 {
+		return nil, false
+	}
+	switch {
+	case d.Exponent10 >= 0:
+		return n.Mul(n, new(big.Int).Exp(big.NewInt(10), big.NewInt(int64(d.Exponent10)), nil)), true
+	default:
+		q, rem := new(big.Int).QuoRem(n, new(big.Int).Exp(big.NewInt(10), big.NewInt(int64(-d.Exponent10)), nil), new(big.Int))
+		return q, rem.Sign() == 0
+	}
+}
+
+// normalizedDecimal is the whole number n as a decimal with no trailing zero in
+// its coefficient: 520 is 52 x 10^1.
+func normalizedDecimal(n *big.Int) semreg.Decimal {
+	if n.Sign() == 0 {
+		return semreg.Decimal{Coefficient: "0"}
+	}
+	c := new(big.Int).Set(n)
+	ten := big.NewInt(10)
+	var exp int32
+	for {
+		q, rem := new(big.Int).QuoRem(c, ten, new(big.Int))
+		if rem.Sign() != 0 {
+			break
+		}
+		c, exp = q, exp+1
+	}
+	return semreg.Decimal{Coefficient: c.String(), Exponent10: exp}
 }
 
 // identityRow builds one native row of an identity frame: the frame's identifier

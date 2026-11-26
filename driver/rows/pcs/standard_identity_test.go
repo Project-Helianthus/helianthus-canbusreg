@@ -155,6 +155,43 @@ func TestGatewayCountRowAddsHighByteAndKeepsBothBytes(t *testing.T) {
 	}
 }
 
+// TestGatewayCountRowKeepsDecimalBoundaries checks that the aggregate gateway count
+// of 0x323 is the decoder's exact count for every byte pair, including low bytes
+// that are multiples of ten (whose decimal is normalized as a power of ten) and
+// sums that end in zero: B0 = 10 and B0 = 8 with B3 = 2 give 522 and 520.
+func TestGatewayCountRowKeepsDecimalBoundaries(t *testing.T) {
+	sel := vectorSelection{Project: "QCAA", Release: "0001", Flavor: "pcs-standard", Bank: "ordinary", Scope: "aggregate", Endpoint: "gateway", Group: "", Slot: ""}
+	cases := []struct {
+		low, high byte
+		want      string
+	}{
+		{0x0a, 0x02, "522"},
+		{0x08, 0x02, "520"},
+		{0x00, 0x02, "512"},
+		{0xfa, 0x02, "762"},
+		{0x14, 0x00, "20"},
+		{0x03, 0x02, "515"},
+	}
+	for _, c := range cases {
+		payload := []byte{c.low, 0x00, 0x00, c.high, 0x11, 0x22, 0x33, 0x44}
+		s, in, _ := buildIdentity(t, sel, "0x323", payload, identityVectorInput{}, 7, 9*time.Second)
+		res, reason, err := EvaluateIdentity(s, in)
+		if err != nil || reason != "" {
+			t.Fatalf("B0 %#x B3 %#x: reason %q err %v", c.low, c.high, reason, err)
+		}
+		gw, ok := res.Rows["growatt.bms.pcs.standard.323.gateway.count"]
+		if !ok || gw.Native == nil || gw.Native.Value == nil || gw.Native.Value.Quantity == nil {
+			t.Fatalf("B0 %#x B3 %#x: gateway count value missing", c.low, c.high)
+		}
+		if gw.Native.Disposition != dispositionAccepted {
+			t.Fatalf("B0 %#x B3 %#x: disposition %q, want accepted", c.low, c.high, gw.Native.Disposition)
+		}
+		if got := decimalRat(t, gw.Native.Value.Quantity.Number).RatString(); got != c.want {
+			t.Errorf("B0 %#x B3 %#x: gateway count %s, want %s", c.low, c.high, got, c.want)
+		}
+	}
+}
+
 // TestIdentityRowsMatchDecoder checks every identity vector: each field the decoder
 // emits has exactly one applicable row with the same status, raw word and value,
 // and every applicable row is a field the decoder emits. The expectations are the

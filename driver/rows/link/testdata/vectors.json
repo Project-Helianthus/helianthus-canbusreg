@@ -1,0 +1,1235 @@
+{
+ "cases": [
+  {
+   "name": "cell block one under a valid count",
+   "kind": "cells",
+   "family": "1810",
+   "payload": "e40ce50ce60ce70c",
+   "state": {
+    "count": 4,
+    "count_valid": true,
+    "fixed16": false
+   },
+   "selection": {
+    "project": "QAAA",
+    "release": "0011",
+    "choice": "",
+    "group": "0",
+    "slot": "1",
+    "bank": "ordinary",
+    "source": "02",
+    "destination": "F4"
+   },
+   "gates": [
+    "accepted",
+    "accepted",
+    "accepted",
+    "accepted"
+   ],
+   "reason": "",
+   "status": "accepted",
+   "rows": {
+    "cell_voltage_1": {
+     "disposition": "accepted",
+     "value": "3300",
+     "unit": "mV",
+     "raw": "3300"
+    },
+    "cell_voltage_2": {
+     "disposition": "accepted",
+     "value": "3301",
+     "unit": "mV",
+     "raw": "3301"
+    },
+    "cell_voltage_3": {
+     "disposition": "accepted",
+     "value": "3302",
+     "unit": "mV",
+     "raw": "3302"
+    },
+    "cell_voltage_4": {
+     "disposition": "accepted",
+     "value": "3303",
+     "unit": "mV",
+     "raw": "3303"
+    }
+   },
+   "attribution": {
+    "bank": "ordinary",
+    "group": "0",
+    "slot": "1",
+    "has_group": true,
+    "has_slot": true
+   }
+  },
+  {
+   "name": "cell block two with positions beyond the count",
+   "kind": "cells",
+   "family": "1811",
+   "payload": "e80ce90cea0ceb0c",
+   "state": {
+    "count": 6,
+    "count_valid": true,
+    "fixed16": false
+   },
+   "selection": {
+    "project": "QAAA",
+    "release": "0011",
+    "choice": "",
+    "group": "",
+    "slot": "",
+    "bank": "ordinary",
+    "source": "02",
+    "destination": "F4"
+   },
+   "gates": [
+    "accepted",
+    "accepted",
+    "accepted",
+    "accepted"
+   ],
+   "reason": "",
+   "status": "accepted",
+   "rows": {
+    "cell_voltage_5": {
+     "disposition": "accepted",
+     "value": "3304",
+     "unit": "mV",
+     "raw": "3304"
+    },
+    "cell_voltage_6": {
+     "disposition": "accepted",
+     "value": "3305",
+     "unit": "mV",
+     "raw": "3305"
+    },
+    "cell_voltage_7": {
+     "disposition": "unconfigured",
+     "value": "",
+     "unit": "",
+     "raw": "3306"
+    },
+    "cell_voltage_8": {
+     "disposition": "unconfigured",
+     "value": "",
+     "unit": "",
+     "raw": "3307"
+    }
+   },
+   "attribution": null
+  },
+  {
+   "name": "cell block three of a full sixteen cell vector",
+   "kind": "cells",
+   "family": "1812",
+   "payload": "ec0ced0cee0cef0c",
+   "state": {
+    "count": 16,
+    "count_valid": true,
+    "fixed16": false
+   },
+   "selection": {
+    "project": "QAAA",
+    "release": "0011",
+    "choice": "",
+    "group": "",
+    "slot": "",
+    "bank": "ordinary",
+    "source": "02",
+    "destination": "F4"
+   },
+   "gates": [
+    "accepted",
+    "accepted",
+    "accepted",
+    "accepted"
+   ],
+   "reason": "",
+   "status": "accepted",
+   "rows": {
+    "cell_voltage_9": {
+     "disposition": "accepted",
+     "value": "3308",
+     "unit": "mV",
+     "raw": "3308"
+    },
+    "cell_voltage_10": {
+     "disposition": "accepted",
+     "value": "3309",
+     "unit": "mV",
+     "raw": "3309"
+    },
+    "cell_voltage_11": {
+     "disposition": "accepted",
+     "value": "3310",
+     "unit": "mV",
+     "raw": "3310"
+    },
+    "cell_voltage_12": {
+     "disposition": "accepted",
+     "value": "3311",
+     "unit": "mV",
+     "raw": "3311"
+    }
+   },
+   "attribution": null
+  },
+  {
+   "name": "cell block four of a full sixteen cell vector",
+   "kind": "cells",
+   "family": "1813",
+   "payload": "f00cf10cf20cf30c",
+   "state": {
+    "count": 16,
+    "count_valid": true,
+    "fixed16": false
+   },
+   "selection": {
+    "project": "QAAA",
+    "release": "0011",
+    "choice": "",
+    "group": "",
+    "slot": "",
+    "bank": "ordinary",
+    "source": "02",
+    "destination": "F4"
+   },
+   "gates": [
+    "accepted",
+    "accepted",
+    "accepted",
+    "accepted"
+   ],
+   "reason": "",
+   "status": "accepted",
+   "rows": {
+    "cell_voltage_13": {
+     "disposition": "accepted",
+     "value": "3312",
+     "unit": "mV",
+     "raw": "3312"
+    },
+    "cell_voltage_14": {
+     "disposition": "accepted",
+     "value": "3313",
+     "unit": "mV",
+     "raw": "3313"
+    },
+    "cell_voltage_15": {
+     "disposition": "accepted",
+     "value": "3314",
+     "unit": "mV",
+     "raw": "3314"
+    },
+    "cell_voltage_16": {
+     "disposition": "accepted",
+     "value": "3315",
+     "unit": "mV",
+     "raw": "3315"
+    }
+   },
+   "attribution": null
+  },
+  {
+   "name": "cell block one of a vector with fewer cells",
+   "kind": "cells",
+   "family": "1810",
+   "payload": "e40ce50ce60ce70c",
+   "state": {
+    "count": 3,
+    "count_valid": true,
+    "fixed16": false
+   },
+   "selection": {
+    "project": "QAAA",
+    "release": "0011",
+    "choice": "",
+    "group": "",
+    "slot": "",
+    "bank": "ordinary",
+    "source": "02",
+    "destination": "F4"
+   },
+   "gates": [
+    "accepted",
+    "accepted",
+    "accepted",
+    "accepted"
+   ],
+   "reason": "",
+   "status": "accepted",
+   "rows": {
+    "cell_voltage_1": {
+     "disposition": "accepted",
+     "value": "3300",
+     "unit": "mV",
+     "raw": "3300"
+    },
+    "cell_voltage_2": {
+     "disposition": "accepted",
+     "value": "3301",
+     "unit": "mV",
+     "raw": "3301"
+    },
+    "cell_voltage_3": {
+     "disposition": "accepted",
+     "value": "3302",
+     "unit": "mV",
+     "raw": "3302"
+    },
+    "cell_voltage_4": {
+     "disposition": "unconfigured",
+     "value": "",
+     "unit": "",
+     "raw": "3303"
+    }
+   },
+   "attribution": null
+  },
+  {
+   "name": "cell block one with no reported count on the counted path",
+   "kind": "cells",
+   "family": "1810",
+   "payload": "e40ce50ce60ce70c",
+   "state": {
+    "count": 0,
+    "count_valid": false,
+    "fixed16": false
+   },
+   "selection": {
+    "project": "QAAA",
+    "release": "0011",
+    "choice": "",
+    "group": "",
+    "slot": "",
+    "bank": "ordinary",
+    "source": "02",
+    "destination": "F4"
+   },
+   "gates": [
+    "accepted",
+    "accepted",
+    "accepted",
+    "accepted"
+   ],
+   "reason": "",
+   "status": "accepted",
+   "rows": {
+    "cell_voltage_1": {
+     "disposition": "absent",
+     "value": "",
+     "unit": "",
+     "raw": "3300"
+    },
+    "cell_voltage_2": {
+     "disposition": "absent",
+     "value": "",
+     "unit": "",
+     "raw": "3301"
+    },
+    "cell_voltage_3": {
+     "disposition": "absent",
+     "value": "",
+     "unit": "",
+     "raw": "3302"
+    },
+    "cell_voltage_4": {
+     "disposition": "absent",
+     "value": "",
+     "unit": "",
+     "raw": "3303"
+    }
+   },
+   "attribution": null
+  },
+  {
+   "name": "cell block one with an invalid count on the counted path",
+   "kind": "cells",
+   "family": "1810",
+   "payload": "e40ce50ce60ce70c",
+   "state": {
+    "count": 40,
+    "count_valid": false,
+    "fixed16": false
+   },
+   "selection": {
+    "project": "QAAA",
+    "release": "0011",
+    "choice": "",
+    "group": "",
+    "slot": "",
+    "bank": "ordinary",
+    "source": "02",
+    "destination": "F4"
+   },
+   "gates": [
+    "accepted",
+    "accepted",
+    "accepted",
+    "accepted"
+   ],
+   "reason": "",
+   "status": "accepted",
+   "rows": {
+    "cell_voltage_1": {
+     "disposition": "absent",
+     "value": "",
+     "unit": "",
+     "raw": "3300"
+    },
+    "cell_voltage_2": {
+     "disposition": "absent",
+     "value": "",
+     "unit": "",
+     "raw": "3301"
+    },
+    "cell_voltage_3": {
+     "disposition": "absent",
+     "value": "",
+     "unit": "",
+     "raw": "3302"
+    },
+    "cell_voltage_4": {
+     "disposition": "absent",
+     "value": "",
+     "unit": "",
+     "raw": "3303"
+    }
+   },
+   "attribution": null
+  },
+  {
+   "name": "cell block one on the fixed path with no reported count",
+   "kind": "cells",
+   "family": "1810",
+   "payload": "e40ce50ce60ce70c",
+   "state": {
+    "count": 0,
+    "count_valid": false,
+    "fixed16": true
+   },
+   "selection": {
+    "project": "QAAA",
+    "release": "0011",
+    "choice": "",
+    "group": "",
+    "slot": "",
+    "bank": "ordinary",
+    "source": "02",
+    "destination": "F4"
+   },
+   "gates": [
+    "accepted",
+    "accepted",
+    "accepted",
+    "accepted"
+   ],
+   "reason": "",
+   "status": "accepted",
+   "rows": {
+    "cell_voltage_1": {
+     "disposition": "accepted",
+     "value": "3300",
+     "unit": "mV",
+     "raw": "3300"
+    },
+    "cell_voltage_2": {
+     "disposition": "accepted",
+     "value": "3301",
+     "unit": "mV",
+     "raw": "3301"
+    },
+    "cell_voltage_3": {
+     "disposition": "accepted",
+     "value": "3302",
+     "unit": "mV",
+     "raw": "3302"
+    },
+    "cell_voltage_4": {
+     "disposition": "accepted",
+     "value": "3303",
+     "unit": "mV",
+     "raw": "3303"
+    }
+   },
+   "attribution": null
+  },
+  {
+   "name": "cell block two on the fixed path beyond the reported count",
+   "kind": "cells",
+   "family": "1811",
+   "payload": "e80ce90cea0ceb0c",
+   "state": {
+    "count": 4,
+    "count_valid": true,
+    "fixed16": true
+   },
+   "selection": {
+    "project": "QAAA",
+    "release": "0011",
+    "choice": "",
+    "group": "",
+    "slot": "",
+    "bank": "ordinary",
+    "source": "02",
+    "destination": "F4"
+   },
+   "gates": [
+    "accepted",
+    "accepted",
+    "accepted",
+    "accepted"
+   ],
+   "reason": "",
+   "status": "accepted",
+   "rows": {
+    "cell_voltage_5": {
+     "disposition": "accepted",
+     "value": "3304",
+     "unit": "mV",
+     "raw": "3304"
+    },
+    "cell_voltage_6": {
+     "disposition": "accepted",
+     "value": "3305",
+     "unit": "mV",
+     "raw": "3305"
+    },
+    "cell_voltage_7": {
+     "disposition": "accepted",
+     "value": "3306",
+     "unit": "mV",
+     "raw": "3306"
+    },
+    "cell_voltage_8": {
+     "disposition": "accepted",
+     "value": "3307",
+     "unit": "mV",
+     "raw": "3307"
+    }
+   },
+   "attribution": null
+  },
+  {
+   "name": "cell block one with a stale gate and an unconfigured gate",
+   "kind": "cells",
+   "family": "1810",
+   "payload": "e40ce50ce60ce70c",
+   "state": {
+    "count": 4,
+    "count_valid": true,
+    "fixed16": false
+   },
+   "selection": {
+    "project": "QAAA",
+    "release": "0011",
+    "choice": "",
+    "group": "",
+    "slot": "",
+    "bank": "ordinary",
+    "source": "02",
+    "destination": "F4"
+   },
+   "gates": [
+    "stale",
+    "accepted",
+    "unconfigured",
+    "conflict"
+   ],
+   "reason": "",
+   "status": "accepted",
+   "rows": {
+    "cell_voltage_1": {
+     "disposition": "stale",
+     "value": "",
+     "unit": "",
+     "raw": "3300"
+    },
+    "cell_voltage_2": {
+     "disposition": "accepted",
+     "value": "3301",
+     "unit": "mV",
+     "raw": "3301"
+    },
+    "cell_voltage_3": {
+     "disposition": "unconfigured",
+     "value": "",
+     "unit": "",
+     "raw": "3302"
+    },
+    "cell_voltage_4": {
+     "disposition": "conflict",
+     "value": "",
+     "unit": "",
+     "raw": "3303"
+    }
+   },
+   "attribution": null
+  },
+  {
+   "name": "cell block one under the parallel bank with source and slot",
+   "kind": "cells",
+   "family": "1810",
+   "payload": "e40ce50ce60ce70c",
+   "state": {
+    "count": 4,
+    "count_valid": true,
+    "fixed16": false
+   },
+   "selection": {
+    "project": "QAAA",
+    "release": "0011",
+    "choice": "",
+    "group": "3",
+    "slot": "5",
+    "bank": "parallel",
+    "source": "0A",
+    "destination": "F4"
+   },
+   "gates": [
+    "accepted",
+    "accepted",
+    "accepted",
+    "accepted"
+   ],
+   "reason": "",
+   "status": "accepted",
+   "rows": {
+    "cell_voltage_1": {
+     "disposition": "accepted",
+     "value": "3300",
+     "unit": "mV",
+     "raw": "3300"
+    },
+    "cell_voltage_2": {
+     "disposition": "accepted",
+     "value": "3301",
+     "unit": "mV",
+     "raw": "3301"
+    },
+    "cell_voltage_3": {
+     "disposition": "accepted",
+     "value": "3302",
+     "unit": "mV",
+     "raw": "3302"
+    },
+    "cell_voltage_4": {
+     "disposition": "accepted",
+     "value": "3303",
+     "unit": "mV",
+     "raw": "3303"
+    }
+   },
+   "attribution": {
+    "bank": "parallel",
+    "group": "3",
+    "slot": "5",
+    "has_group": true,
+    "has_slot": true
+   }
+  },
+  {
+   "name": "cell block one with a value of zero millivolts",
+   "kind": "cells",
+   "family": "1810",
+   "payload": "0000e50ce60ce70c",
+   "state": {
+    "count": 4,
+    "count_valid": true,
+    "fixed16": false
+   },
+   "selection": {
+    "project": "QAAA",
+    "release": "0011",
+    "choice": "",
+    "group": "",
+    "slot": "",
+    "bank": "ordinary",
+    "source": "02",
+    "destination": "F4"
+   },
+   "gates": [
+    "accepted",
+    "accepted",
+    "accepted",
+    "accepted"
+   ],
+   "reason": "",
+   "status": "accepted",
+   "rows": {
+    "cell_voltage_1": {
+     "disposition": "accepted",
+     "value": "0",
+     "unit": "mV",
+     "raw": "0"
+    },
+    "cell_voltage_2": {
+     "disposition": "accepted",
+     "value": "3301",
+     "unit": "mV",
+     "raw": "3301"
+    },
+    "cell_voltage_3": {
+     "disposition": "accepted",
+     "value": "3302",
+     "unit": "mV",
+     "raw": "3302"
+    },
+    "cell_voltage_4": {
+     "disposition": "accepted",
+     "value": "3303",
+     "unit": "mV",
+     "raw": "3303"
+    }
+   },
+   "attribution": null
+  },
+  {
+   "name": "temperature vector under a valid count",
+   "kind": "temperatures",
+   "family": "1830",
+   "payload": "080230021c025802",
+   "state": {
+    "count": 4,
+    "count_valid": true,
+    "fixed16": false
+   },
+   "selection": {
+    "project": "QAAA",
+    "release": "0011",
+    "choice": "",
+    "group": "",
+    "slot": "",
+    "bank": "ordinary",
+    "source": "02",
+    "destination": "F4"
+   },
+   "gates": [
+    "accepted",
+    "accepted",
+    "accepted",
+    "accepted"
+   ],
+   "reason": "",
+   "status": "accepted",
+   "rows": {
+    "temperature_1": {
+     "disposition": "accepted",
+     "value": "25",
+     "unit": "C",
+     "raw": "520"
+    },
+    "temperature_2": {
+     "disposition": "accepted",
+     "value": "30",
+     "unit": "C",
+     "raw": "560"
+    },
+    "temperature_3": {
+     "disposition": "accepted",
+     "value": "27.5",
+     "unit": "C",
+     "raw": "540"
+    },
+    "temperature_4": {
+     "disposition": "accepted",
+     "value": "35",
+     "unit": "C",
+     "raw": "600"
+    }
+   },
+   "attribution": null
+  },
+  {
+   "name": "temperature vector with two sensors",
+   "kind": "temperatures",
+   "family": "1830",
+   "payload": "080230021c025802",
+   "state": {
+    "count": 2,
+    "count_valid": true,
+    "fixed16": false
+   },
+   "selection": {
+    "project": "QAAA",
+    "release": "0011",
+    "choice": "",
+    "group": "",
+    "slot": "",
+    "bank": "ordinary",
+    "source": "02",
+    "destination": "F4"
+   },
+   "gates": [
+    "accepted",
+    "accepted",
+    "accepted",
+    "accepted"
+   ],
+   "reason": "",
+   "status": "accepted",
+   "rows": {
+    "temperature_1": {
+     "disposition": "accepted",
+     "value": "25",
+     "unit": "C",
+     "raw": "520"
+    },
+    "temperature_2": {
+     "disposition": "accepted",
+     "value": "30",
+     "unit": "C",
+     "raw": "560"
+    },
+    "temperature_3": {
+     "disposition": "unconfigured",
+     "value": "",
+     "unit": "",
+     "raw": "540"
+    },
+    "temperature_4": {
+     "disposition": "unconfigured",
+     "value": "",
+     "unit": "",
+     "raw": "600"
+    }
+   },
+   "attribution": null
+  },
+  {
+   "name": "temperature vector with no count keeps the invalid word apart from an ordinary word",
+   "kind": "temperatures",
+   "family": "1830",
+   "payload": "ffff0802ffff3002",
+   "state": {
+    "count": 0,
+    "count_valid": false,
+    "fixed16": false
+   },
+   "selection": {
+    "project": "QAAA",
+    "release": "0011",
+    "choice": "",
+    "group": "",
+    "slot": "",
+    "bank": "ordinary",
+    "source": "02",
+    "destination": "F4"
+   },
+   "gates": [
+    "accepted",
+    "accepted",
+    "accepted",
+    "accepted"
+   ],
+   "reason": "",
+   "status": "accepted",
+   "rows": {
+    "temperature_1": {
+     "disposition": "invalid",
+     "value": "",
+     "unit": "",
+     "raw": "65535"
+    },
+    "temperature_2": {
+     "disposition": "absent",
+     "value": "",
+     "unit": "",
+     "raw": "520"
+    },
+    "temperature_3": {
+     "disposition": "invalid",
+     "value": "",
+     "unit": "",
+     "raw": "65535"
+    },
+    "temperature_4": {
+     "disposition": "absent",
+     "value": "",
+     "unit": "",
+     "raw": "560"
+    }
+   },
+   "attribution": null
+  },
+  {
+   "name": "temperature vector with an invalid count keeps the invalid word apart",
+   "kind": "temperatures",
+   "family": "1830",
+   "payload": "ffff08021c023002",
+   "state": {
+    "count": 9,
+    "count_valid": false,
+    "fixed16": false
+   },
+   "selection": {
+    "project": "QAAA",
+    "release": "0011",
+    "choice": "",
+    "group": "",
+    "slot": "",
+    "bank": "ordinary",
+    "source": "02",
+    "destination": "F4"
+   },
+   "gates": [
+    "accepted",
+    "accepted",
+    "accepted",
+    "accepted"
+   ],
+   "reason": "",
+   "status": "accepted",
+   "rows": {
+    "temperature_1": {
+     "disposition": "invalid",
+     "value": "",
+     "unit": "",
+     "raw": "65535"
+    },
+    "temperature_2": {
+     "disposition": "absent",
+     "value": "",
+     "unit": "",
+     "raw": "520"
+    },
+    "temperature_3": {
+     "disposition": "absent",
+     "value": "",
+     "unit": "",
+     "raw": "540"
+    },
+    "temperature_4": {
+     "disposition": "absent",
+     "value": "",
+     "unit": "",
+     "raw": "560"
+    }
+   },
+   "attribution": null
+  },
+  {
+   "name": "temperature vector under a valid count with an invalid word",
+   "kind": "temperatures",
+   "family": "1830",
+   "payload": "ffff08021c023002",
+   "state": {
+    "count": 4,
+    "count_valid": true,
+    "fixed16": false
+   },
+   "selection": {
+    "project": "QAAA",
+    "release": "0011",
+    "choice": "",
+    "group": "",
+    "slot": "",
+    "bank": "ordinary",
+    "source": "02",
+    "destination": "F4"
+   },
+   "gates": [
+    "accepted",
+    "accepted",
+    "accepted",
+    "accepted"
+   ],
+   "reason": "",
+   "status": "accepted",
+   "rows": {
+    "temperature_1": {
+     "disposition": "invalid",
+     "value": "",
+     "unit": "",
+     "raw": "65535"
+    },
+    "temperature_2": {
+     "disposition": "accepted",
+     "value": "25",
+     "unit": "C",
+     "raw": "520"
+    },
+    "temperature_3": {
+     "disposition": "accepted",
+     "value": "27.5",
+     "unit": "C",
+     "raw": "540"
+    },
+    "temperature_4": {
+     "disposition": "accepted",
+     "value": "30",
+     "unit": "C",
+     "raw": "560"
+    }
+   },
+   "attribution": null
+  },
+  {
+   "name": "temperature vector below the offset code",
+   "kind": "temperatures",
+   "family": "1830",
+   "payload": "000040014101e803",
+   "state": {
+    "count": 4,
+    "count_valid": true,
+    "fixed16": false
+   },
+   "selection": {
+    "project": "QAAA",
+    "release": "0011",
+    "choice": "",
+    "group": "",
+    "slot": "",
+    "bank": "ordinary",
+    "source": "02",
+    "destination": "F4"
+   },
+   "gates": [
+    "accepted",
+    "accepted",
+    "accepted",
+    "accepted"
+   ],
+   "reason": "",
+   "status": "accepted",
+   "rows": {
+    "temperature_1": {
+     "disposition": "accepted",
+     "value": "-40",
+     "unit": "C",
+     "raw": "0"
+    },
+    "temperature_2": {
+     "disposition": "accepted",
+     "value": "0",
+     "unit": "C",
+     "raw": "320"
+    },
+    "temperature_3": {
+     "disposition": "accepted",
+     "value": "0.125",
+     "unit": "C",
+     "raw": "321"
+    },
+    "temperature_4": {
+     "disposition": "accepted",
+     "value": "85",
+     "unit": "C",
+     "raw": "1000"
+    }
+   },
+   "attribution": null
+  },
+  {
+   "name": "temperature vector with a rejected gate",
+   "kind": "temperatures",
+   "family": "1830",
+   "payload": "080230021c025802",
+   "state": {
+    "count": 4,
+    "count_valid": true,
+    "fixed16": false
+   },
+   "selection": {
+    "project": "QAAA",
+    "release": "0011",
+    "choice": "",
+    "group": "",
+    "slot": "",
+    "bank": "ordinary",
+    "source": "02",
+    "destination": "F4"
+   },
+   "gates": [
+    "accepted",
+    "invalid",
+    "absent",
+    "accepted"
+   ],
+   "reason": "",
+   "status": "accepted",
+   "rows": {
+    "temperature_1": {
+     "disposition": "accepted",
+     "value": "25",
+     "unit": "C",
+     "raw": "520"
+    },
+    "temperature_2": {
+     "disposition": "invalid",
+     "value": "",
+     "unit": "",
+     "raw": "560"
+    },
+    "temperature_3": {
+     "disposition": "absent",
+     "value": "",
+     "unit": "",
+     "raw": "540"
+    },
+    "temperature_4": {
+     "disposition": "accepted",
+     "value": "35",
+     "unit": "C",
+     "raw": "600"
+    }
+   },
+   "attribution": null
+  },
+  {
+   "name": "cell block one with an unconfigured group keeps no rows",
+   "kind": "cells",
+   "family": "1810",
+   "payload": "e40ce50ce60ce70c",
+   "state": {
+    "count": 4,
+    "count_valid": true,
+    "fixed16": false
+   },
+   "selection": {
+    "project": "QAAa",
+    "release": "9011",
+    "choice": "",
+    "group": "",
+    "slot": "",
+    "bank": "ordinary",
+    "source": "02",
+    "destination": "F4"
+   },
+   "gates": [
+    "accepted",
+    "accepted",
+    "accepted",
+    "accepted"
+   ],
+   "reason": "invalid",
+   "status": "invalid",
+   "rows": {},
+   "attribution": null
+  },
+  {
+   "name": "cell block one with a short payload keeps no rows",
+   "kind": "cells",
+   "family": "1810",
+   "payload": "e40ce50ce60c",
+   "state": {
+    "count": 4,
+    "count_valid": true,
+    "fixed16": false
+   },
+   "selection": {
+    "project": "QAAA",
+    "release": "0011",
+    "choice": "",
+    "group": "",
+    "slot": "",
+    "bank": "ordinary",
+    "source": "02",
+    "destination": "F4"
+   },
+   "gates": [
+    "accepted",
+    "accepted",
+    "accepted",
+    "accepted"
+   ],
+   "reason": "invalid",
+   "status": "invalid",
+   "rows": {},
+   "attribution": null
+  },
+  {
+   "name": "temperature frame offered to a cell vector keeps no rows",
+   "kind": "cells",
+   "family": "1830",
+   "payload": "080230021c025802",
+   "state": {
+    "count": 4,
+    "count_valid": true,
+    "fixed16": false
+   },
+   "selection": {
+    "project": "QAAA",
+    "release": "0011",
+    "choice": "",
+    "group": "",
+    "slot": "",
+    "bank": "ordinary",
+    "source": "02",
+    "destination": "F4"
+   },
+   "gates": [
+    "accepted",
+    "accepted",
+    "accepted",
+    "accepted"
+   ],
+   "reason": "no_match",
+   "status": "unsupported",
+   "rows": {},
+   "attribution": null
+  },
+  {
+   "name": "cell frame offered to a temperature vector keeps no rows",
+   "kind": "temperatures",
+   "family": "1810",
+   "payload": "e40ce50ce60ce70c",
+   "state": {
+    "count": 4,
+    "count_valid": true,
+    "fixed16": false
+   },
+   "selection": {
+    "project": "QAAA",
+    "release": "0011",
+    "choice": "",
+    "group": "",
+    "slot": "",
+    "bank": "ordinary",
+    "source": "02",
+    "destination": "F4"
+   },
+   "gates": [
+    "accepted",
+    "accepted",
+    "accepted",
+    "accepted"
+   ],
+   "reason": "no_match",
+   "status": "unsupported",
+   "rows": {},
+   "attribution": null
+  },
+  {
+   "name": "neighbouring cell family keeps no rows",
+   "kind": "cells",
+   "family": "1814",
+   "payload": "e40ce50ce60ce70c",
+   "state": {
+    "count": 4,
+    "count_valid": true,
+    "fixed16": false
+   },
+   "selection": {
+    "project": "QAAA",
+    "release": "0011",
+    "choice": "",
+    "group": "",
+    "slot": "",
+    "bank": "ordinary",
+    "source": "02",
+    "destination": "F4"
+   },
+   "gates": [
+    "accepted",
+    "accepted",
+    "accepted",
+    "accepted"
+   ],
+   "reason": "no_match",
+   "status": "unsupported",
+   "rows": {},
+   "attribution": null
+  }
+ ]
+}

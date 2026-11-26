@@ -1,0 +1,185 @@
+{
+  "description": "Synthetic diagnostic frames: summary bits (0x312, 0x323) and diagnostic code words (0x333, 0x52X, LINK 1853 family). Every expectation is written by hand from the payload bytes and the selection rules; value is the exact decimal of the native value and is empty when the row withholds it; status is the decoder field status, and absent means the decoder emits no field for the key. For DTC keys, raw is the selected word and value of numeric_index is the index.",
+  "cases": [
+    {
+      "name": "modern-summary-a1-accepted",
+      "kind": "summary",
+      "identifier": "0x312",
+      "extended": false,
+      "payload": "0200000000000000",
+      "offset": 0,
+      "selection": {"flavor": "pcs-standard", "bank": "ordinary", "project": "QAAA", "release": "0011", "scope": "local", "endpoint": "coordinator", "group": "", "slot": ""},
+      "expect": {
+        "A/1": {"status": "accepted", "raw": "1", "value": "1"},
+        "A/0": {"status": "raw", "raw": "0", "value": "0"},
+        "B/4": {"status": "accepted", "raw": "0", "value": "0"}
+      }
+    },
+    {
+      "name": "modern-unmapped-set-stays-raw",
+      "kind": "summary",
+      "identifier": "0x312",
+      "extended": false,
+      "payload": "0001000000000000",
+      "offset": 0,
+      "selection": {"flavor": "pcs-standard", "bank": "ordinary", "project": "QAAA", "release": "0011", "scope": "local", "endpoint": "coordinator", "group": "", "slot": ""},
+      "expect": {
+        "A/8": {"status": "raw", "raw": "1", "value": "1"},
+        "A/1": {"status": "accepted", "raw": "0", "value": "0"}
+      }
+    },
+    {
+      "name": "modern-clear-expected-set-is-conflict",
+      "kind": "summary",
+      "identifier": "0x312",
+      "extended": false,
+      "payload": "0002000000000000",
+      "offset": 0,
+      "selection": {"flavor": "pcs-standard", "bank": "ordinary", "project": "QAAA", "release": "0011", "scope": "local", "endpoint": "coordinator", "group": "", "slot": ""},
+      "expect": {
+        "A/9": {"status": "conflict", "raw": "1", "value": ""}
+      }
+    },
+    {
+      "name": "release-11-summary-323-b5-bit0",
+      "kind": "summary",
+      "identifier": "0x323",
+      "extended": false,
+      "payload": "0000000000010000",
+      "offset": 0,
+      "selection": {"flavor": "pcs-standard", "bank": "ordinary", "project": "QAAA", "release": "0011", "scope": "local", "endpoint": "coordinator", "group": "", "slot": ""},
+      "expect": {
+        "B5/0": {"status": "accepted", "raw": "1", "value": "1"},
+        "B4/0": {"status": "raw", "raw": "0", "value": "0"}
+      }
+    },
+    {
+      "name": "parallel-summary-a1-accepted",
+      "kind": "summary",
+      "identifier": "0x312",
+      "extended": false,
+      "payload": "0200000000000000",
+      "offset": 0,
+      "selection": {"flavor": "pcs-parallel", "bank": "parallel", "project": "QAAA", "release": "0011", "scope": "local", "endpoint": "coordinator", "group": "", "slot": ""},
+      "expect": {
+        "A/1": {"status": "accepted", "raw": "1", "value": "1"}
+      }
+    },
+    {
+      "name": "legacy-unqualified-summary-stays-raw",
+      "kind": "summary",
+      "identifier": "0x312",
+      "extended": false,
+      "payload": "0200000000000000",
+      "offset": 0,
+      "selection": {"flavor": "pcs-standard", "bank": "ordinary", "project": "QAAA", "release": "0006", "scope": "local", "endpoint": "coordinator", "group": "", "slot": "", "local_summary_qualified": false},
+      "expect": {
+        "A/1": {"status": "raw", "raw": "1", "value": "1"},
+        "A/0": {"status": "raw", "raw": "0", "value": "0"}
+      }
+    },
+    {
+      "name": "legacy-qualified-summary-a1-accepted",
+      "kind": "summary",
+      "identifier": "0x312",
+      "extended": false,
+      "payload": "0200000000000000",
+      "offset": 0,
+      "selection": {"flavor": "pcs-standard", "bank": "ordinary", "project": "QAAA", "release": "0006", "scope": "local", "endpoint": "coordinator", "group": "", "slot": "", "local_summary_qualified": true},
+      "expect": {
+        "A/1": {"status": "accepted", "raw": "1", "value": "1"}
+      }
+    },
+    {
+      "name": "standard-word-index-9",
+      "kind": "dtc",
+      "identifier": "0x333",
+      "extended": false,
+      "payload": "0000100900000000",
+      "offset": 2,
+      "selection": {"flavor": "pcs-standard", "bank": "ordinary", "project": "QAAA", "release": "0011", "scope": "local", "endpoint": "coordinator", "group": "0", "slot": "0"},
+      "expect": {
+        "selected_word": {"status": "accepted", "raw": "4105", "value": "4105"},
+        "numeric_index": {"status": "accepted", "raw": "4105", "value": "9"}
+      }
+    },
+    {
+      "name": "standard-word-index-10-trailing-zero",
+      "kind": "dtc",
+      "identifier": "0x333",
+      "extended": false,
+      "payload": "0000101000000000",
+      "offset": 2,
+      "selection": {"flavor": "pcs-standard", "bank": "ordinary", "project": "QAAA", "release": "0011", "scope": "local", "endpoint": "coordinator", "group": "0", "slot": "0"},
+      "expect": {
+        "selected_word": {"status": "accepted", "raw": "4112", "value": "4112"},
+        "numeric_index": {"status": "accepted", "raw": "4112", "value": "10"}
+      }
+    },
+    {
+      "name": "standard-word-index-131-offset-2",
+      "kind": "dtc",
+      "identifier": "0x333",
+      "extended": false,
+      "payload": "0000113100000000",
+      "offset": 2,
+      "selection": {"flavor": "pcs-standard", "bank": "ordinary", "project": "QAAA", "release": "0011", "scope": "local", "endpoint": "coordinator", "group": "0", "slot": "0"},
+      "expect": {
+        "selected_word": {"status": "accepted", "raw": "4401", "value": "4401"},
+        "numeric_index": {"status": "accepted", "raw": "4401", "value": "131"}
+      }
+    },
+    {
+      "name": "standard-unmatched-word-has-no-index",
+      "kind": "dtc",
+      "identifier": "0x333",
+      "extended": false,
+      "payload": "0000123400000000",
+      "offset": 2,
+      "selection": {"flavor": "pcs-standard", "bank": "ordinary", "project": "QAAA", "release": "0011", "scope": "local", "endpoint": "coordinator", "group": "0", "slot": "0"},
+      "expect": {
+        "selected_word": {"status": "unknown", "raw": "4660", "value": "4660"},
+        "numeric_index": {"status": "absent", "raw": "", "value": ""}
+      }
+    },
+    {
+      "name": "standard-empty-word-has-no-index",
+      "kind": "dtc",
+      "identifier": "0x333",
+      "extended": false,
+      "payload": "0000000000000000",
+      "offset": 2,
+      "selection": {"flavor": "pcs-standard", "bank": "ordinary", "project": "QAAA", "release": "0011", "scope": "local", "endpoint": "coordinator", "group": "0", "slot": "0"},
+      "expect": {
+        "selected_word": {"status": "empty", "raw": "0", "value": "0"},
+        "numeric_index": {"status": "absent", "raw": "", "value": ""}
+      }
+    },
+    {
+      "name": "parallel-word-index-62",
+      "kind": "dtc",
+      "identifier": "0x522",
+      "extended": false,
+      "payload": "0310620000000000",
+      "offset": 1,
+      "selection": {"flavor": "pcs-parallel", "bank": "parallel", "project": "QAAA", "release": "0011", "scope": "local", "endpoint": "coordinator", "group": "2", "slot": "3"},
+      "expect": {
+        "selected_word": {"status": "accepted", "raw": "4194", "value": "4194"},
+        "numeric_index": {"status": "accepted", "raw": "4194", "value": "62"}
+      }
+    },
+    {
+      "name": "link-word-index-9",
+      "kind": "dtc",
+      "identifier": "0x1853F41A",
+      "extended": true,
+      "payload": "0910000000000000",
+      "offset": 0,
+      "selection": {"flavor": "link", "pcs_flavor": "pcs-standard", "bank": "ordinary", "project": "QAAA", "release": "0011", "scope": "local", "endpoint": "1A", "group": "", "slot": ""},
+      "expect": {
+        "selected_word": {"status": "accepted", "raw": "4105", "value": "4105"},
+        "numeric_index": {"status": "accepted", "raw": "4105", "value": "9"}
+      }
+    }
+  ]
+}

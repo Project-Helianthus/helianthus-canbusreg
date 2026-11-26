@@ -1,0 +1,278 @@
+{
+  "description": "Synthetic vectors of the slot frames 0x326, 0x327, 0x333 and 0x334. Expectations are written from the page's layouts and conversions: the 0x326 current is (word - 4000) / 10 A on the ordinary bank and (word - 10000) / 10 A on the parallel bank; the 0x333 dictionary word of index 5 is 0x1005 on the non-modern contract. Values are decimal strings; an empty value is not checked.",
+  "cases": [
+    {
+      "name": "slot-326-ordinary-word-4000",
+      "identifier": "0x326",
+      "payload": "0213880FA05A0000",
+      "selection": {"project": "QAAA", "release": "0011", "flavor": "pcs-standard", "bank": "ordinary", "scope": "local", "endpoint": "coordinator", "group": "0", "slot": "2"},
+      "input": {"measurement_valid": true, "slot_valid": true, "native_slot": 2, "group_valid": true, "native_group": 0},
+      "expect": {
+        "slot": {"status": "accepted", "value": "2"},
+        "voltage": {"status": "accepted", "value": "50"},
+        "current": {"status": "accepted", "value": "0"},
+        "soc_low": {"status": "accepted", "value": "90"}
+      }
+    },
+    {
+      "name": "slot-326-parallel-word-4000",
+      "identifier": "0x326",
+      "payload": "0213880FA05A0000",
+      "selection": {"project": "QAAA", "release": "0011", "flavor": "pcs-parallel", "bank": "parallel", "scope": "local", "endpoint": "coordinator", "group": "0", "slot": "2"},
+      "input": {"measurement_valid": true, "slot_valid": true, "native_slot": 2, "group_valid": true, "native_group": 0},
+      "expect": {
+        "slot": {"status": "accepted", "value": "2"},
+        "voltage": {"status": "accepted", "value": "50"},
+        "current": {"status": "accepted", "value": "-600"},
+        "soc_low": {"status": "accepted", "value": "90"}
+      }
+    },
+    {
+      "name": "slot-326-ordinary-word-0",
+      "identifier": "0x326",
+      "payload": "02138800005A0000",
+      "selection": {"project": "QAAA", "release": "0011", "flavor": "pcs-standard", "bank": "ordinary", "scope": "local", "endpoint": "coordinator", "group": "0", "slot": "2"},
+      "input": {"measurement_valid": true, "slot_valid": true, "native_slot": 2, "group_valid": true, "native_group": 0},
+      "expect": {
+        "current": {"status": "accepted", "value": "-400"}
+      }
+    },
+    {
+      "name": "slot-326-ordinary-word-ffff",
+      "identifier": "0x326",
+      "payload": "021388FFFF5A0000",
+      "selection": {"project": "QAAA", "release": "0011", "flavor": "pcs-standard", "bank": "ordinary", "scope": "local", "endpoint": "coordinator", "group": "0", "slot": "2"},
+      "input": {"measurement_valid": true, "slot_valid": true, "native_slot": 2, "group_valid": true, "native_group": 0},
+      "expect": {
+        "current": {"status": "accepted", "value": "6153.5"}
+      }
+    },
+    {
+      "name": "slot-326-padding-nonzero",
+      "identifier": "0x326",
+      "payload": "0213880FA05A0100",
+      "selection": {"project": "QAAA", "release": "0011", "flavor": "pcs-standard", "bank": "ordinary", "scope": "local", "endpoint": "coordinator", "group": "0", "slot": "2"},
+      "input": {"measurement_valid": true, "slot_valid": true, "native_slot": 2, "group_valid": true, "native_group": 0},
+      "expect": {
+        "slot": {"status": "raw"},
+        "voltage": {"status": "raw"},
+        "current": {"status": "raw"},
+        "soc_low": {"status": "raw"}
+      }
+    },
+    {
+      "name": "slot-326-unmeasured",
+      "identifier": "0x326",
+      "payload": "0213880FA05A0000",
+      "selection": {"project": "QAAA", "release": "0011", "flavor": "pcs-standard", "bank": "ordinary", "scope": "local", "endpoint": "coordinator", "group": "0", "slot": "2"},
+      "input": {"measurement_valid": false, "slot_valid": true, "native_slot": 2, "group_valid": true, "native_group": 0},
+      "expect": {
+        "slot": {"status": "accepted", "value": "2"},
+        "voltage": {"status": "raw"},
+        "current": {"status": "raw"},
+        "soc_low": {"status": "accepted", "value": "90"}
+      }
+    },
+    {
+      "name": "slot-326-slot-mismatch",
+      "identifier": "0x326",
+      "payload": "0213880FA05A0000",
+      "selection": {"project": "QAAA", "release": "0011", "flavor": "pcs-standard", "bank": "ordinary", "scope": "local", "endpoint": "coordinator", "group": "0", "slot": "2"},
+      "input": {"measurement_valid": true, "slot_valid": true, "native_slot": 3, "group_valid": true, "native_group": 0},
+      "expect": {
+        "slot": {"status": "raw"},
+        "voltage": {"status": "raw"},
+        "current": {"status": "raw"},
+        "soc_low": {"status": "raw"}
+      }
+    },
+    {
+      "name": "slot-326-legacy-release-0006",
+      "identifier": "0x326",
+      "payload": "0213880FA05A0000",
+      "selection": {"project": "QAAA", "release": "0006", "flavor": "pcs-standard", "bank": "ordinary", "scope": "local", "endpoint": "coordinator", "group": "0", "slot": "2"},
+      "input": {"measurement_valid": true, "slot_valid": true, "native_slot": 2, "group_valid": true, "native_group": 0},
+      "expect": {
+        "slot": {"status": "raw"},
+        "voltage": {"status": "raw"},
+        "current": {"status": "raw"},
+        "soc_low": {"status": "raw"}
+      }
+    },
+    {
+      "name": "slot-326-field-state-stale",
+      "identifier": "0x326",
+      "payload": "0213880FA05A0000",
+      "selection": {"project": "QAAA", "release": "0011", "flavor": "pcs-standard", "bank": "ordinary", "scope": "local", "endpoint": "coordinator", "group": "0", "slot": "2"},
+      "input": {"measurement_valid": true, "slot_valid": true, "native_slot": 2, "group_valid": true, "native_group": 0, "field_states": {"voltage": "stale"}},
+      "expect": {
+        "voltage": {"status": "stale"},
+        "current": {"status": "accepted", "value": "0"}
+      }
+    },
+    {
+      "name": "slot-326-negative-field-age",
+      "identifier": "0x326",
+      "payload": "0213880FA05A0000",
+      "selection": {"project": "QAAA", "release": "0011", "flavor": "pcs-standard", "bank": "ordinary", "scope": "local", "endpoint": "coordinator", "group": "0", "slot": "2"},
+      "input": {"measurement_valid": true, "slot_valid": true, "native_slot": 2, "group_valid": true, "native_group": 0, "field_ages_ms": {"current": -1}},
+      "expect": {
+        "current": {"status": "invalid"}
+      }
+    },
+    {
+      "name": "slot-327-ordinary-cells",
+      "identifier": "0x327",
+      "payload": "020D200C80030700",
+      "selection": {"project": "QAAA", "release": "0011", "flavor": "pcs-standard", "bank": "ordinary", "scope": "local", "endpoint": "coordinator", "group": "0", "slot": "2"},
+      "input": {"measurement_valid": true, "slot_valid": true, "native_slot": 2, "group_valid": true, "native_group": 0},
+      "expect": {
+        "slot": {"status": "accepted", "value": "2"},
+        "maximum_cell": {"status": "accepted", "value": "3360"},
+        "minimum_cell": {"status": "accepted", "value": "3200"},
+        "maximum_index": {"status": "accepted", "value": "3"},
+        "minimum_index": {"status": "accepted", "value": "7"}
+      }
+    },
+    {
+      "name": "slot-327-parallel-cells",
+      "identifier": "0x327",
+      "payload": "020D200C80030700",
+      "selection": {"project": "QAAA", "release": "0011", "flavor": "pcs-parallel", "bank": "parallel", "scope": "local", "endpoint": "coordinator", "group": "0", "slot": "2"},
+      "input": {"measurement_valid": true, "slot_valid": true, "native_slot": 2, "group_valid": true, "native_group": 0},
+      "expect": {
+        "slot": {"status": "accepted", "value": "2"},
+        "maximum_cell": {"status": "accepted", "value": "3360"},
+        "minimum_cell": {"status": "accepted", "value": "3200"},
+        "maximum_index": {"status": "accepted", "value": "3"},
+        "minimum_index": {"status": "accepted", "value": "7"}
+      }
+    },
+    {
+      "name": "slot-327-trailing-byte",
+      "identifier": "0x327",
+      "payload": "020D200C80030701",
+      "selection": {"project": "QAAA", "release": "0011", "flavor": "pcs-standard", "bank": "ordinary", "scope": "local", "endpoint": "coordinator", "group": "0", "slot": "2"},
+      "input": {"measurement_valid": true, "slot_valid": true, "native_slot": 2, "group_valid": true, "native_group": 0},
+      "expect": {
+        "slot": {"status": "raw"},
+        "maximum_cell": {"status": "raw"},
+        "minimum_cell": {"status": "raw"},
+        "maximum_index": {"status": "raw"},
+        "minimum_index": {"status": "raw"}
+      }
+    },
+    {
+      "name": "slot-333-dictionary-index-5",
+      "identifier": "0x333",
+      "payload": "0002100500000000",
+      "selection": {"project": "QAAA", "release": "0011", "flavor": "pcs-standard", "bank": "ordinary", "scope": "local", "endpoint": "coordinator", "group": "0", "slot": "2"},
+      "input": {"measurement_valid": true, "slot_valid": true, "native_slot": 2, "group_valid": true, "native_group": 0, "member": true},
+      "expect": {
+        "group": {"status": "accepted", "value": "0"},
+        "slot": {"status": "accepted", "value": "2"},
+        "dtc_a": {"status": "accepted", "value": "4101"},
+        "dtc_a_index": {"status": "accepted", "value": "5"},
+        "dtc_b": {"status": "empty"},
+        "dtc_b_index": {"status": "empty"}
+      }
+    },
+    {
+      "name": "slot-333-parallel-dictionary-index-5",
+      "identifier": "0x333",
+      "payload": "0002100500000000",
+      "selection": {"project": "QAAA", "release": "0011", "flavor": "pcs-parallel", "bank": "parallel", "scope": "local", "endpoint": "coordinator", "group": "0", "slot": "2"},
+      "input": {"measurement_valid": true, "slot_valid": true, "native_slot": 2, "group_valid": true, "native_group": 0, "member": true},
+      "expect": {
+        "group": {"status": "accepted", "value": "0"},
+        "slot": {"status": "accepted", "value": "2"},
+        "dtc_a": {"status": "accepted", "value": "4101"},
+        "dtc_a_index": {"status": "accepted", "value": "5"},
+        "dtc_b": {"status": "empty"},
+        "dtc_b_index": {"status": "empty"}
+      }
+    },
+    {
+      "name": "slot-333-no-member",
+      "identifier": "0x333",
+      "payload": "0002100500000000",
+      "selection": {"project": "QAAA", "release": "0011", "flavor": "pcs-standard", "bank": "ordinary", "scope": "local", "endpoint": "coordinator", "group": "0", "slot": "2"},
+      "input": {"measurement_valid": true, "slot_valid": true, "native_slot": 2, "group_valid": true, "native_group": 0, "member": false},
+      "expect": {
+        "group": {"status": "accepted", "value": "0"},
+        "slot": {"status": "accepted", "value": "2"},
+        "dtc_a": {"status": "raw"},
+        "dtc_b": {"status": "raw"}
+      }
+    },
+    {
+      "name": "slot-333-group-mismatch",
+      "identifier": "0x333",
+      "payload": "0002100500000000",
+      "selection": {"project": "QAAA", "release": "0011", "flavor": "pcs-standard", "bank": "ordinary", "scope": "local", "endpoint": "coordinator", "group": "0", "slot": "2"},
+      "input": {"measurement_valid": true, "slot_valid": true, "native_slot": 2, "group_valid": true, "native_group": 1, "member": true},
+      "expect": {
+        "group": {"status": "raw"},
+        "slot": {"status": "raw"},
+        "dtc_a": {"status": "raw"},
+        "dtc_b": {"status": "raw"}
+      }
+    },
+    {
+      "name": "slot-333-unmapped-word",
+      "identifier": "0x333",
+      "payload": "0002099900000000",
+      "selection": {"project": "QAAA", "release": "0011", "flavor": "pcs-standard", "bank": "ordinary", "scope": "local", "endpoint": "coordinator", "group": "0", "slot": "2"},
+      "input": {"measurement_valid": true, "slot_valid": true, "native_slot": 2, "group_valid": true, "native_group": 0, "member": true},
+      "expect": {
+        "dtc_a": {"status": "raw"},
+        "dtc_b": {"status": "empty"},
+        "dtc_b_index": {"status": "empty"}
+      }
+    },
+    {
+      "name": "slot-334-modern-state-and-independent",
+      "identifier": "0x334",
+      "payload": "0301000000000000",
+      "selection": {"project": "QAAa", "release": "9011", "choice": "release11", "flavor": "pcs-standard", "bank": "ordinary", "scope": "local", "endpoint": "coordinator", "group": "0", "slot": "2"},
+      "input": {"measurement_valid": true, "slot_valid": true, "native_slot": 2, "group_valid": true, "native_group": 0},
+      "expect": {
+        "state": {"status": "accepted", "value": "3"},
+        "independent": {"status": "accepted", "value": "1"}
+      }
+    },
+    {
+      "name": "slot-334-parallel-modern",
+      "identifier": "0x334",
+      "payload": "0301000000000000",
+      "selection": {"project": "QAAa", "release": "9011", "choice": "release11", "flavor": "pcs-parallel", "bank": "parallel", "scope": "local", "endpoint": "coordinator", "group": "0", "slot": "2"},
+      "input": {"measurement_valid": true, "slot_valid": true, "native_slot": 2, "group_valid": true, "native_group": 0},
+      "expect": {
+        "state": {"status": "accepted", "value": "3"},
+        "independent": {"status": "accepted", "value": "1"}
+      }
+    },
+    {
+      "name": "slot-334-0011-zero-second-byte",
+      "identifier": "0x334",
+      "payload": "0300000000000000",
+      "selection": {"project": "QAAA", "release": "0011", "flavor": "pcs-standard", "bank": "ordinary", "scope": "local", "endpoint": "coordinator", "group": "0", "slot": "2"},
+      "input": {"measurement_valid": true, "slot_valid": true, "native_slot": 2, "group_valid": true, "native_group": 0},
+      "expect": {
+        "state": {"status": "accepted", "value": "3"},
+        "independent": {"status": "raw"}
+      }
+    },
+    {
+      "name": "slot-334-0011-nonzero-second-byte",
+      "identifier": "0x334",
+      "payload": "0301000000000000",
+      "selection": {"project": "QAAA", "release": "0011", "flavor": "pcs-standard", "bank": "ordinary", "scope": "local", "endpoint": "coordinator", "group": "0", "slot": "2"},
+      "input": {"measurement_valid": true, "slot_valid": true, "native_slot": 2, "group_valid": true, "native_group": 0},
+      "expect": {
+        "state": {"status": "raw"},
+        "independent": {"status": "raw"}
+      }
+    }
+  ]
+}

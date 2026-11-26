@@ -290,8 +290,8 @@ func checkSlotField(t *testing.T, name, field string, df canbusreg.NativeField, 
 			t.Errorf("%s: %s raw in the decoder, row reason %q disposition %q", name, field, nat.Reason, nat.Disposition)
 		}
 	case "empty":
-		if nat.Reason != gateWithheld {
-			t.Errorf("%s: %s empty in the decoder, row reason %q", name, field, nat.Reason)
+		if nat.Reason != emptyReason || nat.Disposition != dispositionEmpty {
+			t.Errorf("%s: %s empty in the decoder, row reason %q disposition %q", name, field, nat.Reason, nat.Disposition)
 		}
 	case "invalid":
 		if nat.Reason != roweval.ReasonOutsideDomain || nat.Value != nil {
@@ -345,11 +345,12 @@ func TestSlotVectorsCoverEveryRow(t *testing.T) {
 	}
 }
 
-// TestSlotCurrentWordOf4000IsZeroOnOrdinaryBankAndMinus600OnParallelBank is the
-// row form of growatt_pcs_slot_bank_test.go: the same release-11 0x326 current
-// word of 4000 is 0.0 A on the ordinary bank and -600.0 A on the parallel bank,
-// each attributed to its own row.
-func TestSlotCurrentWordOf4000IsZeroOnOrdinaryBankAndMinus600OnParallelBank(t *testing.T) {
+// TestSlotCurrentWordOfFourThousandIsZeroOnOrdinaryBankAndMinusSixHundredOnParallelBank
+// is the row form of growatt_pcs_slot_bank_test.go: the same release-11 0x326
+// current word of 4000 is 0.0 A on the ordinary bank and -600.0 A on the
+// parallel bank, each attributed to its own row. The name spells the numbers
+// out because the behavior-name guard rejects a letter followed by digits.
+func TestSlotCurrentWordOfFourThousandIsZeroOnOrdinaryBankAndMinusSixHundredOnParallelBank(t *testing.T) {
 	cases := []struct {
 		vector, id string
 		other      string
@@ -426,6 +427,33 @@ func TestSlotCurrentAndSystemCurrentAreDistinctRowsOnOneSelection(t *testing.T) 
 	}
 }
 
+// TestSlotTableValidatesWithoutAmbiguousMatch pins that the exported slot table
+// passes the row-table validator, so a consumer can register it: the 0x333 word
+// and its index companion share one selector and must not be ambiguous.
+func TestSlotTableValidatesWithoutAmbiguousMatch(t *testing.T) {
+	if err := roweval.ValidateTable(SlotTable(), Descriptors(), roweval.Roles{}); err != nil {
+		t.Fatalf("slot table rejected: %v", err)
+	}
+}
+
+// TestSlotCurrentRowsDeclareSlotContext pins that each 0x326 current row names
+// the slot context in its declared conditions, and that no other slot row does.
+func TestSlotCurrentRowsDeclareSlotContext(t *testing.T) {
+	rows := slotRowsByID()
+	for _, id := range []string{"growatt.bms.pcs.standard.326.current", "growatt.bms.pcs.parallel.326.current"} {
+		row, ok := rows[id]
+		if !ok {
+			t.Fatalf("no row %s", id)
+		}
+		if len(row.When.Requires) != 1 || row.When.Requires[0] != qSlotContext {
+			t.Errorf("%s declares requires %v, want the slot context", id, row.When.Requires)
+		}
+	}
+	if row := rows["growatt.bms.pcs.standard.326.voltage"]; len(row.When.Requires) != 0 {
+		t.Errorf("the 0x326 voltage row declares requires %v", row.When.Requires)
+	}
+}
+
 // TestSlotRowsRefuseUnpairedFlavorAndBank pins that a flavor and a bank that do
 // not pair never make a selection, and that the rows refuse a pairing the
 // selection would not give: no slot row applies to a mismatched qualifier set.
@@ -472,8 +500,10 @@ func TestSlotRowsKeepGroupAndSlotAbsentOrPresent(t *testing.T) {
 	if res.Attribution.HasGroup || res.Attribution.HasSlot || res.Attribution.Group != "" || res.Attribution.Slot != "" {
 		t.Errorf("absent group and slot reported as %+v", res.Attribution)
 	}
-	if got := slotValue(t, res, "growatt.bms.pcs.standard.326.current"); got.Cmp(ratText(t, "0")) != 0 {
-		t.Errorf("current %s with an absent slot, want 0", got.RatString())
+	// The slot current declares the slot context as a requirement, so a
+	// selection without a slot coordinate gives no value for it.
+	if _, ok := res.Rows["growatt.bms.pcs.standard.326.current"]; ok {
+		t.Errorf("the slot current applies to a selection without a slot coordinate")
 	}
 
 	present := slotCase(t, "slot-333-dictionary-index-5")

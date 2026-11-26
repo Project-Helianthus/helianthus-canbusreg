@@ -38,6 +38,25 @@ const (
 	// 0x333 index companion; the companion field key follows.
 	qIndexState = "dtc-index-state:"
 	qIndex      = "dtc-index:"
+
+	// qDTCRole separates the two roles of one 0x333 dictionary word: the word
+	// itself and its index companion. Both rows read the same selector, so the
+	// validator needs the roles to differ in their conditions.
+	qDTCRole  = "dtc-role"
+	roleWord  = "word"
+	roleIndex = "index"
+
+	// qSlotContext is the slot-context condition of the 0x326 current rows: the
+	// selection carries a slot coordinate. It is a requirement, not a value, so
+	// the row invents no coordinate when the selection has none.
+	qSlotContext = "slot-context"
+
+	// emptyReason is the reason of a valid zero word, or of its index, under a
+	// populated dictionary: the decoder's empty status, which is not withheld
+	// evidence.
+	emptyReason roweval.Reason = "empty"
+	// dispositionEmpty is the disposition of a row in the empty status.
+	dispositionEmpty = "empty"
 )
 
 // slotBank is one bank of the slot frames: the flavor and bank the selection
@@ -66,6 +85,10 @@ type slotSpec struct {
 	// indexOf names the 0x333 word field whose dictionary index this row
 	// states; empty for every other row.
 	indexOf string
+	// role is the 0x333 dictionary role of a word or index row; empty otherwise.
+	role string
+	// requiresSlot marks a row whose selection must carry a slot coordinate.
+	requiresSlot bool
 }
 
 // slotSpecs returns the rows of the slot frames for one bank, in frame order.
@@ -73,7 +96,7 @@ func slotSpecs(b slotBank) []slotSpec {
 	return []slotSpec{
 		{frame: 0x326, field: "slot", slice: byteAt(0), divisor: 1, gate: gateSlot326},
 		{frame: 0x326, field: "voltage", slice: bigWord(8), unit: "V", divisor: 100, gate: gateMeasured326},
-		{frame: 0x326, field: "current", slice: bigWord(24), unit: "A", divisor: 10, offset: -b.currentBase / 10, gate: gateMeasured326},
+		{frame: 0x326, field: "current", slice: bigWord(24), unit: "A", divisor: 10, offset: -b.currentBase / 10, gate: gateMeasured326, requiresSlot: true},
 		{frame: 0x326, field: "soc_low", slice: byteAt(40), divisor: 1, gate: gateSlot326},
 		{frame: 0x327, field: "slot", slice: byteAt(0), divisor: 1, gate: gateSlot327},
 		{frame: 0x327, field: "maximum_cell", slice: bigWord(8), unit: "mV", divisor: 1, gate: gateMeasured327},
@@ -82,10 +105,10 @@ func slotSpecs(b slotBank) []slotSpec {
 		{frame: 0x327, field: "minimum_index", slice: byteAt(48), divisor: 1, gate: gateSlot327},
 		{frame: 0x333, field: "group", slice: byteAt(0), divisor: 1, gate: gateGroup333},
 		{frame: 0x333, field: "slot", slice: byteAt(8), divisor: 1, gate: gateGroup333},
-		{frame: 0x333, field: "dtc_a", slice: bigWord(16), divisor: 1, gate: qDTCAccepted + "dtc_a"},
-		{frame: 0x333, field: "dtc_b", slice: bigWord(32), divisor: 1, gate: qDTCAccepted + "dtc_b"},
-		{frame: 0x333, field: "dtc_a_index", slice: bigWord(16), divisor: 1, indexOf: "dtc_a"},
-		{frame: 0x333, field: "dtc_b_index", slice: bigWord(32), divisor: 1, indexOf: "dtc_b"},
+		{frame: 0x333, field: "dtc_a", slice: bigWord(16), divisor: 1, gate: qDTCAccepted + "dtc_a", role: roleWord},
+		{frame: 0x333, field: "dtc_b", slice: bigWord(32), divisor: 1, gate: qDTCAccepted + "dtc_b", role: roleWord},
+		{frame: 0x333, field: "dtc_a_index", slice: bigWord(16), divisor: 1, indexOf: "dtc_a", role: roleIndex},
+		{frame: 0x333, field: "dtc_b_index", slice: bigWord(32), divisor: 1, indexOf: "dtc_b", role: roleIndex},
 		{frame: 0x334, field: "state", slice: byteAt(0), divisor: 1, gate: gateState334},
 		{frame: 0x334, field: "independent", slice: byteAt(8), divisor: 1, gate: gateIndependent334},
 	}
@@ -97,12 +120,20 @@ func slotSpecs(b slotBank) []slotSpec {
 // the field disposition and, for a dictionary index, the index state.
 func slotNativeRow(b slotBank, r slotSpec) roweval.NativeRow[Selector] {
 	codec := "unsigned"
+	equal := map[string]string{qFlavor: b.flavor, qBank: b.bank}
+	if r.role != "" {
+		equal[qDTCRole] = r.role
+	}
+	var requires []string
+	if r.requiresSlot {
+		requires = []string{qSlotContext}
+	}
 	row := roweval.NativeRow[Selector]{
 		ID:      fmt.Sprintf("growatt.bms.pcs.%s.%X.%s", b.token, r.frame, r.field),
 		Unit:    r.unit,
 		SpecRef: fmt.Sprintf("CAN %#x", r.frame),
 		At:      Selector{Identifier: r.frame, DLC: 8, RawDLC: 8, Slice: r.slice},
-		When:    roweval.When{Equal: map[string]string{qFlavor: b.flavor, qBank: b.bank}},
+		When:    roweval.When{Equal: equal, Requires: requires},
 		Wire:    roweval.Layout{BitOffset: r.slice.offset, Width: r.slice.width, Codec: codec, ByteOrder: r.slice.order, BitOrder: "lsb0", WordOrder: "single"},
 		Decode:  roweval.Convert{Numeric: &roweval.Affine{Num: 1, Den: r.divisor}},
 	}
@@ -125,29 +156,78 @@ func wholeDecimal(n int64) semreg.Decimal {
 	return d
 }
 
-// slotIndexHook is the hook of a 0x333 index companion. The index is not a
-// field of the wire word; it is the position of the word in the selected
-// member dictionary, which slotQualifiers supplies. An accepted word gives that
-// index; a zero word under a populated dictionary gives the decoder's empty
-// status; any other word leaves the companion absent, as the decoder does.
-func slotIndexHook(field string) roweval.RowHook {
+// slotIndexHook is the hook of the index companion of the 0x333 word field
+// word. The index is not a field of the wire word; it is the position of the
+// word in the selected member dictionary, which slotQualifiers supplies. As the
+// decoder does, the index derives from its word: an invalid age or a state of
+// the word (or of the index itself) is the index's status. An accepted word
+// gives its index as a canonical decimal; a zero word under a populated
+// dictionary gives the empty status; any other word leaves the companion absent.
+func slotIndexHook(word string) roweval.RowHook {
+	index := word + "_index"
 	return func(in roweval.DetachedInputs, _ roweval.RowID, _ roweval.Direction, _ roweval.TypedValue) (roweval.DerivedValue, roweval.Reason) {
 		q := in.Qualifiers().Values
-		if q[qFieldAgeInvalid+field] == "true" {
-			return roweval.DerivedValue{}, roweval.ReasonOutsideDomain
+		for _, field := range []string{word, index} {
+			if q[qFieldAgeInvalid+field] == "true" {
+				return roweval.DerivedValue{}, roweval.ReasonOutsideDomain
+			}
+			if state, ok := q[qFieldState+field]; ok {
+				return roweval.DerivedValue{}, dispositionReason(state)
+			}
 		}
-		if state, ok := q[qFieldState+field]; ok {
-			return roweval.DerivedValue{}, dispositionReason(state)
-		}
-		switch q[qIndexState+field] {
+		switch q[qIndexState+index] {
 		case "accepted":
-			number := semreg.Decimal{Coefficient: q[qIndex+field]}
+			n, err := strconv.ParseInt(q[qIndex+index], 10, 64)
+			if err != nil {
+				return roweval.DerivedValue{}, roweval.ReasonDecode
+			}
+			number := wholeDecimal(n)
 			return roweval.DerivedValue{Value: semreg.Value{Kind: semreg.ValueQuantity, Quantity: &semreg.Quantity{Number: number}}}, ""
 		case "empty":
-			return roweval.DerivedValue{}, gateWithheld
+			return roweval.DerivedValue{}, emptyReason
 		}
 		return roweval.DerivedValue{}, roweval.Reason("absent")
 	}
+}
+
+// slotWordHook is the hook of a 0x333 dictionary word. It is rowHook, except
+// that a valid zero word under a populated dictionary keeps the decoder's empty
+// status instead of the withheld gate reason.
+func slotWordHook(field, gate string) roweval.RowHook {
+	base := rowHook(field, gate)
+	return func(in roweval.DetachedInputs, id roweval.RowID, d roweval.Direction, v roweval.TypedValue) (roweval.DerivedValue, roweval.Reason) {
+		dv, reason := base(in, id, d, v)
+		if reason == gateWithheld && in.Qualifiers().Values[qIndexState+field+"_index"] == "empty" {
+			return roweval.DerivedValue{}, emptyReason
+		}
+		return dv, reason
+	}
+}
+
+// slotDisposition states how the native value of a slot row was obtained: the
+// empty status is its own disposition; every other case is disposition.
+func slotDisposition(n *roweval.Native, rawRow bool) string {
+	if n.Reason == emptyReason {
+		return dispositionEmpty
+	}
+	return disposition(n, rawRow)
+}
+
+// rowQualifiers gives one row the selection vocabulary of its own role. The
+// selection supplies one value per key, so the 0x333 word and its index, which
+// read the same word, are evaluated each with the role it declares. Any other
+// row is evaluated with the selection's vocabulary unchanged.
+func rowQualifiers(q roweval.Qualifiers, row roweval.NativeRow[Selector]) roweval.Qualifiers {
+	role, ok := row.When.Equal[qDTCRole]
+	if !ok {
+		return q
+	}
+	values := make(map[string]string, len(q.Values)+1)
+	for k, v := range q.Values {
+		values[k] = v
+	}
+	values[qDTCRole] = role
+	return roweval.Qualifiers{Values: values, Revisions: q.Revisions, Features: q.Features}
 }
 
 // SlotTable returns the native rows of the slot frames 0x326, 0x327, 0x333 and
@@ -160,9 +240,12 @@ func SlotTable() roweval.Table[Selector] {
 		for _, r := range slotSpecs(b) {
 			row := slotNativeRow(b, r)
 			rows = append(rows, row)
-			if r.indexOf != "" {
-				hooks[row.Decode.Hook] = slotIndexHook(r.field)
-			} else {
+			switch {
+			case r.indexOf != "":
+				hooks[row.Decode.Hook] = slotIndexHook(r.indexOf)
+			case r.role == roleWord:
+				hooks[row.Decode.Hook] = slotWordHook(r.field, r.gate)
+			default:
 				hooks[row.Decode.Hook] = rowHook(r.field, r.gate)
 			}
 		}
@@ -269,7 +352,7 @@ func slotQualifiers(s canbusreg.Selection, in canbusreg.PCSSlotPCSInput) roweval
 		values[qIndexState+dtc.name+"_index"] = state
 		values[qIndex+dtc.name+"_index"] = strconv.Itoa(index)
 	}
-	return roweval.Qualifiers{Values: values}
+	return roweval.Qualifiers{Values: values, Features: map[string]bool{qSlotContext: c.Slot != ""}}
 }
 
 // SlotResult is the evaluation of one slot observation: the evidence it carries,
@@ -319,7 +402,7 @@ func evaluateSlotRows(t roweval.Table[Selector], frame canbus.Frame, q roweval.Q
 		// dictionary companion reads the word of its field, so it shares the
 		// word row's selector; evaluating the table as a whole would find both.
 		one := roweval.Table[Selector]{Native: []roweval.NativeRow[Selector]{row}, Hooks: t.Hooks}
-		a := roweval.Acquired[Selector]{Selector: frameSelector(frame, row.At.Slice), Payload: frame.Data(), Qualifiers: q, Descriptors: Descriptors()}
+		a := roweval.Acquired[Selector]{Selector: frameSelector(frame, row.At.Slice), Payload: frame.Data(), Qualifiers: rowQualifiers(q, row), Descriptors: Descriptors()}
 		ev, err := roweval.Evaluate(one, a)
 		if err != nil {
 			return nil, err
@@ -329,7 +412,7 @@ func evaluateSlotRows(t roweval.Table[Selector], frame canbus.Frame, q roweval.Q
 				ev.Native.Value = nil
 				ev.Native.Unit = ""
 			}
-			ev.Native.Disposition = disposition(ev.Native, false)
+			ev.Native.Disposition = slotDisposition(ev.Native, false)
 			out[ev.Native.RowID] = ev
 		} else if ev.Reason != roweval.ReasonNoMatch {
 			out[row.ID] = ev

@@ -35,7 +35,7 @@ type commandVectors struct {
 
 func loadCommandVectors(t *testing.T) commandVectors {
 	t.Helper()
-	raw, err := os.ReadFile("testdata/commands_211_37f_6f0.json")
+	raw, err := os.ReadFile("testdata/commands_clock_discovery.json")
 	if err != nil {
 		t.Fatal(err)
 	}

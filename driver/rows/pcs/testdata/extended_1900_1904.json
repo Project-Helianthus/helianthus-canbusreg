@@ -1,0 +1,773 @@
+{
+ "description": "Synthetic extended PCS frames 0x1900 to 0x1904. Every expectation is written by hand from the frame layout: status is accepted, raw (word kept, no typed value) or invalid; raw is the little-endian wire word or byte; value is the exact decimal where the row presents one.",
+ "cases": [
+  {
+   "name": "1900-local-l2",
+   "identifier": "0x1900F202",
+   "payload": "3412050201000000",
+   "selection": {
+    "project": "QAAA",
+    "release": "0006",
+    "flavor": "pcs-extended19",
+    "bank": "ordinary",
+    "scope": "local",
+    "endpoint": "coordinator",
+    "group": "0",
+    "slot": "1",
+    "destination": 242,
+    "source": 2
+   },
+   "expect": {
+    "product": {
+     "status": "accepted",
+     "raw": 4660,
+     "value": "4660"
+    },
+    "hardware": {
+     "status": "accepted",
+     "raw": 5,
+     "value": "5"
+    },
+    "version": {
+     "status": "accepted",
+     "raw": 258,
+     "value": "258"
+    },
+    "padding_5": {
+     "status": "raw",
+     "raw": 0,
+     "value": "0"
+    },
+    "padding_6": {
+     "status": "raw",
+     "raw": 0,
+     "value": "0"
+    },
+    "padding_7": {
+     "status": "raw",
+     "raw": 0,
+     "value": "0"
+    }
+   }
+  },
+  {
+   "name": "1900-padding-nonzero-invalid",
+   "identifier": "0x1900F202",
+   "payload": "3412050201000100",
+   "selection": {
+    "project": "QAAA",
+    "release": "0006",
+    "flavor": "pcs-extended19",
+    "bank": "ordinary",
+    "scope": "local",
+    "endpoint": "coordinator",
+    "group": "0",
+    "slot": "1",
+    "destination": 242,
+    "source": 2
+   },
+   "expect": {
+    "product": {
+     "status": "accepted",
+     "raw": 4660,
+     "value": "4660"
+    },
+    "hardware": {
+     "status": "accepted",
+     "raw": 5,
+     "value": "5"
+    },
+    "version": {
+     "status": "accepted",
+     "raw": 258,
+     "value": "258"
+    },
+    "padding_5": {
+     "status": "raw",
+     "raw": 0,
+     "value": "0"
+    },
+    "padding_6": {
+     "status": "invalid",
+     "raw": 1
+    },
+    "padding_7": {
+     "status": "raw",
+     "raw": 0,
+     "value": "0"
+    }
+   }
+  },
+  {
+   "name": "1900-aggregate-product-ffff-invalid",
+   "identifier": "0x1900DFF2",
+   "payload": "ffff050201000000",
+   "selection": {
+    "project": "QAAA",
+    "release": "0006",
+    "flavor": "pcs-extended19",
+    "bank": "ordinary",
+    "scope": "aggregate",
+    "endpoint": "coordinator",
+    "group": "0",
+    "slot": "1",
+    "destination": 223,
+    "source": 242
+   },
+   "expect": {
+    "product": {
+     "status": "invalid",
+     "raw": 65535
+    },
+    "hardware": {
+     "status": "accepted",
+     "raw": 5,
+     "value": "5"
+    },
+    "version": {
+     "status": "accepted",
+     "raw": 258,
+     "value": "258"
+    },
+    "padding_5": {
+     "status": "raw",
+     "raw": 0,
+     "value": "0"
+    },
+    "padding_6": {
+     "status": "raw",
+     "raw": 0,
+     "value": "0"
+    },
+    "padding_7": {
+     "status": "raw",
+     "raw": 0,
+     "value": "0"
+    }
+   }
+  },
+  {
+   "name": "1900-local-product-ffff-kept",
+   "identifier": "0x1900F202",
+   "payload": "ffff050201000000",
+   "selection": {
+    "project": "QAAA",
+    "release": "0006",
+    "flavor": "pcs-extended19",
+    "bank": "ordinary",
+    "scope": "local",
+    "endpoint": "coordinator",
+    "group": "0",
+    "slot": "1",
+    "destination": 242,
+    "source": 2
+   },
+   "expect": {
+    "product": {
+     "status": "accepted",
+     "raw": 65535,
+     "value": "65535"
+    },
+    "hardware": {
+     "status": "accepted",
+     "raw": 5,
+     "value": "5"
+    },
+    "version": {
+     "status": "accepted",
+     "raw": 258,
+     "value": "258"
+    },
+    "padding_5": {
+     "status": "raw",
+     "raw": 0,
+     "value": "0"
+    },
+    "padding_6": {
+     "status": "raw",
+     "raw": 0,
+     "value": "0"
+    },
+    "padding_7": {
+     "status": "raw",
+     "raw": 0,
+     "value": "0"
+    }
+   }
+  },
+  {
+   "name": "1900-aggregate-folded-1910",
+   "identifier": "0x1910DFF2",
+   "payload": "0100050201000000",
+   "selection": {
+    "project": "QAAA",
+    "release": "0006",
+    "flavor": "pcs-extended19",
+    "bank": "ordinary",
+    "scope": "aggregate",
+    "endpoint": "coordinator",
+    "group": "0",
+    "slot": "1",
+    "destination": 223,
+    "source": 242
+   },
+   "expect": {
+    "product": {
+     "status": "accepted",
+     "raw": 1,
+     "value": "1"
+    },
+    "hardware": {
+     "status": "accepted",
+     "raw": 5,
+     "value": "5"
+    },
+    "version": {
+     "status": "accepted",
+     "raw": 258,
+     "value": "258"
+    },
+    "padding_5": {
+     "status": "raw",
+     "raw": 0,
+     "value": "0"
+    },
+    "padding_6": {
+     "status": "raw",
+     "raw": 0,
+     "value": "0"
+    },
+    "padding_7": {
+     "status": "raw",
+     "raw": 0,
+     "value": "0"
+    }
+   }
+  },
+  {
+   "name": "1901-local-l2",
+   "identifier": "0x1901F202",
+   "payload": "030a0b0434127856",
+   "selection": {
+    "project": "QAAA",
+    "release": "0006",
+    "flavor": "pcs-extended19",
+    "bank": "ordinary",
+    "scope": "local",
+    "endpoint": "coordinator",
+    "group": "0",
+    "slot": "1",
+    "destination": 242,
+    "source": 2
+   },
+   "expect": {
+    "count": {
+     "status": "accepted",
+     "raw": 3,
+     "value": "3"
+    },
+    "configuration_1": {
+     "status": "raw",
+     "raw": 10,
+     "value": "10"
+    },
+    "configuration_2": {
+     "status": "raw",
+     "raw": 11,
+     "value": "11"
+    },
+    "state": {
+     "status": "accepted",
+     "raw": 4,
+     "value": "4"
+    },
+    "configuration_4": {
+     "status": "raw",
+     "raw": 4660,
+     "value": "4660"
+    },
+    "configuration_6": {
+     "status": "raw",
+     "raw": 22136,
+     "value": "22136"
+    }
+   }
+  },
+  {
+   "name": "1902-local-l2-pack-and-port",
+   "identifier": "0x1902F202",
+   "payload": "341210277856e803",
+   "selection": {
+    "project": "QAAA",
+    "release": "0006",
+    "flavor": "pcs-extended19",
+    "bank": "ordinary",
+    "scope": "local",
+    "endpoint": "coordinator",
+    "group": "0",
+    "slot": "1",
+    "destination": 242,
+    "source": 2
+   },
+   "expect": {
+    "pack_voltage": {
+     "status": "accepted",
+     "raw": 4660,
+     "value": "466"
+    },
+    "current": {
+     "status": "accepted",
+     "raw": 10000,
+     "value": "0"
+    },
+    "port_voltage": {
+     "status": "accepted",
+     "raw": 22136,
+     "value": "2213.6"
+    },
+    "soc": {
+     "status": "accepted",
+     "raw": 1000,
+     "value": "100"
+    }
+   }
+  },
+  {
+   "name": "1902-local-l2-zero-current-word",
+   "identifier": "0x1902F202",
+   "payload": "341200007856e803",
+   "selection": {
+    "project": "QAAA",
+    "release": "0006",
+    "flavor": "pcs-extended19",
+    "bank": "ordinary",
+    "scope": "local",
+    "endpoint": "coordinator",
+    "group": "0",
+    "slot": "1",
+    "destination": 242,
+    "source": 2
+   },
+   "expect": {
+    "pack_voltage": {
+     "status": "accepted",
+     "raw": 4660,
+     "value": "466"
+    },
+    "current": {
+     "status": "accepted",
+     "raw": 0,
+     "value": "-1000"
+    },
+    "port_voltage": {
+     "status": "accepted",
+     "raw": 22136,
+     "value": "2213.6"
+    },
+    "soc": {
+     "status": "accepted",
+     "raw": 1000,
+     "value": "100"
+    }
+   }
+  },
+  {
+   "name": "1902-local-l2-maximum-words",
+   "identifier": "0x1902F202",
+   "payload": "3412ffff7856ffff",
+   "selection": {
+    "project": "QAAA",
+    "release": "0006",
+    "flavor": "pcs-extended19",
+    "bank": "ordinary",
+    "scope": "local",
+    "endpoint": "coordinator",
+    "group": "0",
+    "slot": "1",
+    "destination": 242,
+    "source": 2
+   },
+   "expect": {
+    "pack_voltage": {
+     "status": "accepted",
+     "raw": 4660,
+     "value": "466"
+    },
+    "current": {
+     "status": "accepted",
+     "raw": 65535,
+     "value": "5553.5"
+    },
+    "port_voltage": {
+     "status": "accepted",
+     "raw": 22136,
+     "value": "2213.6"
+    },
+    "soc": {
+     "status": "accepted",
+     "raw": 65535,
+     "value": "6553.5"
+    }
+   }
+  },
+  {
+   "name": "1902-local-other-release-raw",
+   "identifier": "0x1902F202",
+   "payload": "341210277856e803",
+   "selection": {
+    "project": "QAAA",
+    "release": "0007",
+    "flavor": "pcs-extended19",
+    "bank": "ordinary",
+    "scope": "local",
+    "endpoint": "coordinator",
+    "group": "0",
+    "slot": "1",
+    "destination": 242,
+    "source": 2
+   },
+   "expect": {
+    "pack_voltage": {
+     "status": "raw",
+     "raw": 4660
+    },
+    "current": {
+     "status": "raw",
+     "raw": 10000
+    },
+    "port_voltage": {
+     "status": "raw",
+     "raw": 22136
+    },
+    "soc": {
+     "status": "raw",
+     "raw": 1000
+    }
+   }
+  },
+  {
+   "name": "1902-aggregate-raw",
+   "identifier": "0x1902DFF2",
+   "payload": "341210277856e803",
+   "selection": {
+    "project": "QAAA",
+    "release": "0006",
+    "flavor": "pcs-extended19",
+    "bank": "ordinary",
+    "scope": "aggregate",
+    "endpoint": "coordinator",
+    "group": "0",
+    "slot": "1",
+    "destination": 223,
+    "source": 242
+   },
+   "expect": {
+    "pack_voltage": {
+     "status": "raw",
+     "raw": 4660
+    },
+    "current": {
+     "status": "raw",
+     "raw": 10000
+    },
+    "port_voltage": {
+     "status": "raw",
+     "raw": 22136
+    },
+    "soc": {
+     "status": "raw",
+     "raw": 1000
+    }
+   }
+  },
+  {
+   "name": "1902-aggregate-folded-1912-raw",
+   "identifier": "0x1912DFF2",
+   "payload": "341210277856e803",
+   "selection": {
+    "project": "QAAA",
+    "release": "0006",
+    "flavor": "pcs-extended19",
+    "bank": "ordinary",
+    "scope": "aggregate",
+    "endpoint": "coordinator",
+    "group": "0",
+    "slot": "1",
+    "destination": 223,
+    "source": 242
+   },
+   "expect": {
+    "pack_voltage": {
+     "status": "raw",
+     "raw": 4660
+    },
+    "current": {
+     "status": "raw",
+     "raw": 10000
+    },
+    "port_voltage": {
+     "status": "raw",
+     "raw": 22136
+    },
+    "soc": {
+     "status": "raw",
+     "raw": 1000
+    }
+   }
+  },
+  {
+   "name": "1902-gateway-endpoint-raw",
+   "identifier": "0x1902F203",
+   "payload": "341210277856e803",
+   "selection": {
+    "project": "QCAA",
+    "release": "0001",
+    "flavor": "pcs-extended19",
+    "bank": "ordinary",
+    "scope": "local",
+    "endpoint": "gateway",
+    "group": "",
+    "slot": "",
+    "destination": 242,
+    "source": 3
+   },
+   "expect": {
+    "pack_voltage": {
+     "status": "raw",
+     "raw": 4660
+    },
+    "current": {
+     "status": "raw",
+     "raw": 10000
+    },
+    "port_voltage": {
+     "status": "raw",
+     "raw": 22136
+    },
+    "soc": {
+     "status": "raw",
+     "raw": 1000
+    }
+   }
+  },
+  {
+   "name": "1903-local-l2",
+   "identifier": "0x1903F202",
+   "payload": "0100020003040506",
+   "selection": {
+    "project": "QAAA",
+    "release": "0006",
+    "flavor": "pcs-extended19",
+    "bank": "ordinary",
+    "scope": "local",
+    "endpoint": "coordinator",
+    "group": "0",
+    "slot": "1",
+    "destination": 242,
+    "source": 2
+   },
+   "expect": {
+    "limit_0": {
+     "status": "raw",
+     "raw": 1,
+     "value": "1"
+    },
+    "limit_2": {
+     "status": "raw",
+     "raw": 2,
+     "value": "2"
+    },
+    "permission_4": {
+     "status": "raw",
+     "raw": 3,
+     "value": "3"
+    },
+    "permission_5": {
+     "status": "raw",
+     "raw": 4,
+     "value": "4"
+    },
+    "state": {
+     "status": "accepted",
+     "raw": 5,
+     "value": "5"
+    },
+    "role": {
+     "status": "accepted",
+     "raw": 6,
+     "value": "6"
+    }
+   }
+  },
+  {
+   "name": "1904-local-l2",
+   "identifier": "0x1904F202",
+   "payload": "a00fd0072a000000",
+   "selection": {
+    "project": "QAAA",
+    "release": "0006",
+    "flavor": "pcs-extended19",
+    "bank": "ordinary",
+    "scope": "local",
+    "endpoint": "coordinator",
+    "group": "0",
+    "slot": "1",
+    "destination": 242,
+    "source": 2
+   },
+   "expect": {
+    "full_capacity": {
+     "status": "accepted",
+     "raw": 4000,
+     "value": "400"
+    },
+    "remaining_capacity": {
+     "status": "accepted",
+     "raw": 2000,
+     "value": "200"
+    },
+    "cycles": {
+     "status": "accepted",
+     "raw": 42,
+     "value": "42"
+    },
+    "padding_6": {
+     "status": "raw",
+     "raw": 0,
+     "value": "0"
+    },
+    "padding_7": {
+     "status": "raw",
+     "raw": 0,
+     "value": "0"
+    }
+   }
+  },
+  {
+   "name": "1904-aggregate-l2-cycles-only",
+   "identifier": "0x1904DFF2",
+   "payload": "a00fd0072a000000",
+   "selection": {
+    "project": "QAAA",
+    "release": "0006",
+    "flavor": "pcs-extended19",
+    "bank": "ordinary",
+    "scope": "aggregate",
+    "endpoint": "coordinator",
+    "group": "0",
+    "slot": "1",
+    "destination": 223,
+    "source": 242
+   },
+   "expect": {
+    "full_capacity": {
+     "status": "raw",
+     "raw": 4000
+    },
+    "remaining_capacity": {
+     "status": "raw",
+     "raw": 2000
+    },
+    "cycles": {
+     "status": "accepted",
+     "raw": 42,
+     "value": "42"
+    },
+    "padding_6": {
+     "status": "raw",
+     "raw": 0,
+     "value": "0"
+    },
+    "padding_7": {
+     "status": "raw",
+     "raw": 0,
+     "value": "0"
+    }
+   }
+  },
+  {
+   "name": "1904-local-other-release-raw",
+   "identifier": "0x1904F202",
+   "payload": "a00fd0072a000000",
+   "selection": {
+    "project": "QAAA",
+    "release": "0007",
+    "flavor": "pcs-extended19",
+    "bank": "ordinary",
+    "scope": "local",
+    "endpoint": "coordinator",
+    "group": "0",
+    "slot": "1",
+    "destination": 242,
+    "source": 2
+   },
+   "expect": {
+    "full_capacity": {
+     "status": "raw",
+     "raw": 4000
+    },
+    "remaining_capacity": {
+     "status": "raw",
+     "raw": 2000
+    },
+    "cycles": {
+     "status": "raw",
+     "raw": 42
+    },
+    "padding_6": {
+     "status": "raw",
+     "raw": 0,
+     "value": "0"
+    },
+    "padding_7": {
+     "status": "raw",
+     "raw": 0,
+     "value": "0"
+    }
+   }
+  },
+  {
+   "name": "1904-padding-nonzero-invalid",
+   "identifier": "0x1904F202",
+   "payload": "a00fd0072a000001",
+   "selection": {
+    "project": "QAAA",
+    "release": "0006",
+    "flavor": "pcs-extended19",
+    "bank": "ordinary",
+    "scope": "local",
+    "endpoint": "coordinator",
+    "group": "0",
+    "slot": "1",
+    "destination": 242,
+    "source": 2
+   },
+   "expect": {
+    "full_capacity": {
+     "status": "accepted",
+     "raw": 4000,
+     "value": "400"
+    },
+    "remaining_capacity": {
+     "status": "accepted",
+     "raw": 2000,
+     "value": "200"
+    },
+    "cycles": {
+     "status": "accepted",
+     "raw": 42,
+     "value": "42"
+    },
+    "padding_6": {
+     "status": "raw",
+     "raw": 0,
+     "value": "0"
+    },
+    "padding_7": {
+     "status": "invalid",
+     "raw": 1
+    }
+   }
+  }
+ ]
+}

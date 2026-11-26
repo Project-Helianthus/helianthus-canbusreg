@@ -1,0 +1,215 @@
+{
+ "description": "Synthetic vectors of the status, extremum, aggregate and limit rows. class_words are the words that state a condition class; no decoder meaning states one. unbound_facts are the storage facts no LINK binding feeds; bound_facts are the facts the table binds. Extremum and aggregate expectations are written by hand from the frame layouts.",
+ "class_words": [
+  "alarm",
+  "protection",
+  "warning",
+  "interlock",
+  "permission"
+ ],
+ "unbound_facts": [
+  "storage.status.alarm",
+  "storage.status.warning",
+  "storage.status.protection",
+  "storage.status.interlock",
+  "storage.cell.voltage_maximum",
+  "storage.cell.voltage_minimum",
+  "storage.temperature.cell",
+  "storage.capacity.discharge",
+  "storage.state.soh"
+ ],
+ "bound_facts": [
+  "storage.pack.voltage",
+  "storage.pack.current",
+  "storage.state.soc",
+  "storage.capacity.charge",
+  "storage.temperature.pack"
+ ],
+ "status_cases": [
+  {
+   "name": "legacy dictionary fault bits",
+   "family": "1850",
+   "payload": "0100008000000080",
+   "selection": {
+    "project": "QAAA",
+    "release": "0011",
+    "choice": "",
+    "group": "0",
+    "slot": "1",
+    "bank": "ordinary",
+    "source": "02",
+    "destination": "F4",
+    "direction": "module-to-coordinator",
+    "scope": "local"
+   }
+  },
+  {
+   "name": "modern dictionary fault bits",
+   "family": "1850",
+   "payload": "0000008008000040",
+   "selection": {
+    "project": "QAAa",
+    "release": "9011",
+    "choice": "release11",
+    "group": "0",
+    "slot": "1",
+    "bank": "ordinary",
+    "source": "02",
+    "destination": "F4",
+    "direction": "module-to-coordinator",
+    "scope": "local"
+   }
+  },
+  {
+   "name": "modern selected words",
+   "family": "1853",
+   "payload": "a104000001000000",
+   "selection": {
+    "project": "QAAa",
+    "release": "9011",
+    "choice": "release11",
+    "group": "0",
+    "slot": "1",
+    "bank": "ordinary",
+    "source": "02",
+    "destination": "F4",
+    "direction": "module-to-coordinator",
+    "scope": "local"
+   }
+  },
+  {
+   "name": "legacy selected words under the parallel bank",
+   "family": "1853",
+   "payload": "0010331100000000",
+   "selection": {
+    "project": "QAAA",
+    "release": "0011",
+    "choice": "",
+    "group": "0",
+    "slot": "1",
+    "bank": "parallel",
+    "source": "02",
+    "destination": "F4",
+    "direction": "module-to-coordinator",
+    "scope": "local"
+   }
+  }
+ ],
+ "extremum_cases": [
+  {
+   "name": "cell extrema stay native with their index under the ordinary bank",
+   "family": "1806",
+   "payload": "10e40c03800cb20c",
+   "selection": {
+    "project": "QAAA",
+    "release": "0006",
+    "choice": "",
+    "group": "",
+    "slot": "",
+    "bank": "ordinary",
+    "source": "02",
+    "destination": "F4",
+    "direction": "module-to-coordinator",
+    "scope": "local"
+   },
+   "rows": {
+    "growatt.bms.link.1806.maximum": "3300",
+    "growatt.bms.link.1806.minimum": "3200",
+    "growatt.bms.link.1806.minimum_index": "3"
+   }
+  },
+  {
+   "name": "cell extrema stay native with their index under the parallel bank",
+   "family": "1806",
+   "payload": "10e40c03800cb20c",
+   "selection": {
+    "project": "QAAA",
+    "release": "0006",
+    "choice": "",
+    "group": "3",
+    "slot": "",
+    "bank": "parallel",
+    "source": "02",
+    "destination": "F4",
+    "direction": "module-to-coordinator",
+    "scope": "local"
+   },
+   "rows": {
+    "growatt.bms.link.1806.maximum": "3300",
+    "growatt.bms.link.1806.minimum": "3200",
+    "growatt.bms.link.1806.minimum_index": "3"
+   }
+  }
+ ],
+ "aggregate_cases": [
+  {
+   "name": "coordinator state and index bytes",
+   "family": "180D",
+   "payload": "0102030405060708",
+   "selection": {
+    "project": "QAAA",
+    "release": "0006",
+    "choice": "",
+    "group": "",
+    "slot": "",
+    "bank": "ordinary",
+    "source": "F4",
+    "destination": "F5",
+    "direction": "coordinator-to-module",
+    "scope": "aggregate"
+   },
+   "rows": {
+    "growatt.bms.link.soc_cache": "1",
+    "growatt.bms.link.180D.maximum_index": "5",
+    "growatt.bms.link.180D.minimum_index": "6"
+   }
+  },
+  {
+   "name": "coordinator extrema words",
+   "family": "180E",
+   "payload": "0a0b3412785610e0",
+   "selection": {
+    "project": "QAAA",
+    "release": "0006",
+    "choice": "",
+    "group": "",
+    "slot": "",
+    "bank": "parallel",
+    "source": "F4",
+    "destination": "F5",
+    "direction": "coordinator-to-module",
+    "scope": "aggregate"
+   },
+   "rows": {
+    "growatt.bms.link.index_0": "10",
+    "growatt.bms.link.index_1": "11",
+    "growatt.bms.link.extremum_2": "4660",
+    "growatt.bms.link.extremum_4": "22136"
+   }
+  },
+  {
+   "name": "coordinator limit current and count",
+   "family": "180F",
+   "payload": "e803d0070a5a1027",
+   "selection": {
+    "project": "QAAA",
+    "release": "0006",
+    "choice": "",
+    "group": "",
+    "slot": "",
+    "bank": "ordinary",
+    "source": "F4",
+    "destination": "F5",
+    "direction": "coordinator-to-module",
+    "scope": "aggregate"
+   },
+   "rows": {
+    "growatt.bms.link.limit": "1000",
+    "growatt.bms.link.180F.current": "2000",
+    "growatt.bms.link.count": "10",
+    "growatt.bms.link.soh_cache": "90",
+    "growatt.bms.link.quotient": "10000"
+   }
+  }
+ ]
+}

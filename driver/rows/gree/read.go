@@ -184,9 +184,11 @@ func bindingFor(p reg.GreeVRFTypedPoint, in ReadInput) (ReadBinding, string) {
 		return ReadBinding{}, "exact water sensor to DHW subject association"
 	case Coordinate{0x78, 0x59, bytePoint}, Coordinate{0x78, 0x5b, bytePoint}, Coordinate{0x78, 0x5d, bytePoint}:
 		return ReadBinding{}, "terminal-unit valve subject and ratio scale"
-	default:
-		return ReadBinding{}, "no established semantic binding"
 	}
+	if row, ok := unboundPoints[c]; ok {
+		return ReadBinding{}, row.subject + ": " + row.missing
+	}
+	return ReadBinding{}, "no established semantic binding"
 }
 
 func pointNumber(p reg.GreeVRFTypedPoint) (semreg.Decimal, error) {

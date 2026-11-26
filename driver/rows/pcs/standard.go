@@ -1,5 +1,13 @@
 package pcs
 
+import (
+	"math/big"
+	"strconv"
+
+	"github.com/Project-Helianthus/helianthus-canbusreg"
+	"github.com/Project-Helianthus/helianthus-semreg/semreg/v1/roweval"
+)
+
 // rowSpec describes one native row of a standard PCS frame. The field is the
 // key DecodePCSStandard emits; the layout names the selection under which a
 // repeated field name has its own slice or meaning (empty when unique); the
@@ -135,4 +143,144 @@ func capacitySpecs() []rowSpec {
 		{frame: f, field: "spread", slice: bigWord(32), unit: "mV", divisor: 1, gate: gateMeasured, when: when()},
 		{frame: f, field: "cycles", slice: bigWord(48), unit: "cycles", divisor: 1, gate: gateMeasured, when: when()},
 	}
+}
+
+// Qualifiers of the extrema frames 0x319, 0x322 and 0x330. They are added to the
+// standard qualifiers by extremaQualifiers and read by the extrema hooks.
+const (
+	qIndexValid             = "index-valid"
+	qIndexMinimum           = "index-minimum"
+	qIndexMaximum           = "index-maximum"
+	qMeasuredTemperature    = "measured-temperature"
+	qGatewayMeasured        = "gateway-measured"
+	qFixedAggregateLocation = "fixed-aggregate-location"
+)
+
+// extremaSpec is a native row of an extrema frame. A row with an admit function
+// is withheld unless its gate is met and the native value passes admit; the
+// function receives the qualifiers and the whole value of the field.
+type extremaSpec struct {
+	rowSpec
+	admit func(q map[string]string, n int64) bool
+}
+
+// indexSpec is a native index row. The decoder interprets the index only when the
+// index is valid for the selection scope and the value lies within the inclusive
+// native bounds the caller selected.
+func indexSpec(frame uint32, field string, slice signalSlice) extremaSpec {
+	return extremaSpec{rowSpec: rowSpec{frame: frame, field: field, slice: slice, unit: "index", divisor: 1, gate: qIndexValid, when: when()}, admit: inIndexRange}
+}
+
+// fixedLocationSpec is the fixed-aggregate location candidate: the decoder keeps it
+// as a candidate only when the byte is exactly 1. The raw location row reads the
+// same byte, and the evaluator matches a row by its selector alone, so the
+// candidate's selector carries the little-endian order: for one byte that order
+// is the identity, so the decoded value is the same.
+func fixedLocationSpec(frame uint32, field string, at uint16) extremaSpec {
+	slice := signalSlice{offset: at, width: 8, order: littleEndian}
+	return extremaSpec{rowSpec: rowSpec{frame: frame, field: field, slice: slice, divisor: 1, gate: qFixedAggregateLocation, when: when()}, admit: isOne}
+}
+
+func inIndexRange(q map[string]string, n int64) bool {
+	lo, errLo := strconv.ParseInt(q[qIndexMinimum], 10, 64)
+	hi, errHi := strconv.ParseInt(q[qIndexMaximum], 10, 64)
+	return errLo == nil && errHi == nil && n >= lo && n <= hi
+}
+
+func isOne(_ map[string]string, n int64) bool { return n == 1 }
+
+// extremaSpecs returns the row specifications of frames 0x319, 0x322 and 0x330, in
+// frame order. The measured cell extrema use the decoder's measured gate; the
+// temperature extrema use the measured gate with the temperature validity; the
+// downstream SOC extrema of 0x322 use the gateway aggregate with measurement
+// validity, and their percentage domain is the decoder's [0, 100].
+func extremaSpecs() []extremaSpec {
+	specs := []extremaSpec{
+		{rowSpec: rawRow(0x319, "state_0", byteAt(0))},
+		{rowSpec: rowSpec{frame: 0x319, field: "maximum_cell", slice: bigWord(8), unit: "mV", divisor: 1, gate: gateMeasured, when: when()}},
+		{rowSpec: rowSpec{frame: 0x319, field: "minimum_cell", slice: bigWord(24), unit: "mV", divisor: 1, gate: gateMeasured, when: when()}},
+		indexSpec(0x319, "maximum_index", byteAt(40)),
+		indexSpec(0x319, "minimum_index", byteAt(48)),
+		{rowSpec: rawRow(0x319, "state_7", byteAt(56))},
+		{rowSpec: rowSpec{frame: 0x322, field: "temperature_maximum", slice: signedBigWord(0), unit: "C", divisor: 10, gate: qMeasuredTemperature, when: when()}},
+		{rowSpec: rowSpec{frame: 0x322, field: "temperature_minimum", slice: signedBigWord(16), unit: "C", divisor: 10, gate: qMeasuredTemperature, when: when()}},
+		indexSpec(0x322, "maximum_temperature_index", byteAt(32)),
+		indexSpec(0x322, "minimum_temperature_index", byteAt(40)),
+		{rowSpec: rowSpec{frame: 0x322, field: "extra_6", slice: byteAt(48), unit: "percent", divisor: 1, gate: qGatewayMeasured, percentDomain: true, when: when()}},
+		{rowSpec: rowSpec{frame: 0x322, field: "extra_7", slice: byteAt(56), unit: "percent", divisor: 1, gate: qGatewayMeasured, percentDomain: true, when: when()}},
+		{rowSpec: rawRow(0x330, "maximum_location", byteAt(0))},
+		fixedLocationSpec(0x330, "maximum_location_fixed_aggregate", 0),
+		indexSpec(0x330, "maximum_index", byteAt(8)),
+		{rowSpec: rawRow(0x330, "minimum_location", byteAt(16))},
+		fixedLocationSpec(0x330, "minimum_location_fixed_aggregate", 16),
+		indexSpec(0x330, "minimum_index", byteAt(24)),
+		{rowSpec: rowSpec{frame: 0x330, field: "maximum_cell", slice: bigWord(32), unit: "mV", divisor: 1, gate: gateMeasured, when: when()}},
+		{rowSpec: rowSpec{frame: 0x330, field: "minimum_cell", slice: bigWord(48), unit: "mV", divisor: 1, gate: gateMeasured, when: when()}},
+	}
+	return specs
+}
+
+// extremaHook withholds a value the row's gate or admit function refuses. The
+// field-state and field-age dispositions and the gate are those of rowHook.
+func extremaHook(s extremaSpec) roweval.RowHook {
+	base := rowHook(s.field, s.gate)
+	return func(in roweval.DetachedInputs, id roweval.RowID, dir roweval.Direction, v roweval.TypedValue) (roweval.DerivedValue, roweval.Reason) {
+		d, reason := base(in, id, dir, v)
+		if reason != "" || s.admit == nil {
+			return d, reason
+		}
+		n, ok := wholeOf(v)
+		if !ok || !s.admit(in.Qualifiers().Values, n) {
+			return roweval.DerivedValue{}, gateWithheld
+		}
+		return d, ""
+	}
+}
+
+// wholeOf returns the whole number a converted value carries.
+func wholeOf(v roweval.TypedValue) (int64, bool) {
+	if v.Quantity == nil {
+		return 0, false
+	}
+	r, ok := new(big.Rat).SetString(v.Quantity.Number.Coefficient + "e" + strconv.FormatInt(int64(v.Quantity.Number.Exponent10), 10))
+	if !ok || !r.IsInt() || !r.Num().IsInt64() {
+		return 0, false
+	}
+	return r.Num().Int64(), true
+}
+
+// extremaTable returns the native rows of frames 0x319, 0x322 and 0x330 with the
+// hooks those rows name. It is kept apart from Table, whose rows and evaluator
+// admit the frames 0x311 to 0x314 only; it has no bindings.
+func extremaTable() roweval.Table[Selector] {
+	specs := extremaSpecs()
+	rows := make([]roweval.NativeRow[Selector], 0, len(specs))
+	hooks := make(map[string]roweval.RowHook, len(specs))
+	for _, s := range specs {
+		row := nativeRow(s.rowSpec)
+		rows = append(rows, row)
+		hooks[row.Decode.Hook] = extremaHook(s)
+	}
+	return roweval.Table[Selector]{Native: rows, Hooks: hooks}
+}
+
+// extremaQualifiers returns the standard qualifiers of the selection and input,
+// with the extrema qualifiers the decoder's index, measurement, temperature,
+// gateway and fixed-aggregate conditions name.
+func extremaQualifiers(s canbusreg.Selection, in canbusreg.PCSStandardPCSInput) roweval.Qualifiers {
+	q := Qualifiers(s, in)
+	c := s.SelectionSpecValue()
+	local := c.ProjectCode == "QAAA" && c.Release == "0006" && c.Scope == "local"
+	release11 := s.SelectionGroup() == "L8"
+	gateway := c.ProjectCode == "QCAA" && c.Release == "0001" && c.Scope == "aggregate"
+	fixedAggregate := c.ProjectCode == "QAAB" && c.Release == "0004" && c.Scope == "aggregate"
+	supported := local || release11 || gateway || fixedAggregate
+	v := q.Values
+	v[qIndexValid] = boolText(supported && in.IndexValid && in.IndexScope == c.Scope && in.IndexMinimum <= in.IndexMaximum)
+	v[qIndexMinimum] = strconv.Itoa(int(in.IndexMinimum))
+	v[qIndexMaximum] = strconv.Itoa(int(in.IndexMaximum))
+	v[qMeasuredTemperature] = boolText(v[qMeasured] == "true" && in.TemperatureValid)
+	v[qGatewayMeasured] = boolText(gateway && in.MeasurementValid)
+	v[qFixedAggregateLocation] = boolText(fixedAggregate && s.SelectionGroup() != "" && in.IndexValid && in.IndexScope == c.Scope)
+	return q
 }

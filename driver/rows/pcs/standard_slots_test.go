@@ -436,21 +436,20 @@ func TestSlotTableValidatesWithoutAmbiguousMatch(t *testing.T) {
 	}
 }
 
-// TestSlotCurrentRowsDeclareSlotContext pins that each 0x326 current row names
-// the slot context in its declared conditions, and that no other slot row does.
-func TestSlotCurrentRowsDeclareSlotContext(t *testing.T) {
+// TestSlotCurrentRowsDeclareNoSlotRequirement pins that the 0x326 current rows
+// declare no slot-coordinate requirement, as DecodePCSSlots has none: the
+// coordinate is attribution, and the gate is the slot association the input
+// supplies.
+func TestSlotCurrentRowsDeclareNoSlotRequirement(t *testing.T) {
 	rows := slotRowsByID()
 	for _, id := range []string{"growatt.bms.pcs.standard.326.current", "growatt.bms.pcs.parallel.326.current"} {
 		row, ok := rows[id]
 		if !ok {
 			t.Fatalf("no row %s", id)
 		}
-		if len(row.When.Requires) != 1 || row.When.Requires[0] != qSlotContext {
-			t.Errorf("%s declares requires %v, want the slot context", id, row.When.Requires)
+		if len(row.When.Requires) != 0 {
+			t.Errorf("%s declares requires %v, want none", id, row.When.Requires)
 		}
-	}
-	if row := rows["growatt.bms.pcs.standard.326.voltage"]; len(row.When.Requires) != 0 {
-		t.Errorf("the 0x326 voltage row declares requires %v", row.When.Requires)
 	}
 }
 
@@ -500,10 +499,15 @@ func TestSlotRowsKeepGroupAndSlotAbsentOrPresent(t *testing.T) {
 	if res.Attribution.HasGroup || res.Attribution.HasSlot || res.Attribution.Group != "" || res.Attribution.Slot != "" {
 		t.Errorf("absent group and slot reported as %+v", res.Attribution)
 	}
-	// The slot current declares the slot context as a requirement, so a
-	// selection without a slot coordinate gives no value for it.
-	if _, ok := res.Rows["growatt.bms.pcs.standard.326.current"]; ok {
-		t.Errorf("the slot current applies to a selection without a slot coordinate")
+	// DecodePCSSlots admits the current word of 4000 without a slot coordinate
+	// (the gate is the input's slot association, not the coordinate text), so
+	// the row keeps the decoded value while the coordinate stays absent.
+	decoded := canbusreg.DecodePCSSlots(s, in).Fields["current"]
+	if decoded.Status != "accepted" {
+		t.Fatalf("decoder current status %q without a slot coordinate, want accepted", decoded.Status)
+	}
+	if got := slotValue(t, res, "growatt.bms.pcs.standard.326.current"); got.Cmp(ratText(t, "0")) != 0 {
+		t.Errorf("slot current without a slot coordinate %s, want 0", got.RatString())
 	}
 
 	present := slotCase(t, "slot-333-dictionary-index-5")

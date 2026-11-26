@@ -46,11 +46,6 @@ const (
 	roleWord  = "word"
 	roleIndex = "index"
 
-	// qSlotContext is the slot-context condition of the 0x326 current rows: the
-	// selection carries a slot coordinate. It is a requirement, not a value, so
-	// the row invents no coordinate when the selection has none.
-	qSlotContext = "slot-context"
-
 	// emptyReason is the reason of a valid zero word, or of its index, under a
 	// populated dictionary: the decoder's empty status, which is not withheld
 	// evidence.
@@ -87,8 +82,6 @@ type slotSpec struct {
 	indexOf string
 	// role is the 0x333 dictionary role of a word or index row; empty otherwise.
 	role string
-	// requiresSlot marks a row whose selection must carry a slot coordinate.
-	requiresSlot bool
 }
 
 // slotSpecs returns the rows of the slot frames for one bank, in frame order.
@@ -96,7 +89,7 @@ func slotSpecs(b slotBank) []slotSpec {
 	return []slotSpec{
 		{frame: 0x326, field: "slot", slice: byteAt(0), divisor: 1, gate: gateSlot326},
 		{frame: 0x326, field: "voltage", slice: bigWord(8), unit: "V", divisor: 100, gate: gateMeasured326},
-		{frame: 0x326, field: "current", slice: bigWord(24), unit: "A", divisor: 10, offset: -b.currentBase / 10, gate: gateMeasured326, requiresSlot: true},
+		{frame: 0x326, field: "current", slice: bigWord(24), unit: "A", divisor: 10, offset: -b.currentBase / 10, gate: gateMeasured326},
 		{frame: 0x326, field: "soc_low", slice: byteAt(40), divisor: 1, gate: gateSlot326},
 		{frame: 0x327, field: "slot", slice: byteAt(0), divisor: 1, gate: gateSlot327},
 		{frame: 0x327, field: "maximum_cell", slice: bigWord(8), unit: "mV", divisor: 1, gate: gateMeasured327},
@@ -124,16 +117,12 @@ func slotNativeRow(b slotBank, r slotSpec) roweval.NativeRow[Selector] {
 	if r.role != "" {
 		equal[qDTCRole] = r.role
 	}
-	var requires []string
-	if r.requiresSlot {
-		requires = []string{qSlotContext}
-	}
 	row := roweval.NativeRow[Selector]{
 		ID:      fmt.Sprintf("growatt.bms.pcs.%s.%X.%s", b.token, r.frame, r.field),
 		Unit:    r.unit,
 		SpecRef: fmt.Sprintf("CAN %#x", r.frame),
 		At:      Selector{Identifier: r.frame, DLC: 8, RawDLC: 8, Slice: r.slice},
-		When:    roweval.When{Equal: equal, Requires: requires},
+		When:    roweval.When{Equal: equal},
 		Wire:    roweval.Layout{BitOffset: r.slice.offset, Width: r.slice.width, Codec: codec, ByteOrder: r.slice.order, BitOrder: "lsb0", WordOrder: "single"},
 		Decode:  roweval.Convert{Numeric: &roweval.Affine{Num: 1, Den: r.divisor}},
 	}
@@ -158,25 +147,27 @@ func wholeDecimal(n int64) semreg.Decimal {
 
 // slotIndexHook is the hook of the index companion of the 0x333 word field
 // word. The index is not a field of the wire word; it is the position of the
-// word in the selected member dictionary, which slotQualifiers supplies. As the
-// decoder does, the index derives from its word: an invalid age or a state of
-// the word (or of the index itself) is the index's status. An accepted word
-// gives its index as a canonical decimal; a zero word under a populated
-// dictionary gives the empty status; any other word leaves the companion absent.
+// word in the selected member dictionary, which slotQualifiers supplies. The
+// companion exists only where the decoder emits it: an accepted nonzero word
+// gives its index, and a zero word under a populated dictionary gives the
+// empty status. Any other case leaves the companion absent.
+//
+// The status precedence follows DecodePCSSlots. For an accepted nonzero word
+// the word's own status (its state or invalid age) wins over the index's own
+// status. For a zero word the index's own status wins, and only an accepted
+// index takes the word's status (empty when the word is accepted).
 func slotIndexHook(word string) roweval.RowHook {
 	index := word + "_index"
 	return func(in roweval.DetachedInputs, _ roweval.RowID, _ roweval.Direction, _ roweval.TypedValue) (roweval.DerivedValue, roweval.Reason) {
 		q := in.Qualifiers().Values
-		for _, field := range []string{word, index} {
-			if q[qFieldAgeInvalid+field] == "true" {
-				return roweval.DerivedValue{}, roweval.ReasonOutsideDomain
-			}
-			if state, ok := q[qFieldState+field]; ok {
-				return roweval.DerivedValue{}, dispositionReason(state)
-			}
-		}
 		switch q[qIndexState+index] {
 		case "accepted":
+			if reason := fieldReason(q, word); reason != "" {
+				return roweval.DerivedValue{}, reason
+			}
+			if reason := fieldReason(q, index); reason != "" {
+				return roweval.DerivedValue{}, reason
+			}
 			n, err := strconv.ParseInt(q[qIndex+index], 10, 64)
 			if err != nil {
 				return roweval.DerivedValue{}, roweval.ReasonDecode
@@ -184,10 +175,28 @@ func slotIndexHook(word string) roweval.RowHook {
 			number := wholeDecimal(n)
 			return roweval.DerivedValue{Value: semreg.Value{Kind: semreg.ValueQuantity, Quantity: &semreg.Quantity{Number: number}}}, ""
 		case "empty":
+			if reason := fieldReason(q, index); reason != "" {
+				return roweval.DerivedValue{}, reason
+			}
+			if reason := fieldReason(q, word); reason != "" {
+				return roweval.DerivedValue{}, reason
+			}
 			return roweval.DerivedValue{}, emptyReason
 		}
 		return roweval.DerivedValue{}, roweval.Reason("absent")
 	}
+}
+
+// fieldReason is the reason of a field's own invalid age or explicit state, or
+// empty when the field carries no such disposition.
+func fieldReason(q map[string]string, field string) roweval.Reason {
+	if q[qFieldAgeInvalid+field] == "true" {
+		return roweval.ReasonOutsideDomain
+	}
+	if state, ok := q[qFieldState+field]; ok {
+		return dispositionReason(state)
+	}
+	return ""
 }
 
 // slotWordHook is the hook of a 0x333 dictionary word. It is rowHook, except
@@ -352,7 +361,7 @@ func slotQualifiers(s canbusreg.Selection, in canbusreg.PCSSlotPCSInput) roweval
 		values[qIndexState+dtc.name+"_index"] = state
 		values[qIndex+dtc.name+"_index"] = strconv.Itoa(index)
 	}
-	return roweval.Qualifiers{Values: values, Features: map[string]bool{qSlotContext: c.Slot != ""}}
+	return roweval.Qualifiers{Values: values}
 }
 
 // SlotResult is the evaluation of one slot observation: the evidence it carries,

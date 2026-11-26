@@ -317,6 +317,27 @@
         "dtc_a": {"status": "stale"},
         "dtc_a_index": {"status": "stale"}
       }
+    },
+    {
+      "name": "slot-333-stale-word-no-member",
+      "identifier": "0x333",
+      "payload": "0002100500000000",
+      "selection": {"project": "QAAA", "release": "0011", "flavor": "pcs-standard", "bank": "ordinary", "scope": "local", "endpoint": "coordinator", "group": "0", "slot": "2"},
+      "input": {"measurement_valid": true, "slot_valid": true, "native_slot": 2, "group_valid": true, "native_group": 0, "member": false, "field_states": {"dtc_a": "stale"}},
+      "expect": {
+        "dtc_a": {"status": "stale"}
+      }
+    },
+    {
+      "name": "slot-333-zero-stale-word-conflict-index",
+      "identifier": "0x333",
+      "payload": "0002000000000000",
+      "selection": {"project": "QAAA", "release": "0011", "flavor": "pcs-standard", "bank": "ordinary", "scope": "local", "endpoint": "coordinator", "group": "0", "slot": "2"},
+      "input": {"measurement_valid": true, "slot_valid": true, "native_slot": 2, "group_valid": true, "native_group": 0, "member": true, "field_states": {"dtc_a": "stale", "dtc_a_index": "conflict"}},
+      "expect": {
+        "dtc_a": {"status": "stale"},
+        "dtc_a_index": {"status": "conflict"}
+      }
     }
   ]
 }

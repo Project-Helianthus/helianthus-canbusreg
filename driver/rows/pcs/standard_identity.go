@@ -228,7 +228,7 @@ func gatewayCountHook(base roweval.RowHook) roweval.RowHook {
 		if err != nil || v.Kind != semreg.ValueQuantity || v.Quantity == nil {
 			return roweval.DerivedValue{}, roweval.ReasonConversion
 		}
-		low, ok := wholeOf(v.Quantity.Number)
+		low, ok := wholeDecimalOf(v.Quantity.Number)
 		if !ok {
 			return roweval.DerivedValue{}, roweval.ReasonConversion
 		}
@@ -238,9 +238,9 @@ func gatewayCountHook(base roweval.RowHook) roweval.RowHook {
 	}
 }
 
-// wholeOf is the exact non-negative integer a decimal of a byte denotes, or false
-// when it is not a whole number.
-func wholeOf(d semreg.Decimal) (*big.Int, bool) {
+// wholeDecimalOf is the exact non-negative integer a semreg decimal of a byte
+// denotes, or false when it is negative or not a whole number.
+func wholeDecimalOf(d semreg.Decimal) (*big.Int, bool) {
 	n, ok := new(big.Int).SetString(d.Coefficient, 10)
 	if !ok || n.Sign() < 0 {
 		return nil, false

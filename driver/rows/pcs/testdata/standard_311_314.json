@@ -1,0 +1,313 @@
+{
+  "description": "Synthetic standard PCS frames 0x311 to 0x314. Each expectation is written by hand from the frame layout and the decoder's scale: value is the exact decimal of the native value, status is the decoder field status (accepted, raw or invalid).",
+  "cases": [
+    {
+      "name": "legacy-local-measured-313",
+      "identifier": "0x313",
+      "payload": "14beFFF6FFF664E4",
+      "selection": {"project": "QAAA", "release": "0006", "flavor": "pcs-standard", "bank": "ordinary", "scope": "local", "endpoint": "coordinator", "group": "0", "slot": "1"},
+      "input": {"measurement_valid": true, "temperature_valid": true, "count_valid": true, "count": 2},
+      "expect": {
+        "voltage": {"status": "accepted", "value": "53.1"},
+        "current": {"status": "accepted", "value": "-1"},
+        "temperature": {"status": "accepted", "value": "-1"},
+        "soc": {"status": "accepted", "value": "100"},
+        "soh": {"status": "accepted", "value": "100"},
+        "soh_status": {"status": "raw", "value": "228"},
+        "soh_high_bit": {"status": "accepted", "value": "1"}
+      }
+    },
+    {
+      "name": "release-11-local-average-temperature-313",
+      "identifier": "0x313",
+      "payload": "14beFFF600FA64E4",
+      "selection": {"project": "QAAA", "release": "0011", "flavor": "pcs-standard", "bank": "ordinary", "scope": "local", "endpoint": "coordinator", "group": "0", "slot": "1"},
+      "input": {"measurement_valid": true, "temperature_valid": true, "count_valid": true, "count": 5},
+      "expect": {
+        "voltage": {"status": "accepted", "value": "53.1"},
+        "temperature": {"status": "accepted", "value": "25"},
+        "soh_high_bit": {"status": "accepted", "value": "1"}
+      }
+    },
+    {
+      "name": "release-11-zero-count-withholds-temperature",
+      "identifier": "0x313",
+      "payload": "14beFFF600FA64E4",
+      "selection": {"project": "QAAA", "release": "0011", "flavor": "pcs-standard", "bank": "ordinary", "scope": "local", "endpoint": "coordinator", "group": "0", "slot": "1"},
+      "input": {"measurement_valid": true, "temperature_valid": true, "count_valid": true, "count": 0},
+      "expect": {
+        "voltage": {"status": "accepted", "value": "53.1"},
+        "temperature": {"status": "raw", "value": "25"}
+      }
+    },
+    {
+      "name": "release-11-unvalidated-count-withholds-temperature",
+      "identifier": "0x313",
+      "payload": "14beFFF600FA64E4",
+      "selection": {"project": "QAAA", "release": "0011", "flavor": "pcs-standard", "bank": "ordinary", "scope": "aggregate", "endpoint": "coordinator", "group": "0", "slot": "1"},
+      "input": {"measurement_valid": true, "temperature_valid": true, "count_valid": false, "count": 5},
+      "expect": {
+        "voltage": {"status": "accepted", "value": "53.1"},
+        "temperature": {"status": "raw", "value": "25"}
+      }
+    },
+    {
+      "name": "release-11-scale-boundaries-313",
+      "identifier": "0x313",
+      "payload": "FFFF7FFF80006464",
+      "selection": {"project": "QAAA", "release": "0011", "flavor": "pcs-standard", "bank": "ordinary", "scope": "local", "endpoint": "coordinator", "group": "0", "slot": "1"},
+      "input": {"measurement_valid": true, "temperature_valid": true, "count_valid": true, "count": 1},
+      "expect": {
+        "voltage": {"status": "accepted", "value": "655.35"},
+        "current": {"status": "accepted", "value": "3276.7"},
+        "temperature": {"status": "accepted", "value": "-3276.8"},
+        "soc": {"status": "accepted", "value": "100"},
+        "soh": {"status": "accepted", "value": "100"},
+        "soh_high_bit": {"status": "accepted", "value": "0"}
+      }
+    },
+    {
+      "name": "soc-above-percent-range-is-invalid",
+      "identifier": "0x313",
+      "payload": "1388000000006580",
+      "selection": {"project": "QAAA", "release": "0006", "flavor": "pcs-standard", "bank": "ordinary", "scope": "local", "endpoint": "coordinator", "group": "0", "slot": "1"},
+      "input": {"measurement_valid": true, "temperature_valid": true, "count_valid": false, "count": 0},
+      "expect": {
+        "soc": {"status": "invalid", "value": "101"},
+        "soh": {"status": "accepted", "value": "0"},
+        "soh_high_bit": {"status": "accepted", "value": "1"}
+      }
+    },
+    {
+      "name": "soh-above-percent-range-is-invalid",
+      "identifier": "0x313",
+      "payload": "138800000000647F",
+      "selection": {"project": "QAAA", "release": "0006", "flavor": "pcs-standard", "bank": "ordinary", "scope": "local", "endpoint": "coordinator", "group": "0", "slot": "1"},
+      "input": {"measurement_valid": true, "temperature_valid": true, "count_valid": false, "count": 0},
+      "expect": {
+        "soc": {"status": "accepted", "value": "100"},
+        "soh": {"status": "invalid", "value": "127"},
+        "soh_high_bit": {"status": "accepted", "value": "0"}
+      }
+    },
+    {
+      "name": "temperature-unvalidated-313-withholds-temperature",
+      "identifier": "0x313",
+      "payload": "14beFFF6FFF664E4",
+      "selection": {"project": "QAAA", "release": "0006", "flavor": "pcs-standard", "bank": "ordinary", "scope": "local", "endpoint": "coordinator", "group": "0", "slot": "1"},
+      "input": {"measurement_valid": true, "temperature_valid": false, "count_valid": true, "count": 2},
+      "expect": {
+        "voltage": {"status": "accepted", "value": "53.1"},
+        "current": {"status": "accepted", "value": "-1"},
+        "temperature": {"status": "raw", "value": "-1"},
+        "soc": {"status": "accepted", "value": "100"},
+        "soh": {"status": "accepted", "value": "100"},
+        "soh_high_bit": {"status": "accepted", "value": "1"}
+      }
+    },
+    {
+      "name": "release-11-temperature-unvalidated-313-withholds-average",
+      "identifier": "0x313",
+      "payload": "14beFFF600FA64E4",
+      "selection": {"project": "QAAA", "release": "0011", "flavor": "pcs-standard", "bank": "ordinary", "scope": "local", "endpoint": "coordinator", "group": "0", "slot": "1"},
+      "input": {"measurement_valid": true, "temperature_valid": false, "count_valid": true, "count": 5},
+      "expect": {
+        "voltage": {"status": "accepted", "value": "53.1"},
+        "current": {"status": "accepted", "value": "-1"},
+        "temperature": {"status": "raw", "value": "25"},
+        "soc": {"status": "accepted", "value": "100"},
+        "soh": {"status": "accepted", "value": "100"},
+        "soh_high_bit": {"status": "accepted", "value": "1"}
+      }
+    },
+    {
+      "name": "unmeasured-local-313-is-raw",
+      "identifier": "0x313",
+      "payload": "14beFFF6FFF664E4",
+      "selection": {"project": "QAAA", "release": "0006", "flavor": "pcs-standard", "bank": "ordinary", "scope": "local", "endpoint": "coordinator", "group": "0", "slot": "1"},
+      "input": {"measurement_valid": false, "temperature_valid": true, "count_valid": true, "count": 2},
+      "expect": {
+        "voltage": {"status": "raw", "value": "53.1"},
+        "current": {"status": "raw", "value": "-1"},
+        "soc": {"status": "raw", "value": "100"},
+        "soh_high_bit": {"status": "raw", "value": "1"}
+      }
+    },
+    {
+      "name": "unmeasured-local-311-withholds-limits",
+      "identifier": "0x311",
+      "payload": "1388006400320041",
+      "selection": {"project": "QAAA", "release": "0006", "flavor": "pcs-standard", "bank": "ordinary", "scope": "local", "endpoint": "coordinator", "group": "0", "slot": "1"},
+      "input": {"measurement_valid": false, "temperature_valid": true, "count_valid": true, "count": 2},
+      "expect": {
+        "voltage_limit": {"status": "raw", "value": "500"},
+        "charge_limit": {"status": "raw", "value": "100"},
+        "discharge_limit": {"status": "raw", "value": "50"},
+        "status": {"status": "raw", "value": "65"},
+        "raw_state": {"status": "accepted", "value": "1"},
+        "charge_hint": {"status": "accepted", "value": "1"},
+        "fault_hint": {"status": "accepted", "value": "0"}
+      }
+    },
+    {
+      "name": "gateway-aggregate-313-is-raw",
+      "identifier": "0x313",
+      "payload": "14beFFF6FFF664E4",
+      "selection": {"project": "QCAA", "release": "0001", "flavor": "pcs-standard", "bank": "ordinary", "scope": "aggregate", "endpoint": "gateway", "group": "", "slot": ""},
+      "input": {"measurement_valid": true, "temperature_valid": true, "count_valid": true, "count": 2},
+      "expect": {
+        "voltage": {"status": "raw", "value": "53.1"},
+        "temperature": {"status": "raw", "value": "-1"}
+      }
+    },
+    {
+      "name": "fixed-aggregate-313-is-raw",
+      "identifier": "0x313",
+      "payload": "14beFFF6FFF664E4",
+      "selection": {"project": "QAAB", "release": "0004", "flavor": "pcs-standard", "bank": "ordinary", "scope": "aggregate", "endpoint": "coordinator", "group": "0", "slot": "1"},
+      "input": {"measurement_valid": true, "temperature_valid": true, "count_valid": true, "count": 2},
+      "expect": {
+        "voltage": {"status": "raw", "value": "53.1"},
+        "soh_status": {"status": "raw", "value": "228"}
+      }
+    },
+    {
+      "name": "legacy-local-311-limits-and-hints",
+      "identifier": "0x311",
+      "payload": "1388006400320041",
+      "selection": {"project": "QAAA", "release": "0006", "flavor": "pcs-standard", "bank": "ordinary", "scope": "local", "endpoint": "coordinator", "group": "0", "slot": "1"},
+      "input": {"measurement_valid": true, "temperature_valid": true, "count_valid": true, "count": 2},
+      "expect": {
+        "voltage_limit": {"status": "accepted", "value": "500"},
+        "charge_limit": {"status": "accepted", "value": "100"},
+        "discharge_limit": {"status": "accepted", "value": "50"},
+        "status": {"status": "raw", "value": "65"},
+        "raw_state": {"status": "accepted", "value": "1"},
+        "charge_hint": {"status": "accepted", "value": "1"},
+        "fault_hint": {"status": "accepted", "value": "0"}
+      }
+    },
+    {
+      "name": "legacy-local-311-hint-bits-all-set",
+      "identifier": "0x311",
+      "payload": "13880000000004FF",
+      "selection": {"project": "QAAA", "release": "0006", "flavor": "pcs-standard", "bank": "ordinary", "scope": "local", "endpoint": "coordinator", "group": "0", "slot": "1"},
+      "input": {"measurement_valid": true, "temperature_valid": true, "count_valid": true, "count": 2},
+      "expect": {
+        "raw_state": {"status": "accepted", "value": "3"},
+        "fault_hint": {"status": "accepted", "value": "1"},
+        "sleep_hint": {"status": "accepted", "value": "1"},
+        "discharge_hint": {"status": "accepted", "value": "1"},
+        "charge_hint": {"status": "accepted", "value": "1"},
+        "force_hint": {"status": "accepted", "value": "1"}
+      }
+    },
+    {
+      "name": "gateway-311-swaps-the-aggregation-words",
+      "identifier": "0x311",
+      "payload": "1388006400320041",
+      "selection": {"project": "QCAA", "release": "0001", "flavor": "pcs-standard", "bank": "ordinary", "scope": "aggregate", "endpoint": "gateway", "group": "", "slot": ""},
+      "input": {"measurement_valid": true, "temperature_valid": true, "count_valid": true, "count": 2},
+      "expect": {
+        "voltage_limit": {"status": "raw", "value": "500"},
+        "charge_limit": {"status": "raw", "value": "50"},
+        "discharge_limit": {"status": "raw", "value": "100"}
+      }
+    },
+    {
+      "name": "summary-words-312",
+      "identifier": "0x312",
+      "payload": "3412785603AABBCC",
+      "selection": {"project": "QAAA", "release": "0006", "flavor": "pcs-standard", "bank": "ordinary", "scope": "local", "endpoint": "coordinator", "group": "0", "slot": "1"},
+      "input": {"measurement_valid": false, "temperature_valid": false, "count_valid": false, "count": 0},
+      "expect": {
+        "status_a": {"status": "raw", "value": "4660"},
+        "status_b": {"status": "raw", "value": "22136"},
+        "reported_count": {"status": "raw", "value": "3"},
+        "padding_5": {"status": "raw", "value": "170"},
+        "padding_6": {"status": "raw", "value": "187"},
+        "padding_7": {"status": "raw", "value": "204"}
+      }
+    },
+    {
+      "name": "capacity-and-cycles-314",
+      "identifier": "0x314",
+      "payload": "04d2000000080009",
+      "selection": {"project": "QAAA", "release": "0006", "flavor": "pcs-standard", "bank": "ordinary", "scope": "local", "endpoint": "coordinator", "group": "0", "slot": "1"},
+      "input": {"measurement_valid": true, "temperature_valid": true, "count_valid": true, "count": 2},
+      "expect": {
+        "remaining_capacity": {"status": "accepted", "value": "12.34"},
+        "full_capacity": {"status": "accepted", "value": "0"},
+        "spread": {"status": "accepted", "value": "8"},
+        "cycles": {"status": "accepted", "value": "9"}
+      }
+    },
+    {
+      "name": "capacity-words-asymmetric-bytes-314",
+      "identifier": "0x314",
+      "payload": "12340064012C0102",
+      "selection": {"project": "QAAA", "release": "0006", "flavor": "pcs-standard", "bank": "ordinary", "scope": "local", "endpoint": "coordinator", "group": "0", "slot": "1"},
+      "input": {"measurement_valid": true, "temperature_valid": true, "count_valid": true, "count": 2},
+      "expect": {
+        "remaining_capacity": {"status": "accepted", "value": "46.6"},
+        "full_capacity": {"status": "accepted", "value": "1"},
+        "spread": {"status": "accepted", "value": "300"},
+        "cycles": {"status": "accepted", "value": "258"}
+      }
+    },
+    {
+      "name": "unmeasured-capacity-314-is-raw",
+      "identifier": "0x314",
+      "payload": "04d2000000080009",
+      "selection": {"project": "QAAA", "release": "0011", "flavor": "pcs-standard", "bank": "ordinary", "scope": "local", "endpoint": "coordinator", "group": "0", "slot": "1"},
+      "input": {"measurement_valid": false, "temperature_valid": true, "count_valid": true, "count": 2},
+      "expect": {
+        "remaining_capacity": {"status": "raw", "value": "12.34"},
+        "cycles": {"status": "raw", "value": "9"}
+      }
+    },
+    {
+      "name": "capacity-boundaries-314",
+      "identifier": "0x314",
+      "payload": "FFFFFFFFFFFFFFFF",
+      "selection": {"project": "QAAA", "release": "0006", "flavor": "pcs-standard", "bank": "ordinary", "scope": "local", "endpoint": "coordinator", "group": "0", "slot": "1"},
+      "input": {"measurement_valid": true, "temperature_valid": true, "count_valid": true, "count": 2},
+      "expect": {
+        "remaining_capacity": {"status": "accepted", "value": "655.35"},
+        "full_capacity": {"status": "accepted", "value": "655.35"},
+        "spread": {"status": "accepted", "value": "65535"},
+        "cycles": {"status": "accepted", "value": "65535"}
+      }
+    },
+    {
+      "name": "publisher-unresolved-313-is-refused",
+      "identifier": "0x313",
+      "payload": "14beFFF6FFF664E4",
+      "selection": {"project": "QAAA", "release": "0006", "flavor": "pcs-standard", "bank": "ordinary", "scope": "local", "endpoint": "coordinator", "group": "0", "slot": "1"},
+      "input": {"measurement_valid": true, "temperature_valid": true, "count_valid": true, "count": 2, "publisher_unresolved": true},
+      "expect": {}
+    },
+    {
+      "name": "release-11-stale-temperature-keeps-voltage",
+      "identifier": "0x313",
+      "payload": "14beFFF600FA64E4",
+      "selection": {"project": "QAAA", "release": "0011", "flavor": "pcs-standard", "bank": "ordinary", "scope": "local", "endpoint": "coordinator", "group": "0", "slot": "1"},
+      "input": {"measurement_valid": true, "temperature_valid": true, "count_valid": true, "count": 5, "field_states": {"temperature": "stale"}},
+      "expect": {
+        "voltage": {"status": "accepted", "value": "53.1"},
+        "temperature": {"status": "stale", "value": "25"}
+      }
+    },
+    {
+      "name": "negative-field-age-invalidates-soc-only",
+      "identifier": "0x313",
+      "payload": "14beFFF6FFF664E4",
+      "selection": {"project": "QAAA", "release": "0006", "flavor": "pcs-standard", "bank": "ordinary", "scope": "local", "endpoint": "coordinator", "group": "0", "slot": "1"},
+      "input": {"measurement_valid": true, "temperature_valid": true, "count_valid": true, "count": 2, "field_ages_ms": {"soc": -1}},
+      "expect": {
+        "voltage": {"status": "accepted", "value": "53.1"},
+        "soc": {"status": "invalid", "value": "100"}
+      }
+    }
+  ]
+}

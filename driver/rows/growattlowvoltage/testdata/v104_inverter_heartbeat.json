@@ -1,0 +1,14 @@
+{
+  "source": "Rev_04 section 1, Communication mode, physical p. 3",
+  "source_sha256": "df02fd1e21d6b055faec512439349aad4b35dee7d8b19c143df3d355ed455577",
+  "revision": "growatt.bms.low_voltage.can.v1_04",
+  "role": "inverter",
+  "frame": {
+    "identifier": "0x301",
+    "format": "standard",
+    "kind": "data",
+    "dlc": 8,
+    "bytes_decimal": [11, 22, 33, 44, 55, 66, 77, 88],
+    "payload": "0b16212c37424d58"
+  }
+}

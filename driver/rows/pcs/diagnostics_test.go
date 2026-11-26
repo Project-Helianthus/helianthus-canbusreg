@@ -515,7 +515,7 @@ func TestDiagnosticResultsKeepAttribution(t *testing.T) {
 // 0x52X at 1 and 3, and the LINK 1853 frame at 0 and 2. The caller-offset
 // decoder accepts a valid word at offset 0 of a 0x333 frame, and no row applies.
 func TestDiagnosticWordOffsetsFollowFrameLayout(t *testing.T) {
-	pcs := diagSelection(t, diagVectorSelection{Flavor: "pcs-standard", Bank: "ordinary", Project: "QAAA", Release: "0011", Scope: "local", Endpoint: "coordinator"})
+	pcs := diagSelection(t, diagVectorSelection{Flavor: "pcs-standard", Bank: "ordinary", Project: "QAAA", Release: "0011", Scope: "local", Endpoint: "coordinator", Group: "0", Slot: "0"})
 	parallel := diagSelection(t, diagVectorSelection{Flavor: "pcs-parallel", Bank: "parallel", Project: "QAAA", Release: "0011", Scope: "local", Endpoint: "coordinator", Group: "2", Slot: "3"})
 	link := diagSelection(t, diagVectorSelection{Flavor: "link", PCSFlavor: "pcs-standard", Bank: "ordinary", Project: "QAAA", Release: "0011", Scope: "local", Endpoint: "1A"})
 	cases := []struct {
@@ -635,5 +635,25 @@ func TestDiagnosticStandardWordAttributedToSelectedMember(t *testing.T) {
 				t.Fatalf("another member's word attributed: reason %q rows %d", reason, len(res.Rows))
 			}
 		})
+	}
+}
+
+// TestDiagnosticStandardWordWithoutMemberNotPublished checks that a 0x333 word
+// seen under a selection that names neither a group nor a slot is not published
+// as an index. Two frames of different members give the same row identifier and
+// empty attribution, so the decoder's refusal of an unassociated word is the
+// only attribution-safe outcome.
+func TestDiagnosticStandardWordWithoutMemberNotPublished(t *testing.T) {
+	unassociated := diagSelection(t, diagVectorSelection{Flavor: "pcs-standard", Bank: "ordinary", Project: "QAAA", Release: "0011", Scope: "local", Endpoint: "coordinator"})
+	for _, payload := range []string{"0203100900000000", "0204100900000000"} {
+		f := diagFrame(t, "0x333", false, payload)
+		in := diagLinkInput(unassociated, f)
+		res, reason, err := EvaluateDTC(unassociated, in, 2)
+		if err != nil {
+			t.Fatal(err)
+		}
+		if reason != roweval.Reason("invalid") || len(res.Rows) != 0 {
+			t.Fatalf("payload %s published without member: reason %q rows %d", payload, reason, len(res.Rows))
+		}
 	}
 }

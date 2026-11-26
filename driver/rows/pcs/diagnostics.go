@@ -230,12 +230,14 @@ func diagParallelAttributed(member canbusreg.Selection, frame canbus.Frame) bool
 
 // diagStandardAttributed admits a 0x333 word only for the group and slot bytes
 // the selection names, as the standard frame decoder does. A selection that
-// names neither has no member group or slot to compare, and keeps the decoder's
-// own admission. A frame of another member keeps no attributed index.
+// names neither has no member to attribute the word to, and the frame decoder
+// requires a validated group and slot, so such a word is refused: it is raw
+// evidence only and no index is published under an empty attribution. A frame
+// of another member keeps no attributed index.
 func diagStandardAttributed(member canbusreg.Selection, frame canbus.Frame) bool {
 	c := member.SelectionSpecValue()
-	if c.Group == "" && c.Slot == "" {
-		return true
+	if c.Group == "" || c.Slot == "" {
+		return false
 	}
 	g, e := strconv.ParseUint(c.Group, 10, 8)
 	slot, es := strconv.ParseUint(c.Slot, 10, 8)
@@ -355,8 +357,8 @@ func diagDTCSpecs(fam diagDTCFamily, member canbusreg.Selection, offset int, fra
 // refuses gives the decoder's status and no rows. An offset that is not a word
 // position of the frame family gives roweval.ReasonNoMatch, and a 0x52X word
 // not attributed to the selected group and slot gives "invalid", as the frame
-// decoder refuses it. A 0x333 word of another group or slot than the selection's
-// is refused the same way.
+// decoder refuses it. A 0x333 word of another group or slot than the selection's,
+// or under a selection that names no group and slot, is refused the same way.
 func EvaluateDTC(member canbusreg.Selection, in canbusreg.LINKInput, offset int) (DiagnosticResult, roweval.Reason, error) {
 	res := DiagnosticResult{Evidence: in.Evidence, Attribution: diagAttribution(in), Rows: make(map[string]roweval.Evaluation)}
 	frame := in.Evidence.Frame

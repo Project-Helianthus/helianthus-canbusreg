@@ -97,7 +97,7 @@
       "extended": false,
       "payload": "0000100900000000",
       "offset": 2,
-      "selection": {"flavor": "pcs-standard", "bank": "ordinary", "project": "QAAA", "release": "0011", "scope": "local", "endpoint": "coordinator", "group": "", "slot": ""},
+      "selection": {"flavor": "pcs-standard", "bank": "ordinary", "project": "QAAA", "release": "0011", "scope": "local", "endpoint": "coordinator", "group": "0", "slot": "0"},
       "expect": {
         "selected_word": {"status": "accepted", "raw": "4105", "value": "4105"},
         "numeric_index": {"status": "accepted", "raw": "4105", "value": "9"}
@@ -110,7 +110,7 @@
       "extended": false,
       "payload": "0000101000000000",
       "offset": 2,
-      "selection": {"flavor": "pcs-standard", "bank": "ordinary", "project": "QAAA", "release": "0011", "scope": "local", "endpoint": "coordinator", "group": "", "slot": ""},
+      "selection": {"flavor": "pcs-standard", "bank": "ordinary", "project": "QAAA", "release": "0011", "scope": "local", "endpoint": "coordinator", "group": "0", "slot": "0"},
       "expect": {
         "selected_word": {"status": "accepted", "raw": "4112", "value": "4112"},
         "numeric_index": {"status": "accepted", "raw": "4112", "value": "10"}
@@ -123,7 +123,7 @@
       "extended": false,
       "payload": "0000113100000000",
       "offset": 2,
-      "selection": {"flavor": "pcs-standard", "bank": "ordinary", "project": "QAAA", "release": "0011", "scope": "local", "endpoint": "coordinator", "group": "", "slot": ""},
+      "selection": {"flavor": "pcs-standard", "bank": "ordinary", "project": "QAAA", "release": "0011", "scope": "local", "endpoint": "coordinator", "group": "0", "slot": "0"},
       "expect": {
         "selected_word": {"status": "accepted", "raw": "4401", "value": "4401"},
         "numeric_index": {"status": "accepted", "raw": "4401", "value": "131"}
@@ -136,7 +136,7 @@
       "extended": false,
       "payload": "0000123400000000",
       "offset": 2,
-      "selection": {"flavor": "pcs-standard", "bank": "ordinary", "project": "QAAA", "release": "0011", "scope": "local", "endpoint": "coordinator", "group": "", "slot": ""},
+      "selection": {"flavor": "pcs-standard", "bank": "ordinary", "project": "QAAA", "release": "0011", "scope": "local", "endpoint": "coordinator", "group": "0", "slot": "0"},
       "expect": {
         "selected_word": {"status": "unknown", "raw": "4660", "value": "4660"},
         "numeric_index": {"status": "absent", "raw": "", "value": ""}
@@ -149,7 +149,7 @@
       "extended": false,
       "payload": "0000000000000000",
       "offset": 2,
-      "selection": {"flavor": "pcs-standard", "bank": "ordinary", "project": "QAAA", "release": "0011", "scope": "local", "endpoint": "coordinator", "group": "", "slot": ""},
+      "selection": {"flavor": "pcs-standard", "bank": "ordinary", "project": "QAAA", "release": "0011", "scope": "local", "endpoint": "coordinator", "group": "0", "slot": "0"},
       "expect": {
         "selected_word": {"status": "empty", "raw": "0", "value": "0"},
         "numeric_index": {"status": "absent", "raw": "", "value": ""}

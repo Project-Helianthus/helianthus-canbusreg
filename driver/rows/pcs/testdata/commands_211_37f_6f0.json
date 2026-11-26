@@ -1,5 +1,5 @@
 {
-  "description": "Synthetic expectations for the host input frames 0x211, 0x37F and 0x6F0, written by hand from the page layouts before the encoders ran. Payloads are hexadecimal, eight bytes each.",
+  "description": "Synthetic expectations for the host input frames 0x211 and 0x6F0, written by hand from the page layouts before the encoders ran. Payloads are hexadecimal, eight bytes each.",
   "clock": [
     {"name": "typical", "args": {"year_offset": 26, "month": 11, "day": 26, "hour": 13, "minute": 45, "second": 30}, "identifier": "0x211", "payload": "001a0b1a0d2d1e00"},
     {"name": "lower-bounds", "args": {"year_offset": 0, "month": 1, "day": 1, "hour": 0, "minute": 0, "second": 0}, "identifier": "0x211", "payload": "0000010100000000"},

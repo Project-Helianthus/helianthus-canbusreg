@@ -1,0 +1,1057 @@
+{
+ "description": "Synthetic binding vectors of the LINK read bindings. Every expectation is written by hand from the frame layout and the registry unit: fact is the registry fact the binding gives, with the exact SI decimal; none is a row that gives no candidate.",
+ "cases": [
+  {
+   "name": "1805 pack voltage and current on the local profile ordinary",
+   "table": "telemetry",
+   "family": "1805",
+   "payload": "1282ea9b10feffff",
+   "selection": {
+    "project": "QAAA",
+    "release": "0006",
+    "choice": "",
+    "group": "",
+    "slot": "",
+    "source": "02",
+    "bank": "ordinary",
+    "destination": "F4"
+   },
+   "expect": {
+    "growatt.bms.link.pack_voltage": {
+     "outcome": "fact",
+     "fact": "storage.pack.voltage",
+     "unit": "unit.volt",
+     "value": "53"
+    },
+    "growatt.bms.link.1805.current": {
+     "outcome": "fact",
+     "fact": "storage.pack.current",
+     "unit": "unit.ampere",
+     "value": "1"
+    },
+    "growatt.bms.link.port_voltage": {
+     "outcome": "none"
+    }
+   },
+   "count_aware": false,
+   "count_valid": false
+  },
+  {
+   "name": "1805 pack voltage and current on the local profile parallel",
+   "table": "telemetry",
+   "family": "1805",
+   "payload": "1282ea9b10feffff",
+   "selection": {
+    "project": "QAAA",
+    "release": "0006",
+    "choice": "",
+    "group": "3",
+    "slot": "",
+    "source": "0A",
+    "bank": "parallel",
+    "destination": "F4"
+   },
+   "expect": {
+    "growatt.bms.link.pack_voltage": {
+     "outcome": "fact",
+     "fact": "storage.pack.voltage",
+     "unit": "unit.volt",
+     "value": "53"
+    },
+    "growatt.bms.link.1805.current": {
+     "outcome": "fact",
+     "fact": "storage.pack.current",
+     "unit": "unit.ampere",
+     "value": "1"
+    },
+    "growatt.bms.link.port_voltage": {
+     "outcome": "none"
+    }
+   },
+   "count_aware": false,
+   "count_valid": false
+  },
+  {
+   "name": "1805 negative current on the local profile",
+   "table": "telemetry",
+   "family": "1805",
+   "payload": "1282e59b10feffff",
+   "selection": {
+    "project": "QAAA",
+    "release": "0006",
+    "choice": "",
+    "group": "",
+    "slot": "",
+    "source": "02",
+    "bank": "ordinary",
+    "destination": "F4"
+   },
+   "expect": {
+    "growatt.bms.link.pack_voltage": {
+     "outcome": "fact",
+     "fact": "storage.pack.voltage",
+     "unit": "unit.volt",
+     "value": "53"
+    },
+    "growatt.bms.link.1805.current": {
+     "outcome": "fact",
+     "fact": "storage.pack.current",
+     "unit": "unit.ampere",
+     "value": "-1"
+    },
+    "growatt.bms.link.port_voltage": {
+     "outcome": "none"
+    }
+   },
+   "count_aware": false,
+   "count_valid": false
+  },
+  {
+   "name": "1805 zero current on release eleven",
+   "table": "telemetry",
+   "family": "1805",
+   "payload": "1202e89b10feffff",
+   "selection": {
+    "project": "QAAA",
+    "release": "0011",
+    "choice": "",
+    "group": "",
+    "slot": "",
+    "source": "02",
+    "bank": "ordinary",
+    "destination": "F4"
+   },
+   "expect": {
+    "growatt.bms.link.pack_voltage": {
+     "outcome": "fact",
+     "fact": "storage.pack.voltage",
+     "unit": "unit.volt",
+     "value": "53"
+    },
+    "growatt.bms.link.1805.current": {
+     "outcome": "fact",
+     "fact": "storage.pack.current",
+     "unit": "unit.ampere",
+     "value": "0"
+    },
+    "growatt.bms.link.port_voltage": {
+     "outcome": "none"
+    }
+   },
+   "count_aware": false,
+   "count_valid": false
+  },
+  {
+   "name": "1805 raw words under another group bind nothing",
+   "table": "telemetry",
+   "family": "1805",
+   "payload": "1282ea9b10feffff",
+   "selection": {
+    "project": "QAAA",
+    "release": "0007",
+    "choice": "",
+    "group": "",
+    "slot": "",
+    "source": "02",
+    "bank": "ordinary",
+    "destination": "F4"
+   },
+   "expect": {
+    "growatt.bms.link.pack_voltage": {
+     "outcome": "none"
+    },
+    "growatt.bms.link.1805.current": {
+     "outcome": "none"
+    },
+    "growatt.bms.link.port_voltage": {
+     "outcome": "none"
+    }
+   },
+   "count_aware": false,
+   "count_valid": false
+  },
+  {
+   "name": "1807 fine and whole percent state of charge on release eleven ordinary",
+   "table": "telemetry",
+   "family": "1807",
+   "payload": "1000020355035507",
+   "selection": {
+    "project": "QAAA",
+    "release": "0011",
+    "choice": "",
+    "group": "",
+    "slot": "",
+    "source": "02",
+    "bank": "ordinary",
+    "destination": "F4"
+   },
+   "expect": {
+    "growatt.bms.link.1807.b4": {
+     "outcome": "fact",
+     "fact": "storage.state.soc",
+     "unit": "unit.ratio",
+     "value": "0.853"
+    },
+    "growatt.bms.link.whole_estimate": {
+     "outcome": "fact",
+     "fact": "storage.state.soc",
+     "unit": "unit.ratio",
+     "value": "0.85"
+    }
+   },
+   "count_aware": false,
+   "count_valid": false
+  },
+  {
+   "name": "1807 fine and whole percent state of charge on release eleven parallel",
+   "table": "telemetry",
+   "family": "1807",
+   "payload": "1000020355035507",
+   "selection": {
+    "project": "QAAA",
+    "release": "0011",
+    "choice": "",
+    "group": "3",
+    "slot": "",
+    "source": "0A",
+    "bank": "parallel",
+    "destination": "F4"
+   },
+   "expect": {
+    "growatt.bms.link.1807.b4": {
+     "outcome": "fact",
+     "fact": "storage.state.soc",
+     "unit": "unit.ratio",
+     "value": "0.853"
+    },
+    "growatt.bms.link.whole_estimate": {
+     "outcome": "fact",
+     "fact": "storage.state.soc",
+     "unit": "unit.ratio",
+     "value": "0.85"
+    }
+   },
+   "count_aware": false,
+   "count_valid": false
+  },
+  {
+   "name": "1807 state of charge words stay native under the local profile",
+   "table": "telemetry",
+   "family": "1807",
+   "payload": "1000020355035507",
+   "selection": {
+    "project": "QAAA",
+    "release": "0006",
+    "choice": "",
+    "group": "",
+    "slot": "",
+    "source": "02",
+    "bank": "ordinary",
+    "destination": "F4"
+   },
+   "expect": {
+    "growatt.bms.link.1807.b4": {
+     "outcome": "none"
+    },
+    "growatt.bms.link.whole_estimate": {
+     "outcome": "none"
+    }
+   },
+   "count_aware": false,
+   "count_valid": false
+  },
+  {
+   "name": "1800 soc_status byte is never a state of charge",
+   "table": "telemetry",
+   "family": "1800",
+   "payload": "0000000000000064",
+   "selection": {
+    "project": "QAAA",
+    "release": "0011",
+    "choice": "",
+    "group": "",
+    "slot": "",
+    "source": "02",
+    "bank": "ordinary",
+    "destination": "F4"
+   },
+   "expect": {
+    "growatt.bms.link.soc_status": {
+     "outcome": "none"
+    }
+   },
+   "count_aware": false,
+   "count_valid": false
+  },
+  {
+   "name": "1803 full charge capacity on the local profile ordinary",
+   "table": "telemetry",
+   "family": "1803",
+   "payload": "01010203e8030607",
+   "selection": {
+    "project": "QAAA",
+    "release": "0006",
+    "choice": "",
+    "group": "",
+    "slot": "",
+    "source": "02",
+    "bank": "ordinary",
+    "destination": "F4"
+   },
+   "expect": {
+    "growatt.bms.link.capacity": {
+     "outcome": "fact",
+     "fact": "storage.capacity.charge",
+     "unit": "unit.ampere_hour",
+     "value": "100"
+    }
+   },
+   "count_aware": false,
+   "count_valid": false
+  },
+  {
+   "name": "1803 full charge capacity on the local profile parallel",
+   "table": "telemetry",
+   "family": "1803",
+   "payload": "01010203e8030607",
+   "selection": {
+    "project": "QAAA",
+    "release": "0006",
+    "choice": "",
+    "group": "3",
+    "slot": "",
+    "source": "0A",
+    "bank": "parallel",
+    "destination": "F4"
+   },
+   "expect": {
+    "growatt.bms.link.capacity": {
+     "outcome": "fact",
+     "fact": "storage.capacity.charge",
+     "unit": "unit.ampere_hour",
+     "value": "100"
+    }
+   },
+   "count_aware": false,
+   "count_valid": false
+  },
+  {
+   "name": "1803 capacity stays raw on release eleven",
+   "table": "telemetry",
+   "family": "1803",
+   "payload": "01020203e8030607",
+   "selection": {
+    "project": "QAAA",
+    "release": "0011",
+    "choice": "",
+    "group": "",
+    "slot": "",
+    "source": "02",
+    "bank": "ordinary",
+    "destination": "F4"
+   },
+   "expect": {
+    "growatt.bms.link.capacity": {
+     "outcome": "none"
+    }
+   },
+   "count_aware": false,
+   "count_valid": false
+  },
+  {
+   "name": "180B layout W full capacity on the local profile ordinary",
+   "table": "fine",
+   "family": "180B",
+   "payload": "e803190007095802",
+   "selection": {
+    "project": "QAAA",
+    "release": "0006",
+    "choice": "",
+    "group": "",
+    "slot": "",
+    "source": "02",
+    "bank": "ordinary",
+    "destination": "F4"
+   },
+   "expect": {
+    "growatt.bms.link.full_capacity": {
+     "outcome": "fact",
+     "fact": "storage.capacity.charge",
+     "unit": "unit.ampere_hour",
+     "value": "100"
+    }
+   },
+   "count_aware": false,
+   "count_valid": false
+  },
+  {
+   "name": "180B layout W full capacity on the local profile parallel",
+   "table": "fine",
+   "family": "180B",
+   "payload": "e803190007095802",
+   "selection": {
+    "project": "QAAA",
+    "release": "0006",
+    "choice": "",
+    "group": "3",
+    "slot": "",
+    "source": "0A",
+    "bank": "parallel",
+    "destination": "F4"
+   },
+   "expect": {
+    "growatt.bms.link.full_capacity": {
+     "outcome": "fact",
+     "fact": "storage.capacity.charge",
+     "unit": "unit.ampere_hour",
+     "value": "100"
+    }
+   },
+   "count_aware": false,
+   "count_valid": false
+  },
+  {
+   "name": "180B layout W full capacity stays raw on release eleven",
+   "table": "fine",
+   "family": "180B",
+   "payload": "e803190007095802",
+   "selection": {
+    "project": "QAAA",
+    "release": "0011",
+    "choice": "",
+    "group": "",
+    "slot": "",
+    "source": "02",
+    "bank": "ordinary",
+    "destination": "F4"
+   },
+   "expect": {
+    "growatt.bms.link.full_capacity": {
+     "outcome": "none"
+    }
+   },
+   "count_aware": false,
+   "count_valid": false
+  },
+  {
+   "name": "180B remaining capacity is never a charge capacity",
+   "table": "fine",
+   "family": "180B",
+   "payload": "e803190007095802",
+   "selection": {
+    "project": "QAAA",
+    "release": "0006",
+    "choice": "",
+    "group": "",
+    "slot": "",
+    "source": "02",
+    "bank": "ordinary",
+    "destination": "F4"
+   },
+   "expect": {
+    "growatt.bms.link.remaining_capacity": {
+     "outcome": "none"
+    },
+    "growatt.bms.link.full_capacity": {
+     "outcome": "fact",
+     "fact": "storage.capacity.charge",
+     "unit": "unit.ampere_hour",
+     "value": "100"
+    }
+   },
+   "count_aware": false,
+   "count_valid": false
+  },
+  {
+   "name": "1862 mean of codes 520 and 560 on release eleven ordinary",
+   "table": "fine",
+   "family": "1862",
+   "payload": "300208021c020000",
+   "selection": {
+    "project": "QAAA",
+    "release": "0011",
+    "choice": "",
+    "group": "",
+    "slot": "",
+    "source": "02",
+    "bank": "ordinary",
+    "destination": "F4"
+   },
+   "expect": {
+    "growatt.bms.link.1862.mean": {
+     "outcome": "fact",
+     "fact": "storage.temperature.pack",
+     "unit": "unit.kelvin",
+     "value": "300.65"
+    }
+   },
+   "fine": {
+    "fine_valid": true,
+    "maximum": "accepted",
+    "minimum": "accepted",
+    "mean": "accepted",
+    "contributors": {
+     "count": 2,
+     "count_valid": true,
+     "payload": "0802300200000000",
+     "stale_sensor": -1,
+     "fixed_four": false
+    }
+   },
+   "count_aware": false,
+   "count_valid": false
+  },
+  {
+   "name": "1862 mean of codes 520 and 560 on release eleven parallel",
+   "table": "fine",
+   "family": "1862",
+   "payload": "300208021c020000",
+   "selection": {
+    "project": "QAAA",
+    "release": "0011",
+    "choice": "",
+    "group": "3",
+    "slot": "",
+    "source": "0A",
+    "bank": "parallel",
+    "destination": "F4"
+   },
+   "expect": {
+    "growatt.bms.link.1862.mean": {
+     "outcome": "fact",
+     "fact": "storage.temperature.pack",
+     "unit": "unit.kelvin",
+     "value": "300.65"
+    }
+   },
+   "fine": {
+    "fine_valid": true,
+    "maximum": "accepted",
+    "minimum": "accepted",
+    "mean": "accepted",
+    "contributors": {
+     "count": 2,
+     "count_valid": true,
+     "payload": "0802300200000000",
+     "stale_sensor": -1,
+     "fixed_four": false
+    }
+   },
+   "count_aware": false,
+   "count_valid": false
+  },
+  {
+   "name": "1862 mean on group four",
+   "table": "fine",
+   "family": "1862",
+   "payload": "300208021c020000",
+   "selection": {
+    "project": "QAAA",
+    "release": "0009",
+    "choice": "",
+    "group": "",
+    "slot": "",
+    "source": "02",
+    "bank": "ordinary",
+    "destination": "F4"
+   },
+   "expect": {
+    "growatt.bms.link.1862.mean": {
+     "outcome": "fact",
+     "fact": "storage.temperature.pack",
+     "unit": "unit.kelvin",
+     "value": "300.65"
+    }
+   },
+   "fine": {
+    "fine_valid": true,
+    "maximum": "accepted",
+    "minimum": "accepted",
+    "mean": "accepted",
+    "contributors": {
+     "count": 2,
+     "count_valid": true,
+     "payload": "0802300200000000",
+     "stale_sensor": -1,
+     "fixed_four": false
+    }
+   },
+   "count_aware": false,
+   "count_valid": false
+  },
+  {
+   "name": "1862 mean of four sensors is truncated",
+   "table": "fine",
+   "family": "1862",
+   "payload": "a80190019c010000",
+   "selection": {
+    "project": "QAAA",
+    "release": "0011",
+    "choice": "",
+    "group": "",
+    "slot": "",
+    "source": "02",
+    "bank": "ordinary",
+    "destination": "F4"
+   },
+   "expect": {
+    "growatt.bms.link.1862.mean": {
+     "outcome": "fact",
+     "fact": "storage.temperature.pack",
+     "unit": "unit.kelvin",
+     "value": "284.65"
+    }
+   },
+   "fine": {
+    "fine_valid": true,
+    "maximum": "accepted",
+    "minimum": "accepted",
+    "mean": "accepted",
+    "contributors": {
+     "count": 4,
+     "count_valid": true,
+     "payload": "90019801a001a801",
+     "stale_sensor": -1,
+     "fixed_four": false
+    }
+   },
+   "count_aware": false,
+   "count_valid": false
+  },
+  {
+   "name": "1862 mean with the fine gate off binds nothing",
+   "table": "fine",
+   "family": "1862",
+   "payload": "300208021c020000",
+   "selection": {
+    "project": "QAAA",
+    "release": "0011",
+    "choice": "",
+    "group": "",
+    "slot": "",
+    "source": "02",
+    "bank": "ordinary",
+    "destination": "F4"
+   },
+   "expect": {
+    "growatt.bms.link.1862.mean": {
+     "outcome": "none"
+    }
+   },
+   "fine": {
+    "fine_valid": false,
+    "maximum": "accepted",
+    "minimum": "accepted",
+    "mean": "accepted",
+    "contributors": {
+     "count": 2,
+     "count_valid": true,
+     "payload": "0802300200000000",
+     "stale_sensor": -1,
+     "fixed_four": false
+    }
+   },
+   "count_aware": false,
+   "count_valid": false
+  },
+  {
+   "name": "1862 mean with a stale contributor binds nothing",
+   "table": "fine",
+   "family": "1862",
+   "payload": "300208021c020000",
+   "selection": {
+    "project": "QAAA",
+    "release": "0011",
+    "choice": "",
+    "group": "",
+    "slot": "",
+    "source": "02",
+    "bank": "ordinary",
+    "destination": "F4"
+   },
+   "expect": {
+    "growatt.bms.link.1862.mean": {
+     "outcome": "none"
+    }
+   },
+   "fine": {
+    "fine_valid": true,
+    "maximum": "accepted",
+    "minimum": "accepted",
+    "mean": "accepted",
+    "contributors": {
+     "count": 2,
+     "count_valid": true,
+     "payload": "0802300200000000",
+     "stale_sensor": 0,
+     "fixed_four": false
+    }
+   },
+   "count_aware": false,
+   "count_valid": false
+  },
+  {
+   "name": "1862 mean on the fixed four path binds nothing",
+   "table": "fine",
+   "family": "1862",
+   "payload": "300208021c020000",
+   "selection": {
+    "project": "QAAA",
+    "release": "0011",
+    "choice": "",
+    "group": "",
+    "slot": "",
+    "source": "02",
+    "bank": "ordinary",
+    "destination": "F4"
+   },
+   "expect": {
+    "growatt.bms.link.1862.mean": {
+     "outcome": "none"
+    }
+   },
+   "fine": {
+    "fine_valid": true,
+    "maximum": "accepted",
+    "minimum": "accepted",
+    "mean": "accepted",
+    "contributors": {
+     "count": 2,
+     "count_valid": true,
+     "payload": "0802300200000000",
+     "stale_sensor": -1,
+     "fixed_four": true
+    }
+   },
+   "count_aware": false,
+   "count_valid": false
+  },
+  {
+   "name": "1862 mean with an invalid count binds nothing",
+   "table": "fine",
+   "family": "1862",
+   "payload": "300208021c020000",
+   "selection": {
+    "project": "QAAA",
+    "release": "0011",
+    "choice": "",
+    "group": "",
+    "slot": "",
+    "source": "02",
+    "bank": "ordinary",
+    "destination": "F4"
+   },
+   "expect": {
+    "growatt.bms.link.1862.mean": {
+     "outcome": "none"
+    }
+   },
+   "fine": {
+    "fine_valid": true,
+    "maximum": "accepted",
+    "minimum": "accepted",
+    "mean": "accepted",
+    "contributors": {
+     "count": 2,
+     "count_valid": false,
+     "payload": "0802300200000000",
+     "stale_sensor": -1,
+     "fixed_four": false
+    }
+   },
+   "count_aware": false,
+   "count_valid": false
+  },
+  {
+   "name": "1862 mean with a mismatching word binds nothing",
+   "table": "fine",
+   "family": "1862",
+   "payload": "300208021d020000",
+   "selection": {
+    "project": "QAAA",
+    "release": "0011",
+    "choice": "",
+    "group": "",
+    "slot": "",
+    "source": "02",
+    "bank": "ordinary",
+    "destination": "F4"
+   },
+   "expect": {
+    "growatt.bms.link.1862.mean": {
+     "outcome": "none"
+    }
+   },
+   "fine": {
+    "fine_valid": true,
+    "maximum": "accepted",
+    "minimum": "accepted",
+    "mean": "accepted",
+    "contributors": {
+     "count": 2,
+     "count_valid": true,
+     "payload": "0802300200000000",
+     "stale_sensor": -1,
+     "fixed_four": false
+    }
+   },
+   "count_aware": false,
+   "count_valid": false
+  },
+  {
+   "name": "1862 mean with an unconfigured mean gate binds nothing",
+   "table": "fine",
+   "family": "1862",
+   "payload": "300208021c020000",
+   "selection": {
+    "project": "QAAA",
+    "release": "0011",
+    "choice": "",
+    "group": "",
+    "slot": "",
+    "source": "02",
+    "bank": "ordinary",
+    "destination": "F4"
+   },
+   "expect": {
+    "growatt.bms.link.1862.mean": {
+     "outcome": "none"
+    }
+   },
+   "fine": {
+    "fine_valid": true,
+    "maximum": "accepted",
+    "minimum": "accepted",
+    "mean": "unconfigured",
+    "contributors": {
+     "count": 2,
+     "count_valid": true,
+     "payload": "0802300200000000",
+     "stale_sensor": -1,
+     "fixed_four": false
+    }
+   },
+   "count_aware": false,
+   "count_valid": false
+  },
+  {
+   "name": "1862 mean words FFFF bind nothing",
+   "table": "fine",
+   "family": "1862",
+   "payload": "ffffffffffff0000",
+   "selection": {
+    "project": "QAAA",
+    "release": "0011",
+    "choice": "",
+    "group": "",
+    "slot": "",
+    "source": "02",
+    "bank": "ordinary",
+    "destination": "F4"
+   },
+   "expect": {
+    "growatt.bms.link.1862.mean": {
+     "outcome": "none"
+    }
+   },
+   "fine": {
+    "fine_valid": true,
+    "maximum": "accepted",
+    "minimum": "accepted",
+    "mean": "accepted",
+    "contributors": {
+     "count": 2,
+     "count_valid": true,
+     "payload": "0802300200000000",
+     "stale_sensor": -1,
+     "fixed_four": false
+    }
+   },
+   "count_aware": false,
+   "count_valid": false
+  },
+  {
+   "name": "1862 mean on a path without the mean selector binds nothing",
+   "table": "fine",
+   "family": "1862",
+   "payload": "300208021c020000",
+   "selection": {
+    "project": "QAAa",
+    "release": "9010",
+    "choice": "",
+    "group": "",
+    "slot": "",
+    "source": "02",
+    "bank": "ordinary",
+    "destination": "F4"
+   },
+   "expect": {
+    "growatt.bms.link.1862.mean": {
+     "outcome": "none"
+    }
+   },
+   "fine": {
+    "fine_valid": true,
+    "maximum": "accepted",
+    "minimum": "accepted",
+    "mean": "accepted",
+    "contributors": {
+     "count": 2,
+     "count_valid": true,
+     "payload": "0802300200000000",
+     "stale_sensor": -1,
+     "fixed_four": false
+    }
+   },
+   "count_aware": false,
+   "count_valid": false
+  },
+  {
+   "name": "1808 average of one-byte codes on the count-aware release eleven path ordinary",
+   "table": "telemetry",
+   "family": "1808",
+   "payload": "0146023246140102",
+   "selection": {
+    "project": "QAAA",
+    "release": "0011",
+    "choice": "",
+    "group": "",
+    "slot": "",
+    "source": "02",
+    "bank": "ordinary",
+    "destination": "F4"
+   },
+   "expect": {
+    "growatt.bms.link.extra_average": {
+     "outcome": "fact",
+     "fact": "storage.temperature.pack",
+     "unit": "unit.kelvin",
+     "value": "303.15"
+    }
+   },
+   "count_aware": true,
+   "count_valid": true
+  },
+  {
+   "name": "1808 average of one-byte codes on the count-aware release eleven path parallel",
+   "table": "telemetry",
+   "family": "1808",
+   "payload": "0146023246140102",
+   "selection": {
+    "project": "QAAA",
+    "release": "0011",
+    "choice": "",
+    "group": "3",
+    "slot": "",
+    "source": "0A",
+    "bank": "parallel",
+    "destination": "F4"
+   },
+   "expect": {
+    "growatt.bms.link.extra_average": {
+     "outcome": "fact",
+     "fact": "storage.temperature.pack",
+     "unit": "unit.kelvin",
+     "value": "303.15"
+    }
+   },
+   "count_aware": true,
+   "count_valid": true
+  },
+  {
+   "name": "1808 average with the 1862 mean gates failing",
+   "table": "telemetry",
+   "family": "1808",
+   "payload": "0146023246140102",
+   "selection": {
+    "project": "QAAA",
+    "release": "0011",
+    "choice": "",
+    "group": "",
+    "slot": "",
+    "source": "02",
+    "bank": "ordinary",
+    "destination": "F4"
+   },
+   "expect": {
+    "growatt.bms.link.extra_average": {
+     "outcome": "fact",
+     "fact": "storage.temperature.pack",
+     "unit": "unit.kelvin",
+     "value": "303.15"
+    }
+   },
+   "count_aware": true,
+   "count_valid": true
+  },
+  {
+   "name": "1808 average with an invalid count binds nothing",
+   "table": "telemetry",
+   "family": "1808",
+   "payload": "0146023246140102",
+   "selection": {
+    "project": "QAAA",
+    "release": "0011",
+    "choice": "",
+    "group": "",
+    "slot": "",
+    "source": "02",
+    "bank": "ordinary",
+    "destination": "F4"
+   },
+   "expect": {
+    "growatt.bms.link.extra_average": {
+     "outcome": "none"
+    }
+   },
+   "count_aware": true,
+   "count_valid": false
+  },
+  {
+   "name": "1808 average off the count-aware path binds nothing",
+   "table": "telemetry",
+   "family": "1808",
+   "payload": "0146023246140102",
+   "selection": {
+    "project": "QAAA",
+    "release": "0011",
+    "choice": "",
+    "group": "",
+    "slot": "",
+    "source": "02",
+    "bank": "ordinary",
+    "destination": "F4"
+   },
+   "expect": {
+    "growatt.bms.link.extra_average": {
+     "outcome": "none"
+    }
+   },
+   "count_aware": false,
+   "count_valid": true
+  },
+  {
+   "name": "1808 average on the local profile binds nothing",
+   "table": "telemetry",
+   "family": "1808",
+   "payload": "0146023246140102",
+   "selection": {
+    "project": "QAAA",
+    "release": "0006",
+    "choice": "",
+    "group": "",
+    "slot": "",
+    "source": "02",
+    "bank": "ordinary",
+    "destination": "F4"
+   },
+   "expect": {
+    "growatt.bms.link.extra_average": {
+     "outcome": "none"
+    }
+   },
+   "count_aware": true,
+   "count_valid": true
+  }
+ ]
+}

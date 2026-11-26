@@ -1,0 +1,20 @@
+{
+  "source": "V1.08 contract page, Frame map 0x211 bytes 0-7 and section 0x211 dispatch; witnesses written by hand from the documented byte table",
+  "clock": [
+    {"name": "frequency enabled, clear off, mid-range clock", "args": {"frequency_enable": 1, "year": 26, "month": 11, "day": 27, "hour": 14, "minute": 30, "second": 45, "clear_fault_enable": 0}, "identifier": "0x211", "payload": "011a0b1b0e1e2d00"},
+    {"name": "frequency off, clear on", "args": {"frequency_enable": 0, "year": 26, "month": 11, "day": 27, "hour": 14, "minute": 30, "second": 45, "clear_fault_enable": 1}, "identifier": "0x211", "payload": "001a0b1b0e1e2d01"},
+    {"name": "lower domain bounds", "args": {"frequency_enable": 0, "year": 20, "month": 1, "day": 1, "hour": 0, "minute": 0, "second": 0, "clear_fault_enable": 0}, "identifier": "0x211", "payload": "0014010100000000"},
+    {"name": "upper domain bounds", "args": {"frequency_enable": 1, "year": 250, "month": 12, "day": 31, "hour": 23, "minute": 59, "second": 59, "clear_fault_enable": 1}, "identifier": "0x211", "payload": "01fa0c1f173b3b01"}
+  ],
+  "clock_refused": [
+    {"name": "year below 20", "args": {"year": 19, "month": 1, "day": 1, "hour": 0, "minute": 0, "second": 0}},
+    {"name": "year above 250", "args": {"year": 251, "month": 1, "day": 1, "hour": 0, "minute": 0, "second": 0}},
+    {"name": "month 0", "args": {"year": 26, "month": 0, "day": 1, "hour": 0, "minute": 0, "second": 0}},
+    {"name": "month 13", "args": {"year": 26, "month": 13, "day": 1, "hour": 0, "minute": 0, "second": 0}},
+    {"name": "day 0", "args": {"year": 26, "month": 1, "day": 0, "hour": 0, "minute": 0, "second": 0}},
+    {"name": "day 32", "args": {"year": 26, "month": 1, "day": 32, "hour": 0, "minute": 0, "second": 0}},
+    {"name": "hour 24", "args": {"year": 26, "month": 1, "day": 1, "hour": 24, "minute": 0, "second": 0}},
+    {"name": "minute 60", "args": {"year": 26, "month": 1, "day": 1, "hour": 0, "minute": 60, "second": 0}},
+    {"name": "second 60", "args": {"year": 26, "month": 1, "day": 1, "hour": 0, "minute": 0, "second": 60}}
+  ]
+}

@@ -473,6 +473,43 @@ func TestStandardRowsRetainSeparateNativeRecord(t *testing.T) {
 	}
 }
 
+// TestStandardRowsKeepRecordOfRejectedObservation pins that a rejected
+// observation, whether conflicted (unresolved publisher) or invalid (epoch
+// mismatch), keeps the separately supplied native record and emits no rows.
+func TestStandardRowsKeepRecordOfRejectedObservation(t *testing.T) {
+	base := caseNamed(t, "legacy-local-measured-313")
+	cases := map[string]struct {
+		mutate func(*canbusreg.PCSStandardPCSInput)
+		reason roweval.Reason
+	}{
+		"conflict": {func(in *canbusreg.PCSStandardPCSInput) { in.PublisherResolved = false }, "conflict"},
+		"invalid":  {func(in *canbusreg.PCSStandardPCSInput) { in.Epoch++ }, "invalid"},
+	}
+	for name, tc := range cases {
+		t.Run(name, func(t *testing.T) {
+			s, in, frame := build(t, base)
+			record := make([]byte, canbus.SocketCANRecordSize)
+			binary.NativeEndian.PutUint32(record[:4], frame.ID().Value())
+			record[4] = byte(len(frame.Data()))
+			copy(record[8:], frame.Data())
+			in.NativeRecord = record
+			in.Evidence.RawRecord = [canbus.SocketCANRecordSize]byte{}
+			tc.mutate(&in)
+			want := canbusreg.DecodePCSStandard(s, in)
+			res, reason, err := Evaluate(s, in)
+			if err != nil || reason != tc.reason || want.Status != string(tc.reason) {
+				t.Fatalf("reason %q err %v decoder status %q, want %q", reason, err, want.Status, tc.reason)
+			}
+			if !bytes.Equal(res.Diagnostics, record) || !bytes.Equal(res.Diagnostics, want.Diagnostics) {
+				t.Errorf("evaluator keeps %x, want the supplied record %x", res.Diagnostics, record)
+			}
+			if len(res.Rows) != 0 {
+				t.Errorf("rejected observation emitted %d rows", len(res.Rows))
+			}
+		})
+	}
+}
+
 func TestStandardRowsRefuseNeighbouringIdentifierWrongLengthAndExtendedFormat(t *testing.T) {
 	base := caseNamed(t, "legacy-local-measured-313")
 	s, in, _ := build(t, base)

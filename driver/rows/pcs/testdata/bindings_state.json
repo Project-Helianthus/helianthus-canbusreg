@@ -1,0 +1,1123 @@
+{
+ "description": "Synthetic binding vectors of the PCS read bindings. Every expectation is written by hand from the frame layout, the decoder scale and the registry unit: fact is the registry fact the binding gives (value in SI as an exact decimal), no_binding is a native value with no candidate, withheld is a value the native row withholds with its reason, and no_match is a row whose selection conditions do not hold.",
+ "cases": [
+  {
+   "name": "legacy-local-313",
+   "table": "standard",
+   "identifier": "0x313",
+   "payload": "14BEFFF6FFF65563",
+   "selection": {
+    "project": "QAAA",
+    "release": "0006",
+    "flavor": "pcs-standard",
+    "bank": "ordinary",
+    "scope": "local",
+    "endpoint": "coordinator",
+    "group": "0",
+    "slot": "1"
+   },
+   "expect": {
+    "growatt.bms.pcs.standard.313.soc": {
+     "outcome": "fact",
+     "fact": "storage.state.soc",
+     "unit": "unit.ratio",
+     "value": "0.85"
+    },
+    "growatt.bms.pcs.standard.313.soh": {
+     "outcome": "fact",
+     "fact": "storage.state.soh",
+     "unit": "unit.ratio",
+     "value": "0.99"
+    },
+    "growatt.bms.pcs.standard.313.current": {
+     "outcome": "fact",
+     "fact": "storage.pack.current",
+     "unit": "unit.ampere",
+     "value": "-1"
+    },
+    "growatt.bms.pcs.standard.313.legacy.voltage": {
+     "outcome": "fact",
+     "fact": "storage.pack.voltage",
+     "unit": "unit.volt",
+     "value": "53.1"
+    },
+    "growatt.bms.pcs.standard.313.legacy.temperature": {
+     "outcome": "no_binding",
+     "native": "-1"
+    },
+    "growatt.bms.pcs.standard.313.release11.voltage": {
+     "outcome": "no_match"
+    },
+    "growatt.bms.pcs.standard.313.release11.temperature": {
+     "outcome": "no_match"
+    }
+   },
+   "input": {
+    "measurement_valid": true,
+    "temperature_valid": true,
+    "count_valid": true,
+    "count": 2
+   }
+  },
+  {
+   "name": "legacy-local-313-group-and-slot-absent",
+   "table": "standard",
+   "identifier": "0x313",
+   "payload": "14BEFFF6FFF65563",
+   "selection": {
+    "project": "QAAA",
+    "release": "0006",
+    "flavor": "pcs-standard",
+    "bank": "ordinary",
+    "scope": "local",
+    "endpoint": "coordinator",
+    "group": "",
+    "slot": ""
+   },
+   "expect": {
+    "growatt.bms.pcs.standard.313.soc": {
+     "outcome": "fact",
+     "fact": "storage.state.soc",
+     "unit": "unit.ratio",
+     "value": "0.85"
+    },
+    "growatt.bms.pcs.standard.313.soh": {
+     "outcome": "fact",
+     "fact": "storage.state.soh",
+     "unit": "unit.ratio",
+     "value": "0.99"
+    },
+    "growatt.bms.pcs.standard.313.current": {
+     "outcome": "fact",
+     "fact": "storage.pack.current",
+     "unit": "unit.ampere",
+     "value": "-1"
+    },
+    "growatt.bms.pcs.standard.313.legacy.voltage": {
+     "outcome": "fact",
+     "fact": "storage.pack.voltage",
+     "unit": "unit.volt",
+     "value": "53.1"
+    },
+    "growatt.bms.pcs.standard.313.legacy.temperature": {
+     "outcome": "no_binding",
+     "native": "-1"
+    },
+    "growatt.bms.pcs.standard.313.release11.voltage": {
+     "outcome": "no_match"
+    },
+    "growatt.bms.pcs.standard.313.release11.temperature": {
+     "outcome": "no_match"
+    }
+   },
+   "input": {
+    "measurement_valid": true,
+    "temperature_valid": true,
+    "count_valid": true,
+    "count": 2
+   }
+  },
+  {
+   "name": "legacy-local-313-group-and-slot-at-boundary",
+   "table": "standard",
+   "identifier": "0x313",
+   "payload": "14BEFFF6FFF65563",
+   "selection": {
+    "project": "QAAA",
+    "release": "0006",
+    "flavor": "pcs-standard",
+    "bank": "ordinary",
+    "scope": "local",
+    "endpoint": "coordinator",
+    "group": "7",
+    "slot": "255"
+   },
+   "expect": {
+    "growatt.bms.pcs.standard.313.soc": {
+     "outcome": "fact",
+     "fact": "storage.state.soc",
+     "unit": "unit.ratio",
+     "value": "0.85"
+    },
+    "growatt.bms.pcs.standard.313.soh": {
+     "outcome": "fact",
+     "fact": "storage.state.soh",
+     "unit": "unit.ratio",
+     "value": "0.99"
+    },
+    "growatt.bms.pcs.standard.313.current": {
+     "outcome": "fact",
+     "fact": "storage.pack.current",
+     "unit": "unit.ampere",
+     "value": "-1"
+    },
+    "growatt.bms.pcs.standard.313.legacy.voltage": {
+     "outcome": "fact",
+     "fact": "storage.pack.voltage",
+     "unit": "unit.volt",
+     "value": "53.1"
+    },
+    "growatt.bms.pcs.standard.313.legacy.temperature": {
+     "outcome": "no_binding",
+     "native": "-1"
+    },
+    "growatt.bms.pcs.standard.313.release11.voltage": {
+     "outcome": "no_match"
+    },
+    "growatt.bms.pcs.standard.313.release11.temperature": {
+     "outcome": "no_match"
+    }
+   },
+   "input": {
+    "measurement_valid": true,
+    "temperature_valid": true,
+    "count_valid": true,
+    "count": 2
+   }
+  },
+  {
+   "name": "legacy-313-count-unresolved-keeps-minimum-native",
+   "table": "standard",
+   "identifier": "0x313",
+   "payload": "14BEFFF6FFF65563",
+   "selection": {
+    "project": "QAAA",
+    "release": "0006",
+    "flavor": "pcs-standard",
+    "bank": "ordinary",
+    "scope": "local",
+    "endpoint": "coordinator",
+    "group": "0",
+    "slot": "1"
+   },
+   "expect": {
+    "growatt.bms.pcs.standard.313.soc": {
+     "outcome": "fact",
+     "fact": "storage.state.soc",
+     "unit": "unit.ratio",
+     "value": "0.85"
+    },
+    "growatt.bms.pcs.standard.313.soh": {
+     "outcome": "fact",
+     "fact": "storage.state.soh",
+     "unit": "unit.ratio",
+     "value": "0.99"
+    },
+    "growatt.bms.pcs.standard.313.current": {
+     "outcome": "fact",
+     "fact": "storage.pack.current",
+     "unit": "unit.ampere",
+     "value": "-1"
+    },
+    "growatt.bms.pcs.standard.313.legacy.voltage": {
+     "outcome": "fact",
+     "fact": "storage.pack.voltage",
+     "unit": "unit.volt",
+     "value": "53.1"
+    },
+    "growatt.bms.pcs.standard.313.legacy.temperature": {
+     "outcome": "no_binding",
+     "native": "-1"
+    },
+    "growatt.bms.pcs.standard.313.release11.voltage": {
+     "outcome": "no_match"
+    },
+    "growatt.bms.pcs.standard.313.release11.temperature": {
+     "outcome": "no_match"
+    }
+   },
+   "input": {
+    "measurement_valid": true,
+    "temperature_valid": true,
+    "count_valid": false,
+    "count": 0
+   }
+  },
+  {
+   "name": "release11-local-313-average-25C",
+   "table": "standard",
+   "identifier": "0x313",
+   "payload": "14BEFFF600FA5563",
+   "selection": {
+    "project": "QAAA",
+    "release": "0011",
+    "flavor": "pcs-standard",
+    "bank": "ordinary",
+    "scope": "local",
+    "endpoint": "coordinator",
+    "group": "0",
+    "slot": "1"
+   },
+   "expect": {
+    "growatt.bms.pcs.standard.313.soc": {
+     "outcome": "fact",
+     "fact": "storage.state.soc",
+     "unit": "unit.ratio",
+     "value": "0.85"
+    },
+    "growatt.bms.pcs.standard.313.soh": {
+     "outcome": "fact",
+     "fact": "storage.state.soh",
+     "unit": "unit.ratio",
+     "value": "0.99"
+    },
+    "growatt.bms.pcs.standard.313.current": {
+     "outcome": "fact",
+     "fact": "storage.pack.current",
+     "unit": "unit.ampere",
+     "value": "-1"
+    },
+    "growatt.bms.pcs.standard.313.release11.voltage": {
+     "outcome": "no_binding",
+     "native": "53.1"
+    },
+    "growatt.bms.pcs.standard.313.release11.temperature": {
+     "outcome": "fact",
+     "fact": "storage.temperature.pack",
+     "unit": "unit.kelvin",
+     "value": "298.15"
+    },
+    "growatt.bms.pcs.standard.313.legacy.voltage": {
+     "outcome": "no_match"
+    },
+    "growatt.bms.pcs.standard.313.legacy.temperature": {
+     "outcome": "no_match"
+    }
+   },
+   "input": {
+    "measurement_valid": true,
+    "temperature_valid": true,
+    "count_valid": true,
+    "count": 2
+   }
+  },
+  {
+   "name": "release11-local-313-negative-average",
+   "table": "standard",
+   "identifier": "0x313",
+   "payload": "14BEFFF6FF9C5563",
+   "selection": {
+    "project": "QAAA",
+    "release": "0011",
+    "flavor": "pcs-standard",
+    "bank": "ordinary",
+    "scope": "local",
+    "endpoint": "coordinator",
+    "group": "0",
+    "slot": "1"
+   },
+   "expect": {
+    "growatt.bms.pcs.standard.313.soc": {
+     "outcome": "fact",
+     "fact": "storage.state.soc",
+     "unit": "unit.ratio",
+     "value": "0.85"
+    },
+    "growatt.bms.pcs.standard.313.soh": {
+     "outcome": "fact",
+     "fact": "storage.state.soh",
+     "unit": "unit.ratio",
+     "value": "0.99"
+    },
+    "growatt.bms.pcs.standard.313.current": {
+     "outcome": "fact",
+     "fact": "storage.pack.current",
+     "unit": "unit.ampere",
+     "value": "-1"
+    },
+    "growatt.bms.pcs.standard.313.release11.voltage": {
+     "outcome": "no_binding",
+     "native": "53.1"
+    },
+    "growatt.bms.pcs.standard.313.release11.temperature": {
+     "outcome": "fact",
+     "fact": "storage.temperature.pack",
+     "unit": "unit.kelvin",
+     "value": "263.15"
+    },
+    "growatt.bms.pcs.standard.313.legacy.voltage": {
+     "outcome": "no_match"
+    },
+    "growatt.bms.pcs.standard.313.legacy.temperature": {
+     "outcome": "no_match"
+    }
+   },
+   "input": {
+    "measurement_valid": true,
+    "temperature_valid": true,
+    "count_valid": true,
+    "count": 2
+   }
+  },
+  {
+   "name": "release11-local-313-count-one",
+   "table": "standard",
+   "identifier": "0x313",
+   "payload": "14BEFFF600FA5563",
+   "selection": {
+    "project": "QAAA",
+    "release": "0011",
+    "flavor": "pcs-standard",
+    "bank": "ordinary",
+    "scope": "local",
+    "endpoint": "coordinator",
+    "group": "0",
+    "slot": "1"
+   },
+   "expect": {
+    "growatt.bms.pcs.standard.313.soc": {
+     "outcome": "fact",
+     "fact": "storage.state.soc",
+     "unit": "unit.ratio",
+     "value": "0.85"
+    },
+    "growatt.bms.pcs.standard.313.soh": {
+     "outcome": "fact",
+     "fact": "storage.state.soh",
+     "unit": "unit.ratio",
+     "value": "0.99"
+    },
+    "growatt.bms.pcs.standard.313.current": {
+     "outcome": "fact",
+     "fact": "storage.pack.current",
+     "unit": "unit.ampere",
+     "value": "-1"
+    },
+    "growatt.bms.pcs.standard.313.release11.voltage": {
+     "outcome": "no_binding",
+     "native": "53.1"
+    },
+    "growatt.bms.pcs.standard.313.release11.temperature": {
+     "outcome": "fact",
+     "fact": "storage.temperature.pack",
+     "unit": "unit.kelvin",
+     "value": "298.15"
+    },
+    "growatt.bms.pcs.standard.313.legacy.voltage": {
+     "outcome": "no_match"
+    },
+    "growatt.bms.pcs.standard.313.legacy.temperature": {
+     "outcome": "no_match"
+    }
+   },
+   "input": {
+    "measurement_valid": true,
+    "temperature_valid": true,
+    "count_valid": true,
+    "count": 1
+   }
+  },
+  {
+   "name": "release11-local-313-count-zero",
+   "table": "standard",
+   "identifier": "0x313",
+   "payload": "14BEFFF600FA5563",
+   "selection": {
+    "project": "QAAA",
+    "release": "0011",
+    "flavor": "pcs-standard",
+    "bank": "ordinary",
+    "scope": "local",
+    "endpoint": "coordinator",
+    "group": "0",
+    "slot": "1"
+   },
+   "expect": {
+    "growatt.bms.pcs.standard.313.soc": {
+     "outcome": "fact",
+     "fact": "storage.state.soc",
+     "unit": "unit.ratio",
+     "value": "0.85"
+    },
+    "growatt.bms.pcs.standard.313.soh": {
+     "outcome": "fact",
+     "fact": "storage.state.soh",
+     "unit": "unit.ratio",
+     "value": "0.99"
+    },
+    "growatt.bms.pcs.standard.313.current": {
+     "outcome": "fact",
+     "fact": "storage.pack.current",
+     "unit": "unit.ampere",
+     "value": "-1"
+    },
+    "growatt.bms.pcs.standard.313.release11.voltage": {
+     "outcome": "no_binding",
+     "native": "53.1"
+    },
+    "growatt.bms.pcs.standard.313.release11.temperature": {
+     "outcome": "withheld",
+     "reason": "gate_withheld"
+    },
+    "growatt.bms.pcs.standard.313.legacy.voltage": {
+     "outcome": "no_match"
+    },
+    "growatt.bms.pcs.standard.313.legacy.temperature": {
+     "outcome": "no_match"
+    }
+   },
+   "input": {
+    "measurement_valid": true,
+    "temperature_valid": true,
+    "count_valid": true,
+    "count": 0
+   }
+  },
+  {
+   "name": "release11-local-313-count-invalid",
+   "table": "standard",
+   "identifier": "0x313",
+   "payload": "14BEFFF600FA5563",
+   "selection": {
+    "project": "QAAA",
+    "release": "0011",
+    "flavor": "pcs-standard",
+    "bank": "ordinary",
+    "scope": "local",
+    "endpoint": "coordinator",
+    "group": "0",
+    "slot": "1"
+   },
+   "expect": {
+    "growatt.bms.pcs.standard.313.soc": {
+     "outcome": "fact",
+     "fact": "storage.state.soc",
+     "unit": "unit.ratio",
+     "value": "0.85"
+    },
+    "growatt.bms.pcs.standard.313.soh": {
+     "outcome": "fact",
+     "fact": "storage.state.soh",
+     "unit": "unit.ratio",
+     "value": "0.99"
+    },
+    "growatt.bms.pcs.standard.313.current": {
+     "outcome": "fact",
+     "fact": "storage.pack.current",
+     "unit": "unit.ampere",
+     "value": "-1"
+    },
+    "growatt.bms.pcs.standard.313.release11.voltage": {
+     "outcome": "no_binding",
+     "native": "53.1"
+    },
+    "growatt.bms.pcs.standard.313.release11.temperature": {
+     "outcome": "withheld",
+     "reason": "gate_withheld"
+    },
+    "growatt.bms.pcs.standard.313.legacy.voltage": {
+     "outcome": "no_match"
+    },
+    "growatt.bms.pcs.standard.313.legacy.temperature": {
+     "outcome": "no_match"
+    }
+   },
+   "input": {
+    "measurement_valid": true,
+    "temperature_valid": true,
+    "count_valid": false,
+    "count": 5
+   }
+  },
+  {
+   "name": "release11-local-313-temperature-invalid",
+   "table": "standard",
+   "identifier": "0x313",
+   "payload": "14BEFFF600FA5563",
+   "selection": {
+    "project": "QAAA",
+    "release": "0011",
+    "flavor": "pcs-standard",
+    "bank": "ordinary",
+    "scope": "local",
+    "endpoint": "coordinator",
+    "group": "0",
+    "slot": "1"
+   },
+   "expect": {
+    "growatt.bms.pcs.standard.313.soc": {
+     "outcome": "fact",
+     "fact": "storage.state.soc",
+     "unit": "unit.ratio",
+     "value": "0.85"
+    },
+    "growatt.bms.pcs.standard.313.soh": {
+     "outcome": "fact",
+     "fact": "storage.state.soh",
+     "unit": "unit.ratio",
+     "value": "0.99"
+    },
+    "growatt.bms.pcs.standard.313.current": {
+     "outcome": "fact",
+     "fact": "storage.pack.current",
+     "unit": "unit.ampere",
+     "value": "-1"
+    },
+    "growatt.bms.pcs.standard.313.release11.voltage": {
+     "outcome": "no_binding",
+     "native": "53.1"
+    },
+    "growatt.bms.pcs.standard.313.release11.temperature": {
+     "outcome": "withheld",
+     "reason": "gate_withheld"
+    },
+    "growatt.bms.pcs.standard.313.legacy.voltage": {
+     "outcome": "no_match"
+    },
+    "growatt.bms.pcs.standard.313.legacy.temperature": {
+     "outcome": "no_match"
+    }
+   },
+   "input": {
+    "measurement_valid": true,
+    "temperature_valid": false,
+    "count_valid": true,
+    "count": 2
+   }
+  },
+  {
+   "name": "release11-local-313-measurement-invalid",
+   "table": "standard",
+   "identifier": "0x313",
+   "payload": "14BEFFF600FA5563",
+   "selection": {
+    "project": "QAAA",
+    "release": "0011",
+    "flavor": "pcs-standard",
+    "bank": "ordinary",
+    "scope": "local",
+    "endpoint": "coordinator",
+    "group": "0",
+    "slot": "1"
+   },
+   "expect": {
+    "growatt.bms.pcs.standard.313.soc": {
+     "outcome": "withheld",
+     "reason": "gate_withheld"
+    },
+    "growatt.bms.pcs.standard.313.soh": {
+     "outcome": "withheld",
+     "reason": "gate_withheld"
+    },
+    "growatt.bms.pcs.standard.313.current": {
+     "outcome": "withheld",
+     "reason": "gate_withheld"
+    },
+    "growatt.bms.pcs.standard.313.release11.voltage": {
+     "outcome": "withheld",
+     "reason": "gate_withheld"
+    },
+    "growatt.bms.pcs.standard.313.release11.temperature": {
+     "outcome": "withheld",
+     "reason": "gate_withheld"
+    }
+   },
+   "input": {
+    "measurement_valid": false,
+    "temperature_valid": true,
+    "count_valid": true,
+    "count": 2
+   }
+  },
+  {
+   "name": "legacy-local-313-percent-zero",
+   "table": "standard",
+   "identifier": "0x313",
+   "payload": "14BEFFF6FFF60000",
+   "selection": {
+    "project": "QAAA",
+    "release": "0006",
+    "flavor": "pcs-standard",
+    "bank": "ordinary",
+    "scope": "local",
+    "endpoint": "coordinator",
+    "group": "0",
+    "slot": "1"
+   },
+   "expect": {
+    "growatt.bms.pcs.standard.313.soc": {
+     "outcome": "fact",
+     "fact": "storage.state.soc",
+     "unit": "unit.ratio",
+     "value": "0"
+    },
+    "growatt.bms.pcs.standard.313.soh": {
+     "outcome": "fact",
+     "fact": "storage.state.soh",
+     "unit": "unit.ratio",
+     "value": "0"
+    },
+    "growatt.bms.pcs.standard.313.current": {
+     "outcome": "fact",
+     "fact": "storage.pack.current",
+     "unit": "unit.ampere",
+     "value": "-1"
+    },
+    "growatt.bms.pcs.standard.313.legacy.voltage": {
+     "outcome": "fact",
+     "fact": "storage.pack.voltage",
+     "unit": "unit.volt",
+     "value": "53.1"
+    },
+    "growatt.bms.pcs.standard.313.legacy.temperature": {
+     "outcome": "no_binding",
+     "native": "-1"
+    },
+    "growatt.bms.pcs.standard.313.release11.voltage": {
+     "outcome": "no_match"
+    },
+    "growatt.bms.pcs.standard.313.release11.temperature": {
+     "outcome": "no_match"
+    }
+   },
+   "input": {
+    "measurement_valid": true,
+    "temperature_valid": true,
+    "count_valid": true,
+    "count": 2
+   }
+  },
+  {
+   "name": "legacy-local-313-percent-hundred",
+   "table": "standard",
+   "identifier": "0x313",
+   "payload": "14BEFFF6FFF66464",
+   "selection": {
+    "project": "QAAA",
+    "release": "0006",
+    "flavor": "pcs-standard",
+    "bank": "ordinary",
+    "scope": "local",
+    "endpoint": "coordinator",
+    "group": "0",
+    "slot": "1"
+   },
+   "expect": {
+    "growatt.bms.pcs.standard.313.soc": {
+     "outcome": "fact",
+     "fact": "storage.state.soc",
+     "unit": "unit.ratio",
+     "value": "1"
+    },
+    "growatt.bms.pcs.standard.313.soh": {
+     "outcome": "fact",
+     "fact": "storage.state.soh",
+     "unit": "unit.ratio",
+     "value": "1"
+    },
+    "growatt.bms.pcs.standard.313.current": {
+     "outcome": "fact",
+     "fact": "storage.pack.current",
+     "unit": "unit.ampere",
+     "value": "-1"
+    },
+    "growatt.bms.pcs.standard.313.legacy.voltage": {
+     "outcome": "fact",
+     "fact": "storage.pack.voltage",
+     "unit": "unit.volt",
+     "value": "53.1"
+    },
+    "growatt.bms.pcs.standard.313.legacy.temperature": {
+     "outcome": "no_binding",
+     "native": "-1"
+    },
+    "growatt.bms.pcs.standard.313.release11.voltage": {
+     "outcome": "no_match"
+    },
+    "growatt.bms.pcs.standard.313.release11.temperature": {
+     "outcome": "no_match"
+    }
+   },
+   "input": {
+    "measurement_valid": true,
+    "temperature_valid": true,
+    "count_valid": true,
+    "count": 2
+   }
+  },
+  {
+   "name": "legacy-local-313-percent-above-hundred",
+   "table": "standard",
+   "identifier": "0x313",
+   "payload": "14BEFFF6FFF66565",
+   "selection": {
+    "project": "QAAA",
+    "release": "0006",
+    "flavor": "pcs-standard",
+    "bank": "ordinary",
+    "scope": "local",
+    "endpoint": "coordinator",
+    "group": "0",
+    "slot": "1"
+   },
+   "expect": {
+    "growatt.bms.pcs.standard.313.soc": {
+     "outcome": "withheld",
+     "reason": "outside_domain"
+    },
+    "growatt.bms.pcs.standard.313.soh": {
+     "outcome": "withheld",
+     "reason": "outside_domain"
+    },
+    "growatt.bms.pcs.standard.313.current": {
+     "outcome": "fact",
+     "fact": "storage.pack.current",
+     "unit": "unit.ampere",
+     "value": "-1"
+    },
+    "growatt.bms.pcs.standard.313.legacy.voltage": {
+     "outcome": "fact",
+     "fact": "storage.pack.voltage",
+     "unit": "unit.volt",
+     "value": "53.1"
+    },
+    "growatt.bms.pcs.standard.313.legacy.temperature": {
+     "outcome": "no_binding",
+     "native": "-1"
+    },
+    "growatt.bms.pcs.standard.313.release11.voltage": {
+     "outcome": "no_match"
+    },
+    "growatt.bms.pcs.standard.313.release11.temperature": {
+     "outcome": "no_match"
+    }
+   },
+   "input": {
+    "measurement_valid": true,
+    "temperature_valid": true,
+    "count_valid": true,
+    "count": 2
+   }
+  },
+  {
+   "name": "legacy-local-313-positive-current",
+   "table": "standard",
+   "identifier": "0x313",
+   "payload": "14BE00FAFFF65563",
+   "selection": {
+    "project": "QAAA",
+    "release": "0006",
+    "flavor": "pcs-standard",
+    "bank": "ordinary",
+    "scope": "local",
+    "endpoint": "coordinator",
+    "group": "0",
+    "slot": "1"
+   },
+   "expect": {
+    "growatt.bms.pcs.standard.313.soc": {
+     "outcome": "fact",
+     "fact": "storage.state.soc",
+     "unit": "unit.ratio",
+     "value": "0.85"
+    },
+    "growatt.bms.pcs.standard.313.soh": {
+     "outcome": "fact",
+     "fact": "storage.state.soh",
+     "unit": "unit.ratio",
+     "value": "0.99"
+    },
+    "growatt.bms.pcs.standard.313.current": {
+     "outcome": "fact",
+     "fact": "storage.pack.current",
+     "unit": "unit.ampere",
+     "value": "25"
+    },
+    "growatt.bms.pcs.standard.313.legacy.voltage": {
+     "outcome": "fact",
+     "fact": "storage.pack.voltage",
+     "unit": "unit.volt",
+     "value": "53.1"
+    },
+    "growatt.bms.pcs.standard.313.legacy.temperature": {
+     "outcome": "no_binding",
+     "native": "-1"
+    },
+    "growatt.bms.pcs.standard.313.release11.voltage": {
+     "outcome": "no_match"
+    },
+    "growatt.bms.pcs.standard.313.release11.temperature": {
+     "outcome": "no_match"
+    }
+   },
+   "input": {
+    "measurement_valid": true,
+    "temperature_valid": true,
+    "count_valid": true,
+    "count": 2
+   }
+  },
+  {
+   "name": "legacy-local-311-limit-words",
+   "table": "standard",
+   "identifier": "0x311",
+   "payload": "023800FA01F40043",
+   "selection": {
+    "project": "QAAA",
+    "release": "0006",
+    "flavor": "pcs-standard",
+    "bank": "ordinary",
+    "scope": "local",
+    "endpoint": "coordinator",
+    "group": "0",
+    "slot": "1"
+   },
+   "expect": {
+    "growatt.bms.pcs.standard.311.voltage_limit": {
+     "outcome": "no_binding",
+     "native": "56.8"
+    },
+    "growatt.bms.pcs.standard.311.direct.charge_limit": {
+     "outcome": "no_binding",
+     "native": "250"
+    },
+    "growatt.bms.pcs.standard.311.direct.discharge_limit": {
+     "outcome": "no_binding",
+     "native": "500"
+    },
+    "growatt.bms.pcs.standard.311.gateway.charge_limit": {
+     "outcome": "no_match"
+    },
+    "growatt.bms.pcs.standard.311.gateway.discharge_limit": {
+     "outcome": "no_match"
+    }
+   },
+   "input": {
+    "measurement_valid": true,
+    "temperature_valid": true,
+    "count_valid": true,
+    "count": 2
+   }
+  },
+  {
+   "name": "extended-1902-local-pack-and-port",
+   "table": "extended",
+   "identifier": "0x1902F202",
+   "payload": "341210277856F401",
+   "selection": {
+    "project": "QAAA",
+    "release": "0006",
+    "flavor": "pcs-extended19",
+    "bank": "ordinary",
+    "scope": "local",
+    "endpoint": "participant",
+    "group": "2",
+    "slot": "2",
+    "destination": 242,
+    "source": 2
+   },
+   "expect": {
+    "growatt.bms.pcs.extended19.1902.pack_voltage": {
+     "outcome": "fact",
+     "fact": "storage.pack.voltage",
+     "unit": "unit.volt",
+     "value": "466"
+    },
+    "growatt.bms.pcs.extended19.1902.current": {
+     "outcome": "fact",
+     "fact": "storage.pack.current",
+     "unit": "unit.ampere",
+     "value": "0"
+    },
+    "growatt.bms.pcs.extended19.1902.soc": {
+     "outcome": "fact",
+     "fact": "storage.state.soc",
+     "unit": "unit.ratio",
+     "value": "0.5"
+    },
+    "growatt.bms.pcs.extended19.1902.port_voltage": {
+     "outcome": "no_binding",
+     "native": "2213.6"
+    }
+   }
+  },
+  {
+   "name": "extended-1902-local-group-and-slot-absent",
+   "table": "extended",
+   "identifier": "0x1902F202",
+   "payload": "341210277856F401",
+   "selection": {
+    "project": "QAAA",
+    "release": "0006",
+    "flavor": "pcs-extended19",
+    "bank": "ordinary",
+    "scope": "local",
+    "endpoint": "participant",
+    "group": "",
+    "slot": "",
+    "destination": 242,
+    "source": 2
+   },
+   "expect": {
+    "growatt.bms.pcs.extended19.1902.pack_voltage": {
+     "outcome": "fact",
+     "fact": "storage.pack.voltage",
+     "unit": "unit.volt",
+     "value": "466"
+    },
+    "growatt.bms.pcs.extended19.1902.current": {
+     "outcome": "fact",
+     "fact": "storage.pack.current",
+     "unit": "unit.ampere",
+     "value": "0"
+    },
+    "growatt.bms.pcs.extended19.1902.soc": {
+     "outcome": "fact",
+     "fact": "storage.state.soc",
+     "unit": "unit.ratio",
+     "value": "0.5"
+    },
+    "growatt.bms.pcs.extended19.1902.port_voltage": {
+     "outcome": "no_binding",
+     "native": "2213.6"
+    }
+   }
+  },
+  {
+   "name": "extended-1902-other-release-is-withheld",
+   "table": "extended",
+   "identifier": "0x1902F202",
+   "payload": "341210277856F401",
+   "selection": {
+    "project": "QAAA",
+    "release": "0011",
+    "flavor": "pcs-extended19",
+    "bank": "ordinary",
+    "scope": "local",
+    "endpoint": "participant",
+    "group": "2",
+    "slot": "2",
+    "destination": 242,
+    "source": 2
+   },
+   "expect": {
+    "growatt.bms.pcs.extended19.1902.pack_voltage": {
+     "outcome": "withheld",
+     "reason": "gate_withheld"
+    },
+    "growatt.bms.pcs.extended19.1902.current": {
+     "outcome": "withheld",
+     "reason": "gate_withheld"
+    },
+    "growatt.bms.pcs.extended19.1902.soc": {
+     "outcome": "withheld",
+     "reason": "gate_withheld"
+    },
+    "growatt.bms.pcs.extended19.1902.port_voltage": {
+     "outcome": "withheld",
+     "reason": "gate_withheld"
+    }
+   }
+  },
+  {
+   "name": "extended-1902-current-offset",
+   "table": "extended",
+   "identifier": "0x1902F202",
+   "payload": "341200007856E803",
+   "selection": {
+    "project": "QAAA",
+    "release": "0006",
+    "flavor": "pcs-extended19",
+    "bank": "ordinary",
+    "scope": "local",
+    "endpoint": "participant",
+    "group": "2",
+    "slot": "2",
+    "destination": 242,
+    "source": 2
+   },
+   "expect": {
+    "growatt.bms.pcs.extended19.1902.pack_voltage": {
+     "outcome": "fact",
+     "fact": "storage.pack.voltage",
+     "unit": "unit.volt",
+     "value": "466"
+    },
+    "growatt.bms.pcs.extended19.1902.current": {
+     "outcome": "fact",
+     "fact": "storage.pack.current",
+     "unit": "unit.ampere",
+     "value": "-1000"
+    },
+    "growatt.bms.pcs.extended19.1902.soc": {
+     "outcome": "fact",
+     "fact": "storage.state.soc",
+     "unit": "unit.ratio",
+     "value": "1"
+    },
+    "growatt.bms.pcs.extended19.1902.port_voltage": {
+     "outcome": "no_binding",
+     "native": "2213.6"
+    }
+   }
+  },
+  {
+   "name": "parallel-610-local",
+   "table": "parallel",
+   "identifier": "0x611",
+   "payload": "F4811C25E0015703",
+   "selection": {
+    "project": "QAAA",
+    "release": "0011",
+    "flavor": "pcs-parallel",
+    "bank": "parallel",
+    "scope": "local",
+    "endpoint": "coordinator",
+    "group": "1",
+    "slot": ""
+   },
+   "expect": {
+    "growatt.bms.pcs.parallel.610.current": {
+     "outcome": "fact",
+     "fact": "storage.pack.current",
+     "unit": "unit.ampere",
+     "value": "-50"
+    },
+    "growatt.bms.pcs.parallel.610.soc": {
+     "outcome": "fact",
+     "fact": "storage.state.soc",
+     "unit": "unit.ratio",
+     "value": "0.855"
+    },
+    "growatt.bms.pcs.parallel.610.voltage": {
+     "outcome": "no_binding",
+     "native": "50"
+    },
+    "growatt.bms.pcs.parallel.610.local.port": {
+     "outcome": "no_binding",
+     "native": "48"
+    }
+   }
+  },
+  {
+   "name": "parallel-610-group-and-slot-present",
+   "table": "parallel",
+   "identifier": "0x611",
+   "payload": "F4811C25E0015703",
+   "selection": {
+    "project": "QAAA",
+    "release": "0011",
+    "flavor": "pcs-parallel",
+    "bank": "parallel",
+    "scope": "local",
+    "endpoint": "coordinator",
+    "group": "3",
+    "slot": "4"
+   },
+   "expect": {
+    "growatt.bms.pcs.parallel.610.current": {
+     "outcome": "fact",
+     "fact": "storage.pack.current",
+     "unit": "unit.ampere",
+     "value": "-50"
+    },
+    "growatt.bms.pcs.parallel.610.soc": {
+     "outcome": "fact",
+     "fact": "storage.state.soc",
+     "unit": "unit.ratio",
+     "value": "0.855"
+    }
+   }
+  }
+ ]
+}

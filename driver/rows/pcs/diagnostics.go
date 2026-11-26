@@ -35,7 +35,18 @@ const (
 // roweval.ReasonNoMatch.
 type DiagnosticResult struct {
 	Evidence canbusreg.Evidence
-	Rows     map[string]roweval.Evaluation
+	// Attribution is the bank, group and slot the observation was decoded under.
+	Attribution Attribution
+	// Diagnostics retains the native record the decoder was given, even when the
+	// decoder refuses the observation. It is raw evidence, not a condition.
+	Diagnostics []byte
+	Rows        map[string]roweval.Evaluation
+}
+
+// attributionOf reads the selection context the observation was decoded under;
+// an empty group or slot is absent, never zero.
+func diagAttribution(i canbusreg.LINKInput) Attribution {
+	return Attribution{Scope: i.Scope, Bank: i.Bank, Group: i.Group, Slot: i.Slot, HasGroup: i.Group != "", HasSlot: i.Slot != ""}
 }
 
 // diagSpec is one native row with the key the decoder emits it under and the
@@ -128,12 +139,13 @@ func diagSummarySpecs(frame uint32) []diagSpec {
 // selection and decoder input it was received with. A frame or input the decoder
 // refuses gives the decoder's status and no rows.
 func EvaluateSummaryBits(s canbusreg.Selection, in canbusreg.PCSSummaryPCSInput) (DiagnosticResult, roweval.Reason, error) {
-	res := DiagnosticResult{Evidence: in.Evidence, Rows: make(map[string]roweval.Evaluation)}
+	res := DiagnosticResult{Evidence: in.Evidence, Attribution: diagAttribution(in.LINKInput), Rows: make(map[string]roweval.Evaluation)}
 	frame := in.Evidence.Frame
+	decoded := canbusreg.DecodePCSSummaries(s, in)
+	res.Diagnostics = decoded.Diagnostics
 	if !diagSummaryFrame(frame) {
 		return res, roweval.ReasonNoMatch, nil
 	}
-	decoded := canbusreg.DecodePCSSummaries(s, in)
 	if len(decoded.Bits) == 0 {
 		return res, roweval.Reason(decoded.Status), nil
 	}
@@ -182,6 +194,8 @@ func diagEvaluate(spec diagSpec, frame canbus.Frame, q roweval.Qualifiers) (rowe
 type diagDTCFamily struct {
 	token, path, flavor, bank string
 	order                     string
+	// specRef is the family the frame is admitted from, as the row declares it.
+	specRef string
 }
 
 // diagDTCFamilyOf admits the 0x333 frame, the 0x520 to 0x52F frames and the
@@ -195,14 +209,14 @@ func diagDTCFamilyOf(f canbus.Frame) (diagDTCFamily, bool) {
 	if !f.ID().Extended() {
 		switch {
 		case id == 0x333:
-			return diagDTCFamily{token: "333", path: "pcs.standard", flavor: "pcs-standard", bank: "ordinary", order: bigEndian}, true
+			return diagDTCFamily{token: "333", path: "pcs.standard", flavor: "pcs-standard", bank: "ordinary", order: bigEndian, specRef: "CAN 0x333"}, true
 		case id >= 0x520 && id <= 0x52F:
-			return diagDTCFamily{token: "52X", path: "pcs.parallel", flavor: "pcs-parallel", bank: "parallel", order: bigEndian}, true
+			return diagDTCFamily{token: "52X", path: "pcs.parallel", flavor: "pcs-parallel", bank: "parallel", order: bigEndian, specRef: "CAN 0x520-0x52F"}, true
 		}
 		return diagDTCFamily{}, false
 	}
 	if id>>16 == 0x1853 {
-		return diagDTCFamily{token: "1853", path: "link", flavor: "link", order: littleEndian}, true
+		return diagDTCFamily{token: "1853", path: "link", flavor: "link", order: littleEndian, specRef: "CAN 0x1853xxxx extended"}, true
 	}
 	return diagDTCFamily{}, false
 }
@@ -253,8 +267,9 @@ func diagIndexHook(member canbusreg.Selection) roweval.RowHook {
 
 // diagDTCSpecs returns the selected_word and numeric_index rows of one family at
 // one caller-located word offset. The offset is part of the row identifier,
-// because the decoder takes the offset from its caller.
-func diagDTCSpecs(fam diagDTCFamily, member canbusreg.Selection, offset int) []diagSpec {
+// because the decoder takes the offset from its caller. The row declares the
+// identifier and format of the admitted frame, not a fixed one.
+func diagDTCSpecs(fam diagDTCFamily, member canbusreg.Selection, offset int, frame canbus.Frame) []diagSpec {
 	var specs []diagSpec
 	for _, key := range []string{dtcSelectedWord, dtcNumericIndex} {
 		id := fmt.Sprintf("growatt.bms.%s.%s.offset%d.%s", fam.path, fam.token, offset, key)
@@ -264,8 +279,8 @@ func diagDTCSpecs(fam diagDTCFamily, member canbusreg.Selection, offset int) []d
 		}
 		row := roweval.NativeRow[Selector]{
 			ID:      id,
-			SpecRef: fmt.Sprintf("CAN %#x", 0x333),
-			At:      Selector{Identifier: 0x333, DLC: 8, RawDLC: 8, Slice: signalSlice{offset: uint16(8 * offset), width: 16, order: fam.order}},
+			SpecRef: fam.specRef,
+			At:      Selector{Identifier: frame.ID().Value(), Extended: frame.ID().Extended(), DLC: 8, RawDLC: 8, Slice: signalSlice{offset: uint16(8 * offset), width: 16, order: fam.order}},
 			When:    roweval.When{Equal: when},
 			Wire:    roweval.Layout{BitOffset: uint16(8 * offset), Width: 16, Codec: "unsigned", ByteOrder: fam.order, BitOrder: "lsb0", WordOrder: "single"},
 		}
@@ -284,7 +299,7 @@ func diagDTCSpecs(fam diagDTCFamily, member canbusreg.Selection, offset int) []d
 // diagnostic word at the caller's offset. A frame, member or offset the decoder
 // refuses gives the decoder's status and no rows.
 func EvaluateDTC(member canbusreg.Selection, in canbusreg.LINKInput, offset int) (DiagnosticResult, roweval.Reason, error) {
-	res := DiagnosticResult{Evidence: in.Evidence, Rows: make(map[string]roweval.Evaluation)}
+	res := DiagnosticResult{Evidence: in.Evidence, Attribution: diagAttribution(in), Rows: make(map[string]roweval.Evaluation)}
 	frame := in.Evidence.Frame
 	fam, ok := diagDTCFamilyOf(frame)
 	if !ok {
@@ -303,7 +318,7 @@ func EvaluateDTC(member canbusreg.Selection, in canbusreg.LINKInput, offset int)
 	for key, f := range decoded.Fields {
 		q.Values[qDiagStatus+key] = f.Status
 	}
-	for _, spec := range diagDTCSpecs(fam, member, offset) {
+	for _, spec := range diagDTCSpecs(fam, member, offset, frame) {
 		ev, err := diagEvaluate(spec, frame, q)
 		if err != nil {
 			return res, "", err

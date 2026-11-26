@@ -430,3 +430,80 @@ func TestDiagnosticBankPairing(t *testing.T) {
 		}
 	}
 }
+
+// TestDiagnosticRowsRetainNativeRecordOnRefusal checks that the native record
+// supplied to the summary decoder is kept as diagnostic evidence when the
+// decoder refuses the observation, and that no row or condition is derived.
+func TestDiagnosticRowsRetainNativeRecordOnRefusal(t *testing.T) {
+	s := diagSelection(t, diagVectorSelection{Flavor: "pcs-standard", Bank: "ordinary", Project: "QAAA", Release: "0011", Scope: "local", Endpoint: "coordinator"})
+	f := diagFrame(t, "0x312", false, "0100000000000000")
+	in := diagSummaryInput(s, f, true)
+	in.PublisherResolved = false
+	record := []byte{0xde, 0xad, 0xbe, 0xef}
+	in.NativeRecord = record
+	res, reason, err := EvaluateSummaryBits(s, in)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if reason == "" || len(res.Rows) != 0 {
+		t.Fatalf("refused observation has rows: reason %q rows %d", reason, len(res.Rows))
+	}
+	if hex.EncodeToString(res.Diagnostics) != hex.EncodeToString(record) {
+		t.Fatalf("diagnostic record %x, want %x", res.Diagnostics, record)
+	}
+}
+
+// TestDiagnosticRowsDeclareFrameIdentifierAndFormat checks that each DTC row
+// declares the identifier and format of the frame it reads, not a fixed one.
+func TestDiagnosticRowsDeclareFrameIdentifierAndFormat(t *testing.T) {
+	member := diagSelection(t, diagVectorSelection{Flavor: "pcs-standard", Bank: "ordinary", Project: "QAAA", Release: "0011", Scope: "local", Endpoint: "coordinator"})
+	for _, c := range []struct {
+		id       string
+		extended bool
+		flavor   string
+	}{
+		{"0x333", false, "pcs-standard"},
+		{"0x52A", false, "pcs-parallel"},
+		{"0x1853F41A", true, "link"},
+	} {
+		frame := diagFrame(t, c.id, c.extended, "1009000000000000")
+		fam, ok := diagDTCFamilyOf(frame)
+		if !ok {
+			t.Fatalf("%s: family not admitted", c.id)
+		}
+		if fam.flavor != c.flavor {
+			t.Fatalf("%s: family flavor %q", c.id, fam.flavor)
+		}
+		for _, spec := range diagDTCSpecs(fam, member, 0, frame) {
+			if spec.row.At.Identifier != frame.ID().Value() || spec.row.At.Extended != c.extended || spec.row.At.DLC != 8 || spec.row.At.RawDLC != 8 {
+				t.Errorf("%s: row %s declares identifier %#x extended %v, frame %#x extended %v", c.id, spec.id, spec.row.At.Identifier, spec.row.At.Extended, frame.ID().Value(), c.extended)
+			}
+		}
+	}
+}
+
+// TestDiagnosticResultsKeepAttribution checks that a DTC result keeps the bank
+// and slot its observation was decoded under, so two observations of the same
+// row identifiers under different associations are told apart.
+func TestDiagnosticResultsKeepAttribution(t *testing.T) {
+	first := diagSelection(t, diagVectorSelection{Flavor: "link", PCSFlavor: "pcs-standard", Bank: "ordinary", Project: "QAAA", Release: "0011", Scope: "local", Endpoint: "1A", Slot: "3"})
+	second := diagSelection(t, diagVectorSelection{Flavor: "link", PCSFlavor: "pcs-standard", Bank: "ordinary", Project: "QAAA", Release: "0011", Scope: "local", Endpoint: "1A", Slot: "4"})
+	frame := diagFrame(t, "0x1853F41A", true, "0910000000000000")
+	resA, _, err := EvaluateDTC(first, diagLinkInput(first, frame), 0)
+	if err != nil {
+		t.Fatal(err)
+	}
+	resB, _, err := EvaluateDTC(second, diagLinkInput(second, frame), 0)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if resA.Attribution.Slot != "3" || !resA.Attribution.HasSlot {
+		t.Errorf("first slot attribution %+v", resA.Attribution)
+	}
+	if resB.Attribution.Slot != "4" || !resB.Attribution.HasSlot {
+		t.Errorf("second slot attribution %+v", resB.Attribution)
+	}
+	if resA.Attribution == resB.Attribution {
+		t.Errorf("distinct associations share one attribution: %+v", resA.Attribution)
+	}
+}

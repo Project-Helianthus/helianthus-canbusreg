@@ -1,0 +1,2428 @@
+{
+ "cases": [
+  {
+   "name": "fine temperatures with a valid count-aware mean on release 11 ordinary",
+   "family": "1862",
+   "payload": "300208021c020000",
+   "selection": {
+    "project": "QAAA",
+    "release": "0011",
+    "choice": "",
+    "group": "",
+    "slot": "",
+    "source": "02",
+    "bank": "ordinary",
+    "destination": "F4"
+   },
+   "status": "accepted",
+   "rows": {
+    "growatt.bms.link.1862.maximum": {
+     "value": "30",
+     "unit": "C",
+     "disposition": "accepted",
+     "raw": "560"
+    },
+    "growatt.bms.link.1862.minimum": {
+     "value": "25",
+     "unit": "C",
+     "disposition": "accepted",
+     "raw": "520"
+    },
+    "growatt.bms.link.1862.mean": {
+     "value": "27.5",
+     "unit": "C",
+     "disposition": "accepted",
+     "raw": "540"
+    },
+    "growatt.bms.link.1862.reserved": {
+     "value": "0",
+     "unit": "",
+     "disposition": "raw",
+     "raw": "0"
+    }
+   },
+   "absent": [],
+   "fine": {
+    "fine_valid": true,
+    "maximum": "accepted",
+    "minimum": "accepted",
+    "mean": "accepted",
+    "contributors": {
+     "count": 2,
+     "count_valid": true,
+     "payload": "0802300200000000",
+     "stale_sensor": -1,
+     "fixed_four": false
+    }
+   }
+  },
+  {
+   "name": "fine temperatures with a valid count-aware mean on release 11 parallel",
+   "family": "1862",
+   "payload": "300208021c020000",
+   "selection": {
+    "project": "QAAA",
+    "release": "0011",
+    "choice": "",
+    "group": "3",
+    "slot": "5",
+    "source": "0A",
+    "bank": "parallel",
+    "destination": "F4"
+   },
+   "status": "accepted",
+   "rows": {
+    "growatt.bms.link.1862.maximum": {
+     "value": "30",
+     "unit": "C",
+     "disposition": "accepted",
+     "raw": "560"
+    },
+    "growatt.bms.link.1862.minimum": {
+     "value": "25",
+     "unit": "C",
+     "disposition": "accepted",
+     "raw": "520"
+    },
+    "growatt.bms.link.1862.mean": {
+     "value": "27.5",
+     "unit": "C",
+     "disposition": "accepted",
+     "raw": "540"
+    },
+    "growatt.bms.link.1862.reserved": {
+     "value": "0",
+     "unit": "",
+     "disposition": "raw",
+     "raw": "0"
+    }
+   },
+   "absent": [],
+   "fine": {
+    "fine_valid": true,
+    "maximum": "accepted",
+    "minimum": "accepted",
+    "mean": "accepted",
+    "contributors": {
+     "count": 2,
+     "count_valid": true,
+     "payload": "0802300200000000",
+     "stale_sensor": -1,
+     "fixed_four": false
+    }
+   }
+  },
+  {
+   "name": "fine temperatures with a valid count-aware mean on group four ordinary",
+   "family": "1862",
+   "payload": "300208021c020000",
+   "selection": {
+    "project": "QAAA",
+    "release": "0009",
+    "choice": "",
+    "group": "",
+    "slot": "",
+    "source": "02",
+    "bank": "ordinary",
+    "destination": "F4"
+   },
+   "status": "accepted",
+   "rows": {
+    "growatt.bms.link.1862.maximum": {
+     "value": "30",
+     "unit": "C",
+     "disposition": "accepted",
+     "raw": "560"
+    },
+    "growatt.bms.link.1862.minimum": {
+     "value": "25",
+     "unit": "C",
+     "disposition": "accepted",
+     "raw": "520"
+    },
+    "growatt.bms.link.1862.mean": {
+     "value": "27.5",
+     "unit": "C",
+     "disposition": "accepted",
+     "raw": "540"
+    },
+    "growatt.bms.link.1862.reserved": {
+     "value": "0",
+     "unit": "",
+     "disposition": "raw",
+     "raw": "0"
+    }
+   },
+   "absent": [],
+   "fine": {
+    "fine_valid": true,
+    "maximum": "accepted",
+    "minimum": "accepted",
+    "mean": "accepted",
+    "contributors": {
+     "count": 2,
+     "count_valid": true,
+     "payload": "0802300200000000",
+     "stale_sensor": -1,
+     "fixed_four": false
+    }
+   }
+  },
+  {
+   "name": "fine temperatures with a valid count-aware mean on group four parallel",
+   "family": "1862",
+   "payload": "300208021c020000",
+   "selection": {
+    "project": "QAAA",
+    "release": "0009",
+    "choice": "",
+    "group": "3",
+    "slot": "5",
+    "source": "0A",
+    "bank": "parallel",
+    "destination": "F4"
+   },
+   "status": "accepted",
+   "rows": {
+    "growatt.bms.link.1862.maximum": {
+     "value": "30",
+     "unit": "C",
+     "disposition": "accepted",
+     "raw": "560"
+    },
+    "growatt.bms.link.1862.minimum": {
+     "value": "25",
+     "unit": "C",
+     "disposition": "accepted",
+     "raw": "520"
+    },
+    "growatt.bms.link.1862.mean": {
+     "value": "27.5",
+     "unit": "C",
+     "disposition": "accepted",
+     "raw": "540"
+    },
+    "growatt.bms.link.1862.reserved": {
+     "value": "0",
+     "unit": "",
+     "disposition": "raw",
+     "raw": "0"
+    }
+   },
+   "absent": [],
+   "fine": {
+    "fine_valid": true,
+    "maximum": "accepted",
+    "minimum": "accepted",
+    "mean": "accepted",
+    "contributors": {
+     "count": 2,
+     "count_valid": true,
+     "payload": "0802300200000000",
+     "stale_sensor": -1,
+     "fixed_four": false
+    }
+   }
+  },
+  {
+   "name": "fine temperatures with a valid mean on the release 11 choice ordinary",
+   "family": "1862",
+   "payload": "300208021c020000",
+   "selection": {
+    "project": "QAAa",
+    "release": "9011",
+    "choice": "release11",
+    "group": "",
+    "slot": "",
+    "source": "02",
+    "bank": "ordinary",
+    "destination": "F4"
+   },
+   "status": "accepted",
+   "rows": {
+    "growatt.bms.link.1862.maximum": {
+     "value": "30",
+     "unit": "C",
+     "disposition": "accepted",
+     "raw": "560"
+    },
+    "growatt.bms.link.1862.minimum": {
+     "value": "25",
+     "unit": "C",
+     "disposition": "accepted",
+     "raw": "520"
+    },
+    "growatt.bms.link.1862.mean": {
+     "value": "27.5",
+     "unit": "C",
+     "disposition": "accepted",
+     "raw": "540"
+    },
+    "growatt.bms.link.1862.reserved": {
+     "value": "0",
+     "unit": "",
+     "disposition": "raw",
+     "raw": "0"
+    }
+   },
+   "absent": [],
+   "fine": {
+    "fine_valid": true,
+    "maximum": "accepted",
+    "minimum": "accepted",
+    "mean": "accepted",
+    "contributors": {
+     "count": 2,
+     "count_valid": true,
+     "payload": "0802300200000000",
+     "stale_sensor": -1,
+     "fixed_four": false
+    }
+   }
+  },
+  {
+   "name": "fine temperatures with a valid mean on the release 11 choice parallel",
+   "family": "1862",
+   "payload": "300208021c020000",
+   "selection": {
+    "project": "QAAa",
+    "release": "9011",
+    "choice": "release11",
+    "group": "3",
+    "slot": "5",
+    "source": "0A",
+    "bank": "parallel",
+    "destination": "F4"
+   },
+   "status": "accepted",
+   "rows": {
+    "growatt.bms.link.1862.maximum": {
+     "value": "30",
+     "unit": "C",
+     "disposition": "accepted",
+     "raw": "560"
+    },
+    "growatt.bms.link.1862.minimum": {
+     "value": "25",
+     "unit": "C",
+     "disposition": "accepted",
+     "raw": "520"
+    },
+    "growatt.bms.link.1862.mean": {
+     "value": "27.5",
+     "unit": "C",
+     "disposition": "accepted",
+     "raw": "540"
+    },
+    "growatt.bms.link.1862.reserved": {
+     "value": "0",
+     "unit": "",
+     "disposition": "raw",
+     "raw": "0"
+    }
+   },
+   "absent": [],
+   "fine": {
+    "fine_valid": true,
+    "maximum": "accepted",
+    "minimum": "accepted",
+    "mean": "accepted",
+    "contributors": {
+     "count": 2,
+     "count_valid": true,
+     "payload": "0802300200000000",
+     "stale_sensor": -1,
+     "fixed_four": false
+    }
+   }
+  },
+  {
+   "name": "fine temperatures with the fine gate off keep raw words ordinary",
+   "family": "1862",
+   "payload": "300208021c020000",
+   "selection": {
+    "project": "QAAA",
+    "release": "0011",
+    "choice": "",
+    "group": "",
+    "slot": "",
+    "source": "02",
+    "bank": "ordinary",
+    "destination": "F4"
+   },
+   "status": "accepted",
+   "rows": {
+    "growatt.bms.link.1862.maximum": {
+     "value": "560",
+     "unit": "",
+     "disposition": "raw",
+     "raw": "560"
+    },
+    "growatt.bms.link.1862.minimum": {
+     "value": "520",
+     "unit": "",
+     "disposition": "raw",
+     "raw": "520"
+    },
+    "growatt.bms.link.1862.mean": {
+     "value": "540",
+     "unit": "",
+     "disposition": "raw",
+     "raw": "540"
+    },
+    "growatt.bms.link.1862.reserved": {
+     "value": "0",
+     "unit": "",
+     "disposition": "raw",
+     "raw": "0"
+    }
+   },
+   "absent": [],
+   "fine": {
+    "fine_valid": false,
+    "maximum": "accepted",
+    "minimum": "accepted",
+    "mean": "accepted",
+    "contributors": {
+     "count": 2,
+     "count_valid": true,
+     "payload": "0802300200000000",
+     "stale_sensor": -1,
+     "fixed_four": false
+    }
+   }
+  },
+  {
+   "name": "fine temperatures with the fine gate off keep raw words parallel",
+   "family": "1862",
+   "payload": "300208021c020000",
+   "selection": {
+    "project": "QAAA",
+    "release": "0011",
+    "choice": "",
+    "group": "3",
+    "slot": "5",
+    "source": "0A",
+    "bank": "parallel",
+    "destination": "F4"
+   },
+   "status": "accepted",
+   "rows": {
+    "growatt.bms.link.1862.maximum": {
+     "value": "560",
+     "unit": "",
+     "disposition": "raw",
+     "raw": "560"
+    },
+    "growatt.bms.link.1862.minimum": {
+     "value": "520",
+     "unit": "",
+     "disposition": "raw",
+     "raw": "520"
+    },
+    "growatt.bms.link.1862.mean": {
+     "value": "540",
+     "unit": "",
+     "disposition": "raw",
+     "raw": "540"
+    },
+    "growatt.bms.link.1862.reserved": {
+     "value": "0",
+     "unit": "",
+     "disposition": "raw",
+     "raw": "0"
+    }
+   },
+   "absent": [],
+   "fine": {
+    "fine_valid": false,
+    "maximum": "accepted",
+    "minimum": "accepted",
+    "mean": "accepted",
+    "contributors": {
+     "count": 2,
+     "count_valid": true,
+     "payload": "0802300200000000",
+     "stale_sensor": -1,
+     "fixed_four": false
+    }
+   }
+  },
+  {
+   "name": "fine temperatures with a stale contributor keep the mean raw ordinary",
+   "family": "1862",
+   "payload": "300208021c020000",
+   "selection": {
+    "project": "QAAA",
+    "release": "0011",
+    "choice": "",
+    "group": "",
+    "slot": "",
+    "source": "02",
+    "bank": "ordinary",
+    "destination": "F4"
+   },
+   "status": "accepted",
+   "rows": {
+    "growatt.bms.link.1862.maximum": {
+     "value": "30",
+     "unit": "C",
+     "disposition": "accepted",
+     "raw": "560"
+    },
+    "growatt.bms.link.1862.minimum": {
+     "value": "25",
+     "unit": "C",
+     "disposition": "accepted",
+     "raw": "520"
+    },
+    "growatt.bms.link.1862.mean": {
+     "value": "540",
+     "unit": "",
+     "disposition": "raw",
+     "raw": "540"
+    },
+    "growatt.bms.link.1862.reserved": {
+     "value": "0",
+     "unit": "",
+     "disposition": "raw",
+     "raw": "0"
+    }
+   },
+   "absent": [],
+   "fine": {
+    "fine_valid": true,
+    "maximum": "accepted",
+    "minimum": "accepted",
+    "mean": "accepted",
+    "contributors": {
+     "count": 2,
+     "count_valid": true,
+     "payload": "0802300200000000",
+     "stale_sensor": 0,
+     "fixed_four": false
+    }
+   }
+  },
+  {
+   "name": "fine temperatures with a stale contributor keep the mean raw parallel",
+   "family": "1862",
+   "payload": "300208021c020000",
+   "selection": {
+    "project": "QAAA",
+    "release": "0011",
+    "choice": "",
+    "group": "3",
+    "slot": "5",
+    "source": "0A",
+    "bank": "parallel",
+    "destination": "F4"
+   },
+   "status": "accepted",
+   "rows": {
+    "growatt.bms.link.1862.maximum": {
+     "value": "30",
+     "unit": "C",
+     "disposition": "accepted",
+     "raw": "560"
+    },
+    "growatt.bms.link.1862.minimum": {
+     "value": "25",
+     "unit": "C",
+     "disposition": "accepted",
+     "raw": "520"
+    },
+    "growatt.bms.link.1862.mean": {
+     "value": "540",
+     "unit": "",
+     "disposition": "raw",
+     "raw": "540"
+    },
+    "growatt.bms.link.1862.reserved": {
+     "value": "0",
+     "unit": "",
+     "disposition": "raw",
+     "raw": "0"
+    }
+   },
+   "absent": [],
+   "fine": {
+    "fine_valid": true,
+    "maximum": "accepted",
+    "minimum": "accepted",
+    "mean": "accepted",
+    "contributors": {
+     "count": 2,
+     "count_valid": true,
+     "payload": "0802300200000000",
+     "stale_sensor": 0,
+     "fixed_four": false
+    }
+   }
+  },
+  {
+   "name": "fine temperatures on the fixed four path keep the mean raw ordinary",
+   "family": "1862",
+   "payload": "300208021c020000",
+   "selection": {
+    "project": "QAAA",
+    "release": "0011",
+    "choice": "",
+    "group": "",
+    "slot": "",
+    "source": "02",
+    "bank": "ordinary",
+    "destination": "F4"
+   },
+   "status": "accepted",
+   "rows": {
+    "growatt.bms.link.1862.maximum": {
+     "value": "30",
+     "unit": "C",
+     "disposition": "accepted",
+     "raw": "560"
+    },
+    "growatt.bms.link.1862.minimum": {
+     "value": "25",
+     "unit": "C",
+     "disposition": "accepted",
+     "raw": "520"
+    },
+    "growatt.bms.link.1862.mean": {
+     "value": "540",
+     "unit": "",
+     "disposition": "raw",
+     "raw": "540"
+    },
+    "growatt.bms.link.1862.reserved": {
+     "value": "0",
+     "unit": "",
+     "disposition": "raw",
+     "raw": "0"
+    }
+   },
+   "absent": [],
+   "fine": {
+    "fine_valid": true,
+    "maximum": "accepted",
+    "minimum": "accepted",
+    "mean": "accepted",
+    "contributors": {
+     "count": 2,
+     "count_valid": true,
+     "payload": "0802300200000000",
+     "stale_sensor": -1,
+     "fixed_four": true
+    }
+   }
+  },
+  {
+   "name": "fine temperatures on the fixed four path keep the mean raw parallel",
+   "family": "1862",
+   "payload": "300208021c020000",
+   "selection": {
+    "project": "QAAA",
+    "release": "0011",
+    "choice": "",
+    "group": "3",
+    "slot": "5",
+    "source": "0A",
+    "bank": "parallel",
+    "destination": "F4"
+   },
+   "status": "accepted",
+   "rows": {
+    "growatt.bms.link.1862.maximum": {
+     "value": "30",
+     "unit": "C",
+     "disposition": "accepted",
+     "raw": "560"
+    },
+    "growatt.bms.link.1862.minimum": {
+     "value": "25",
+     "unit": "C",
+     "disposition": "accepted",
+     "raw": "520"
+    },
+    "growatt.bms.link.1862.mean": {
+     "value": "540",
+     "unit": "",
+     "disposition": "raw",
+     "raw": "540"
+    },
+    "growatt.bms.link.1862.reserved": {
+     "value": "0",
+     "unit": "",
+     "disposition": "raw",
+     "raw": "0"
+    }
+   },
+   "absent": [],
+   "fine": {
+    "fine_valid": true,
+    "maximum": "accepted",
+    "minimum": "accepted",
+    "mean": "accepted",
+    "contributors": {
+     "count": 2,
+     "count_valid": true,
+     "payload": "0802300200000000",
+     "stale_sensor": -1,
+     "fixed_four": true
+    }
+   }
+  },
+  {
+   "name": "fine temperatures with an absent count keep the mean raw ordinary",
+   "family": "1862",
+   "payload": "300208021c020000",
+   "selection": {
+    "project": "QAAA",
+    "release": "0011",
+    "choice": "",
+    "group": "",
+    "slot": "",
+    "source": "02",
+    "bank": "ordinary",
+    "destination": "F4"
+   },
+   "status": "accepted",
+   "rows": {
+    "growatt.bms.link.1862.maximum": {
+     "value": "30",
+     "unit": "C",
+     "disposition": "accepted",
+     "raw": "560"
+    },
+    "growatt.bms.link.1862.minimum": {
+     "value": "25",
+     "unit": "C",
+     "disposition": "accepted",
+     "raw": "520"
+    },
+    "growatt.bms.link.1862.mean": {
+     "value": "540",
+     "unit": "",
+     "disposition": "raw",
+     "raw": "540"
+    },
+    "growatt.bms.link.1862.reserved": {
+     "value": "0",
+     "unit": "",
+     "disposition": "raw",
+     "raw": "0"
+    }
+   },
+   "absent": [],
+   "fine": {
+    "fine_valid": true,
+    "maximum": "accepted",
+    "minimum": "accepted",
+    "mean": "accepted",
+    "contributors": {
+     "count": 2,
+     "count_valid": false,
+     "payload": "0802300200000000",
+     "stale_sensor": -1,
+     "fixed_four": false
+    }
+   }
+  },
+  {
+   "name": "fine temperatures with an absent count keep the mean raw parallel",
+   "family": "1862",
+   "payload": "300208021c020000",
+   "selection": {
+    "project": "QAAA",
+    "release": "0011",
+    "choice": "",
+    "group": "3",
+    "slot": "5",
+    "source": "0A",
+    "bank": "parallel",
+    "destination": "F4"
+   },
+   "status": "accepted",
+   "rows": {
+    "growatt.bms.link.1862.maximum": {
+     "value": "30",
+     "unit": "C",
+     "disposition": "accepted",
+     "raw": "560"
+    },
+    "growatt.bms.link.1862.minimum": {
+     "value": "25",
+     "unit": "C",
+     "disposition": "accepted",
+     "raw": "520"
+    },
+    "growatt.bms.link.1862.mean": {
+     "value": "540",
+     "unit": "",
+     "disposition": "raw",
+     "raw": "540"
+    },
+    "growatt.bms.link.1862.reserved": {
+     "value": "0",
+     "unit": "",
+     "disposition": "raw",
+     "raw": "0"
+    }
+   },
+   "absent": [],
+   "fine": {
+    "fine_valid": true,
+    "maximum": "accepted",
+    "minimum": "accepted",
+    "mean": "accepted",
+    "contributors": {
+     "count": 2,
+     "count_valid": false,
+     "payload": "0802300200000000",
+     "stale_sensor": -1,
+     "fixed_four": false
+    }
+   }
+  },
+  {
+   "name": "fine temperatures with a count above four keep the mean raw ordinary",
+   "family": "1862",
+   "payload": "300208021c020000",
+   "selection": {
+    "project": "QAAA",
+    "release": "0011",
+    "choice": "",
+    "group": "",
+    "slot": "",
+    "source": "02",
+    "bank": "ordinary",
+    "destination": "F4"
+   },
+   "status": "accepted",
+   "rows": {
+    "growatt.bms.link.1862.maximum": {
+     "value": "30",
+     "unit": "C",
+     "disposition": "accepted",
+     "raw": "560"
+    },
+    "growatt.bms.link.1862.minimum": {
+     "value": "25",
+     "unit": "C",
+     "disposition": "accepted",
+     "raw": "520"
+    },
+    "growatt.bms.link.1862.mean": {
+     "value": "540",
+     "unit": "",
+     "disposition": "raw",
+     "raw": "540"
+    },
+    "growatt.bms.link.1862.reserved": {
+     "value": "0",
+     "unit": "",
+     "disposition": "raw",
+     "raw": "0"
+    }
+   },
+   "absent": [],
+   "fine": {
+    "fine_valid": true,
+    "maximum": "accepted",
+    "minimum": "accepted",
+    "mean": "accepted",
+    "contributors": {
+     "count": 5,
+     "count_valid": true,
+     "payload": "0802300200000000",
+     "stale_sensor": -1,
+     "fixed_four": false
+    }
+   }
+  },
+  {
+   "name": "fine temperatures with a count above four keep the mean raw parallel",
+   "family": "1862",
+   "payload": "300208021c020000",
+   "selection": {
+    "project": "QAAA",
+    "release": "0011",
+    "choice": "",
+    "group": "3",
+    "slot": "5",
+    "source": "0A",
+    "bank": "parallel",
+    "destination": "F4"
+   },
+   "status": "accepted",
+   "rows": {
+    "growatt.bms.link.1862.maximum": {
+     "value": "30",
+     "unit": "C",
+     "disposition": "accepted",
+     "raw": "560"
+    },
+    "growatt.bms.link.1862.minimum": {
+     "value": "25",
+     "unit": "C",
+     "disposition": "accepted",
+     "raw": "520"
+    },
+    "growatt.bms.link.1862.mean": {
+     "value": "540",
+     "unit": "",
+     "disposition": "raw",
+     "raw": "540"
+    },
+    "growatt.bms.link.1862.reserved": {
+     "value": "0",
+     "unit": "",
+     "disposition": "raw",
+     "raw": "0"
+    }
+   },
+   "absent": [],
+   "fine": {
+    "fine_valid": true,
+    "maximum": "accepted",
+    "minimum": "accepted",
+    "mean": "accepted",
+    "contributors": {
+     "count": 5,
+     "count_valid": true,
+     "payload": "0802300200000000",
+     "stale_sensor": -1,
+     "fixed_four": false
+    }
+   }
+  },
+  {
+   "name": "fine temperatures with four sensors give the truncated mean ordinary",
+   "family": "1862",
+   "payload": "a80190019c010000",
+   "selection": {
+    "project": "QAAA",
+    "release": "0011",
+    "choice": "",
+    "group": "",
+    "slot": "",
+    "source": "02",
+    "bank": "ordinary",
+    "destination": "F4"
+   },
+   "status": "accepted",
+   "rows": {
+    "growatt.bms.link.1862.maximum": {
+     "value": "13",
+     "unit": "C",
+     "disposition": "accepted",
+     "raw": "424"
+    },
+    "growatt.bms.link.1862.minimum": {
+     "value": "10",
+     "unit": "C",
+     "disposition": "accepted",
+     "raw": "400"
+    },
+    "growatt.bms.link.1862.mean": {
+     "value": "11.5",
+     "unit": "C",
+     "disposition": "accepted",
+     "raw": "412"
+    },
+    "growatt.bms.link.1862.reserved": {
+     "value": "0",
+     "unit": "",
+     "disposition": "raw",
+     "raw": "0"
+    }
+   },
+   "absent": [],
+   "fine": {
+    "fine_valid": true,
+    "maximum": "accepted",
+    "minimum": "accepted",
+    "mean": "accepted",
+    "contributors": {
+     "count": 4,
+     "count_valid": true,
+     "payload": "90019801a001a801",
+     "stale_sensor": -1,
+     "fixed_four": false
+    }
+   }
+  },
+  {
+   "name": "fine temperatures with four sensors give the truncated mean parallel",
+   "family": "1862",
+   "payload": "a80190019c010000",
+   "selection": {
+    "project": "QAAA",
+    "release": "0011",
+    "choice": "",
+    "group": "3",
+    "slot": "5",
+    "source": "0A",
+    "bank": "parallel",
+    "destination": "F4"
+   },
+   "status": "accepted",
+   "rows": {
+    "growatt.bms.link.1862.maximum": {
+     "value": "13",
+     "unit": "C",
+     "disposition": "accepted",
+     "raw": "424"
+    },
+    "growatt.bms.link.1862.minimum": {
+     "value": "10",
+     "unit": "C",
+     "disposition": "accepted",
+     "raw": "400"
+    },
+    "growatt.bms.link.1862.mean": {
+     "value": "11.5",
+     "unit": "C",
+     "disposition": "accepted",
+     "raw": "412"
+    },
+    "growatt.bms.link.1862.reserved": {
+     "value": "0",
+     "unit": "",
+     "disposition": "raw",
+     "raw": "0"
+    }
+   },
+   "absent": [],
+   "fine": {
+    "fine_valid": true,
+    "maximum": "accepted",
+    "minimum": "accepted",
+    "mean": "accepted",
+    "contributors": {
+     "count": 4,
+     "count_valid": true,
+     "payload": "90019801a001a801",
+     "stale_sensor": -1,
+     "fixed_four": false
+    }
+   }
+  },
+  {
+   "name": "fine temperatures with a mismatching mean word keep it raw ordinary",
+   "family": "1862",
+   "payload": "300208021d020000",
+   "selection": {
+    "project": "QAAA",
+    "release": "0011",
+    "choice": "",
+    "group": "",
+    "slot": "",
+    "source": "02",
+    "bank": "ordinary",
+    "destination": "F4"
+   },
+   "status": "accepted",
+   "rows": {
+    "growatt.bms.link.1862.maximum": {
+     "value": "30",
+     "unit": "C",
+     "disposition": "accepted",
+     "raw": "560"
+    },
+    "growatt.bms.link.1862.minimum": {
+     "value": "25",
+     "unit": "C",
+     "disposition": "accepted",
+     "raw": "520"
+    },
+    "growatt.bms.link.1862.mean": {
+     "value": "541",
+     "unit": "",
+     "disposition": "raw",
+     "raw": "541"
+    },
+    "growatt.bms.link.1862.reserved": {
+     "value": "0",
+     "unit": "",
+     "disposition": "raw",
+     "raw": "0"
+    }
+   },
+   "absent": [],
+   "fine": {
+    "fine_valid": true,
+    "maximum": "accepted",
+    "minimum": "accepted",
+    "mean": "accepted",
+    "contributors": {
+     "count": 2,
+     "count_valid": true,
+     "payload": "0802300200000000",
+     "stale_sensor": -1,
+     "fixed_four": false
+    }
+   }
+  },
+  {
+   "name": "fine temperatures with a mismatching mean word keep it raw parallel",
+   "family": "1862",
+   "payload": "300208021d020000",
+   "selection": {
+    "project": "QAAA",
+    "release": "0011",
+    "choice": "",
+    "group": "3",
+    "slot": "5",
+    "source": "0A",
+    "bank": "parallel",
+    "destination": "F4"
+   },
+   "status": "accepted",
+   "rows": {
+    "growatt.bms.link.1862.maximum": {
+     "value": "30",
+     "unit": "C",
+     "disposition": "accepted",
+     "raw": "560"
+    },
+    "growatt.bms.link.1862.minimum": {
+     "value": "25",
+     "unit": "C",
+     "disposition": "accepted",
+     "raw": "520"
+    },
+    "growatt.bms.link.1862.mean": {
+     "value": "541",
+     "unit": "",
+     "disposition": "raw",
+     "raw": "541"
+    },
+    "growatt.bms.link.1862.reserved": {
+     "value": "0",
+     "unit": "",
+     "disposition": "raw",
+     "raw": "0"
+    }
+   },
+   "absent": [],
+   "fine": {
+    "fine_valid": true,
+    "maximum": "accepted",
+    "minimum": "accepted",
+    "mean": "accepted",
+    "contributors": {
+     "count": 2,
+     "count_valid": true,
+     "payload": "0802300200000000",
+     "stale_sensor": -1,
+     "fixed_four": false
+    }
+   }
+  },
+  {
+   "name": "fine temperatures with a stale maximum gate keep its status ordinary",
+   "family": "1862",
+   "payload": "300208021c020000",
+   "selection": {
+    "project": "QAAA",
+    "release": "0011",
+    "choice": "",
+    "group": "",
+    "slot": "",
+    "source": "02",
+    "bank": "ordinary",
+    "destination": "F4"
+   },
+   "status": "accepted",
+   "rows": {
+    "growatt.bms.link.1862.maximum": {
+     "value": "560",
+     "unit": "",
+     "disposition": "stale",
+     "raw": "560"
+    },
+    "growatt.bms.link.1862.minimum": {
+     "value": "25",
+     "unit": "C",
+     "disposition": "accepted",
+     "raw": "520"
+    },
+    "growatt.bms.link.1862.mean": {
+     "value": "27.5",
+     "unit": "C",
+     "disposition": "accepted",
+     "raw": "540"
+    },
+    "growatt.bms.link.1862.reserved": {
+     "value": "0",
+     "unit": "",
+     "disposition": "raw",
+     "raw": "0"
+    }
+   },
+   "absent": [],
+   "fine": {
+    "fine_valid": true,
+    "maximum": "stale",
+    "minimum": "accepted",
+    "mean": "accepted",
+    "contributors": {
+     "count": 2,
+     "count_valid": true,
+     "payload": "0802300200000000",
+     "stale_sensor": -1,
+     "fixed_four": false
+    }
+   }
+  },
+  {
+   "name": "fine temperatures with a stale maximum gate keep its status parallel",
+   "family": "1862",
+   "payload": "300208021c020000",
+   "selection": {
+    "project": "QAAA",
+    "release": "0011",
+    "choice": "",
+    "group": "3",
+    "slot": "5",
+    "source": "0A",
+    "bank": "parallel",
+    "destination": "F4"
+   },
+   "status": "accepted",
+   "rows": {
+    "growatt.bms.link.1862.maximum": {
+     "value": "560",
+     "unit": "",
+     "disposition": "stale",
+     "raw": "560"
+    },
+    "growatt.bms.link.1862.minimum": {
+     "value": "25",
+     "unit": "C",
+     "disposition": "accepted",
+     "raw": "520"
+    },
+    "growatt.bms.link.1862.mean": {
+     "value": "27.5",
+     "unit": "C",
+     "disposition": "accepted",
+     "raw": "540"
+    },
+    "growatt.bms.link.1862.reserved": {
+     "value": "0",
+     "unit": "",
+     "disposition": "raw",
+     "raw": "0"
+    }
+   },
+   "absent": [],
+   "fine": {
+    "fine_valid": true,
+    "maximum": "stale",
+    "minimum": "accepted",
+    "mean": "accepted",
+    "contributors": {
+     "count": 2,
+     "count_valid": true,
+     "payload": "0802300200000000",
+     "stale_sensor": -1,
+     "fixed_four": false
+    }
+   }
+  },
+  {
+   "name": "fine temperatures with an unconfigured minimum gate stay raw ordinary",
+   "family": "1862",
+   "payload": "300208021c020000",
+   "selection": {
+    "project": "QAAA",
+    "release": "0011",
+    "choice": "",
+    "group": "",
+    "slot": "",
+    "source": "02",
+    "bank": "ordinary",
+    "destination": "F4"
+   },
+   "status": "accepted",
+   "rows": {
+    "growatt.bms.link.1862.maximum": {
+     "value": "30",
+     "unit": "C",
+     "disposition": "accepted",
+     "raw": "560"
+    },
+    "growatt.bms.link.1862.minimum": {
+     "value": "520",
+     "unit": "",
+     "disposition": "raw",
+     "raw": "520"
+    },
+    "growatt.bms.link.1862.mean": {
+     "value": "27.5",
+     "unit": "C",
+     "disposition": "accepted",
+     "raw": "540"
+    },
+    "growatt.bms.link.1862.reserved": {
+     "value": "0",
+     "unit": "",
+     "disposition": "raw",
+     "raw": "0"
+    }
+   },
+   "absent": [],
+   "fine": {
+    "fine_valid": true,
+    "maximum": "accepted",
+    "minimum": "unconfigured",
+    "mean": "accepted",
+    "contributors": {
+     "count": 2,
+     "count_valid": true,
+     "payload": "0802300200000000",
+     "stale_sensor": -1,
+     "fixed_four": false
+    }
+   }
+  },
+  {
+   "name": "fine temperatures with an unconfigured minimum gate stay raw parallel",
+   "family": "1862",
+   "payload": "300208021c020000",
+   "selection": {
+    "project": "QAAA",
+    "release": "0011",
+    "choice": "",
+    "group": "3",
+    "slot": "5",
+    "source": "0A",
+    "bank": "parallel",
+    "destination": "F4"
+   },
+   "status": "accepted",
+   "rows": {
+    "growatt.bms.link.1862.maximum": {
+     "value": "30",
+     "unit": "C",
+     "disposition": "accepted",
+     "raw": "560"
+    },
+    "growatt.bms.link.1862.minimum": {
+     "value": "520",
+     "unit": "",
+     "disposition": "raw",
+     "raw": "520"
+    },
+    "growatt.bms.link.1862.mean": {
+     "value": "27.5",
+     "unit": "C",
+     "disposition": "accepted",
+     "raw": "540"
+    },
+    "growatt.bms.link.1862.reserved": {
+     "value": "0",
+     "unit": "",
+     "disposition": "raw",
+     "raw": "0"
+    }
+   },
+   "absent": [],
+   "fine": {
+    "fine_valid": true,
+    "maximum": "accepted",
+    "minimum": "unconfigured",
+    "mean": "accepted",
+    "contributors": {
+     "count": 2,
+     "count_valid": true,
+     "payload": "0802300200000000",
+     "stale_sensor": -1,
+     "fixed_four": false
+    }
+   }
+  },
+  {
+   "name": "fine temperature words FFFF are invalid ordinary",
+   "family": "1862",
+   "payload": "ffffffffffff0000",
+   "selection": {
+    "project": "QAAA",
+    "release": "0011",
+    "choice": "",
+    "group": "",
+    "slot": "",
+    "source": "02",
+    "bank": "ordinary",
+    "destination": "F4"
+   },
+   "status": "accepted",
+   "rows": {
+    "growatt.bms.link.1862.maximum": {
+     "value": "65535",
+     "unit": "",
+     "disposition": "invalid",
+     "raw": "65535"
+    },
+    "growatt.bms.link.1862.minimum": {
+     "value": "65535",
+     "unit": "",
+     "disposition": "invalid",
+     "raw": "65535"
+    },
+    "growatt.bms.link.1862.mean": {
+     "value": "65535",
+     "unit": "",
+     "disposition": "invalid",
+     "raw": "65535"
+    },
+    "growatt.bms.link.1862.reserved": {
+     "value": "0",
+     "unit": "",
+     "disposition": "raw",
+     "raw": "0"
+    }
+   },
+   "absent": [],
+   "fine": {
+    "fine_valid": true,
+    "maximum": "accepted",
+    "minimum": "accepted",
+    "mean": "accepted",
+    "contributors": {
+     "count": 2,
+     "count_valid": true,
+     "payload": "0802300200000000",
+     "stale_sensor": -1,
+     "fixed_four": false
+    }
+   }
+  },
+  {
+   "name": "fine temperature words FFFF are invalid parallel",
+   "family": "1862",
+   "payload": "ffffffffffff0000",
+   "selection": {
+    "project": "QAAA",
+    "release": "0011",
+    "choice": "",
+    "group": "3",
+    "slot": "5",
+    "source": "0A",
+    "bank": "parallel",
+    "destination": "F4"
+   },
+   "status": "accepted",
+   "rows": {
+    "growatt.bms.link.1862.maximum": {
+     "value": "65535",
+     "unit": "",
+     "disposition": "invalid",
+     "raw": "65535"
+    },
+    "growatt.bms.link.1862.minimum": {
+     "value": "65535",
+     "unit": "",
+     "disposition": "invalid",
+     "raw": "65535"
+    },
+    "growatt.bms.link.1862.mean": {
+     "value": "65535",
+     "unit": "",
+     "disposition": "invalid",
+     "raw": "65535"
+    },
+    "growatt.bms.link.1862.reserved": {
+     "value": "0",
+     "unit": "",
+     "disposition": "raw",
+     "raw": "0"
+    }
+   },
+   "absent": [],
+   "fine": {
+    "fine_valid": true,
+    "maximum": "accepted",
+    "minimum": "accepted",
+    "mean": "accepted",
+    "contributors": {
+     "count": 2,
+     "count_valid": true,
+     "payload": "0802300200000000",
+     "stale_sensor": -1,
+     "fixed_four": false
+    }
+   }
+  },
+  {
+   "name": "fine temperatures on a path without the mean selector keep the mean raw ordinary",
+   "family": "1862",
+   "payload": "300208021c020000",
+   "selection": {
+    "project": "QAAa",
+    "release": "9010",
+    "choice": "",
+    "group": "",
+    "slot": "",
+    "source": "02",
+    "bank": "ordinary",
+    "destination": "F4"
+   },
+   "status": "accepted",
+   "rows": {
+    "growatt.bms.link.1862.maximum": {
+     "value": "30",
+     "unit": "C",
+     "disposition": "accepted",
+     "raw": "560"
+    },
+    "growatt.bms.link.1862.minimum": {
+     "value": "25",
+     "unit": "C",
+     "disposition": "accepted",
+     "raw": "520"
+    },
+    "growatt.bms.link.1862.mean": {
+     "value": "540",
+     "unit": "",
+     "disposition": "raw",
+     "raw": "540"
+    },
+    "growatt.bms.link.1862.reserved": {
+     "value": "0",
+     "unit": "",
+     "disposition": "raw",
+     "raw": "0"
+    }
+   },
+   "absent": [],
+   "fine": {
+    "fine_valid": true,
+    "maximum": "accepted",
+    "minimum": "accepted",
+    "mean": "accepted",
+    "contributors": {
+     "count": 2,
+     "count_valid": true,
+     "payload": "0802300200000000",
+     "stale_sensor": -1,
+     "fixed_four": false
+    }
+   }
+  },
+  {
+   "name": "fine temperatures on a path without the mean selector keep the mean raw parallel",
+   "family": "1862",
+   "payload": "300208021c020000",
+   "selection": {
+    "project": "QAAa",
+    "release": "9010",
+    "choice": "",
+    "group": "3",
+    "slot": "5",
+    "source": "0A",
+    "bank": "parallel",
+    "destination": "F4"
+   },
+   "status": "accepted",
+   "rows": {
+    "growatt.bms.link.1862.maximum": {
+     "value": "30",
+     "unit": "C",
+     "disposition": "accepted",
+     "raw": "560"
+    },
+    "growatt.bms.link.1862.minimum": {
+     "value": "25",
+     "unit": "C",
+     "disposition": "accepted",
+     "raw": "520"
+    },
+    "growatt.bms.link.1862.mean": {
+     "value": "540",
+     "unit": "",
+     "disposition": "raw",
+     "raw": "540"
+    },
+    "growatt.bms.link.1862.reserved": {
+     "value": "0",
+     "unit": "",
+     "disposition": "raw",
+     "raw": "0"
+    }
+   },
+   "absent": [],
+   "fine": {
+    "fine_valid": true,
+    "maximum": "accepted",
+    "minimum": "accepted",
+    "mean": "accepted",
+    "contributors": {
+     "count": 2,
+     "count_valid": true,
+     "payload": "0802300200000000",
+     "stale_sensor": -1,
+     "fixed_four": false
+    }
+   }
+  },
+  {
+   "name": "fine temperatures with a reserved word that is not zero ordinary",
+   "family": "1862",
+   "payload": "300208021c020500",
+   "selection": {
+    "project": "QAAA",
+    "release": "0011",
+    "choice": "",
+    "group": "",
+    "slot": "",
+    "source": "02",
+    "bank": "ordinary",
+    "destination": "F4"
+   },
+   "status": "accepted",
+   "rows": {
+    "growatt.bms.link.1862.maximum": {
+     "value": "30",
+     "unit": "C",
+     "disposition": "accepted",
+     "raw": "560"
+    },
+    "growatt.bms.link.1862.minimum": {
+     "value": "25",
+     "unit": "C",
+     "disposition": "accepted",
+     "raw": "520"
+    },
+    "growatt.bms.link.1862.mean": {
+     "value": "27.5",
+     "unit": "C",
+     "disposition": "accepted",
+     "raw": "540"
+    },
+    "growatt.bms.link.1862.reserved": {
+     "value": "5",
+     "unit": "",
+     "disposition": "invalid",
+     "raw": "5"
+    }
+   },
+   "absent": [],
+   "fine": {
+    "fine_valid": true,
+    "maximum": "accepted",
+    "minimum": "accepted",
+    "mean": "accepted",
+    "contributors": {
+     "count": 2,
+     "count_valid": true,
+     "payload": "0802300200000000",
+     "stale_sensor": -1,
+     "fixed_four": false
+    }
+   }
+  },
+  {
+   "name": "fine temperatures with a reserved word that is not zero parallel",
+   "family": "1862",
+   "payload": "300208021c020500",
+   "selection": {
+    "project": "QAAA",
+    "release": "0011",
+    "choice": "",
+    "group": "3",
+    "slot": "5",
+    "source": "0A",
+    "bank": "parallel",
+    "destination": "F4"
+   },
+   "status": "accepted",
+   "rows": {
+    "growatt.bms.link.1862.maximum": {
+     "value": "30",
+     "unit": "C",
+     "disposition": "accepted",
+     "raw": "560"
+    },
+    "growatt.bms.link.1862.minimum": {
+     "value": "25",
+     "unit": "C",
+     "disposition": "accepted",
+     "raw": "520"
+    },
+    "growatt.bms.link.1862.mean": {
+     "value": "27.5",
+     "unit": "C",
+     "disposition": "accepted",
+     "raw": "540"
+    },
+    "growatt.bms.link.1862.reserved": {
+     "value": "5",
+     "unit": "",
+     "disposition": "invalid",
+     "raw": "5"
+    }
+   },
+   "absent": [],
+   "fine": {
+    "fine_valid": true,
+    "maximum": "accepted",
+    "minimum": "accepted",
+    "mean": "accepted",
+    "contributors": {
+     "count": 2,
+     "count_valid": true,
+     "payload": "0802300200000000",
+     "stale_sensor": -1,
+     "fixed_four": false
+    }
+   }
+  },
+  {
+   "name": "fine temperatures outside groups four and eight have no rows ordinary",
+   "family": "1862",
+   "payload": "300208021c020000",
+   "selection": {
+    "project": "QAAA",
+    "release": "0006",
+    "choice": "",
+    "group": "",
+    "slot": "",
+    "source": "02",
+    "bank": "ordinary",
+    "destination": "F4"
+   },
+   "status": "unsupported",
+   "rows": {},
+   "absent": [
+    "growatt.bms.link.1862.maximum",
+    "growatt.bms.link.1862.minimum",
+    "growatt.bms.link.1862.mean",
+    "growatt.bms.link.1862.reserved"
+   ],
+   "fine": {
+    "fine_valid": true,
+    "maximum": "accepted",
+    "minimum": "accepted",
+    "mean": "accepted",
+    "contributors": {
+     "count": 2,
+     "count_valid": true,
+     "payload": "0802300200000000",
+     "stale_sensor": -1,
+     "fixed_four": false
+    }
+   }
+  },
+  {
+   "name": "fine temperatures outside groups four and eight have no rows parallel",
+   "family": "1862",
+   "payload": "300208021c020000",
+   "selection": {
+    "project": "QAAA",
+    "release": "0006",
+    "choice": "",
+    "group": "3",
+    "slot": "5",
+    "source": "0A",
+    "bank": "parallel",
+    "destination": "F4"
+   },
+   "status": "unsupported",
+   "rows": {},
+   "absent": [
+    "growatt.bms.link.1862.maximum",
+    "growatt.bms.link.1862.minimum",
+    "growatt.bms.link.1862.mean",
+    "growatt.bms.link.1862.reserved"
+   ],
+   "fine": {
+    "fine_valid": true,
+    "maximum": "accepted",
+    "minimum": "accepted",
+    "mean": "accepted",
+    "contributors": {
+     "count": 2,
+     "count_valid": true,
+     "payload": "0802300200000000",
+     "stale_sensor": -1,
+     "fixed_four": false
+    }
+   }
+  },
+  {
+   "name": "layout W on group two carries the 0.1 Ah fields ordinary",
+   "family": "180B",
+   "payload": "e803190007095802",
+   "selection": {
+    "project": "QAAA",
+    "release": "0006",
+    "choice": "",
+    "group": "",
+    "slot": "",
+    "source": "02",
+    "bank": "ordinary",
+    "destination": "F4"
+   },
+   "status": "accepted",
+   "rows": {
+    "growatt.bms.link.full_capacity": {
+     "value": "100",
+     "unit": "Ah",
+     "disposition": "accepted",
+     "raw": "1000"
+    },
+    "growatt.bms.link.fine_cycles": {
+     "value": "2.5",
+     "unit": "cycles",
+     "disposition": "accepted",
+     "raw": "25"
+    },
+    "growatt.bms.link.algorithm_state": {
+     "value": "7",
+     "unit": "",
+     "disposition": "raw",
+     "raw": "7"
+    },
+    "growatt.bms.link.residual_budget": {
+     "value": "9",
+     "unit": "",
+     "disposition": "raw",
+     "raw": "9"
+    },
+    "growatt.bms.link.remaining_capacity": {
+     "value": "60",
+     "unit": "Ah",
+     "disposition": "accepted",
+     "raw": "600"
+    }
+   },
+   "absent": [],
+   "fine": null
+  },
+  {
+   "name": "layout W on group two carries the 0.1 Ah fields parallel",
+   "family": "180B",
+   "payload": "e803190007095802",
+   "selection": {
+    "project": "QAAA",
+    "release": "0006",
+    "choice": "",
+    "group": "3",
+    "slot": "5",
+    "source": "0A",
+    "bank": "parallel",
+    "destination": "F4"
+   },
+   "status": "accepted",
+   "rows": {
+    "growatt.bms.link.full_capacity": {
+     "value": "100",
+     "unit": "Ah",
+     "disposition": "accepted",
+     "raw": "1000"
+    },
+    "growatt.bms.link.fine_cycles": {
+     "value": "2.5",
+     "unit": "cycles",
+     "disposition": "accepted",
+     "raw": "25"
+    },
+    "growatt.bms.link.algorithm_state": {
+     "value": "7",
+     "unit": "",
+     "disposition": "raw",
+     "raw": "7"
+    },
+    "growatt.bms.link.residual_budget": {
+     "value": "9",
+     "unit": "",
+     "disposition": "raw",
+     "raw": "9"
+    },
+    "growatt.bms.link.remaining_capacity": {
+     "value": "60",
+     "unit": "Ah",
+     "disposition": "accepted",
+     "raw": "600"
+    }
+   },
+   "absent": [],
+   "fine": null
+  },
+  {
+   "name": "layout W on release 11 keeps the full capacity and remaining capacity raw ordinary",
+   "family": "180B",
+   "payload": "e803190007095802",
+   "selection": {
+    "project": "QAAA",
+    "release": "0011",
+    "choice": "",
+    "group": "",
+    "slot": "",
+    "source": "02",
+    "bank": "ordinary",
+    "destination": "F4"
+   },
+   "status": "accepted",
+   "rows": {
+    "growatt.bms.link.full_capacity": {
+     "value": "1000",
+     "unit": "",
+     "disposition": "raw",
+     "raw": "1000"
+    },
+    "growatt.bms.link.fine_cycles": {
+     "value": "25",
+     "unit": "",
+     "disposition": "raw",
+     "raw": "25"
+    },
+    "growatt.bms.link.algorithm_state": {
+     "value": "7",
+     "unit": "",
+     "disposition": "raw",
+     "raw": "7"
+    },
+    "growatt.bms.link.residual_budget": {
+     "value": "9",
+     "unit": "",
+     "disposition": "raw",
+     "raw": "9"
+    },
+    "growatt.bms.link.remaining_capacity": {
+     "value": "600",
+     "unit": "",
+     "disposition": "raw",
+     "raw": "600"
+    }
+   },
+   "absent": [],
+   "fine": null
+  },
+  {
+   "name": "layout W on release 11 keeps the full capacity and remaining capacity raw parallel",
+   "family": "180B",
+   "payload": "e803190007095802",
+   "selection": {
+    "project": "QAAA",
+    "release": "0011",
+    "choice": "",
+    "group": "3",
+    "slot": "5",
+    "source": "0A",
+    "bank": "parallel",
+    "destination": "F4"
+   },
+   "status": "accepted",
+   "rows": {
+    "growatt.bms.link.full_capacity": {
+     "value": "1000",
+     "unit": "",
+     "disposition": "raw",
+     "raw": "1000"
+    },
+    "growatt.bms.link.fine_cycles": {
+     "value": "25",
+     "unit": "",
+     "disposition": "raw",
+     "raw": "25"
+    },
+    "growatt.bms.link.algorithm_state": {
+     "value": "7",
+     "unit": "",
+     "disposition": "raw",
+     "raw": "7"
+    },
+    "growatt.bms.link.residual_budget": {
+     "value": "9",
+     "unit": "",
+     "disposition": "raw",
+     "raw": "9"
+    },
+    "growatt.bms.link.remaining_capacity": {
+     "value": "600",
+     "unit": "",
+     "disposition": "raw",
+     "raw": "600"
+    }
+   },
+   "absent": [],
+   "fine": null
+  },
+  {
+   "name": "layout W on group three keeps the words raw ordinary",
+   "family": "180B",
+   "payload": "e803190007095802",
+   "selection": {
+    "project": "QAAA",
+    "release": "0007",
+    "choice": "",
+    "group": "",
+    "slot": "",
+    "source": "02",
+    "bank": "ordinary",
+    "destination": "F4"
+   },
+   "status": "accepted",
+   "rows": {
+    "growatt.bms.link.full_capacity": {
+     "value": "1000",
+     "unit": "",
+     "disposition": "raw",
+     "raw": "1000"
+    },
+    "growatt.bms.link.fine_cycles": {
+     "value": "25",
+     "unit": "",
+     "disposition": "raw",
+     "raw": "25"
+    },
+    "growatt.bms.link.algorithm_state": {
+     "value": "7",
+     "unit": "",
+     "disposition": "raw",
+     "raw": "7"
+    },
+    "growatt.bms.link.residual_budget": {
+     "value": "9",
+     "unit": "",
+     "disposition": "raw",
+     "raw": "9"
+    },
+    "growatt.bms.link.remaining_capacity": {
+     "value": "600",
+     "unit": "",
+     "disposition": "raw",
+     "raw": "600"
+    }
+   },
+   "absent": [],
+   "fine": null
+  },
+  {
+   "name": "layout W on group three keeps the words raw parallel",
+   "family": "180B",
+   "payload": "e803190007095802",
+   "selection": {
+    "project": "QAAA",
+    "release": "0007",
+    "choice": "",
+    "group": "3",
+    "slot": "5",
+    "source": "0A",
+    "bank": "parallel",
+    "destination": "F4"
+   },
+   "status": "accepted",
+   "rows": {
+    "growatt.bms.link.full_capacity": {
+     "value": "1000",
+     "unit": "",
+     "disposition": "raw",
+     "raw": "1000"
+    },
+    "growatt.bms.link.fine_cycles": {
+     "value": "25",
+     "unit": "",
+     "disposition": "raw",
+     "raw": "25"
+    },
+    "growatt.bms.link.algorithm_state": {
+     "value": "7",
+     "unit": "",
+     "disposition": "raw",
+     "raw": "7"
+    },
+    "growatt.bms.link.residual_budget": {
+     "value": "9",
+     "unit": "",
+     "disposition": "raw",
+     "raw": "9"
+    },
+    "growatt.bms.link.remaining_capacity": {
+     "value": "600",
+     "unit": "",
+     "disposition": "raw",
+     "raw": "600"
+    }
+   },
+   "absent": [],
+   "fine": null
+  },
+  {
+   "name": "layout C carries checkpoints and a raw remaining capacity ordinary",
+   "family": "180B",
+   "payload": "0100020003000400",
+   "selection": {
+    "project": "QAAA",
+    "release": "0002",
+    "choice": "",
+    "group": "",
+    "slot": "",
+    "source": "02",
+    "bank": "ordinary",
+    "destination": "F4"
+   },
+   "status": "accepted",
+   "rows": {
+    "growatt.bms.link.checkpoint_0": {
+     "value": "1",
+     "unit": "",
+     "disposition": "raw",
+     "raw": "1"
+    },
+    "growatt.bms.link.checkpoint_1": {
+     "value": "2",
+     "unit": "",
+     "disposition": "raw",
+     "raw": "2"
+    },
+    "growatt.bms.link.checkpoint_2": {
+     "value": "3",
+     "unit": "",
+     "disposition": "raw",
+     "raw": "3"
+    },
+    "growatt.bms.link.remaining_capacity": {
+     "value": "4",
+     "unit": "",
+     "disposition": "raw",
+     "raw": "4"
+    }
+   },
+   "absent": [],
+   "fine": null
+  },
+  {
+   "name": "layout C carries checkpoints and a raw remaining capacity parallel",
+   "family": "180B",
+   "payload": "0100020003000400",
+   "selection": {
+    "project": "QAAA",
+    "release": "0002",
+    "choice": "",
+    "group": "3",
+    "slot": "5",
+    "source": "0A",
+    "bank": "parallel",
+    "destination": "F4"
+   },
+   "status": "accepted",
+   "rows": {
+    "growatt.bms.link.checkpoint_0": {
+     "value": "1",
+     "unit": "",
+     "disposition": "raw",
+     "raw": "1"
+    },
+    "growatt.bms.link.checkpoint_1": {
+     "value": "2",
+     "unit": "",
+     "disposition": "raw",
+     "raw": "2"
+    },
+    "growatt.bms.link.checkpoint_2": {
+     "value": "3",
+     "unit": "",
+     "disposition": "raw",
+     "raw": "3"
+    },
+    "growatt.bms.link.remaining_capacity": {
+     "value": "4",
+     "unit": "",
+     "disposition": "raw",
+     "raw": "4"
+    }
+   },
+   "absent": [],
+   "fine": null
+  },
+  {
+   "name": "layout B carries derived capacity, algorithm byte and cycles ordinary",
+   "family": "180B",
+   "payload": "05060201090a0403",
+   "selection": {
+    "project": "QAAb",
+    "release": "5004",
+    "choice": "",
+    "group": "",
+    "slot": "",
+    "source": "02",
+    "bank": "ordinary",
+    "destination": "F4"
+   },
+   "status": "accepted",
+   "rows": {
+    "growatt.bms.link.capacity_derived": {
+     "value": "5",
+     "unit": "",
+     "disposition": "raw",
+     "raw": "5"
+    },
+    "growatt.bms.link.algorithm": {
+     "value": "6",
+     "unit": "",
+     "disposition": "raw",
+     "raw": "6"
+    },
+    "growatt.bms.link.cycles": {
+     "value": "258",
+     "unit": "",
+     "disposition": "raw",
+     "raw": "258"
+    },
+    "growatt.bms.link.180B.b4": {
+     "value": "9",
+     "unit": "",
+     "disposition": "raw",
+     "raw": "9"
+    },
+    "growatt.bms.link.180B.b5": {
+     "value": "10",
+     "unit": "",
+     "disposition": "raw",
+     "raw": "10"
+    },
+    "growatt.bms.link.remaining_capacity": {
+     "value": "772",
+     "unit": "",
+     "disposition": "raw",
+     "raw": "772"
+    }
+   },
+   "absent": [],
+   "fine": null
+  },
+  {
+   "name": "layout B carries derived capacity, algorithm byte and cycles parallel",
+   "family": "180B",
+   "payload": "05060201090a0403",
+   "selection": {
+    "project": "QAAb",
+    "release": "5004",
+    "choice": "",
+    "group": "3",
+    "slot": "5",
+    "source": "0A",
+    "bank": "parallel",
+    "destination": "F4"
+   },
+   "status": "accepted",
+   "rows": {
+    "growatt.bms.link.capacity_derived": {
+     "value": "5",
+     "unit": "",
+     "disposition": "raw",
+     "raw": "5"
+    },
+    "growatt.bms.link.algorithm": {
+     "value": "6",
+     "unit": "",
+     "disposition": "raw",
+     "raw": "6"
+    },
+    "growatt.bms.link.cycles": {
+     "value": "258",
+     "unit": "",
+     "disposition": "raw",
+     "raw": "258"
+    },
+    "growatt.bms.link.180B.b4": {
+     "value": "9",
+     "unit": "",
+     "disposition": "raw",
+     "raw": "9"
+    },
+    "growatt.bms.link.180B.b5": {
+     "value": "10",
+     "unit": "",
+     "disposition": "raw",
+     "raw": "10"
+    },
+    "growatt.bms.link.remaining_capacity": {
+     "value": "772",
+     "unit": "",
+     "disposition": "raw",
+     "raw": "772"
+    }
+   },
+   "absent": [],
+   "fine": null
+  },
+  {
+   "name": "layout without a resolved group has no rows ordinary",
+   "family": "180B",
+   "payload": "e803190007095802",
+   "selection": {
+    "project": "QAAa",
+    "release": "9011",
+    "choice": "",
+    "group": "",
+    "slot": "",
+    "source": "02",
+    "bank": "ordinary",
+    "destination": "F4"
+   },
+   "status": "unsupported",
+   "rows": {},
+   "absent": [
+    "growatt.bms.link.full_capacity",
+    "growatt.bms.link.remaining_capacity",
+    "growatt.bms.link.cycles",
+    "growatt.bms.link.checkpoint_0"
+   ],
+   "fine": null
+  },
+  {
+   "name": "layout without a resolved group has no rows parallel",
+   "family": "180B",
+   "payload": "e803190007095802",
+   "selection": {
+    "project": "QAAa",
+    "release": "9011",
+    "choice": "",
+    "group": "3",
+    "slot": "5",
+    "source": "0A",
+    "bank": "parallel",
+    "destination": "F4"
+   },
+   "status": "unsupported",
+   "rows": {},
+   "absent": [
+    "growatt.bms.link.full_capacity",
+    "growatt.bms.link.remaining_capacity",
+    "growatt.bms.link.cycles",
+    "growatt.bms.link.checkpoint_0"
+   ],
+   "fine": null
+  },
+  {
+   "name": "layout W rows are absent under layout B ordinary",
+   "family": "180B",
+   "payload": "e803190007095802",
+   "selection": {
+    "project": "QAAb",
+    "release": "5004",
+    "choice": "",
+    "group": "",
+    "slot": "",
+    "source": "02",
+    "bank": "ordinary",
+    "destination": "F4"
+   },
+   "status": "accepted",
+   "rows": {
+    "growatt.bms.link.capacity_derived": {
+     "value": "232",
+     "unit": "",
+     "disposition": "raw",
+     "raw": "232"
+    },
+    "growatt.bms.link.algorithm": {
+     "value": "3",
+     "unit": "",
+     "disposition": "raw",
+     "raw": "3"
+    },
+    "growatt.bms.link.cycles": {
+     "value": "25",
+     "unit": "",
+     "disposition": "raw",
+     "raw": "25"
+    },
+    "growatt.bms.link.180B.b4": {
+     "value": "7",
+     "unit": "",
+     "disposition": "raw",
+     "raw": "7"
+    },
+    "growatt.bms.link.180B.b5": {
+     "value": "9",
+     "unit": "",
+     "disposition": "raw",
+     "raw": "9"
+    },
+    "growatt.bms.link.remaining_capacity": {
+     "value": "600",
+     "unit": "",
+     "disposition": "raw",
+     "raw": "600"
+    }
+   },
+   "absent": [
+    "growatt.bms.link.full_capacity",
+    "growatt.bms.link.fine_cycles",
+    "growatt.bms.link.algorithm_state",
+    "growatt.bms.link.residual_budget",
+    "growatt.bms.link.checkpoint_0"
+   ],
+   "fine": null
+  },
+  {
+   "name": "layout W rows are absent under layout B parallel",
+   "family": "180B",
+   "payload": "e803190007095802",
+   "selection": {
+    "project": "QAAb",
+    "release": "5004",
+    "choice": "",
+    "group": "3",
+    "slot": "5",
+    "source": "0A",
+    "bank": "parallel",
+    "destination": "F4"
+   },
+   "status": "accepted",
+   "rows": {
+    "growatt.bms.link.capacity_derived": {
+     "value": "232",
+     "unit": "",
+     "disposition": "raw",
+     "raw": "232"
+    },
+    "growatt.bms.link.algorithm": {
+     "value": "3",
+     "unit": "",
+     "disposition": "raw",
+     "raw": "3"
+    },
+    "growatt.bms.link.cycles": {
+     "value": "25",
+     "unit": "",
+     "disposition": "raw",
+     "raw": "25"
+    },
+    "growatt.bms.link.180B.b4": {
+     "value": "7",
+     "unit": "",
+     "disposition": "raw",
+     "raw": "7"
+    },
+    "growatt.bms.link.180B.b5": {
+     "value": "9",
+     "unit": "",
+     "disposition": "raw",
+     "raw": "9"
+    },
+    "growatt.bms.link.remaining_capacity": {
+     "value": "600",
+     "unit": "",
+     "disposition": "raw",
+     "raw": "600"
+    }
+   },
+   "absent": [
+    "growatt.bms.link.full_capacity",
+    "growatt.bms.link.fine_cycles",
+    "growatt.bms.link.algorithm_state",
+    "growatt.bms.link.residual_budget",
+    "growatt.bms.link.checkpoint_0"
+   ],
+   "fine": null
+  }
+ ]
+}

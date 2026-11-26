@@ -1,0 +1,1946 @@
+{
+ "cases": [
+  {
+   "name": "coordinator state bytes",
+   "evaluator": "aggregate",
+   "family": "180D",
+   "payload": "0102030405060708",
+   "selection": {
+    "project": "QAAA",
+    "release": "0006",
+    "choice": "",
+    "direction": "coordinator-to-module",
+    "scope": "aggregate",
+    "bank": "ordinary",
+    "source": "F4",
+    "destination": "F5",
+    "group": "",
+    "slot": ""
+   },
+   "status": "raw",
+   "reason": "",
+   "rows": {
+    "growatt.bms.link.soc_cache": {
+     "value": "1",
+     "unit": "",
+     "disposition": "raw",
+     "raw": "1"
+    },
+    "growatt.bms.link.state_1": {
+     "value": "2",
+     "unit": "",
+     "disposition": "raw",
+     "raw": "2"
+    },
+    "growatt.bms.link.state_2": {
+     "value": "3",
+     "unit": "",
+     "disposition": "raw",
+     "raw": "3"
+    },
+    "growatt.bms.link.state_3": {
+     "value": "4",
+     "unit": "",
+     "disposition": "raw",
+     "raw": "4"
+    },
+    "growatt.bms.link.180D.maximum_index": {
+     "value": "5",
+     "unit": "",
+     "disposition": "raw",
+     "raw": "5"
+    },
+    "growatt.bms.link.180D.minimum_index": {
+     "value": "6",
+     "unit": "",
+     "disposition": "raw",
+     "raw": "6"
+    },
+    "growatt.bms.link.temperature_6": {
+     "value": "7",
+     "unit": "",
+     "disposition": "raw",
+     "raw": "7"
+    },
+    "growatt.bms.link.temperature_7": {
+     "value": "8",
+     "unit": "",
+     "disposition": "raw",
+     "raw": "8"
+    }
+   },
+   "absent": [],
+   "attribution": null
+  },
+  {
+   "name": "coordinator state bytes under the parallel bank with group and slot",
+   "evaluator": "aggregate",
+   "family": "180D",
+   "payload": "fffefdfcfbfaf9f8",
+   "selection": {
+    "project": "QAAA",
+    "release": "0006",
+    "choice": "",
+    "direction": "coordinator-to-module",
+    "scope": "aggregate",
+    "bank": "parallel",
+    "source": "F4",
+    "destination": "F5",
+    "group": "3",
+    "slot": "5"
+   },
+   "status": "raw",
+   "reason": "",
+   "rows": {
+    "growatt.bms.link.soc_cache": {
+     "value": "255",
+     "unit": "",
+     "disposition": "raw",
+     "raw": "255"
+    },
+    "growatt.bms.link.state_1": {
+     "value": "254",
+     "unit": "",
+     "disposition": "raw",
+     "raw": "254"
+    },
+    "growatt.bms.link.state_2": {
+     "value": "253",
+     "unit": "",
+     "disposition": "raw",
+     "raw": "253"
+    },
+    "growatt.bms.link.state_3": {
+     "value": "252",
+     "unit": "",
+     "disposition": "raw",
+     "raw": "252"
+    },
+    "growatt.bms.link.180D.maximum_index": {
+     "value": "251",
+     "unit": "",
+     "disposition": "raw",
+     "raw": "251"
+    },
+    "growatt.bms.link.180D.minimum_index": {
+     "value": "250",
+     "unit": "",
+     "disposition": "raw",
+     "raw": "250"
+    },
+    "growatt.bms.link.temperature_6": {
+     "value": "249",
+     "unit": "",
+     "disposition": "raw",
+     "raw": "249"
+    },
+    "growatt.bms.link.temperature_7": {
+     "value": "248",
+     "unit": "",
+     "disposition": "raw",
+     "raw": "248"
+    }
+   },
+   "absent": [],
+   "attribution": {
+    "bank": "parallel",
+    "group": "3",
+    "slot": "5",
+    "has_group": true,
+    "has_slot": true
+   }
+  },
+  {
+   "name": "coordinator extrema words",
+   "evaluator": "aggregate",
+   "family": "180E",
+   "payload": "0102030405060708",
+   "selection": {
+    "project": "QAAA",
+    "release": "0006",
+    "choice": "",
+    "direction": "coordinator-to-module",
+    "scope": "aggregate",
+    "bank": "ordinary",
+    "source": "F4",
+    "destination": "F5",
+    "group": "",
+    "slot": ""
+   },
+   "status": "raw",
+   "reason": "",
+   "rows": {
+    "growatt.bms.link.index_0": {
+     "value": "1",
+     "unit": "",
+     "disposition": "raw",
+     "raw": "1"
+    },
+    "growatt.bms.link.index_1": {
+     "value": "2",
+     "unit": "",
+     "disposition": "raw",
+     "raw": "2"
+    },
+    "growatt.bms.link.extremum_2": {
+     "value": "1027",
+     "unit": "",
+     "disposition": "raw",
+     "raw": "1027"
+    },
+    "growatt.bms.link.extremum_4": {
+     "value": "1541",
+     "unit": "",
+     "disposition": "raw",
+     "raw": "1541"
+    },
+    "growatt.bms.link.additional_limit": {
+     "value": "2055",
+     "unit": "",
+     "disposition": "raw",
+     "raw": "2055"
+    }
+   },
+   "absent": [],
+   "attribution": null
+  },
+  {
+   "name": "coordinator additional limit keeps word geometry",
+   "evaluator": "aggregate",
+   "family": "180E",
+   "payload": "0000000000000102",
+   "selection": {
+    "project": "QAAA",
+    "release": "0006",
+    "choice": "",
+    "direction": "coordinator-to-module",
+    "scope": "aggregate",
+    "bank": "ordinary",
+    "source": "F4",
+    "destination": "F5",
+    "group": "",
+    "slot": ""
+   },
+   "status": "raw",
+   "reason": "",
+   "rows": {
+    "growatt.bms.link.index_0": {
+     "value": "0",
+     "unit": "",
+     "disposition": "raw",
+     "raw": "0"
+    },
+    "growatt.bms.link.index_1": {
+     "value": "0",
+     "unit": "",
+     "disposition": "raw",
+     "raw": "0"
+    },
+    "growatt.bms.link.extremum_2": {
+     "value": "0",
+     "unit": "",
+     "disposition": "raw",
+     "raw": "0"
+    },
+    "growatt.bms.link.extremum_4": {
+     "value": "0",
+     "unit": "",
+     "disposition": "raw",
+     "raw": "0"
+    },
+    "growatt.bms.link.additional_limit": {
+     "value": "513",
+     "unit": "",
+     "disposition": "raw",
+     "raw": "513"
+    }
+   },
+   "absent": [],
+   "attribution": null
+  },
+  {
+   "name": "coordinator limit current count and quotient",
+   "evaluator": "aggregate",
+   "family": "180F",
+   "payload": "0102030405060708",
+   "selection": {
+    "project": "QAAA",
+    "release": "0006",
+    "choice": "",
+    "direction": "coordinator-to-module",
+    "scope": "aggregate",
+    "bank": "ordinary",
+    "source": "F4",
+    "destination": "F5",
+    "group": "",
+    "slot": ""
+   },
+   "status": "raw",
+   "reason": "",
+   "rows": {
+    "growatt.bms.link.limit": {
+     "value": "513",
+     "unit": "",
+     "disposition": "raw",
+     "raw": "513"
+    },
+    "growatt.bms.link.180F.current": {
+     "value": "1027",
+     "unit": "",
+     "disposition": "raw",
+     "raw": "1027"
+    },
+    "growatt.bms.link.count": {
+     "value": "5",
+     "unit": "",
+     "disposition": "raw",
+     "raw": "5"
+    },
+    "growatt.bms.link.soh_cache": {
+     "value": "6",
+     "unit": "",
+     "disposition": "raw",
+     "raw": "6"
+    },
+    "growatt.bms.link.quotient": {
+     "value": "2055",
+     "unit": "",
+     "disposition": "raw",
+     "raw": "2055"
+    }
+   },
+   "absent": [],
+   "attribution": null
+  },
+  {
+   "name": "coordinator quotient keeps word geometry",
+   "evaluator": "aggregate",
+   "family": "180F",
+   "payload": "0000000000000102",
+   "selection": {
+    "project": "QAAA",
+    "release": "0006",
+    "choice": "",
+    "direction": "coordinator-to-module",
+    "scope": "aggregate",
+    "bank": "ordinary",
+    "source": "F4",
+    "destination": "F5",
+    "group": "",
+    "slot": ""
+   },
+   "status": "raw",
+   "reason": "",
+   "rows": {
+    "growatt.bms.link.limit": {
+     "value": "0",
+     "unit": "",
+     "disposition": "raw",
+     "raw": "0"
+    },
+    "growatt.bms.link.180F.current": {
+     "value": "0",
+     "unit": "",
+     "disposition": "raw",
+     "raw": "0"
+    },
+    "growatt.bms.link.count": {
+     "value": "0",
+     "unit": "",
+     "disposition": "raw",
+     "raw": "0"
+    },
+    "growatt.bms.link.soh_cache": {
+     "value": "0",
+     "unit": "",
+     "disposition": "raw",
+     "raw": "0"
+    },
+    "growatt.bms.link.quotient": {
+     "value": "513",
+     "unit": "",
+     "disposition": "raw",
+     "raw": "513"
+    }
+   },
+   "absent": [],
+   "attribution": null
+  },
+  {
+   "name": "coordinator words at their maximum",
+   "evaluator": "aggregate",
+   "family": "180F",
+   "payload": "ffffffffffffffff",
+   "selection": {
+    "project": "QAAA",
+    "release": "0006",
+    "choice": "",
+    "direction": "coordinator-to-module",
+    "scope": "aggregate",
+    "bank": "ordinary",
+    "source": "F4",
+    "destination": "F5",
+    "group": "",
+    "slot": ""
+   },
+   "status": "raw",
+   "reason": "",
+   "rows": {
+    "growatt.bms.link.limit": {
+     "value": "65535",
+     "unit": "",
+     "disposition": "raw",
+     "raw": "65535"
+    },
+    "growatt.bms.link.180F.current": {
+     "value": "65535",
+     "unit": "",
+     "disposition": "raw",
+     "raw": "65535"
+    },
+    "growatt.bms.link.count": {
+     "value": "255",
+     "unit": "",
+     "disposition": "raw",
+     "raw": "255"
+    },
+    "growatt.bms.link.soh_cache": {
+     "value": "255",
+     "unit": "",
+     "disposition": "raw",
+     "raw": "255"
+    },
+    "growatt.bms.link.quotient": {
+     "value": "65535",
+     "unit": "",
+     "disposition": "raw",
+     "raw": "65535"
+    }
+   },
+   "absent": [],
+   "attribution": null
+  },
+  {
+   "name": "coordinator group destination gives no rows",
+   "evaluator": "aggregate",
+   "family": "180E",
+   "payload": "0102030405060708",
+   "selection": {
+    "project": "QAAA",
+    "release": "0006",
+    "choice": "",
+    "direction": "coordinator-to-module",
+    "scope": "aggregate",
+    "bank": "ordinary",
+    "source": "F4",
+    "destination": "DF",
+    "group": "",
+    "slot": ""
+   },
+   "status": "unsupported",
+   "reason": "no-match",
+   "rows": {},
+   "absent": [],
+   "attribution": null
+  },
+  {
+   "name": "coordinator route neighbouring family gives no rows",
+   "evaluator": "aggregate",
+   "family": "180C",
+   "payload": "0102030405060708",
+   "selection": {
+    "project": "QAAA",
+    "release": "0006",
+    "choice": "",
+    "direction": "coordinator-to-module",
+    "scope": "aggregate",
+    "bank": "ordinary",
+    "source": "F4",
+    "destination": "F5",
+    "group": "",
+    "slot": ""
+   },
+   "status": "unsupported",
+   "reason": "no-match",
+   "rows": {},
+   "absent": [],
+   "attribution": null
+  },
+  {
+   "name": "coordinator route module family gives no rows",
+   "evaluator": "aggregate",
+   "family": "1805",
+   "payload": "0000000000000000",
+   "selection": {
+    "project": "QAAA",
+    "release": "0006",
+    "choice": "",
+    "direction": "coordinator-to-module",
+    "scope": "aggregate",
+    "bank": "ordinary",
+    "source": "F4",
+    "destination": "F5",
+    "group": "",
+    "slot": ""
+   },
+   "status": "unsupported",
+   "reason": "no-match",
+   "rows": {},
+   "absent": [],
+   "attribution": null
+  },
+  {
+   "name": "module route gives no aggregate rows",
+   "evaluator": "aggregate",
+   "family": "180F",
+   "payload": "0102030405060708",
+   "selection": {
+    "project": "QAAA",
+    "release": "0006",
+    "choice": "",
+    "direction": "module-to-coordinator",
+    "scope": "local",
+    "bank": "ordinary",
+    "source": "02",
+    "destination": "F4",
+    "group": "",
+    "slot": ""
+   },
+   "status": "unsupported",
+   "reason": "no-match",
+   "rows": {},
+   "absent": [],
+   "attribution": null
+  },
+  {
+   "name": "module route to the report destination is outside every admitted route",
+   "evaluator": "aggregate",
+   "family": "180D",
+   "payload": "0102030405060708",
+   "selection": {
+    "project": "QAAA",
+    "release": "0006",
+    "choice": "",
+    "direction": "module-to-coordinator",
+    "scope": "local",
+    "bank": "ordinary",
+    "source": "02",
+    "destination": "F5",
+    "group": "",
+    "slot": ""
+   },
+   "status": "invalid",
+   "reason": "invalid",
+   "rows": {},
+   "absent": [],
+   "attribution": null
+  },
+  {
+   "name": "coordinator frame of seven bytes is invalid",
+   "evaluator": "aggregate",
+   "family": "180D",
+   "payload": "01020304050607",
+   "selection": {
+    "project": "QAAA",
+    "release": "0006",
+    "choice": "",
+    "direction": "coordinator-to-module",
+    "scope": "aggregate",
+    "bank": "ordinary",
+    "source": "F4",
+    "destination": "F5",
+    "group": "",
+    "slot": ""
+   },
+   "status": "invalid",
+   "reason": "invalid",
+   "rows": {},
+   "absent": [],
+   "attribution": null
+  },
+  {
+   "name": "clock report with a calendar date",
+   "evaluator": "identity",
+   "family": "1809",
+   "payload": "ea070b1a091e0f01",
+   "selection": {
+    "project": "QAAA",
+    "release": "0006",
+    "choice": "",
+    "direction": "module-to-coordinator",
+    "scope": "local",
+    "bank": "ordinary",
+    "source": "02",
+    "destination": "F5",
+    "group": "",
+    "slot": ""
+   },
+   "status": "accepted",
+   "reason": "",
+   "rows": {
+    "growatt.bms.link.year": {
+     "value": "2026",
+     "unit": "",
+     "disposition": "accepted",
+     "raw": "2026"
+    },
+    "growatt.bms.link.month": {
+     "value": "11",
+     "unit": "",
+     "disposition": "accepted",
+     "raw": "11"
+    },
+    "growatt.bms.link.day": {
+     "value": "26",
+     "unit": "",
+     "disposition": "accepted",
+     "raw": "26"
+    },
+    "growatt.bms.link.hour": {
+     "value": "9",
+     "unit": "",
+     "disposition": "accepted",
+     "raw": "9"
+    },
+    "growatt.bms.link.minute": {
+     "value": "30",
+     "unit": "",
+     "disposition": "accepted",
+     "raw": "30"
+    },
+    "growatt.bms.link.second": {
+     "value": "15",
+     "unit": "",
+     "disposition": "accepted",
+     "raw": "15"
+    },
+    "growatt.bms.link.1809.status": {
+     "value": "1",
+     "unit": "",
+     "disposition": "raw",
+     "raw": "1"
+    }
+   },
+   "absent": [],
+   "attribution": null
+  },
+  {
+   "name": "clock report at the end of a year",
+   "evaluator": "identity",
+   "family": "1809",
+   "payload": "d0070c1f173b3b02",
+   "selection": {
+    "project": "QAAA",
+    "release": "0006",
+    "choice": "",
+    "direction": "module-to-coordinator",
+    "scope": "local",
+    "bank": "parallel",
+    "source": "0A",
+    "destination": "F5",
+    "group": "1",
+    "slot": "7"
+   },
+   "status": "accepted",
+   "reason": "",
+   "rows": {
+    "growatt.bms.link.year": {
+     "value": "2000",
+     "unit": "",
+     "disposition": "accepted",
+     "raw": "2000"
+    },
+    "growatt.bms.link.month": {
+     "value": "12",
+     "unit": "",
+     "disposition": "accepted",
+     "raw": "12"
+    },
+    "growatt.bms.link.day": {
+     "value": "31",
+     "unit": "",
+     "disposition": "accepted",
+     "raw": "31"
+    },
+    "growatt.bms.link.hour": {
+     "value": "23",
+     "unit": "",
+     "disposition": "accepted",
+     "raw": "23"
+    },
+    "growatt.bms.link.minute": {
+     "value": "59",
+     "unit": "",
+     "disposition": "accepted",
+     "raw": "59"
+    },
+    "growatt.bms.link.second": {
+     "value": "59",
+     "unit": "",
+     "disposition": "accepted",
+     "raw": "59"
+    },
+    "growatt.bms.link.1809.status": {
+     "value": "2",
+     "unit": "",
+     "disposition": "raw",
+     "raw": "2"
+    }
+   },
+   "absent": [],
+   "attribution": {
+    "bank": "parallel",
+    "group": "1",
+    "slot": "7",
+    "has_group": true,
+    "has_slot": true
+   }
+  },
+  {
+   "name": "clock report on a leap day",
+   "evaluator": "identity",
+   "family": "1809",
+   "payload": "d007021d000000ff",
+   "selection": {
+    "project": "QAAA",
+    "release": "0006",
+    "choice": "",
+    "direction": "module-to-coordinator",
+    "scope": "local",
+    "bank": "ordinary",
+    "source": "02",
+    "destination": "F5",
+    "group": "",
+    "slot": ""
+   },
+   "status": "accepted",
+   "reason": "",
+   "rows": {
+    "growatt.bms.link.year": {
+     "value": "2000",
+     "unit": "",
+     "disposition": "accepted",
+     "raw": "2000"
+    },
+    "growatt.bms.link.month": {
+     "value": "2",
+     "unit": "",
+     "disposition": "accepted",
+     "raw": "2"
+    },
+    "growatt.bms.link.day": {
+     "value": "29",
+     "unit": "",
+     "disposition": "accepted",
+     "raw": "29"
+    },
+    "growatt.bms.link.hour": {
+     "value": "0",
+     "unit": "",
+     "disposition": "accepted",
+     "raw": "0"
+    },
+    "growatt.bms.link.minute": {
+     "value": "0",
+     "unit": "",
+     "disposition": "accepted",
+     "raw": "0"
+    },
+    "growatt.bms.link.second": {
+     "value": "0",
+     "unit": "",
+     "disposition": "accepted",
+     "raw": "0"
+    },
+    "growatt.bms.link.1809.status": {
+     "value": "255",
+     "unit": "",
+     "disposition": "raw",
+     "raw": "255"
+    }
+   },
+   "absent": [],
+   "attribution": null
+  },
+  {
+   "name": "clock report with month thirteen keeps raw words as invalid",
+   "evaluator": "identity",
+   "family": "1809",
+   "payload": "ea070d1a091e0f01",
+   "selection": {
+    "project": "QAAA",
+    "release": "0006",
+    "choice": "",
+    "direction": "module-to-coordinator",
+    "scope": "local",
+    "bank": "ordinary",
+    "source": "02",
+    "destination": "F5",
+    "group": "",
+    "slot": ""
+   },
+   "status": "accepted",
+   "reason": "",
+   "rows": {
+    "growatt.bms.link.year": {
+     "value": "",
+     "unit": "",
+     "disposition": "invalid",
+     "raw": "2026"
+    },
+    "growatt.bms.link.month": {
+     "value": "",
+     "unit": "",
+     "disposition": "invalid",
+     "raw": "13"
+    },
+    "growatt.bms.link.day": {
+     "value": "",
+     "unit": "",
+     "disposition": "invalid",
+     "raw": "26"
+    },
+    "growatt.bms.link.hour": {
+     "value": "",
+     "unit": "",
+     "disposition": "invalid",
+     "raw": "9"
+    },
+    "growatt.bms.link.minute": {
+     "value": "",
+     "unit": "",
+     "disposition": "invalid",
+     "raw": "30"
+    },
+    "growatt.bms.link.second": {
+     "value": "",
+     "unit": "",
+     "disposition": "invalid",
+     "raw": "15"
+    },
+    "growatt.bms.link.1809.status": {
+     "value": "1",
+     "unit": "",
+     "disposition": "raw",
+     "raw": "1"
+    }
+   },
+   "absent": [],
+   "attribution": null
+  },
+  {
+   "name": "clock report with month zero keeps raw words as invalid",
+   "evaluator": "identity",
+   "family": "1809",
+   "payload": "ea07001a091e0f01",
+   "selection": {
+    "project": "QAAA",
+    "release": "0006",
+    "choice": "",
+    "direction": "module-to-coordinator",
+    "scope": "local",
+    "bank": "ordinary",
+    "source": "02",
+    "destination": "F5",
+    "group": "",
+    "slot": ""
+   },
+   "status": "accepted",
+   "reason": "",
+   "rows": {
+    "growatt.bms.link.year": {
+     "value": "",
+     "unit": "",
+     "disposition": "invalid",
+     "raw": "2026"
+    },
+    "growatt.bms.link.month": {
+     "value": "",
+     "unit": "",
+     "disposition": "invalid",
+     "raw": "0"
+    },
+    "growatt.bms.link.day": {
+     "value": "",
+     "unit": "",
+     "disposition": "invalid",
+     "raw": "26"
+    },
+    "growatt.bms.link.hour": {
+     "value": "",
+     "unit": "",
+     "disposition": "invalid",
+     "raw": "9"
+    },
+    "growatt.bms.link.minute": {
+     "value": "",
+     "unit": "",
+     "disposition": "invalid",
+     "raw": "30"
+    },
+    "growatt.bms.link.second": {
+     "value": "",
+     "unit": "",
+     "disposition": "invalid",
+     "raw": "15"
+    },
+    "growatt.bms.link.1809.status": {
+     "value": "1",
+     "unit": "",
+     "disposition": "raw",
+     "raw": "1"
+    }
+   },
+   "absent": [],
+   "attribution": null
+  },
+  {
+   "name": "clock report with day thirty of February keeps raw words as invalid",
+   "evaluator": "identity",
+   "family": "1809",
+   "payload": "ea07021e091e0f01",
+   "selection": {
+    "project": "QAAA",
+    "release": "0006",
+    "choice": "",
+    "direction": "module-to-coordinator",
+    "scope": "local",
+    "bank": "ordinary",
+    "source": "02",
+    "destination": "F5",
+    "group": "",
+    "slot": ""
+   },
+   "status": "accepted",
+   "reason": "",
+   "rows": {
+    "growatt.bms.link.year": {
+     "value": "",
+     "unit": "",
+     "disposition": "invalid",
+     "raw": "2026"
+    },
+    "growatt.bms.link.month": {
+     "value": "",
+     "unit": "",
+     "disposition": "invalid",
+     "raw": "2"
+    },
+    "growatt.bms.link.day": {
+     "value": "",
+     "unit": "",
+     "disposition": "invalid",
+     "raw": "30"
+    },
+    "growatt.bms.link.hour": {
+     "value": "",
+     "unit": "",
+     "disposition": "invalid",
+     "raw": "9"
+    },
+    "growatt.bms.link.minute": {
+     "value": "",
+     "unit": "",
+     "disposition": "invalid",
+     "raw": "30"
+    },
+    "growatt.bms.link.second": {
+     "value": "",
+     "unit": "",
+     "disposition": "invalid",
+     "raw": "15"
+    },
+    "growatt.bms.link.1809.status": {
+     "value": "1",
+     "unit": "",
+     "disposition": "raw",
+     "raw": "1"
+    }
+   },
+   "absent": [],
+   "attribution": null
+  },
+  {
+   "name": "clock report with day zero keeps raw words as invalid",
+   "evaluator": "identity",
+   "family": "1809",
+   "payload": "ea070b00091e0f01",
+   "selection": {
+    "project": "QAAA",
+    "release": "0006",
+    "choice": "",
+    "direction": "module-to-coordinator",
+    "scope": "local",
+    "bank": "ordinary",
+    "source": "02",
+    "destination": "F5",
+    "group": "",
+    "slot": ""
+   },
+   "status": "accepted",
+   "reason": "",
+   "rows": {
+    "growatt.bms.link.year": {
+     "value": "",
+     "unit": "",
+     "disposition": "invalid",
+     "raw": "2026"
+    },
+    "growatt.bms.link.month": {
+     "value": "",
+     "unit": "",
+     "disposition": "invalid",
+     "raw": "11"
+    },
+    "growatt.bms.link.day": {
+     "value": "",
+     "unit": "",
+     "disposition": "invalid",
+     "raw": "0"
+    },
+    "growatt.bms.link.hour": {
+     "value": "",
+     "unit": "",
+     "disposition": "invalid",
+     "raw": "9"
+    },
+    "growatt.bms.link.minute": {
+     "value": "",
+     "unit": "",
+     "disposition": "invalid",
+     "raw": "30"
+    },
+    "growatt.bms.link.second": {
+     "value": "",
+     "unit": "",
+     "disposition": "invalid",
+     "raw": "15"
+    },
+    "growatt.bms.link.1809.status": {
+     "value": "1",
+     "unit": "",
+     "disposition": "raw",
+     "raw": "1"
+    }
+   },
+   "absent": [],
+   "attribution": null
+  },
+  {
+   "name": "clock report with hour twenty-four keeps raw words as invalid",
+   "evaluator": "identity",
+   "family": "1809",
+   "payload": "ea070b1a181e0f01",
+   "selection": {
+    "project": "QAAA",
+    "release": "0006",
+    "choice": "",
+    "direction": "module-to-coordinator",
+    "scope": "local",
+    "bank": "ordinary",
+    "source": "02",
+    "destination": "F5",
+    "group": "",
+    "slot": ""
+   },
+   "status": "accepted",
+   "reason": "",
+   "rows": {
+    "growatt.bms.link.year": {
+     "value": "",
+     "unit": "",
+     "disposition": "invalid",
+     "raw": "2026"
+    },
+    "growatt.bms.link.month": {
+     "value": "",
+     "unit": "",
+     "disposition": "invalid",
+     "raw": "11"
+    },
+    "growatt.bms.link.day": {
+     "value": "",
+     "unit": "",
+     "disposition": "invalid",
+     "raw": "26"
+    },
+    "growatt.bms.link.hour": {
+     "value": "",
+     "unit": "",
+     "disposition": "invalid",
+     "raw": "24"
+    },
+    "growatt.bms.link.minute": {
+     "value": "",
+     "unit": "",
+     "disposition": "invalid",
+     "raw": "30"
+    },
+    "growatt.bms.link.second": {
+     "value": "",
+     "unit": "",
+     "disposition": "invalid",
+     "raw": "15"
+    },
+    "growatt.bms.link.1809.status": {
+     "value": "1",
+     "unit": "",
+     "disposition": "raw",
+     "raw": "1"
+    }
+   },
+   "absent": [],
+   "attribution": null
+  },
+  {
+   "name": "clock report with minute sixty keeps raw words as invalid",
+   "evaluator": "identity",
+   "family": "1809",
+   "payload": "ea070b1a093c0f01",
+   "selection": {
+    "project": "QAAA",
+    "release": "0006",
+    "choice": "",
+    "direction": "module-to-coordinator",
+    "scope": "local",
+    "bank": "ordinary",
+    "source": "02",
+    "destination": "F5",
+    "group": "",
+    "slot": ""
+   },
+   "status": "accepted",
+   "reason": "",
+   "rows": {
+    "growatt.bms.link.year": {
+     "value": "",
+     "unit": "",
+     "disposition": "invalid",
+     "raw": "2026"
+    },
+    "growatt.bms.link.month": {
+     "value": "",
+     "unit": "",
+     "disposition": "invalid",
+     "raw": "11"
+    },
+    "growatt.bms.link.day": {
+     "value": "",
+     "unit": "",
+     "disposition": "invalid",
+     "raw": "26"
+    },
+    "growatt.bms.link.hour": {
+     "value": "",
+     "unit": "",
+     "disposition": "invalid",
+     "raw": "9"
+    },
+    "growatt.bms.link.minute": {
+     "value": "",
+     "unit": "",
+     "disposition": "invalid",
+     "raw": "60"
+    },
+    "growatt.bms.link.second": {
+     "value": "",
+     "unit": "",
+     "disposition": "invalid",
+     "raw": "15"
+    },
+    "growatt.bms.link.1809.status": {
+     "value": "1",
+     "unit": "",
+     "disposition": "raw",
+     "raw": "1"
+    }
+   },
+   "absent": [],
+   "attribution": null
+  },
+  {
+   "name": "clock report with second sixty keeps raw words as invalid",
+   "evaluator": "identity",
+   "family": "1809",
+   "payload": "ea070b1a091e3c01",
+   "selection": {
+    "project": "QAAA",
+    "release": "0006",
+    "choice": "",
+    "direction": "module-to-coordinator",
+    "scope": "local",
+    "bank": "ordinary",
+    "source": "02",
+    "destination": "F5",
+    "group": "",
+    "slot": ""
+   },
+   "status": "accepted",
+   "reason": "",
+   "rows": {
+    "growatt.bms.link.year": {
+     "value": "",
+     "unit": "",
+     "disposition": "invalid",
+     "raw": "2026"
+    },
+    "growatt.bms.link.month": {
+     "value": "",
+     "unit": "",
+     "disposition": "invalid",
+     "raw": "11"
+    },
+    "growatt.bms.link.day": {
+     "value": "",
+     "unit": "",
+     "disposition": "invalid",
+     "raw": "26"
+    },
+    "growatt.bms.link.hour": {
+     "value": "",
+     "unit": "",
+     "disposition": "invalid",
+     "raw": "9"
+    },
+    "growatt.bms.link.minute": {
+     "value": "",
+     "unit": "",
+     "disposition": "invalid",
+     "raw": "30"
+    },
+    "growatt.bms.link.second": {
+     "value": "",
+     "unit": "",
+     "disposition": "invalid",
+     "raw": "60"
+    },
+    "growatt.bms.link.1809.status": {
+     "value": "1",
+     "unit": "",
+     "disposition": "raw",
+     "raw": "1"
+    }
+   },
+   "absent": [],
+   "attribution": null
+  },
+  {
+   "name": "clock report with year zero keeps raw words as invalid",
+   "evaluator": "identity",
+   "family": "1809",
+   "payload": "0000010100000000",
+   "selection": {
+    "project": "QAAA",
+    "release": "0006",
+    "choice": "",
+    "direction": "module-to-coordinator",
+    "scope": "local",
+    "bank": "ordinary",
+    "source": "02",
+    "destination": "F5",
+    "group": "",
+    "slot": ""
+   },
+   "status": "accepted",
+   "reason": "",
+   "rows": {
+    "growatt.bms.link.year": {
+     "value": "",
+     "unit": "",
+     "disposition": "invalid",
+     "raw": "0"
+    },
+    "growatt.bms.link.month": {
+     "value": "",
+     "unit": "",
+     "disposition": "invalid",
+     "raw": "1"
+    },
+    "growatt.bms.link.day": {
+     "value": "",
+     "unit": "",
+     "disposition": "invalid",
+     "raw": "1"
+    },
+    "growatt.bms.link.hour": {
+     "value": "",
+     "unit": "",
+     "disposition": "invalid",
+     "raw": "0"
+    },
+    "growatt.bms.link.minute": {
+     "value": "",
+     "unit": "",
+     "disposition": "invalid",
+     "raw": "0"
+    },
+    "growatt.bms.link.second": {
+     "value": "",
+     "unit": "",
+     "disposition": "invalid",
+     "raw": "0"
+    },
+    "growatt.bms.link.1809.status": {
+     "value": "0",
+     "unit": "",
+     "disposition": "raw",
+     "raw": "0"
+    }
+   },
+   "absent": [],
+   "attribution": null
+  },
+  {
+   "name": "clock report with day twenty-nine of a common February keeps raw words as invalid",
+   "evaluator": "identity",
+   "family": "1809",
+   "payload": "ea07021d091e0f01",
+   "selection": {
+    "project": "QAAA",
+    "release": "0006",
+    "choice": "",
+    "direction": "module-to-coordinator",
+    "scope": "local",
+    "bank": "ordinary",
+    "source": "02",
+    "destination": "F5",
+    "group": "",
+    "slot": ""
+   },
+   "status": "accepted",
+   "reason": "",
+   "rows": {
+    "growatt.bms.link.year": {
+     "value": "",
+     "unit": "",
+     "disposition": "invalid",
+     "raw": "2026"
+    },
+    "growatt.bms.link.month": {
+     "value": "",
+     "unit": "",
+     "disposition": "invalid",
+     "raw": "2"
+    },
+    "growatt.bms.link.day": {
+     "value": "",
+     "unit": "",
+     "disposition": "invalid",
+     "raw": "29"
+    },
+    "growatt.bms.link.hour": {
+     "value": "",
+     "unit": "",
+     "disposition": "invalid",
+     "raw": "9"
+    },
+    "growatt.bms.link.minute": {
+     "value": "",
+     "unit": "",
+     "disposition": "invalid",
+     "raw": "30"
+    },
+    "growatt.bms.link.second": {
+     "value": "",
+     "unit": "",
+     "disposition": "invalid",
+     "raw": "15"
+    },
+    "growatt.bms.link.1809.status": {
+     "value": "1",
+     "unit": "",
+     "disposition": "raw",
+     "raw": "1"
+    }
+   },
+   "absent": [],
+   "attribution": null
+  },
+  {
+   "name": "clock report without a contract group keeps raw words as invalid",
+   "evaluator": "identity",
+   "family": "1809",
+   "payload": "ea070b1a091e0f01",
+   "selection": {
+    "project": "QAAA",
+    "release": "0001",
+    "choice": "",
+    "direction": "module-to-coordinator",
+    "scope": "local",
+    "bank": "ordinary",
+    "source": "02",
+    "destination": "F5",
+    "group": "",
+    "slot": ""
+   },
+   "status": "accepted",
+   "reason": "",
+   "rows": {
+    "growatt.bms.link.year": {
+     "value": "",
+     "unit": "",
+     "disposition": "invalid",
+     "raw": "2026"
+    },
+    "growatt.bms.link.month": {
+     "value": "",
+     "unit": "",
+     "disposition": "invalid",
+     "raw": "11"
+    },
+    "growatt.bms.link.day": {
+     "value": "",
+     "unit": "",
+     "disposition": "invalid",
+     "raw": "26"
+    },
+    "growatt.bms.link.hour": {
+     "value": "",
+     "unit": "",
+     "disposition": "invalid",
+     "raw": "9"
+    },
+    "growatt.bms.link.minute": {
+     "value": "",
+     "unit": "",
+     "disposition": "invalid",
+     "raw": "30"
+    },
+    "growatt.bms.link.second": {
+     "value": "",
+     "unit": "",
+     "disposition": "invalid",
+     "raw": "15"
+    },
+    "growatt.bms.link.1809.status": {
+     "value": "1",
+     "unit": "",
+     "disposition": "raw",
+     "raw": "1"
+    }
+   },
+   "absent": [],
+   "attribution": null
+  },
+  {
+   "name": "clock report to the module destination gives no rows",
+   "evaluator": "identity",
+   "family": "1809",
+   "payload": "ea070b1a091e0f01",
+   "selection": {
+    "project": "QAAA",
+    "release": "0006",
+    "choice": "",
+    "direction": "module-to-coordinator",
+    "scope": "local",
+    "bank": "ordinary",
+    "source": "02",
+    "destination": "F4",
+    "group": "",
+    "slot": ""
+   },
+   "status": "unsupported",
+   "reason": "no-match",
+   "rows": {},
+   "absent": [],
+   "attribution": null
+  },
+  {
+   "name": "clock report route neighbouring family is outside every admitted route",
+   "evaluator": "identity",
+   "family": "180A",
+   "payload": "ea070b1a091e0f01",
+   "selection": {
+    "project": "QAAA",
+    "release": "0006",
+    "choice": "",
+    "direction": "module-to-coordinator",
+    "scope": "local",
+    "bank": "ordinary",
+    "source": "02",
+    "destination": "F5",
+    "group": "",
+    "slot": ""
+   },
+   "status": "invalid",
+   "reason": "invalid",
+   "rows": {},
+   "absent": [],
+   "attribution": null
+  },
+  {
+   "name": "clock report of seven bytes is invalid",
+   "evaluator": "identity",
+   "family": "1809",
+   "payload": "ea070b1a091e0f",
+   "selection": {
+    "project": "QAAA",
+    "release": "0006",
+    "choice": "",
+    "direction": "module-to-coordinator",
+    "scope": "local",
+    "bank": "ordinary",
+    "source": "02",
+    "destination": "F5",
+    "group": "",
+    "slot": ""
+   },
+   "status": "invalid",
+   "reason": "invalid",
+   "rows": {},
+   "absent": [],
+   "attribution": null
+  },
+  {
+   "name": "clock report from the coordinator route gives no rows",
+   "evaluator": "identity",
+   "family": "1809",
+   "payload": "ea070b1a091e0f01",
+   "selection": {
+    "project": "QAAA",
+    "release": "0006",
+    "choice": "",
+    "direction": "coordinator-to-module",
+    "scope": "aggregate",
+    "bank": "ordinary",
+    "source": "F4",
+    "destination": "F5",
+    "group": "",
+    "slot": ""
+   },
+   "status": "unsupported",
+   "reason": "no-match",
+   "rows": {},
+   "absent": [],
+   "attribution": null
+  },
+  {
+   "name": "first serial fragment",
+   "evaluator": "identity",
+   "family": "18FB",
+   "payload": "0f31323334353637",
+   "selection": {
+    "project": "QAAA",
+    "release": "0006",
+    "choice": "",
+    "direction": "module-to-coordinator",
+    "scope": "local",
+    "bank": "ordinary",
+    "source": "02",
+    "destination": "F4",
+    "group": "",
+    "slot": ""
+   },
+   "status": "raw",
+   "reason": "",
+   "rows": {
+    "growatt.bms.link.serial_header": {
+     "value": "15",
+     "unit": "",
+     "disposition": "raw",
+     "raw": "15"
+    },
+    "growatt.bms.link.serial_length_code": {
+     "value": "15",
+     "unit": "",
+     "disposition": "raw",
+     "raw": "15"
+    },
+    "growatt.bms.link.serial_fragment": {
+     "value": "0",
+     "unit": "",
+     "disposition": "raw",
+     "raw": "0"
+    },
+    "growatt.bms.link.serial_byte_1": {
+     "value": "49",
+     "unit": "",
+     "disposition": "raw",
+     "raw": "49"
+    },
+    "growatt.bms.link.serial_byte_2": {
+     "value": "50",
+     "unit": "",
+     "disposition": "raw",
+     "raw": "50"
+    },
+    "growatt.bms.link.serial_byte_3": {
+     "value": "51",
+     "unit": "",
+     "disposition": "raw",
+     "raw": "51"
+    },
+    "growatt.bms.link.serial_byte_4": {
+     "value": "52",
+     "unit": "",
+     "disposition": "raw",
+     "raw": "52"
+    },
+    "growatt.bms.link.serial_byte_5": {
+     "value": "53",
+     "unit": "",
+     "disposition": "raw",
+     "raw": "53"
+    },
+    "growatt.bms.link.serial_byte_6": {
+     "value": "54",
+     "unit": "",
+     "disposition": "raw",
+     "raw": "54"
+    },
+    "growatt.bms.link.serial_byte_7": {
+     "value": "55",
+     "unit": "",
+     "disposition": "raw",
+     "raw": "55"
+    }
+   },
+   "absent": [],
+   "attribution": null
+  },
+  {
+   "name": "second serial fragment",
+   "evaluator": "identity",
+   "family": "18FB",
+   "payload": "2f38394142434445",
+   "selection": {
+    "project": "QAAA",
+    "release": "0006",
+    "choice": "",
+    "direction": "module-to-coordinator",
+    "scope": "local",
+    "bank": "parallel",
+    "source": "0A",
+    "destination": "F4",
+    "group": "1",
+    "slot": "2"
+   },
+   "status": "raw",
+   "reason": "",
+   "rows": {
+    "growatt.bms.link.serial_header": {
+     "value": "47",
+     "unit": "",
+     "disposition": "raw",
+     "raw": "47"
+    },
+    "growatt.bms.link.serial_length_code": {
+     "value": "15",
+     "unit": "",
+     "disposition": "raw",
+     "raw": "15"
+    },
+    "growatt.bms.link.serial_fragment": {
+     "value": "1",
+     "unit": "",
+     "disposition": "raw",
+     "raw": "1"
+    },
+    "growatt.bms.link.serial_byte_1": {
+     "value": "56",
+     "unit": "",
+     "disposition": "raw",
+     "raw": "56"
+    },
+    "growatt.bms.link.serial_byte_2": {
+     "value": "57",
+     "unit": "",
+     "disposition": "raw",
+     "raw": "57"
+    },
+    "growatt.bms.link.serial_byte_3": {
+     "value": "65",
+     "unit": "",
+     "disposition": "raw",
+     "raw": "65"
+    },
+    "growatt.bms.link.serial_byte_4": {
+     "value": "66",
+     "unit": "",
+     "disposition": "raw",
+     "raw": "66"
+    },
+    "growatt.bms.link.serial_byte_5": {
+     "value": "67",
+     "unit": "",
+     "disposition": "raw",
+     "raw": "67"
+    },
+    "growatt.bms.link.serial_byte_6": {
+     "value": "68",
+     "unit": "",
+     "disposition": "raw",
+     "raw": "68"
+    },
+    "growatt.bms.link.serial_byte_7": {
+     "value": "69",
+     "unit": "",
+     "disposition": "raw",
+     "raw": "69"
+    }
+   },
+   "absent": [],
+   "attribution": null
+  },
+  {
+   "name": "last serial fragment with padding",
+   "evaluator": "identity",
+   "family": "18FB",
+   "payload": "4f46470000000000",
+   "selection": {
+    "project": "QAAa",
+    "release": "9011",
+    "choice": "release11",
+    "direction": "module-to-coordinator",
+    "scope": "local",
+    "bank": "ordinary",
+    "source": "02",
+    "destination": "F4",
+    "group": "",
+    "slot": ""
+   },
+   "status": "raw",
+   "reason": "",
+   "rows": {
+    "growatt.bms.link.serial_header": {
+     "value": "79",
+     "unit": "",
+     "disposition": "raw",
+     "raw": "79"
+    },
+    "growatt.bms.link.serial_length_code": {
+     "value": "15",
+     "unit": "",
+     "disposition": "raw",
+     "raw": "15"
+    },
+    "growatt.bms.link.serial_fragment": {
+     "value": "2",
+     "unit": "",
+     "disposition": "raw",
+     "raw": "2"
+    },
+    "growatt.bms.link.serial_byte_1": {
+     "value": "70",
+     "unit": "",
+     "disposition": "raw",
+     "raw": "70"
+    },
+    "growatt.bms.link.serial_byte_2": {
+     "value": "71",
+     "unit": "",
+     "disposition": "raw",
+     "raw": "71"
+    },
+    "growatt.bms.link.serial_byte_3": {
+     "value": "0",
+     "unit": "",
+     "disposition": "raw",
+     "raw": "0"
+    },
+    "growatt.bms.link.serial_byte_4": {
+     "value": "0",
+     "unit": "",
+     "disposition": "raw",
+     "raw": "0"
+    },
+    "growatt.bms.link.serial_byte_5": {
+     "value": "0",
+     "unit": "",
+     "disposition": "raw",
+     "raw": "0"
+    },
+    "growatt.bms.link.serial_byte_6": {
+     "value": "0",
+     "unit": "",
+     "disposition": "raw",
+     "raw": "0"
+    },
+    "growatt.bms.link.serial_byte_7": {
+     "value": "0",
+     "unit": "",
+     "disposition": "raw",
+     "raw": "0"
+    }
+   },
+   "absent": [],
+   "attribution": null
+  },
+  {
+   "name": "serial header with bit seven keeps the raw header",
+   "evaluator": "identity",
+   "family": "18FB",
+   "payload": "8f31323334353637",
+   "selection": {
+    "project": "QAAA",
+    "release": "0006",
+    "choice": "",
+    "direction": "module-to-coordinator",
+    "scope": "local",
+    "bank": "ordinary",
+    "source": "02",
+    "destination": "F4",
+    "group": "",
+    "slot": ""
+   },
+   "status": "raw",
+   "reason": "",
+   "rows": {
+    "growatt.bms.link.serial_header": {
+     "value": "143",
+     "unit": "",
+     "disposition": "raw",
+     "raw": "143"
+    },
+    "growatt.bms.link.serial_length_code": {
+     "value": "15",
+     "unit": "",
+     "disposition": "raw",
+     "raw": "15"
+    },
+    "growatt.bms.link.serial_fragment": {
+     "value": "0",
+     "unit": "",
+     "disposition": "raw",
+     "raw": "0"
+    },
+    "growatt.bms.link.serial_byte_1": {
+     "value": "49",
+     "unit": "",
+     "disposition": "raw",
+     "raw": "49"
+    },
+    "growatt.bms.link.serial_byte_2": {
+     "value": "50",
+     "unit": "",
+     "disposition": "raw",
+     "raw": "50"
+    },
+    "growatt.bms.link.serial_byte_3": {
+     "value": "51",
+     "unit": "",
+     "disposition": "raw",
+     "raw": "51"
+    },
+    "growatt.bms.link.serial_byte_4": {
+     "value": "52",
+     "unit": "",
+     "disposition": "raw",
+     "raw": "52"
+    },
+    "growatt.bms.link.serial_byte_5": {
+     "value": "53",
+     "unit": "",
+     "disposition": "raw",
+     "raw": "53"
+    },
+    "growatt.bms.link.serial_byte_6": {
+     "value": "54",
+     "unit": "",
+     "disposition": "raw",
+     "raw": "54"
+    },
+    "growatt.bms.link.serial_byte_7": {
+     "value": "55",
+     "unit": "",
+     "disposition": "raw",
+     "raw": "55"
+    }
+   },
+   "absent": [],
+   "attribution": null
+  },
+  {
+   "name": "serial fragment of a group without announcements gives no rows",
+   "evaluator": "identity",
+   "family": "18FB",
+   "payload": "0f31323334353637",
+   "selection": {
+    "project": "QAAA",
+    "release": "0002",
+    "choice": "",
+    "direction": "module-to-coordinator",
+    "scope": "local",
+    "bank": "ordinary",
+    "source": "02",
+    "destination": "F4",
+    "group": "",
+    "slot": ""
+   },
+   "status": "unsupported",
+   "reason": "no-match",
+   "rows": {},
+   "absent": [],
+   "attribution": null
+  },
+  {
+   "name": "serial fragment of an unknown contract group gives no rows",
+   "evaluator": "identity",
+   "family": "18FB",
+   "payload": "0f31323334353637",
+   "selection": {
+    "project": "QAAA",
+    "release": "0001",
+    "choice": "",
+    "direction": "module-to-coordinator",
+    "scope": "local",
+    "bank": "ordinary",
+    "source": "02",
+    "destination": "F4",
+    "group": "",
+    "slot": ""
+   },
+   "status": "unsupported",
+   "reason": "no-match",
+   "rows": {},
+   "absent": [],
+   "attribution": null
+  },
+  {
+   "name": "serial fragment to the report destination is outside every admitted route",
+   "evaluator": "identity",
+   "family": "18FB",
+   "payload": "0f31323334353637",
+   "selection": {
+    "project": "QAAA",
+    "release": "0006",
+    "choice": "",
+    "direction": "module-to-coordinator",
+    "scope": "local",
+    "bank": "ordinary",
+    "source": "02",
+    "destination": "F5",
+    "group": "",
+    "slot": ""
+   },
+   "status": "invalid",
+   "reason": "invalid",
+   "rows": {},
+   "absent": [],
+   "attribution": null
+  },
+  {
+   "name": "serial fragment of seven bytes is invalid",
+   "evaluator": "identity",
+   "family": "18FB",
+   "payload": "0f313233343536",
+   "selection": {
+    "project": "QAAA",
+    "release": "0006",
+    "choice": "",
+    "direction": "module-to-coordinator",
+    "scope": "local",
+    "bank": "ordinary",
+    "source": "02",
+    "destination": "F4",
+    "group": "",
+    "slot": ""
+   },
+   "status": "invalid",
+   "reason": "invalid",
+   "rows": {},
+   "absent": [],
+   "attribution": null
+  }
+ ]
+}

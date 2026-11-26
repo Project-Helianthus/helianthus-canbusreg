@@ -1,3 +1,5 @@
+// Command growatt-can-classify classifies candump text offline from a file or
+// standard input and writes JSON or text; it opens no CAN interface.
 package main
 
 import (

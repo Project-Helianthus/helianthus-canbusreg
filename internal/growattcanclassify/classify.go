@@ -1,3 +1,5 @@
+// Package growattcanclassify classifies candump text offline into CAN frame
+// evidence; it opens no CAN interface and activates no profile.
 package growattcanclassify
 
 import (
@@ -13,22 +15,30 @@ import (
 	"unicode/utf8"
 )
 
+// DefaultMaxBytes is the default input size limit in bytes.
 const DefaultMaxBytes = 4 << 20
+
+// DefaultMaxLine is the default maximum line length in bytes.
 const DefaultMaxLine = 4096
+
+// MaxFrames is the maximum number of frames accepted from one input.
 const MaxFrames = 16384
 
+// Options configures one classification run.
 type Options struct {
 	MaxBytes      int
 	MaxLine       int
 	MONInterfaces []string
 }
 
+// Candidate is one classification candidate for an interface.
 type Candidate struct {
 	Family string `json:"family"`
 	Grade  string `json:"grade"`
 	Reason string `json:"reason"`
 }
 
+// Frame is one parsed candump frame with its classification evidence.
 type Frame struct {
 	Line              int         `json:"line"`
 	Raw               string      `json:"raw"`
@@ -58,6 +68,7 @@ type Frame struct {
 	RuntimeAdmission  bool        `json:"runtime_admission"`
 }
 
+// InterfaceResult holds the classification outcome for one interface.
 type InterfaceResult struct {
 	Interface string   `json:"interface"`
 	Frames    int      `json:"frames"`
@@ -66,6 +77,7 @@ type InterfaceResult struct {
 	Outcome   string   `json:"outcome"`
 }
 
+// Result is the complete classification outcome of one input.
 type Result struct {
 	Outcome           string            `json:"outcome"`
 	Frames            []Frame           `json:"frames"`
@@ -476,6 +488,7 @@ func outcome(families, unknown int) string {
 	return "candidate"
 }
 
+// WriteText writes result to w in the human-readable text form.
 func WriteText(w io.Writer, result Result) error {
 	if _, err := fmt.Fprintf(w, "outcome=%s physical_qualified=false runtime_admission=false\n", result.Outcome); err != nil {
 		return err

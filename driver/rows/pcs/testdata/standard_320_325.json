@@ -1,0 +1,202 @@
+{
+  "description": "Synthetic standard PCS identity, version, serial-fragment and history frames 0x320, 0x321, 0x323, 0x324 and 0x325. Each expectation is written by hand from the frame layout: status is accepted or raw (withheld by its gate, raw word kept), and value is the exact decimal of the native value where the row presents one (empty when the value is withheld).",
+  "cases": [
+    {
+      "name": "identity-320-local-contract-l2",
+      "identifier": "0x320",
+      "payload": "1122330102030400",
+      "selection": {"project": "QAAA", "release": "0006", "flavor": "pcs-standard", "bank": "ordinary", "scope": "local", "endpoint": "coordinator", "group": "0", "slot": "1"},
+      "input": {},
+      "expect": {
+        "product_0": {"status": "accepted", "value": "17"},
+        "product_1": {"status": "accepted", "value": "34"},
+        "hardware": {"status": "accepted", "value": "51"},
+        "version_3": {"status": "accepted", "value": "513"},
+        "version_5": {"status": "accepted", "value": "1027"},
+        "reserved_7": {"status": "accepted", "value": "0"}
+      }
+    },
+    {
+      "name": "identity-320-reserved-byte-nonzero-withheld",
+      "identifier": "0x320",
+      "payload": "1122330102030401",
+      "selection": {"project": "QAAA", "release": "0006", "flavor": "pcs-standard", "bank": "ordinary", "scope": "local", "endpoint": "coordinator", "group": "0", "slot": "1"},
+      "input": {},
+      "expect": {
+        "product_0": {"status": "accepted", "value": "17"},
+        "product_1": {"status": "accepted", "value": "34"},
+        "hardware": {"status": "accepted", "value": "51"},
+        "version_3": {"status": "accepted", "value": "513"},
+        "version_5": {"status": "accepted", "value": "1027"},
+        "reserved_7": {"status": "raw", "value": ""}
+      }
+    },
+    {
+      "name": "identity-321-family-capable-contract-l8",
+      "identifier": "0x321",
+      "payload": "0047525731000000",
+      "selection": {"project": "QAAA", "release": "0011", "flavor": "pcs-standard", "bank": "ordinary", "scope": "local", "endpoint": "coordinator", "group": "0", "slot": "1"},
+      "input": {},
+      "expect": {
+        "family": {"status": "accepted", "value": "1196578609"},
+        "family_omitted": {"status": "raw", "value": ""},
+        "reserved_0": {"status": "raw", "value": "0"},
+        "reserved_5": {"status": "raw", "value": "0"},
+        "tail": {"status": "accepted", "value": "0"}
+      }
+    },
+    {
+      "name": "identity-321-family-omitted-marker-contract-l2",
+      "identifier": "0x321",
+      "payload": "0000000000000000",
+      "selection": {"project": "QAAA", "release": "0006", "flavor": "pcs-standard", "bank": "ordinary", "scope": "local", "endpoint": "coordinator", "group": "0", "slot": "1"},
+      "input": {},
+      "expect": {
+        "family": {"status": "raw", "value": ""},
+        "family_omitted": {"status": "accepted", "value": "0"},
+        "reserved_0": {"status": "raw", "value": "0"},
+        "reserved_5": {"status": "raw", "value": "0"},
+        "tail": {"status": "accepted", "value": "0"}
+      }
+    },
+    {
+      "name": "identity-323-count-parameter-and-threshold-withheld-contract-l2",
+      "identifier": "0x323",
+      "payload": "0501f40711223344",
+      "selection": {"project": "QAAA", "release": "0006", "flavor": "pcs-standard", "bank": "ordinary", "scope": "local", "endpoint": "coordinator", "group": "0", "slot": "1"},
+      "input": {"measurement_valid": true, "threshold_state_known": true},
+      "expect": {
+        "count": {"status": "accepted", "value": "5"},
+        "parameter": {"status": "raw", "value": "500"},
+        "separate_3": {"status": "raw", "value": "7"},
+        "synthesized_4": {"status": "accepted", "value": "17"},
+        "synthesized_5": {"status": "accepted", "value": "34"},
+        "synthesized_6": {"status": "accepted", "value": "51"},
+        "synthesized_7": {"status": "accepted", "value": "68"},
+        "threshold": {"status": "raw", "value": ""}
+      }
+    },
+    {
+      "name": "identity-323-threshold-accepted-contract-l8",
+      "identifier": "0x323",
+      "payload": "0501f40711223344",
+      "selection": {"project": "QAAA", "release": "0011", "flavor": "pcs-standard", "bank": "ordinary", "scope": "local", "endpoint": "coordinator", "group": "0", "slot": "1"},
+      "input": {"measurement_valid": true, "threshold_state_known": true, "alternative_eligible": false},
+      "expect": {
+        "count": {"status": "accepted", "value": "5"},
+        "parameter": {"status": "raw", "value": "500"},
+        "separate_3": {"status": "raw", "value": "7"},
+        "synthesized_4": {"status": "accepted", "value": "17"},
+        "synthesized_5": {"status": "accepted", "value": "34"},
+        "synthesized_6": {"status": "accepted", "value": "51"},
+        "synthesized_7": {"status": "accepted", "value": "68"},
+        "threshold": {"status": "accepted", "value": "500"}
+      }
+    },
+    {
+      "name": "identity-323-threshold-withheld-by-alternative-contract-l8",
+      "identifier": "0x323",
+      "payload": "0501f40711223344",
+      "selection": {"project": "QAAA", "release": "0011", "flavor": "pcs-standard", "bank": "ordinary", "scope": "local", "endpoint": "coordinator", "group": "0", "slot": "1"},
+      "input": {"measurement_valid": true, "threshold_state_known": true, "alternative_eligible": true},
+      "expect": {
+        "count": {"status": "accepted", "value": "5"},
+        "parameter": {"status": "raw", "value": "500"},
+        "separate_3": {"status": "raw", "value": "7"},
+        "synthesized_4": {"status": "accepted", "value": "17"},
+        "synthesized_5": {"status": "accepted", "value": "34"},
+        "synthesized_6": {"status": "accepted", "value": "51"},
+        "synthesized_7": {"status": "accepted", "value": "68"},
+        "threshold": {"status": "raw", "value": ""}
+      }
+    },
+    {
+      "name": "serial-fragment-324-first-frame-contract-l2",
+      "identifier": "0x324",
+      "payload": "0003414243444546",
+      "selection": {"project": "QAAA", "release": "0006", "flavor": "pcs-standard", "bank": "ordinary", "scope": "local", "endpoint": "coordinator", "group": "0", "slot": "1"},
+      "input": {"serial_slot_valid": true, "serial_slot": 3},
+      "expect": {
+        "byte_0": {"status": "raw", "value": "0"},
+        "byte_1": {"status": "raw", "value": "3"},
+        "byte_2": {"status": "raw", "value": "65"},
+        "byte_3": {"status": "raw", "value": "66"},
+        "byte_4": {"status": "raw", "value": "67"},
+        "byte_5": {"status": "raw", "value": "68"},
+        "byte_6": {"status": "raw", "value": "69"},
+        "byte_7": {"status": "raw", "value": "70"}
+      }
+    },
+    {
+      "name": "history-325-bytes-contract-l2",
+      "identifier": "0x325",
+      "payload": "0102030405060708",
+      "selection": {"project": "QAAA", "release": "0006", "flavor": "pcs-standard", "bank": "ordinary", "scope": "local", "endpoint": "coordinator", "group": "0", "slot": "1"},
+      "input": {},
+      "expect": {
+        "byte_0": {"status": "raw", "value": "1"},
+        "byte_1": {"status": "raw", "value": "2"},
+        "byte_2": {"status": "raw", "value": "3"},
+        "byte_3": {"status": "raw", "value": "4"},
+        "byte_4": {"status": "raw", "value": "5"},
+        "byte_5": {"status": "raw", "value": "6"},
+        "byte_6": {"status": "raw", "value": "7"},
+        "byte_7": {"status": "raw", "value": "8"}
+      }
+    },
+    {
+      "name": "gateway-321-placeholder-zero-path",
+      "identifier": "0x321",
+      "payload": "0000000000000000",
+      "selection": {"project": "QCAA", "release": "0001", "flavor": "pcs-standard", "bank": "ordinary", "scope": "aggregate", "endpoint": "gateway", "group": "", "slot": ""},
+      "input": {},
+      "expect": {
+        "byte_0": {"status": "raw", "value": "0"},
+        "byte_1": {"status": "raw", "value": "0"},
+        "byte_2": {"status": "raw", "value": "0"},
+        "byte_3": {"status": "raw", "value": "0"},
+        "byte_4": {"status": "raw", "value": "0"},
+        "byte_5": {"status": "raw", "value": "0"},
+        "byte_6": {"status": "raw", "value": "0"},
+        "byte_7": {"status": "raw", "value": "0"},
+        "placeholder": {"status": "accepted", "value": "0"}
+      }
+    },
+    {
+      "name": "gateway-325-placeholder-nonzero-withheld",
+      "identifier": "0x325",
+      "payload": "0100000000000000",
+      "selection": {"project": "QCAA", "release": "0001", "flavor": "pcs-standard", "bank": "ordinary", "scope": "aggregate", "endpoint": "gateway", "group": "", "slot": ""},
+      "input": {},
+      "expect": {
+        "byte_0": {"status": "raw", "value": "1"},
+        "byte_1": {"status": "raw", "value": "0"},
+        "byte_2": {"status": "raw", "value": "0"},
+        "byte_3": {"status": "raw", "value": "0"},
+        "byte_4": {"status": "raw", "value": "0"},
+        "byte_5": {"status": "raw", "value": "0"},
+        "byte_6": {"status": "raw", "value": "0"},
+        "byte_7": {"status": "raw", "value": "0"},
+        "placeholder": {"status": "raw", "value": ""}
+      }
+    },
+    {
+      "name": "placeholder-324-special-contract-l0-zero",
+      "identifier": "0x324",
+      "payload": "0000000000000000",
+      "selection": {"project": "QAaT", "release": "8252", "flavor": "pcs-standard", "bank": "ordinary", "scope": "local", "endpoint": "coordinator", "group": "0", "slot": "1"},
+      "input": {"serial_slot_valid": true, "serial_slot": 0},
+      "expect": {
+        "byte_0": {"status": "raw", "value": "0"},
+        "byte_1": {"status": "raw", "value": "0"},
+        "byte_2": {"status": "raw", "value": "0"},
+        "byte_3": {"status": "raw", "value": "0"},
+        "byte_4": {"status": "raw", "value": "0"},
+        "byte_5": {"status": "raw", "value": "0"},
+        "byte_6": {"status": "raw", "value": "0"},
+        "byte_7": {"status": "raw", "value": "0"},
+        "placeholder": {"status": "accepted", "value": "0"}
+      }
+    }
+  ]
+}

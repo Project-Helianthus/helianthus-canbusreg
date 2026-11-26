@@ -1,0 +1,547 @@
+{
+  "description": "Synthetic standard PCS gauge frames 0x315 to 0x318. Each expectation is written by hand from the frame bytes and the decoder gates: status is the decoder field status (accepted or raw, or the withholding state), and value is the exact decimal of the native value (numerator over denominator). Selections use public synthetic identities: QAAA0002 is contract group L0, QAAA0005 L1, QAAA0006 L2, QAAA0007 L3, QAAA0009 L4, QAAb5004 L5, QAAB0002 L6, QAAB0006 L7, QAAA0011 L8, QAAA0003 no group, QCAA0001 the gateway aggregate.",
+  "cases": [
+    {
+      "name": "early-315-l0-words",
+      "identifier": "0x315",
+      "payload": "000A0014001E0028",
+      "selection": {"project": "QAAA", "release": "0002", "flavor": "pcs-standard", "bank": "ordinary", "scope": "local", "endpoint": "coordinator", "group": "0", "slot": "1"},
+      "input": {"measurement_valid": true},
+      "expect": {
+        "word_0": {"status": "accepted", "value": "10"},
+        "word_2": {"status": "accepted", "value": "20"},
+        "word_4": {"status": "accepted", "value": "30"},
+        "word_6": {"status": "accepted", "value": "40"}
+      }
+    },
+    {
+      "name": "standard-315-l2-capacity",
+      "identifier": "0x315",
+      "payload": "000A0014001E012C",
+      "selection": {"project": "QAAA", "release": "0006", "flavor": "pcs-standard", "bank": "ordinary", "scope": "local", "endpoint": "coordinator", "group": "0", "slot": "1"},
+      "input": {"measurement_valid": true},
+      "expect": {
+        "cell_word": {"status": "accepted", "value": "10"},
+        "checkpoint": {"status": "accepted", "value": "20"},
+        "algorithm": {"status": "accepted", "value": "30"},
+        "capacity": {"status": "accepted", "value": "30"}
+      }
+    },
+    {
+      "name": "standard-315-l8-capacity-withheld-by-project",
+      "identifier": "0x315",
+      "payload": "000A0014001E012C",
+      "selection": {"project": "QAAA", "release": "0011", "flavor": "pcs-standard", "bank": "ordinary", "scope": "local", "endpoint": "coordinator", "group": "0", "slot": "1"},
+      "input": {"measurement_valid": true},
+      "expect": {
+        "cell_word": {"status": "accepted", "value": "10"},
+        "checkpoint": {"status": "accepted", "value": "20"},
+        "algorithm": {"status": "accepted", "value": "30"},
+        "capacity": {"status": "raw", "value": "300"}
+      }
+    },
+    {
+      "name": "standard-315-empty-group-raw",
+      "identifier": "0x315",
+      "payload": "000A0014001E012C",
+      "selection": {"project": "QAAA", "release": "0003", "flavor": "pcs-standard", "bank": "ordinary", "scope": "local", "endpoint": "coordinator", "group": "0", "slot": "1"},
+      "input": {"measurement_valid": true},
+      "expect": {
+        "cell_word": {"status": "raw", "value": "10"},
+        "checkpoint": {"status": "raw", "value": "20"},
+        "algorithm": {"status": "raw", "value": "30"},
+        "capacity": {"status": "raw", "value": "300"}
+      }
+    },
+    {
+      "name": "placeholder-315-zero-payload",
+      "identifier": "0x315",
+      "payload": "0000000000000000",
+      "selection": {"project": "QCAA", "release": "0001", "flavor": "pcs-standard", "bank": "ordinary", "scope": "aggregate", "endpoint": "coordinator", "group": "0", "slot": "1"},
+      "input": {},
+      "expect": {
+        "byte_0": {"status": "raw", "value": "0"},
+        "byte_7": {"status": "raw", "value": "0"},
+        "placeholder": {"status": "accepted", "value": "0"}
+      }
+    },
+    {
+      "name": "placeholder-316-nonzero-payload",
+      "identifier": "0x316",
+      "payload": "1388002A00350043",
+      "selection": {"project": "QCAA", "release": "0001", "flavor": "pcs-standard", "bank": "ordinary", "scope": "aggregate", "endpoint": "coordinator", "group": "0", "slot": "1"},
+      "input": {},
+      "expect": {
+        "byte_0": {"status": "raw", "value": "19"},
+        "byte_1": {"status": "raw", "value": "136"},
+        "byte_3": {"status": "raw", "value": "42"},
+        "byte_5": {"status": "raw", "value": "53"},
+        "byte_7": {"status": "raw", "value": "67"},
+        "placeholder": {"status": "raw", "value": "0"}
+      }
+    },
+    {
+      "name": "placeholder-315-parallel-qaab-nonzero-payload",
+      "identifier": "0x315",
+      "payload": "1388002A00350043",
+      "selection": {"project": "QAAB", "release": "0002", "flavor": "pcs-parallel", "bank": "parallel", "scope": "local", "endpoint": "coordinator", "group": "0", "slot": "1"},
+      "input": {},
+      "expect": {"byte_0": {"status": "raw", "value": "19"}, "byte_1": {"status": "raw", "value": "136"}, "byte_3": {"status": "raw", "value": "42"}, "byte_5": {"status": "raw", "value": "53"}, "byte_7": {"status": "raw", "value": "67"}, "placeholder": {"status": "raw", "value": "0"}}
+    },
+    {
+      "name": "placeholder-317-zero-payload",
+      "identifier": "0x317",
+      "payload": "0000000000000000",
+      "selection": {"project": "QCAA", "release": "0001", "flavor": "pcs-standard", "bank": "ordinary", "scope": "aggregate", "endpoint": "coordinator", "group": "0", "slot": "1"},
+      "input": {},
+      "expect": {
+        "byte_0": {"status": "raw", "value": "0"},
+        "placeholder": {"status": "accepted", "value": "0"}
+      }
+    },
+    {
+      "name": "placeholder-318-nonzero-payload",
+      "identifier": "0x318",
+      "payload": "0102030405060708",
+      "selection": {"project": "QCAA", "release": "0001", "flavor": "pcs-standard", "bank": "ordinary", "scope": "aggregate", "endpoint": "coordinator", "group": "0", "slot": "1"},
+      "input": {},
+      "expect": {
+        "byte_0": {"status": "raw", "value": "1"},
+        "byte_7": {"status": "raw", "value": "8"},
+        "placeholder": {"status": "raw", "value": "0"}
+      }
+    },
+    {
+      "name": "early-316-l1-cells-by-count",
+      "identifier": "0x316",
+      "payload": "000A0014001E0028",
+      "selection": {"project": "QAAA", "release": "0005", "flavor": "pcs-standard", "bank": "ordinary", "scope": "local", "endpoint": "coordinator", "group": "0", "slot": "1"},
+      "input": {"measurement_valid": true, "count_valid": true, "count": 6},
+      "expect": {
+        "cell_5": {"status": "accepted", "value": "10"},
+        "cell_6": {"status": "accepted", "value": "20"},
+        "cell_7": {"status": "raw", "value": "30"},
+        "cell_8": {"status": "raw", "value": "40"}
+      }
+    },
+    {
+      "name": "l2-316-valid",
+      "identifier": "0x316",
+      "payload": "1388002A00350043",
+      "selection": {"project": "QAAA", "release": "0006", "flavor": "pcs-standard", "bank": "ordinary", "scope": "local", "endpoint": "coordinator", "group": "0", "slot": "1"},
+      "input": {"measurement_valid": true},
+      "expect": {
+        "accumulator": {"status": "accepted", "value": "5000"},
+        "initial_accumulator": {"status": "raw", "value": "5000"},
+        "capacity": {"status": "accepted", "value": "4.2"},
+        "cycles": {"status": "accepted", "value": "5.3"},
+        "state": {"status": "accepted", "value": "0"},
+        "failed_precheck_state": {"status": "raw", "value": "0"},
+        "budget": {"status": "accepted", "value": "67"}
+      }
+    },
+    {
+      "name": "l2-316-initial-and-precheck",
+      "identifier": "0x316",
+      "payload": "1388002A00356407",
+      "selection": {"project": "QAAA", "release": "0006", "flavor": "pcs-standard", "bank": "ordinary", "scope": "local", "endpoint": "coordinator", "group": "0", "slot": "1"},
+      "input": {"measurement_valid": true, "zero_integration": true, "failed_precheck": true},
+      "expect": {
+        "accumulator": {"status": "accepted", "value": "5000"},
+        "initial_accumulator": {"status": "accepted", "value": "5000"},
+        "capacity": {"status": "accepted", "value": "4.2"},
+        "cycles": {"status": "accepted", "value": "5.3"},
+        "state": {"status": "accepted", "value": "100"},
+        "failed_precheck_state": {"status": "accepted", "value": "100"},
+        "budget": {"status": "accepted", "value": "7"}
+      }
+    },
+    {
+      "name": "l2-316-withheld-by-measurement",
+      "identifier": "0x316",
+      "payload": "1388002A00350043",
+      "selection": {"project": "QAAA", "release": "0006", "flavor": "pcs-standard", "bank": "ordinary", "scope": "local", "endpoint": "coordinator", "group": "0", "slot": "1"},
+      "input": {"measurement_valid": false},
+      "expect": {
+        "accumulator": {"status": "raw", "value": "5000"},
+        "capacity": {"status": "raw", "value": "42"},
+        "cycles": {"status": "raw", "value": "53"},
+        "state": {"status": "raw", "value": "0"},
+        "budget": {"status": "raw", "value": "67"}
+      }
+    },
+    {
+      "name": "l2-316-absent-capacity-state",
+      "identifier": "0x316",
+      "payload": "1388002A00350043",
+      "selection": {"project": "QAAA", "release": "0006", "flavor": "pcs-standard", "bank": "ordinary", "scope": "local", "endpoint": "coordinator", "group": "0", "slot": "1"},
+      "input": {"measurement_valid": true, "field_states": {"capacity": "absent"}},
+      "expect": {
+        "capacity": {"status": "absent", "value": "4.2"},
+        "cycles": {"status": "accepted", "value": "5.3"}
+      }
+    },
+    {
+      "name": "l2-316-aged-budget-invalid",
+      "identifier": "0x316",
+      "payload": "1388002A00350043",
+      "selection": {"project": "QAAA", "release": "0006", "flavor": "pcs-standard", "bank": "ordinary", "scope": "local", "endpoint": "coordinator", "group": "0", "slot": "1"},
+      "input": {"measurement_valid": true, "field_ages_ms": {"budget": -1}},
+      "expect": {
+        "budget": {"status": "invalid", "value": "67"},
+        "state": {"status": "accepted", "value": "0"}
+      }
+    },
+    {
+      "name": "l3-316-retained-and-words",
+      "identifier": "0x316",
+      "payload": "1388002A00350043",
+      "selection": {"project": "QAAA", "release": "0007", "flavor": "pcs-standard", "bank": "ordinary", "scope": "local", "endpoint": "coordinator", "group": "0", "slot": "1"},
+      "input": {"measurement_valid": true},
+      "expect": {
+        "retained_fault": {"status": "accepted", "value": "19"},
+        "algorithm": {"status": "accepted", "value": "136"},
+        "word_2": {"status": "raw", "value": "42"},
+        "word_4": {"status": "raw", "value": "53"},
+        "word_6": {"status": "raw", "value": "67"}
+      }
+    },
+    {
+      "name": "l4-316-retained-and-words",
+      "identifier": "0x316",
+      "payload": "1388002A00350043",
+      "selection": {"project": "QAAA", "release": "0009", "flavor": "pcs-standard", "bank": "ordinary", "scope": "local", "endpoint": "coordinator", "group": "0", "slot": "1"},
+      "input": {"measurement_valid": true},
+      "expect": {
+        "retained_fault": {"status": "accepted", "value": "19"},
+        "algorithm": {"status": "accepted", "value": "136"},
+        "word_2": {"status": "raw", "value": "42"},
+        "word_4": {"status": "raw", "value": "53"},
+        "word_6": {"status": "raw", "value": "67"}
+      }
+    },
+    {
+      "name": "l5-316-capacity-and-gauge-bytes",
+      "identifier": "0x316",
+      "payload": "0001000203040506",
+      "selection": {"project": "QAAb", "release": "5004", "flavor": "pcs-standard", "bank": "ordinary", "scope": "local", "endpoint": "coordinator", "group": "0", "slot": "1"},
+      "input": {"measurement_valid": true},
+      "expect": {
+        "word_0": {"status": "raw", "value": "1"},
+        "word_2": {"status": "raw", "value": "2"},
+        "capacity_byte": {"status": "accepted", "value": "3"},
+        "gauge_byte": {"status": "accepted", "value": "4"},
+        "word_6": {"status": "raw", "value": "1286"}
+      }
+    },
+    {
+      "name": "l7-316-capacity-and-gauge-bytes",
+      "identifier": "0x316",
+      "payload": "0001000203040506",
+      "selection": {"project": "QAAB", "release": "0006", "flavor": "pcs-standard", "bank": "ordinary", "scope": "local", "endpoint": "coordinator", "group": "0", "slot": "1"},
+      "input": {"measurement_valid": true},
+      "expect": {
+        "word_0": {"status": "raw", "value": "1"},
+        "word_2": {"status": "raw", "value": "2"},
+        "capacity_byte": {"status": "accepted", "value": "3"},
+        "gauge_byte": {"status": "accepted", "value": "4"},
+        "word_6": {"status": "raw", "value": "1286"}
+      }
+    },
+    {
+      "name": "l6-316-raw-at-l2-positions",
+      "identifier": "0x316",
+      "payload": "1388002A00350043",
+      "selection": {"project": "QAAB", "release": "0002", "flavor": "pcs-standard", "bank": "ordinary", "scope": "local", "endpoint": "coordinator", "group": "0", "slot": "1"},
+      "input": {"measurement_valid": true, "zero_integration": true, "failed_precheck": true},
+      "expect": {
+        "accumulator": {"status": "raw", "value": "5000"},
+        "initial_accumulator": {"status": "raw", "value": "5000"},
+        "capacity": {"status": "raw", "value": "42"},
+        "cycles": {"status": "raw", "value": "53"},
+        "state": {"status": "raw", "value": "0"},
+        "failed_precheck_state": {"status": "raw", "value": "0"},
+        "budget": {"status": "raw", "value": "67"}
+      }
+    },
+    {
+      "name": "l8-316-capacity-and-cycles",
+      "identifier": "0x316",
+      "payload": "1388002A00350043",
+      "selection": {"project": "QAAA", "release": "0011", "flavor": "pcs-standard", "bank": "ordinary", "scope": "local", "endpoint": "coordinator", "group": "0", "slot": "1"},
+      "input": {"measurement_valid": true},
+      "expect": {
+        "retained_fault": {"status": "accepted", "value": "19"},
+        "algorithm": {"status": "accepted", "value": "136"},
+        "word_2": {"status": "accepted", "value": "42"},
+        "capacity": {"status": "accepted", "value": "5.3"},
+        "cycles": {"status": "accepted", "value": "6.7"}
+      }
+    },
+    {
+      "name": "other-316-empty-group-words",
+      "identifier": "0x316",
+      "payload": "1388002A00350043",
+      "selection": {"project": "QAAA", "release": "0003", "flavor": "pcs-standard", "bank": "ordinary", "scope": "local", "endpoint": "coordinator", "group": "0", "slot": "1"},
+      "input": {"measurement_valid": true},
+      "expect": {
+        "word_0": {"status": "raw", "value": "5000"},
+        "word_2": {"status": "raw", "value": "42"},
+        "word_4": {"status": "raw", "value": "53"},
+        "word_6": {"status": "raw", "value": "67"}
+      }
+    },
+    {
+      "name": "l0-317-words",
+      "identifier": "0x317",
+      "payload": "1388002A00350043",
+      "selection": {"project": "QAAA", "release": "0002", "flavor": "pcs-standard", "bank": "ordinary", "scope": "local", "endpoint": "coordinator", "group": "0", "slot": "1"},
+      "input": {"measurement_valid": true},
+      "expect": {
+        "word_0": {"status": "accepted", "value": "5000"},
+        "word_2": {"status": "accepted", "value": "42"},
+        "word_4": {"status": "accepted", "value": "53"},
+        "word_6": {"status": "accepted", "value": "67"}
+      }
+    },
+    {
+      "name": "l1-317-eight-retained-bytes",
+      "identifier": "0x317",
+      "payload": "0102040810204080",
+      "selection": {"project": "QAAA", "release": "0005", "flavor": "pcs-standard", "bank": "ordinary", "scope": "local", "endpoint": "coordinator", "group": "0", "slot": "1"},
+      "input": {"measurement_valid": true},
+      "expect": {
+        "retained_8": {"status": "accepted", "value": "1"},
+        "retained_11": {"status": "accepted", "value": "8"},
+        "retained_13": {"status": "accepted", "value": "32"},
+        "retained_14": {"status": "accepted", "value": "64"},
+        "retained_15": {"status": "accepted", "value": "128"}
+      }
+    },
+    {
+      "name": "other-317-soh-and-slot",
+      "identifier": "0x317",
+      "payload": "0102040810205000",
+      "selection": {"project": "QAAA", "release": "0006", "flavor": "pcs-standard", "bank": "ordinary", "scope": "local", "endpoint": "coordinator", "group": "0", "slot": "1"},
+      "input": {"measurement_valid": true},
+      "expect": {
+        "retained_8": {"status": "accepted", "value": "1"},
+        "retained_13": {"status": "accepted", "value": "32"},
+        "soh_truncated": {"status": "accepted", "value": "80"},
+        "slot": {"status": "accepted", "value": "0"}
+      }
+    },
+    {
+      "name": "other-317-soh-and-slot-withheld-by-slot-byte",
+      "identifier": "0x317",
+      "payload": "0102040810205001",
+      "selection": {"project": "QAAA", "release": "0011", "flavor": "pcs-standard", "bank": "ordinary", "scope": "local", "endpoint": "coordinator", "group": "0", "slot": "1"},
+      "input": {"measurement_valid": true},
+      "expect": {
+        "retained_8": {"status": "accepted", "value": "1"},
+        "retained_13": {"status": "accepted", "value": "32"},
+        "soh_truncated": {"status": "raw", "value": "80"},
+        "slot": {"status": "raw", "value": "1"}
+      }
+    },
+    {
+      "name": "other-317-empty-group-raw",
+      "identifier": "0x317",
+      "payload": "0102040810205000",
+      "selection": {"project": "QAAA", "release": "0003", "flavor": "pcs-standard", "bank": "ordinary", "scope": "local", "endpoint": "coordinator", "group": "0", "slot": "1"},
+      "input": {"measurement_valid": true},
+      "expect": {
+        "retained_8": {"status": "raw", "value": "1"},
+        "retained_13": {"status": "raw", "value": "32"},
+        "soh_truncated": {"status": "raw", "value": "80"},
+        "slot": {"status": "raw", "value": "0"}
+      }
+    },
+    {
+      "name": "l0-318-words",
+      "identifier": "0x318",
+      "payload": "1388002A00350043",
+      "selection": {"project": "QAAA", "release": "0002", "flavor": "pcs-standard", "bank": "ordinary", "scope": "local", "endpoint": "coordinator", "group": "0", "slot": "1"},
+      "input": {"measurement_valid": true},
+      "expect": {
+        "word_0": {"status": "accepted", "value": "5000"},
+        "word_2": {"status": "accepted", "value": "42"},
+        "word_4": {"status": "accepted", "value": "53"},
+        "word_6": {"status": "accepted", "value": "67"}
+      }
+    },
+    {
+      "name": "other-318-eight-retained-bytes",
+      "identifier": "0x318",
+      "payload": "0181040810204080",
+      "selection": {"project": "QAAA", "release": "0006", "flavor": "pcs-standard", "bank": "ordinary", "scope": "local", "endpoint": "coordinator", "group": "0", "slot": "1"},
+      "input": {"measurement_valid": true},
+      "expect": {
+        "retained_0": {"status": "accepted", "value": "1"},
+        "retained_1": {"status": "accepted", "value": "129"},
+        "retained_4": {"status": "accepted", "value": "16"},
+        "retained_7": {"status": "accepted", "value": "128"}
+      }
+    },
+    {
+      "name": "other-318-empty-group-raw",
+      "identifier": "0x318",
+      "payload": "0181040810204080",
+      "selection": {"project": "QAAA", "release": "0003", "flavor": "pcs-standard", "bank": "ordinary", "scope": "local", "endpoint": "coordinator", "group": "0", "slot": "1"},
+      "input": {"measurement_valid": true},
+      "expect": {
+        "retained_0": {"status": "raw", "value": "1"},
+        "retained_1": {"status": "raw", "value": "129"},
+        "retained_7": {"status": "raw", "value": "128"}
+      }
+    },
+    {
+      "name": "placeholder-315-parallel-qaab-nonzero-payload",
+      "identifier": "0x315",
+      "payload": "1388002A00350043",
+      "selection": {"project": "QAAB", "release": "0002", "flavor": "pcs-parallel", "bank": "parallel", "scope": "local", "endpoint": "coordinator", "group": "0", "slot": "1"},
+      "input": {},
+      "expect": {
+        "byte_0": {"status": "raw", "value": "19"},
+        "byte_1": {"status": "raw", "value": "136"},
+        "byte_3": {"status": "raw", "value": "42"},
+        "byte_5": {"status": "raw", "value": "53"},
+        "byte_7": {"status": "raw", "value": "67"},
+        "placeholder": {"status": "raw", "value": "0"}
+      }
+    },
+    {
+      "name": "parallel-315-l2-capacity-withheld",
+      "identifier": "0x315",
+      "payload": "000A0014001E012C",
+      "selection": {"project": "QAAA", "release": "0006", "flavor": "pcs-parallel", "bank": "parallel", "scope": "local", "endpoint": "coordinator", "group": "0", "slot": "1"},
+      "input": {"measurement_valid": true},
+      "expect": {
+        "cell_word": {"status": "raw", "value": "10"},
+        "capacity": {"status": "raw", "value": "300"}
+      }
+    },
+    {
+      "name": "parallel-315-gateway-placeholder-zero",
+      "identifier": "0x315",
+      "payload": "0000000000000000",
+      "selection": {"project": "QCAA", "release": "0001", "flavor": "pcs-parallel", "bank": "parallel", "scope": "aggregate", "endpoint": "coordinator", "group": "0", "slot": "1"},
+      "input": {},
+      "expect": {
+        "byte_0": {"status": "raw", "value": "0"},
+        "placeholder": {"status": "accepted", "value": "0"}
+      }
+    },
+    {
+      "name": "parallel-316-l5-capacity-and-gauge-bytes",
+      "identifier": "0x316",
+      "payload": "0001000203040506",
+      "selection": {"project": "QAAb", "release": "5004", "flavor": "pcs-parallel", "bank": "parallel", "scope": "local", "endpoint": "coordinator", "group": "0", "slot": "1"},
+      "input": {"measurement_valid": true},
+      "expect": {
+        "capacity_byte": {"status": "raw", "value": "3"},
+        "gauge_byte": {"status": "raw", "value": "4"}
+      }
+    },
+    {
+      "name": "parallel-316-l6-raw-at-l2-positions",
+      "identifier": "0x316",
+      "payload": "1388002A00350043",
+      "selection": {"project": "QAAB", "release": "0002", "flavor": "pcs-parallel", "bank": "parallel", "scope": "local", "endpoint": "coordinator", "group": "0", "slot": "1"},
+      "input": {"measurement_valid": true, "zero_integration": true, "failed_precheck": true},
+      "expect": {
+        "capacity": {"status": "raw", "value": "42"},
+        "cycles": {"status": "raw", "value": "53"},
+        "state": {"status": "raw", "value": "0"}
+      }
+    },
+    {
+      "name": "parallel-316-l7-capacity-and-gauge-bytes",
+      "identifier": "0x316",
+      "payload": "0001000203040506",
+      "selection": {"project": "QAAB", "release": "0006", "flavor": "pcs-parallel", "bank": "parallel", "scope": "local", "endpoint": "coordinator", "group": "0", "slot": "1"},
+      "input": {"measurement_valid": true},
+      "expect": {
+        "capacity_byte": {"status": "raw", "value": "3"},
+        "word_6": {"status": "raw", "value": "1286"}
+      }
+    },
+    {
+      "name": "parallel-316-l8-capacity-and-cycles",
+      "identifier": "0x316",
+      "payload": "1388002A00350043",
+      "selection": {"project": "QAAA", "release": "0011", "flavor": "pcs-parallel", "bank": "parallel", "scope": "local", "endpoint": "coordinator", "group": "0", "slot": "1"},
+      "input": {"measurement_valid": true},
+      "expect": {
+        "word_2": {"status": "raw", "value": "42"},
+        "capacity": {"status": "raw", "value": "53"},
+        "cycles": {"status": "raw", "value": "67"}
+      }
+    },
+    {
+      "name": "parallel-316-other-empty-group-words",
+      "identifier": "0x316",
+      "payload": "1388002A00350043",
+      "selection": {"project": "QAAA", "release": "0003", "flavor": "pcs-parallel", "bank": "parallel", "scope": "local", "endpoint": "coordinator", "group": "0", "slot": "1"},
+      "input": {"measurement_valid": true},
+      "expect": {
+        "word_0": {"status": "raw", "value": "5000"},
+        "word_6": {"status": "raw", "value": "67"}
+      }
+    },
+    {
+      "name": "parallel-316-gateway-placeholder-bytes",
+      "identifier": "0x316",
+      "payload": "1388002A00350043",
+      "selection": {"project": "QCAA", "release": "0001", "flavor": "pcs-parallel", "bank": "parallel", "scope": "aggregate", "endpoint": "coordinator", "group": "0", "slot": "1"},
+      "input": {},
+      "expect": {
+        "byte_0": {"status": "raw", "value": "19"},
+        "placeholder": {"status": "raw", "value": "0"}
+      }
+    },
+    {
+      "name": "parallel-317-other-soh-and-slot",
+      "identifier": "0x317",
+      "payload": "0102040810205000",
+      "selection": {"project": "QAAB", "release": "0002", "flavor": "pcs-parallel", "bank": "parallel", "scope": "local", "endpoint": "coordinator", "group": "0", "slot": "1"},
+      "input": {"measurement_valid": true},
+      "expect": {
+        "retained_8": {"status": "raw", "value": "1"},
+        "soh_truncated": {"status": "raw", "value": "80"},
+        "slot": {"status": "raw", "value": "0"}
+      }
+    },
+    {
+      "name": "parallel-317-gateway-placeholder-bytes",
+      "identifier": "0x317",
+      "payload": "0102030405060708",
+      "selection": {"project": "QCAA", "release": "0001", "flavor": "pcs-parallel", "bank": "parallel", "scope": "aggregate", "endpoint": "coordinator", "group": "0", "slot": "1"},
+      "input": {},
+      "expect": {
+        "byte_7": {"status": "raw", "value": "8"}
+      }
+    },
+    {
+      "name": "parallel-318-other-retained-bytes",
+      "identifier": "0x318",
+      "payload": "0181040810204080",
+      "selection": {"project": "QAAA", "release": "0006", "flavor": "pcs-parallel", "bank": "parallel", "scope": "local", "endpoint": "coordinator", "group": "0", "slot": "1"},
+      "input": {"measurement_valid": true},
+      "expect": {
+        "retained_0": {"status": "raw", "value": "1"},
+        "retained_7": {"status": "raw", "value": "128"}
+      }
+    },
+    {
+      "name": "parallel-318-gateway-placeholder-bytes",
+      "identifier": "0x318",
+      "payload": "0102030405060708",
+      "selection": {"project": "QCAA", "release": "0001", "flavor": "pcs-parallel", "bank": "parallel", "scope": "aggregate", "endpoint": "coordinator", "group": "0", "slot": "1"},
+      "input": {},
+      "expect": {
+        "byte_0": {"status": "raw", "value": "1"}
+      }
+    }
+  ]
+}

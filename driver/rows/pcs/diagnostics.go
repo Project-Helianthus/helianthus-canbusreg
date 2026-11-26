@@ -245,7 +245,9 @@ func diagStandardAttributed(member canbusreg.Selection, frame canbus.Frame) bool
 		return false
 	}
 	data := frame.Data()
-	return len(data) > 1 && data[0] == byte(g) && data[1] == byte(slot)
+	// The frame decoder interprets the code words only when bytes 6 and 7 are
+	// zero; a frame with padding there has no attributed index.
+	return len(data) == 8 && data[0] == byte(g) && data[1] == byte(slot) && data[6] == 0 && data[7] == 0
 }
 
 // diagDTCFamilyOf admits the 0x333 frame, the 0x520 to 0x52F frames and the

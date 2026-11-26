@@ -612,6 +612,10 @@ func TestDiagnosticStandardWordAttributedToSelectedMember(t *testing.T) {
 		{"own-group-and-slot", "0203100900000000", true},
 		{"other-slot-same-group", "0204100900000000", false},
 		{"other-group-same-slot", "0103100900000000", false},
+		// Bytes 6 and 7 must be zero; the frame decoder withholds the code
+		// words of a padded frame, so the row evaluator must not index one.
+		{"nonzero-byte-6-padding", "0203100900000100", false},
+		{"nonzero-byte-7-padding", "0203100900000001", false},
 	}
 	for _, c := range cases {
 		t.Run(c.name, func(t *testing.T) {

@@ -1,0 +1,34 @@
+{
+  "description": "Synthetic expectations for the extended 19xx host inputs, written by hand from the page layouts before the encoders ran. Payloads are hexadecimal, eight bytes each; identifiers are 29-bit extended.",
+  "time_190b": [
+    {"name": "typical", "args": {"year_offset": 26, "month": 11, "day": 26, "hour": 13, "minute": 45, "second": 30}, "identifier": "0x190BDFF2", "payload": "1a0b1a0d2d1e0000"},
+    {"name": "lower-bounds", "args": {"year_offset": 0, "month": 1, "day": 1, "hour": 0, "minute": 0, "second": 0}, "identifier": "0x190BDFF2", "payload": "0001010000000000"},
+    {"name": "upper-bounds", "args": {"year_offset": 255, "month": 12, "day": 31, "hour": 23, "minute": 59, "second": 59}, "identifier": "0x190BDFF2", "payload": "ff0c1f173b3b0000"}
+  ],
+  "time_190b_refused": [
+    {"name": "month-zero", "args": {"year_offset": 26, "month": 0, "day": 1, "hour": 0, "minute": 0, "second": 0}},
+    {"name": "month-thirteen", "args": {"year_offset": 26, "month": 13, "day": 1, "hour": 0, "minute": 0, "second": 0}},
+    {"name": "day-zero", "args": {"year_offset": 26, "month": 1, "day": 0, "hour": 0, "minute": 0, "second": 0}},
+    {"name": "day-thirty-two", "args": {"year_offset": 26, "month": 1, "day": 32, "hour": 0, "minute": 0, "second": 0}},
+    {"name": "hour-twenty-four", "args": {"year_offset": 26, "month": 1, "day": 1, "hour": 24, "minute": 0, "second": 0}},
+    {"name": "minute-sixty", "args": {"year_offset": 26, "month": 1, "day": 1, "hour": 0, "minute": 60, "second": 0}},
+    {"name": "second-sixty", "args": {"year_offset": 26, "month": 1, "day": 1, "hour": 0, "minute": 0, "second": 60}}
+  ],
+  "stack_191a": [
+    {"name": "distinct-words", "args": {"current_code": 4660, "state_of_charge": 22136}, "identifier": "0x191ADFF2", "payload": "0000341278560000"},
+    {"name": "all-zero", "args": {"current_code": 0, "state_of_charge": 0}, "identifier": "0x191ADFF2", "payload": "0000000000000000"},
+    {"name": "all-set", "args": {"current_code": 65535, "state_of_charge": 65535}, "identifier": "0x191ADFF2", "payload": "0000ffffffff0000"}
+  ],
+  "secondary_191c": [
+    {"name": "distinct-bytes", "args": {"percentage": 4660, "b4": 9}, "identifier": "0x191CDFF2", "payload": "0000341209000000"},
+    {"name": "all-zero", "args": {"percentage": 0, "b4": 0}, "identifier": "0x191CDFF2", "payload": "0000000000000000"},
+    {"name": "all-set", "args": {"percentage": 65535, "b4": 255}, "identifier": "0x191CDFF2", "payload": "0000ffffff000000"}
+  ],
+  "update_191e": [
+    {"name": "distinct", "args": {"parameter": 7}, "identifier": "0x191EDFF2", "payload": "0700000000000000"},
+    {"name": "all-zero", "args": {"parameter": 0}, "identifier": "0x191EDFF2", "payload": "0000000000000000"},
+    {"name": "all-set", "args": {"parameter": 255}, "identifier": "0x191EDFF2", "payload": "ff00000000000000"}
+  ],
+  "refused_contracts": ["release-11", "", "unlisted-release"],
+  "incomplete": ["0x190A", "0x190C", "0x190D", "0x190E", "0x190F", "0x191B", "0x191D", "0x1918", "0x1919"]
+}

@@ -3,6 +3,7 @@ package pcs
 import (
 	"math/big"
 	"strconv"
+	"strings"
 
 	"github.com/Project-Helianthus/helianthus-canbus"
 	"github.com/Project-Helianthus/helianthus-canbusreg"
@@ -250,6 +251,23 @@ func wholeOf(v roweval.TypedValue) (int64, bool) {
 	return r.Num().Int64(), true
 }
 
+// gradeDetailPrefix prefixes the decoder grade (Proven, Hypothesis or Unknown) that
+// an extrema native value carries in its detail.
+const gradeDetailPrefix = "decoder grade "
+
+// FullTable returns the native rows of Table together with the extrema rows of
+// frames 0x319, 0x322 and 0x330, for a consumer that enumerates the standard PCS
+// rows. EvaluateExtrema evaluates the extrema rows.
+func FullTable() roweval.Table[Selector] {
+	t := Table()
+	ext := extremaTable()
+	t.Native = append(t.Native, ext.Native...)
+	for hook, fn := range ext.Hooks {
+		t.Hooks[hook] = fn
+	}
+	return t
+}
+
 // extremaTable returns the native rows of frames 0x319, 0x322 and 0x330 with the
 // hooks those rows name. It is kept apart from Table, whose rows and evaluator
 // admit the frames 0x311 to 0x314 only; it has no bindings.
@@ -334,6 +352,9 @@ func EvaluateExtrema(s canbusreg.Selection, in canbusreg.PCSStandardPCSInput) (R
 				ev.Native.Unit = ""
 			}
 			ev.Native.Disposition = disposition(ev.Native, raw[ev.Native.RowID])
+			if f, ok := decoded.Fields[ev.Native.RowID[strings.LastIndex(ev.Native.RowID, ".")+1:]]; ok {
+				ev.Native.Detail = gradeDetailPrefix + f.Grade
+			}
 			out[ev.Native.RowID] = ev
 		} else if ev.Reason != roweval.ReasonNoMatch {
 			out[row.ID] = ev

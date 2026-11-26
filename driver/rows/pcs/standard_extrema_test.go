@@ -116,6 +116,9 @@ func checkExtremaCase(t *testing.T, c extremaCase) map[string]bool {
 			continue
 		}
 		checkField(t, c.Name, name, df, rows[ids[0]], gated[ids[0]], res.Rows[ids[0]].Native, frame)
+		if n := res.Rows[ids[0]].Native; n == nil || n.Detail != gradeDetailPrefix+df.Grade {
+			t.Errorf("%s: %s row grade %v, decoder grade %q", c.Name, name, n, df.Grade)
+		}
 	}
 	for name, want := range c.Expect {
 		df, ok := r.Fields[name]
@@ -245,5 +248,43 @@ func TestStandardExtremaRowsRefuseNeighbouringIdentifierAndWrongLength(t *testin
 		if res.Rows != nil {
 			t.Errorf("%s: refused observation carries %d rows", tc.name, len(res.Rows))
 		}
+	}
+}
+
+// TestStandardExtremaRowsAreEnumeratedAndGraded pins that the extrema
+// rows are in FullTable and that EvaluateExtrema gives a native value with the
+// decoder grade for a valid 0x319 observation.
+func TestStandardExtremaRowsAreEnumeratedAndGraded(t *testing.T) {
+	ids := make(map[string]bool)
+	for _, row := range FullTable().Native {
+		ids[row.ID] = true
+	}
+	for _, row := range extremaTable().Native {
+		if !ids[row.ID] {
+			t.Errorf("FullTable lacks %s", row.ID)
+		}
+	}
+	found := false
+	for _, c := range loadExtremaCases(t) {
+		if c.Name != "local-extrema-319" {
+			continue
+		}
+		found = true
+		s, in, _ := buildExtrema(t, c)
+		res, reason, err := EvaluateExtrema(s, in)
+		if err != nil || reason != "" {
+			t.Fatalf("%s: reason %q, error %v", c.Name, reason, err)
+		}
+		id := rowPrefix + "319.maximum_cell"
+		ev, ok := res.Rows[id]
+		if !ok || ev.Native == nil || ev.Native.Reason != "" || ev.Native.Value == nil {
+			t.Fatalf("%s: no native value for %s through EvaluateExtrema", c.Name, id)
+		}
+		if got := ev.Native.Detail; got != gradeDetailPrefix+"Proven" {
+			t.Errorf("%s: %s detail %q, want the Proven grade", c.Name, id, got)
+		}
+	}
+	if !found {
+		t.Fatal("no local-extrema-319 vector")
 	}
 }

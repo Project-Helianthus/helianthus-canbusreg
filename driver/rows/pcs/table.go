@@ -252,6 +252,9 @@ type Result struct {
 	Evidence    canbusreg.Evidence
 	Attribution Attribution
 	Rows        map[string]roweval.Evaluation
+	// Diagnostics is the native record supplied separately from the transport
+	// evidence, as the decoder retains it; empty when none was supplied.
+	Diagnostics []byte
 }
 
 // Evaluate evaluates the native rows of one standard PCS observation under the
@@ -268,9 +271,11 @@ func Evaluate(s canbusreg.Selection, in canbusreg.PCSStandardPCSInput) (Result, 
 	if reason := frameDisposition(frame); reason != "" {
 		return res, reason, nil
 	}
-	if decoded := canbusreg.DecodePCSStandard(s, in); decoded.Status != "decoded" {
+	decoded := canbusreg.DecodePCSStandard(s, in)
+	if decoded.Status != "decoded" {
 		return res, roweval.Reason(decoded.Status), nil
 	}
+	res.Diagnostics = decoded.Diagnostics
 	rows, reason, err := evaluateRows(Table(), frame, Qualifiers(s, in))
 	res.Rows = rows
 	return res, reason, err
@@ -307,6 +312,13 @@ func evaluateRows(t roweval.Table[Selector], frame canbus.Frame, q roweval.Quali
 			return nil, "", err
 		}
 		if ev.Native != nil {
+			// A value the evaluator withholds by reason (an out-of-domain percentage,
+			// a withheld gate) is raw evidence only: the typed value and its unit are
+			// dropped, as the decoder drops the unit of a field it does not accept.
+			if ev.Native.Reason != "" {
+				ev.Native.Value = nil
+				ev.Native.Unit = ""
+			}
 			ev.Native.Disposition = disposition(ev.Native, raw[ev.Native.RowID])
 			out[ev.Native.RowID] = ev
 		} else if ev.Reason != roweval.ReasonNoMatch {

@@ -1,6 +1,8 @@
 package pcs
 
 import (
+	"bytes"
+	"encoding/binary"
 	"encoding/hex"
 	"encoding/json"
 	"errors"
@@ -313,6 +315,9 @@ func checkField(t *testing.T, name, field string, df canbusreg.NativeField, row 
 		if nat.Reason != roweval.ReasonOutsideDomain {
 			t.Errorf("%s: %s invalid in the decoder, row reason %q", name, field, nat.Reason)
 		}
+		if nat.Value != nil || nat.Unit != "" {
+			t.Errorf("%s: %s invalid in the decoder, row still carries a typed value in %q", name, field, nat.Unit)
+		}
 	case "absent", "stale", "unsupported", "conflict", "unassigned":
 		if nat.Reason != roweval.Reason(df.Status) {
 			t.Errorf("%s: %s %s in the decoder, row reason %q", name, field, df.Status, nat.Reason)
@@ -436,6 +441,35 @@ func TestStandardRowsKeepObservationEvidence(t *testing.T) {
 		if ev.Reason != other.Reason || (ev.Native != nil && other.Native != nil && ev.Native.Raw != other.Native.Raw) {
 			t.Errorf("%s differs between receipts of the same bytes", id)
 		}
+	}
+}
+
+// TestStandardRowsRetainSeparateNativeRecord pins that the evaluation keeps a
+// native record supplied apart from the transport evidence. A 0x313 record given
+// only in NativeRecord, with an empty raw record in the evidence, is decoded, and
+// the evaluator returns the same record bytes the decoder retains.
+func TestStandardRowsRetainSeparateNativeRecord(t *testing.T) {
+	base := caseNamed(t, "legacy-local-measured-313")
+	s, in, frame := build(t, base)
+	record := make([]byte, canbus.SocketCANRecordSize)
+	binary.NativeEndian.PutUint32(record[:4], frame.ID().Value())
+	record[4] = byte(len(frame.Data()))
+	copy(record[8:], frame.Data())
+	in.NativeRecord = record
+	in.Evidence.RawRecord = [canbus.SocketCANRecordSize]byte{}
+	r := canbusreg.DecodePCSStandard(s, in)
+	if r.Status != "decoded" {
+		t.Fatalf("decoder status %q, want decoded", r.Status)
+	}
+	res, reason, err := Evaluate(s, in)
+	if err != nil || reason != "" {
+		t.Fatalf("evaluate refused: %q %v", reason, err)
+	}
+	if !bytes.Equal(res.Diagnostics, record) {
+		t.Errorf("evaluator keeps %x, want the supplied record %x", res.Diagnostics, record)
+	}
+	if !bytes.Equal(res.Diagnostics, r.Diagnostics) {
+		t.Errorf("evaluator record %x differs from the decoder record %x", res.Diagnostics, r.Diagnostics)
 	}
 }
 

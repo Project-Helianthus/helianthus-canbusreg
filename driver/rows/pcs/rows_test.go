@@ -7,6 +7,7 @@ import (
 	"fmt"
 	"math/big"
 	"os"
+	"reflect"
 	"strconv"
 	"strings"
 	"testing"
@@ -44,10 +45,13 @@ type vectorSelection struct {
 }
 
 type vectorInput struct {
-	MeasurementValid bool   `json:"measurement_valid"`
-	TemperatureValid bool   `json:"temperature_valid"`
-	CountValid       bool   `json:"count_valid"`
-	Count            uint16 `json:"count"`
+	MeasurementValid    bool              `json:"measurement_valid"`
+	TemperatureValid    bool              `json:"temperature_valid"`
+	CountValid          bool              `json:"count_valid"`
+	Count               uint16            `json:"count"`
+	PublisherUnresolved bool              `json:"publisher_unresolved"`
+	FieldStates         map[string]string `json:"field_states"`
+	FieldAgesMS         map[string]int64  `json:"field_ages_ms"`
 }
 
 // vectorExpect is the independent expectation of one decoder field: its status
@@ -111,7 +115,11 @@ func build(t *testing.T, c vectorCase) (canbusreg.Selection, canbusreg.PCSStanda
 		t.Fatal(err)
 	}
 	in := c.Input
-	return s, canbusreg.PCSStandardPCSInput{LINKInput: canbusreg.LINKInput{Evidence: canbusreg.Evidence{Interface: iface, Frame: frame, Sequence: 7, Monotonic: 9 * time.Second}, Epoch: 1, Direction: spec.Direction, Scope: spec.Scope, Bank: spec.Bank, Endpoint: spec.Endpoint, Group: spec.Group, Slot: spec.Slot, FieldAge: time.Second}, PublisherResolved: true, MeasurementValid: in.MeasurementValid, TemperatureValid: in.TemperatureValid, CountValid: in.CountValid, Count: in.Count}, frame
+	ages := make(map[string]time.Duration, len(in.FieldAgesMS))
+	for field, ms := range in.FieldAgesMS {
+		ages[field] = time.Duration(ms) * time.Millisecond
+	}
+	return s, canbusreg.PCSStandardPCSInput{LINKInput: canbusreg.LINKInput{Evidence: canbusreg.Evidence{Interface: iface, Frame: frame, Sequence: 7, Monotonic: 9 * time.Second}, Epoch: 1, Direction: spec.Direction, Scope: spec.Scope, Bank: spec.Bank, Endpoint: spec.Endpoint, Group: spec.Group, Slot: spec.Slot, FieldAge: time.Second}, PublisherResolved: !in.PublisherUnresolved, MeasurementValid: in.MeasurementValid, TemperatureValid: in.TemperatureValid, CountValid: in.CountValid, Count: in.Count, FieldStates: in.FieldStates, FieldAges: ages}, frame
 }
 
 // fieldOf is the decoder field key of a row: the last segment of its identifier.
@@ -136,29 +144,73 @@ func ratText(t *testing.T, s string) *big.Rat {
 	return r
 }
 
-// evaluateCase runs the decoder and the evaluator on one vector and returns both.
-func evaluateCase(t *testing.T, c vectorCase) (canbusreg.PCSStandardPCSResult, map[string]roweval.Evaluation, canbus.Frame) {
+// gatedRows reports, for each native row identifier, whether the row names a
+// gate. Every row has a hook; only a gated row withholds a raw field.
+func gatedRows() map[string]bool {
+	gated := make(map[string]bool)
+	for _, s := range standardSpecs() {
+		gated[nativeRow(s).ID] = s.gate != ""
+	}
+	return gated
+}
+
+// evaluateCase runs the decoder and the evaluator on one admitted vector and
+// returns both with the frame.
+func evaluateCase(t *testing.T, c vectorCase) (canbusreg.PCSStandardPCSResult, Result, canbus.Frame) {
 	t.Helper()
 	s, in, frame := build(t, c)
-	evals, reason, err := Evaluate(frame, Qualifiers(s, in))
+	res, reason, err := Evaluate(s, in)
 	if err != nil || reason != "" {
 		t.Fatalf("%s: evaluate refused: %v %v", c.Name, reason, err)
 	}
-	return canbusreg.DecodePCSStandard(s, in), evals, frame
+	return canbusreg.DecodePCSStandard(s, in), res, frame
+}
+
+// checkEvidence compares the evidence the evaluator retains with the observation
+// and with the evidence of every decoder field: both sides must name the same
+// receipt and frame.
+func checkEvidence(t *testing.T, name string, res Result, in canbusreg.PCSStandardPCSInput, r canbusreg.PCSStandardPCSResult) {
+	t.Helper()
+	if !reflect.DeepEqual(res.Evidence, in.Evidence) {
+		t.Errorf("%s: evaluator evidence differs from the observation", name)
+	}
+	for field, df := range r.Fields {
+		if !reflect.DeepEqual(df.Evidence, res.Evidence) {
+			t.Errorf("%s: %s decoder evidence differs from the evaluator's", name, field)
+		}
+	}
 }
 
 // checkCase compares every decoder field of a vector with the one row that
-// applies to it. It returns the identifiers of the rows that applied.
+// applies to it. A vector the decoder does not admit must be refused by the
+// evaluator with the decoder's status and no rows. It returns the identifiers
+// of the rows that applied.
 func checkCase(t *testing.T, c vectorCase) map[string]bool {
 	t.Helper()
-	r, evals, frame := evaluateCase(t, c)
+	s, in, frame := build(t, c)
+	r := canbusreg.DecodePCSStandard(s, in)
+	res, reason, err := Evaluate(s, in)
+	if err != nil {
+		t.Fatalf("%s: %v", c.Name, err)
+	}
+	if r.Status != "decoded" {
+		if reason != roweval.Reason(r.Status) || res.Rows != nil || len(r.Fields) != 0 {
+			t.Errorf("%s: decoder status %q with %d fields, evaluator reason %q", c.Name, r.Status, len(r.Fields), reason)
+		}
+		return map[string]bool{}
+	}
+	if reason != "" {
+		t.Fatalf("%s: decoder admits the observation, evaluator refuses it (%q)", c.Name, reason)
+	}
+	checkEvidence(t, c.Name, res, in, r)
 	rows := make(map[string]roweval.NativeRow[Selector])
 	for _, row := range Table().Native {
 		rows[row.ID] = row
 	}
+	gated := gatedRows()
 	applied := make(map[string]bool)
 	byField := make(map[string][]string)
-	for id, ev := range evals {
+	for id, ev := range res.Rows {
 		if ev.Reason == roweval.ReasonNoMatch {
 			continue
 		}
@@ -174,7 +226,7 @@ func checkCase(t *testing.T, c vectorCase) map[string]bool {
 			t.Errorf("%s: field %s has %d applied rows", c.Name, name, len(ids))
 			continue
 		}
-		checkField(t, c.Name, name, df, rows[ids[0]], evals[ids[0]].Native, frame)
+		checkField(t, c.Name, name, df, rows[ids[0]], gated[ids[0]], res.Rows[ids[0]].Native, frame)
 	}
 	for name, want := range c.Expect {
 		df, ok := r.Fields[name]
@@ -185,7 +237,7 @@ func checkCase(t *testing.T, c vectorCase) map[string]bool {
 			t.Errorf("%s: %s decoder value %s, want %s", c.Name, name, got.RatString(), want.Value)
 		}
 		for _, id := range byField[name] {
-			if v := evals[id].Native.Value; v != nil && v.Quantity != nil {
+			if v := res.Rows[id].Native.Value; v != nil && v.Quantity != nil {
 				if got := decimalRat(t, v.Quantity.Number); got.Cmp(ratText(t, want.Value)) != 0 {
 					t.Errorf("%s: %s row value %s, want %s", c.Name, name, got.RatString(), want.Value)
 				}
@@ -195,9 +247,10 @@ func checkCase(t *testing.T, c vectorCase) map[string]bool {
 	return applied
 }
 
-// checkField compares one decoder field with its row: the raw word, the raw
-// evidence, the status and, for an accepted field, the exact native value.
-func checkField(t *testing.T, name, field string, df canbusreg.NativeField, row roweval.NativeRow[Selector], nat *roweval.Native, frame canbus.Frame) {
+// checkField compares one decoder field with its row: the raw word, the status
+// and, for an accepted field, the exact native value. A field the decoder
+// withholds by an explicit state gives that state as the row reason.
+func checkField(t *testing.T, name, field string, df canbusreg.NativeField, row roweval.NativeRow[Selector], gated bool, nat *roweval.Native, frame canbus.Frame) {
 	t.Helper()
 	if df.Raw != frame.Bytes() || df.Evidence.Frame != frame {
 		t.Errorf("%s: %s raw evidence differs from the frame", name, field)
@@ -212,7 +265,6 @@ func checkField(t *testing.T, name, field string, df canbusreg.NativeField, row 
 	if got != df.Numerator {
 		t.Errorf("%s: %s raw %d, decoder %d", name, field, got, df.Numerator)
 	}
-	gated := row.Decode.Hook != ""
 	switch df.Status {
 	case "accepted":
 		if nat.Reason != "" || nat.Value == nil || nat.Value.Quantity == nil {
@@ -234,6 +286,10 @@ func checkField(t *testing.T, name, field string, df canbusreg.NativeField, row 
 	case "invalid":
 		if nat.Reason != roweval.ReasonOutsideDomain {
 			t.Errorf("%s: %s invalid in the decoder, row reason %q", name, field, nat.Reason)
+		}
+	case "absent", "stale", "unsupported", "conflict", "unassigned":
+		if nat.Reason != roweval.Reason(df.Status) {
+			t.Errorf("%s: %s %s in the decoder, row reason %q", name, field, df.Status, nat.Reason)
 		}
 	default:
 		t.Errorf("%s: %s has unexpected status %q", name, field, df.Status)
@@ -295,6 +351,68 @@ func TestStandardVectorsCoverEveryRow(t *testing.T) {
 	}
 }
 
+// TestStandardRowsFollowDecoderAdmission pins that the evaluator refuses every
+// observation the decoder refuses, with the decoder's status and no rows: an
+// unresolved publisher, a direction, bank, endpoint or age mismatch.
+func TestStandardRowsFollowDecoderAdmission(t *testing.T) {
+	base := caseNamed(t, "legacy-local-measured-313")
+	cases := []struct {
+		name   string
+		mutate func(*canbusreg.PCSStandardPCSInput)
+		status string
+	}{
+		{"publisher unresolved", func(in *canbusreg.PCSStandardPCSInput) { in.PublisherResolved = false }, "conflict"},
+		{"direction mismatch", func(in *canbusreg.PCSStandardPCSInput) { in.Direction = "pcs-to-bms" }, "invalid"},
+		{"bank mismatch", func(in *canbusreg.PCSStandardPCSInput) { in.Bank = "parallel" }, "invalid"},
+		{"endpoint mismatch", func(in *canbusreg.PCSStandardPCSInput) { in.Endpoint = "gateway" }, "invalid"},
+		{"negative frame age", func(in *canbusreg.PCSStandardPCSInput) { in.FieldAge = -time.Second }, "invalid"},
+	}
+	for _, tc := range cases {
+		s, in, _ := build(t, base)
+		tc.mutate(&in)
+		r := canbusreg.DecodePCSStandard(s, in)
+		if r.Status != tc.status || len(r.Fields) != 0 {
+			t.Errorf("%s: decoder status %q with %d fields, want %q", tc.name, r.Status, len(r.Fields), tc.status)
+		}
+		res, reason, err := Evaluate(s, in)
+		if err != nil {
+			t.Fatalf("%s: %v", tc.name, err)
+		}
+		if reason != roweval.Reason(tc.status) || res.Rows != nil {
+			t.Errorf("%s: evaluator reason %q with rows %v, want %q and none", tc.name, reason, res.Rows != nil, tc.status)
+		}
+	}
+}
+
+// TestStandardRowsKeepObservationEvidence pins that two receipts of the same
+// bytes and selection are told apart in the evaluation: the evaluator keeps the
+// receipt of each observation, the decoder agrees with it, and the row values
+// are the same.
+func TestStandardRowsKeepObservationEvidence(t *testing.T) {
+	base := caseNamed(t, "legacy-local-measured-313")
+	s, first, _ := build(t, base)
+	firstRes, reason, err := Evaluate(s, first)
+	if err != nil || reason != "" {
+		t.Fatalf("first receipt: %q %v", reason, err)
+	}
+	later := first
+	later.Evidence.Sequence++
+	laterRes, reason, err := Evaluate(s, later)
+	if err != nil || reason != "" {
+		t.Fatalf("later receipt: %q %v", reason, err)
+	}
+	if firstRes.Evidence.Sequence == laterRes.Evidence.Sequence {
+		t.Fatal("two receipts of the same frame keep one sequence")
+	}
+	checkEvidence(t, "later receipt", laterRes, later, canbusreg.DecodePCSStandard(s, later))
+	for id, ev := range firstRes.Rows {
+		other := laterRes.Rows[id]
+		if ev.Reason != other.Reason || (ev.Native != nil && other.Native != nil && ev.Native.Raw != other.Native.Raw) {
+			t.Errorf("%s differs between receipts of the same bytes", id)
+		}
+	}
+}
+
 func TestStandardRowsRefuseNeighbouringIdentifierWrongLengthAndExtendedFormat(t *testing.T) {
 	base := caseNamed(t, "legacy-local-measured-313")
 	s, in, _ := build(t, base)
@@ -311,7 +429,8 @@ func TestStandardRowsRefuseNeighbouringIdentifierWrongLengthAndExtendedFormat(t 
 	assertRefused(t, "extended format", s, in, frame)
 }
 
-// assertRefused checks that the decoder yields no field and that no row applies.
+// assertRefused checks that the decoder yields no field and that the evaluator
+// refuses the frame by the frame disposition: no rows, reason no_match.
 func assertRefused(t *testing.T, name string, s canbusreg.Selection, in canbusreg.PCSStandardPCSInput, frame canbus.Frame) {
 	t.Helper()
 	in.Evidence.Frame = frame
@@ -319,11 +438,11 @@ func assertRefused(t *testing.T, name string, s canbusreg.Selection, in canbusre
 	if len(r.Fields) != 0 {
 		t.Errorf("%s: decoder emitted %d fields", name, len(r.Fields))
 	}
-	evals, reason, err := Evaluate(frame, Qualifiers(s, in))
+	res, reason, err := Evaluate(s, in)
 	if err != nil {
 		t.Fatal(err)
 	}
-	if reason != roweval.ReasonNoMatch || evals != nil {
+	if reason != roweval.ReasonNoMatch || res.Rows != nil {
 		t.Errorf("%s: evaluator admitted the frame (%q)", name, reason)
 	}
 }
@@ -338,8 +457,9 @@ func TestStandardRowsSeparateBanksAndGroupAndSlotContext(t *testing.T) {
 	if rb.Fields["voltage"].Group != "0" || rb.Fields["voltage"].Slot != "1" || ra.Fields["voltage"].Group != "" || ra.Fields["voltage"].Slot != "" {
 		t.Fatalf("decoder context: %q/%q and %q/%q", rb.Fields["voltage"].Group, rb.Fields["voltage"].Slot, ra.Fields["voltage"].Group, ra.Fields["voltage"].Slot)
 	}
-	for id, ev := range eb {
-		if ea[id].Reason != ev.Reason || (ev.Native != nil && ea[id].Native.Raw != ev.Native.Raw) {
+	for id, ev := range eb.Rows {
+		other := ea.Rows[id].Native
+		if ea.Rows[id].Reason != ev.Reason || (ev.Native != nil && (other == nil || other.Raw != ev.Native.Raw)) {
 			t.Errorf("%s differs with the group and slot absent", id)
 		}
 	}
@@ -353,29 +473,44 @@ func TestStandardRowsSeparateBanksAndGroupAndSlotContext(t *testing.T) {
 	if _, err := canbusreg.NewSelection(spec); !errors.Is(err, canbusreg.ErrSelectionBankPairing) {
 		t.Fatalf("pcs-standard with the parallel bank: %v", err)
 	}
+	// The evaluator's own bank qualifier is tested on the rows directly: a
+	// deliberate rejection gives every row no_match with no native value, and
+	// an evaluation failure is an error or a non-empty reason, never a silent pass.
 	s, in, frame := build(t, base)
 	q := Qualifiers(s, in)
 	q.Values[qBank] = "parallel"
-	evals, _, _ := Evaluate(frame, q)
+	evals, reason, err := evaluateRows(frame, q)
+	if err != nil {
+		t.Fatalf("parallel-bank qualifier: %v", err)
+	}
+	if reason != "" {
+		t.Fatalf("parallel-bank qualifier refused the frame (%q), not the bank", reason)
+	}
+	if len(evals) == 0 {
+		t.Fatal("no row was evaluated under the parallel-bank qualifier")
+	}
 	for id, ev := range evals {
-		if ev.Reason != roweval.ReasonNoMatch {
-			t.Errorf("%s applies under the parallel bank", id)
+		if ev.Reason != roweval.ReasonNoMatch || ev.Native != nil {
+			t.Errorf("%s applies under the parallel bank (reason %q)", id, ev.Reason)
 		}
 	}
 }
 
-// assertNoRowApplies checks that a parallel-flavor selection gets no standard row.
+// assertNoRowApplies checks that a parallel-flavor selection gets no standard
+// row: the decoder yields no field and the evaluator refuses with its status.
 func assertNoRowApplies(t *testing.T, c vectorCase) {
 	t.Helper()
-	s, in, frame := build(t, c)
-	if r := canbusreg.DecodePCSStandard(s, in); len(r.Fields) != 0 {
+	s, in, _ := build(t, c)
+	r := canbusreg.DecodePCSStandard(s, in)
+	if len(r.Fields) != 0 {
 		t.Errorf("%s: decoder emitted %d fields", c.Name, len(r.Fields))
 	}
-	evals, _, _ := Evaluate(frame, Qualifiers(s, in))
-	for id, ev := range evals {
-		if ev.Reason != roweval.ReasonNoMatch {
-			t.Errorf("%s: %s applies to the parallel flavor", c.Name, id)
-		}
+	res, reason, err := Evaluate(s, in)
+	if err != nil {
+		t.Fatalf("%s: %v", c.Name, err)
+	}
+	if reason != roweval.Reason(r.Status) || res.Rows != nil {
+		t.Errorf("%s: evaluator reason %q with rows, decoder status %q", c.Name, reason, r.Status)
 	}
 }
 
@@ -391,12 +526,12 @@ func TestStandardMeasurementRowsKeepLegacyAndRelease11MeaningsApart(t *testing.T
 		t.Errorf("release-11 meanings: %q, %q", rr.Fields["voltage"].Meaning, rr.Fields["temperature"].Meaning)
 	}
 	for _, id := range []string{rowPrefix + "313.legacy.voltage", rowPrefix + "313.legacy.temperature"} {
-		if el[id].Reason == roweval.ReasonNoMatch || er[id].Reason != roweval.ReasonNoMatch {
+		if el.Rows[id].Reason == roweval.ReasonNoMatch || er.Rows[id].Reason != roweval.ReasonNoMatch {
 			t.Errorf("%s applies to the wrong contract", id)
 		}
 	}
 	for _, id := range []string{rowPrefix + "313.release11.voltage", rowPrefix + "313.release11.temperature"} {
-		if er[id].Reason == roweval.ReasonNoMatch || el[id].Reason != roweval.ReasonNoMatch {
+		if er.Rows[id].Reason == roweval.ReasonNoMatch || el.Rows[id].Reason != roweval.ReasonNoMatch {
 			t.Errorf("%s applies to the wrong contract", id)
 		}
 	}

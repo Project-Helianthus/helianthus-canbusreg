@@ -50,6 +50,15 @@ const (
 	qMeasured        = "measured"
 	qTemperatureGate = "temperature"
 
+	// qFieldState and qFieldAgeInvalid prefix the per-field dispositions the
+	// decoder input supplies: an explicit field state, and a negative field age
+	// that the decoder reads as invalid. Each is followed by the field key.
+	qFieldState      = "field-state:"
+	qFieldAgeInvalid = "field-age-invalid:"
+
+	// rowHookPrefix prefixes the hook name of a native row; the row identifier follows.
+	rowHookPrefix = "row:"
+
 	// gateWithheld is the native reason of a field whose selection gate is
 	// not met. The native value is withheld and the raw word is kept.
 	gateWithheld roweval.Reason = "gate_withheld"
@@ -65,9 +74,6 @@ const (
 	gateTemperature   = qTemperatureGate
 )
 
-// gateHookPrefix names the gate hook of a qualifier in the table's hook map.
-const gateHookPrefix = "gate:"
-
 func boolText(b bool) string {
 	if b {
 		return "true"
@@ -76,10 +82,11 @@ func boolText(b bool) string {
 }
 
 // Qualifiers returns the selection vocabulary of one standard PCS selection and
-// its input: the When conditions the rows test and the gate qualifiers the
-// gate hooks test. The gates follow the frozen DecodePCSStandard rules: a
-// local QAAA0006 source, the release-11 contract (contract group L8), a
-// gateway aggregate and a measurement or temperature validity assertion.
+// its input: the When conditions the rows test, the gate qualifiers the gate
+// hooks test and the per-field dispositions the decoder input supplies. The
+// gates follow the frozen DecodePCSStandard rules: a local QAAA0006 source, the
+// release-11 contract (contract group L8), a gateway aggregate and a
+// measurement or temperature validity assertion.
 func Qualifiers(s canbusreg.Selection, in canbusreg.PCSStandardPCSInput) roweval.Qualifiers {
 	c := s.SelectionSpecValue()
 	release11 := s.SelectionGroup() == "L8"
@@ -87,7 +94,7 @@ func Qualifiers(s canbusreg.Selection, in canbusreg.PCSStandardPCSInput) roweval
 	gateway := c.ProjectCode == "QCAA" && c.Release == "0001" && c.Scope == "aggregate"
 	measured := in.MeasurementValid && (local || release11)
 	temperature := measured && in.TemperatureValid && (!release11 || in.CountValid && in.Count > 0)
-	return roweval.Qualifiers{Values: map[string]string{
+	values := map[string]string{
 		qFlavor:          c.Flavor,
 		qBank:            c.Bank,
 		qScope:           c.Scope,
@@ -103,27 +110,47 @@ func Qualifiers(s canbusreg.Selection, in canbusreg.PCSStandardPCSInput) roweval
 		qLocalMeasured:   boolText(local && in.MeasurementValid),
 		qMeasured:        boolText(measured),
 		qTemperatureGate: boolText(temperature),
-	}}
+	}
+	for field, state := range in.FieldStates {
+		values[qFieldState+field] = state
+	}
+	for field, age := range in.FieldAges {
+		if age < 0 {
+			values[qFieldAgeInvalid+field] = "true"
+		}
+	}
+	return roweval.Qualifiers{Values: values}
 }
 
-// gateHook is the hook that withholds a native value unless one qualifier is
-// "true". It passes the value through unchanged when the gate is met.
-func gateHook(key string) roweval.RowHook {
+// dispositionReason is the reason of a field the decoder input states as not
+// accepted. The decoder keeps these states as the field status, so the reason
+// is the state itself; any other state is invalid, as the decoder reads it.
+func dispositionReason(state string) roweval.Reason {
+	switch state {
+	case "absent", "stale", "unsupported", "conflict", "unassigned":
+		return roweval.Reason(state)
+	}
+	return roweval.ReasonOutsideDomain
+}
+
+// rowHook is the hook of one native row. It withholds the value when the
+// decoder input gives the field an invalid age (the decoder's invalid status),
+// when it states an explicit disposition for the field, or when the row's gate
+// qualifier is not "true". Each withheld value keeps its raw word.
+func rowHook(field, gate string) roweval.RowHook {
 	return func(in roweval.DetachedInputs, _ roweval.RowID, _ roweval.Direction, v roweval.TypedValue) (roweval.DerivedValue, roweval.Reason) {
-		if in.Qualifiers().Values[key] != "true" {
+		q := in.Qualifiers().Values
+		if q[qFieldAgeInvalid+field] == "true" {
+			return roweval.DerivedValue{}, roweval.ReasonOutsideDomain
+		}
+		if state, ok := q[qFieldState+field]; ok {
+			return roweval.DerivedValue{}, dispositionReason(state)
+		}
+		if gate != "" && q[gate] != "true" {
 			return roweval.DerivedValue{}, gateWithheld
 		}
 		return roweval.DerivedValue{Value: v}, ""
 	}
-}
-
-// gateHooks returns the hook map of the table: one gate hook per gate qualifier.
-func gateHooks() map[string]roweval.RowHook {
-	hooks := make(map[string]roweval.RowHook)
-	for _, key := range []string{gateLocal, gateLocalMeasured, gateMeasured, gateTemperature} {
-		hooks[gateHookPrefix+key] = gateHook(key)
-	}
-	return hooks
 }
 
 // Descriptors returns the codecs and byte, bit and word orders the standard
@@ -178,11 +205,20 @@ func integerCodec(signed bool) roweval.Codec {
 	}
 }
 
-// Table returns the native rows of the standard PCS frames and the gate hooks
-// those rows name. The table has no bindings: the bindings of these rows are
-// added by the later slices of the package.
+// Table returns the native rows of the standard PCS frames and the row hooks
+// those rows name. Each row has its own hook, which carries the row's field
+// disposition and its gate. The table has no bindings: the bindings of these
+// rows are added by the later slices of the package.
 func Table() roweval.Table[Selector] {
-	return roweval.Table[Selector]{Native: standardRows(), Hooks: gateHooks()}
+	specs := standardSpecs()
+	rows := make([]roweval.NativeRow[Selector], 0, len(specs))
+	hooks := make(map[string]roweval.RowHook, len(specs))
+	for _, s := range specs {
+		row := nativeRow(s)
+		rows = append(rows, row)
+		hooks[row.Decode.Hook] = rowHook(s.field, s.gate)
+	}
+	return roweval.Table[Selector]{Native: rows, Hooks: hooks}
 }
 
 // frameDisposition admits only the standard identifier with DLC 8 and raw DLC
@@ -198,15 +234,37 @@ func frameDisposition(frame canbus.Frame) roweval.Reason {
 	return roweval.ReasonNoMatch
 }
 
-// Evaluate evaluates every native row of an admitted standard PCS frame under
-// the qualifiers of its selection. A frame the gate rejects gives the rejection
-// and no evaluation. Rows that share a slice are told apart by their When, so
-// the evaluation of a slice is keyed by the row it matched: a row whose When
-// does not hold under the qualifiers gives roweval.ReasonNoMatch.
-func Evaluate(frame canbus.Frame, q roweval.Qualifiers) (map[string]roweval.Evaluation, roweval.Reason, error) {
+// Result is the evaluation of one standard PCS observation: the evidence the
+// observation carries and the evaluation of every row of its identifier, keyed
+// by row identifier. Rows that do not apply under the selection give
+// roweval.ReasonNoMatch.
+type Result struct {
+	Evidence canbusreg.Evidence
+	Rows     map[string]roweval.Evaluation
+}
+
+// Evaluate evaluates the native rows of one standard PCS observation under the
+// selection and decoder input it was received with. The evaluator admits only
+// what DecodePCSStandard admits: a frame the decoder refuses gives the decoder's
+// status as the reason and no rows, so an unresolved publisher, a direction or
+// context mismatch or a frame outside the table is never evaluated as a value.
+func Evaluate(s canbusreg.Selection, in canbusreg.PCSStandardPCSInput) (Result, roweval.Reason, error) {
+	res := Result{Evidence: in.Evidence}
+	frame := in.Evidence.Frame
 	if reason := frameDisposition(frame); reason != "" {
-		return nil, reason, nil
+		return res, reason, nil
 	}
+	if decoded := canbusreg.DecodePCSStandard(s, in); decoded.Status != "decoded" {
+		return res, roweval.Reason(decoded.Status), nil
+	}
+	rows, reason, err := evaluateRows(frame, Qualifiers(s, in))
+	res.Rows = rows
+	return res, reason, err
+}
+
+// evaluateRows evaluates every native row of the frame's identifier under the
+// qualifiers. It does not check the decoder admission; Evaluate does.
+func evaluateRows(frame canbus.Frame, q roweval.Qualifiers) (map[string]roweval.Evaluation, roweval.Reason, error) {
 	table := Table()
 	out := make(map[string]roweval.Evaluation)
 	for _, row := range table.Native {
@@ -238,8 +296,8 @@ func Evaluate(frame canbus.Frame, q roweval.Qualifiers) (map[string]roweval.Eval
 
 // nativeRow builds one native row of the standard table. The selector is the
 // standard identifier with DLC 8 and raw DLC 8. The conversion is the exact
-// affine x / divisor, and the gate, when named, is the hook of the gate
-// qualifier. The domain, when set, bounds the native value to [0, 100].
+// affine x / divisor, and the hook of the row carries its gate and its field
+// disposition. The domain, when set, bounds the native value to [0, 100].
 func nativeRow(r rowSpec) roweval.NativeRow[Selector] {
 	codec := "unsigned"
 	if r.slice.signed {
@@ -254,9 +312,7 @@ func nativeRow(r rowSpec) roweval.NativeRow[Selector] {
 		Wire:    roweval.Layout{BitOffset: r.slice.offset, Width: r.slice.width, Codec: codec, ByteOrder: r.slice.order, BitOrder: "lsb0", WordOrder: "single"},
 		Decode:  roweval.Convert{Numeric: &roweval.Affine{Num: 1, Den: r.divisor}},
 	}
-	if r.gate != "" {
-		row.Decode.Hook = gateHookPrefix + r.gate
-	}
+	row.Decode.Hook = rowHookPrefix + row.ID
 	if r.percentDomain {
 		zero, hundred := semreg.Decimal{Coefficient: "0"}, semreg.Decimal{Coefficient: "1", Exponent10: 2}
 		row.Domain = roweval.Bounds{Min: &zero, Max: &hundred}

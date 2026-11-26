@@ -219,6 +219,36 @@
         "spread": {"status": "accepted", "value": "65535"},
         "cycles": {"status": "accepted", "value": "65535"}
       }
+    },
+    {
+      "name": "publisher-unresolved-313-is-refused",
+      "identifier": "0x313",
+      "payload": "14beFFF6FFF664E4",
+      "selection": {"project": "QAAA", "release": "0006", "flavor": "pcs-standard", "bank": "ordinary", "scope": "local", "endpoint": "coordinator", "group": "0", "slot": "1"},
+      "input": {"measurement_valid": true, "temperature_valid": true, "count_valid": true, "count": 2, "publisher_unresolved": true},
+      "expect": {}
+    },
+    {
+      "name": "release-11-stale-temperature-keeps-voltage",
+      "identifier": "0x313",
+      "payload": "14beFFF600FA64E4",
+      "selection": {"project": "QAAA", "release": "0011", "flavor": "pcs-standard", "bank": "ordinary", "scope": "local", "endpoint": "coordinator", "group": "0", "slot": "1"},
+      "input": {"measurement_valid": true, "temperature_valid": true, "count_valid": true, "count": 5, "field_states": {"temperature": "stale"}},
+      "expect": {
+        "voltage": {"status": "accepted", "value": "53.1"},
+        "temperature": {"status": "stale", "value": "25"}
+      }
+    },
+    {
+      "name": "negative-field-age-invalidates-soc-only",
+      "identifier": "0x313",
+      "payload": "14beFFF6FFF664E4",
+      "selection": {"project": "QAAA", "release": "0006", "flavor": "pcs-standard", "bank": "ordinary", "scope": "local", "endpoint": "coordinator", "group": "0", "slot": "1"},
+      "input": {"measurement_valid": true, "temperature_valid": true, "count_valid": true, "count": 2, "field_ages_ms": {"soc": -1}},
+      "expect": {
+        "voltage": {"status": "accepted", "value": "53.1"},
+        "soc": {"status": "invalid", "value": "100"}
+      }
     }
   ]
 }

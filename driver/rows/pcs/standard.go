@@ -1,7 +1,5 @@
 package pcs
 
-import "github.com/Project-Helianthus/helianthus-semreg/semreg/v1/roweval"
-
 // rowSpec describes one native row of a standard PCS frame. The field is the
 // key DecodePCSStandard emits; the layout names the selection under which a
 // repeated field name has its own slice or meaning (empty when unique); the
@@ -49,18 +47,14 @@ func rawRow(frame uint32, field string, slice signalSlice) rowSpec {
 	return rowSpec{frame: frame, field: field, slice: slice, divisor: 1, when: when()}
 }
 
-// standardRows returns the native rows of frames 311 to 314, in frame order.
-func standardRows() []roweval.NativeRow[Selector] {
+// standardSpecs returns the row specifications of frames 311 to 314, in frame order.
+func standardSpecs() []rowSpec {
 	var specs []rowSpec
 	specs = append(specs, limitSpecs()...)
 	specs = append(specs, summarySpecs()...)
 	specs = append(specs, measurementSpecs()...)
 	specs = append(specs, capacitySpecs()...)
-	rows := make([]roweval.NativeRow[Selector], 0, len(specs))
-	for _, s := range specs {
-		rows = append(rows, nativeRow(s))
-	}
-	return rows
+	return specs
 }
 
 // limitSpecs are the rows of frame 0x311. The charge and discharge words are

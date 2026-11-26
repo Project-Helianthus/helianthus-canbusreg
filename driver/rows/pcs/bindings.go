@@ -1,6 +1,8 @@
 package pcs
 
 import (
+	"github.com/Project-Helianthus/helianthus-canbus"
+	"github.com/Project-Helianthus/helianthus-canbusreg"
 	"github.com/Project-Helianthus/helianthus-semreg/semreg/v1"
 	"github.com/Project-Helianthus/helianthus-semreg/semreg/v1/roweval"
 )
@@ -27,6 +29,12 @@ import (
 // words, whose scale the page leaves to the measurement contract; and the
 // parallel 0x650 state of health, which the decoder keeps as a raw byte with no
 // unit.
+//
+// The storage.status.alarm, storage.status.protection and storage.status.warning
+// facts take a binding only for a bit or index to which the decoder states that
+// condition class. The decoder states a condition name (LabelCondition and the
+// summary bit meanings) and no class, so statusBindings writes none and every
+// summary bit, diagnostic word and diagnostic index stays a native row.
 //
 // No binding has a way back. The roweval write row of a binding is nil: the
 // page documents no command whose effect is read back as these values. The 191A
@@ -114,11 +122,78 @@ func parallelBindings() []roweval.BindingRow {
 	}
 }
 
+// statusBindings returns the read bindings of the storage status facts. The
+// decoder states no condition class for any bit or index, so there is none.
+func statusBindings() []roweval.BindingRow { return nil }
+
 // Bindings returns the read bindings of every PCS table.
 func Bindings() []roweval.BindingRow {
 	all := standardBindings()
 	all = append(all, extendedBindings()...)
-	return append(all, parallelBindings()...)
+	all = append(all, parallelBindings()...)
+	return append(all, statusBindings()...)
+}
+
+// diagnosticTable returns the native rows of the summary bits of 0x312 and
+// 0x323 and of the diagnostic code words of 0x333, 0x520 to 0x52F and the LINK
+// 0x1853 family, with the hooks they name. The index hook of a word row maps
+// under no dictionary here; EvaluateDTC evaluates a word under the member's.
+func diagnosticTable() roweval.Table[Selector] {
+	t := roweval.Table[Selector]{Hooks: map[string]roweval.RowHook{}}
+	add := func(specs []diagSpec) {
+		for _, s := range specs {
+			t.Native = append(t.Native, s.row)
+			if s.hook != nil {
+				t.Hooks[s.row.Decode.Hook] = s.hook
+			}
+		}
+	}
+	add(diagSummarySpecs(0x312))
+	add(diagSummarySpecs(0x323))
+	for _, c := range []struct {
+		id       uint32
+		extended bool
+	}{{0x333, false}, {0x520, false}, {0x1853F41A, true}} {
+		ident, err := canbus.NewStandardID(c.id)
+		if c.extended {
+			ident, err = canbus.NewExtendedID(c.id)
+		}
+		if err != nil {
+			continue
+		}
+		frame, err := canbus.NewFrame(ident, make([]byte, 8))
+		if err != nil {
+			continue
+		}
+		fam, ok := diagDTCFamilyOf(frame)
+		if !ok {
+			continue
+		}
+		for _, offset := range fam.offsets {
+			add(diagDTCSpecs(fam, canbusreg.Selection{}, offset, frame))
+		}
+	}
+	return t
+}
+
+// CombinedTable returns every native row of the standard (with extrema), gauge,
+// slot, identity, diagnostic, extended, extended fault and parallel tables with
+// all read bindings. A row carries no withdrawal rule and no storage-graph
+// switch; a stale or absent source is left to the runtime.
+func CombinedTable() roweval.Table[Selector] {
+	identity, identityHooks, _ := identityRows()
+	parts := []roweval.Table[Selector]{
+		FullTable(), gaugeTable(), SlotTable(), {Native: identity, Hooks: identityHooks}, diagnosticTable(),
+		ExtendedTable(), ExtendedFaultTable(), ParallelIdentityTable(), ParallelReleaseTable(),
+	}
+	all := roweval.Table[Selector]{Hooks: map[string]roweval.RowHook{}, Bindings: Bindings()}
+	for _, p := range parts {
+		all.Native = append(all.Native, p.Native...)
+		for name, hook := range p.Hooks {
+			all.Hooks[name] = hook
+		}
+	}
+	return all
 }
 
 // BoundTable returns the native rows of the standard PCS frames with their

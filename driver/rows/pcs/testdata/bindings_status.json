@@ -1,0 +1,68 @@
+{
+  "description": "Synthetic status frames for the status bindings. Every expectation is written by hand: class_words are the words that state a condition class, status_facts are the storage facts that take a class-bound binding, bound_facts are the facts the whole table binds, and classified lists, per case, the decoder keys whose condition meaning states a class (none: the decoder states condition names only).",
+  "class_words": ["alarm", "protection", "warning"],
+  "status_facts": ["storage.status.alarm", "storage.status.protection", "storage.status.warning"],
+  "bound_facts": ["storage.state.soc", "storage.state.soh", "storage.pack.current", "storage.pack.voltage", "storage.temperature.pack"],
+  "cases": [
+    {
+      "name": "modern-summary-a1",
+      "kind": "summary",
+      "identifier": "0x312",
+      "extended": false,
+      "payload": "0200000000000000",
+      "offset": 0,
+      "selection": {"flavor": "pcs-standard", "bank": "ordinary", "project": "QAAA", "release": "0011", "scope": "local", "endpoint": "coordinator", "group": "", "slot": ""},
+      "classified": []
+    },
+    {
+      "name": "modern-summary-323-b5-bit0",
+      "kind": "summary",
+      "identifier": "0x323",
+      "extended": false,
+      "payload": "0000000000010000",
+      "offset": 0,
+      "selection": {"flavor": "pcs-standard", "bank": "ordinary", "project": "QAAA", "release": "0011", "scope": "local", "endpoint": "coordinator", "group": "", "slot": ""},
+      "classified": []
+    },
+    {
+      "name": "unmapped-bit-stays-raw",
+      "kind": "summary",
+      "identifier": "0x312",
+      "extended": false,
+      "payload": "0001000000000000",
+      "offset": 0,
+      "selection": {"flavor": "pcs-standard", "bank": "ordinary", "project": "QAAA", "release": "0011", "scope": "local", "endpoint": "coordinator", "group": "", "slot": ""},
+      "classified": []
+    },
+    {
+      "name": "parallel-summary-a1",
+      "kind": "summary",
+      "identifier": "0x312",
+      "extended": false,
+      "payload": "0200000000000000",
+      "offset": 0,
+      "selection": {"flavor": "pcs-parallel", "bank": "parallel", "project": "QAAA", "release": "0011", "scope": "local", "endpoint": "coordinator", "group": "", "slot": ""},
+      "classified": []
+    },
+    {
+      "name": "standard-word-index-9",
+      "kind": "dtc",
+      "identifier": "0x333",
+      "extended": false,
+      "payload": "0000100900000000",
+      "offset": 2,
+      "selection": {"flavor": "pcs-standard", "bank": "ordinary", "project": "QAAA", "release": "0011", "scope": "local", "endpoint": "coordinator", "group": "0", "slot": "0"},
+      "classified": []
+    },
+    {
+      "name": "standard-word-index-131",
+      "kind": "dtc",
+      "identifier": "0x333",
+      "extended": false,
+      "payload": "0000113100000000",
+      "offset": 2,
+      "selection": {"flavor": "pcs-standard", "bank": "ordinary", "project": "QAAA", "release": "0011", "scope": "local", "endpoint": "coordinator", "group": "0", "slot": "0"},
+      "classified": []
+    }
+  ]
+}

@@ -266,6 +266,20 @@ func rowMatches(evals map[string]roweval.Evaluation, id string) bool {
 	return ok && ev.Native != nil && ev.Native.Reason == "" && ev.Native.Value != nil
 }
 
+// unmatchedRows returns the sorted IDs of the evaluations that give no native
+// value. A selector miss keeps its ID in the evaluation map, so the count and
+// the IDs of an evaluation do not show that each of its rows matched the frame.
+func unmatchedRows(evals map[string]roweval.Evaluation) []string {
+	var ids []string
+	for id := range evals {
+		if !rowMatches(evals, id) {
+			ids = append(ids, id)
+		}
+	}
+	sort.Strings(ids)
+	return ids
+}
+
 // sameNames reports whether two name lists hold the same names, in any order.
 func sameNames(a, b []string) bool {
 	x := append([]string(nil), a...)
@@ -429,6 +443,9 @@ func TestMonitorFamiliesMatchOnlyTheirOwnAddressedRows(t *testing.T) {
 				t.Fatalf("%s: row %s belongs to another family", v.name, id)
 			}
 		}
+		if got := unmatchedRows(evals); len(got) != 0 {
+			t.Fatalf("%s: rows %v of the frame's own address give no native value", v.name, got)
+		}
 		// The same bytes at another address, each address changed on its own. The
 		// BCU is the low byte of both forms and is varied for every frame; the BMU
 		// (bits 20 to 23) is varied for the module form too. Each variant runs
@@ -453,6 +470,11 @@ func TestMonitorFamiliesMatchOnlyTheirOwnAddressedRows(t *testing.T) {
 			if otherReason != "" || len(otherEvals) != len(own) {
 				t.Fatalf("%s: address %#x gives %d rows with reason %q, its family has %d", v.name, other.id, len(otherEvals), otherReason, len(own))
 			}
+			// A row whose selector misses keeps its ID in the map, so the count above
+			// does not show that the row matched: each row must give a native value.
+			if got := unmatchedRows(otherEvals); len(got) != 0 {
+				t.Fatalf("%s: rows %v at address %#x give no native value", v.name, got, other.id)
+			}
 			atOther := map[string]bool{}
 			for _, row := range MonitorTable(other.id).Native {
 				if row.At.Identifier == other.id {
@@ -469,6 +491,36 @@ func TestMonitorFamiliesMatchOnlyTheirOwnAddressedRows(t *testing.T) {
 			if row.At.Identifier != v.id {
 				t.Fatalf("%s: row %s of address %#x", v.name, row.ID, row.At.Identifier)
 			}
+		}
+		checked++
+	}
+	if checked == 0 {
+		t.Fatal("no monitor frame was checked")
+	}
+}
+
+// TestMonitorRowWhoseSelectorMissesGivesNoValue pins the native-value check of the
+// monitor family test. The rows of each admitted monitor frame are moved to raw
+// DLC 9 in a copy of the live table, so no row selects the frame. The evaluation
+// keeps every row ID, as the count check of the family test sees, and no row
+// gives a native value, which the unmatched-row check must report.
+func TestMonitorRowWhoseSelectorMissesGivesNoValue(t *testing.T) {
+	roles := storageRoles(t)
+	checked := 0
+	for _, v := range readSelectorVectors(t) {
+		if v.profile != "monitor" || v.frame != "admitted" {
+			continue
+		}
+		table := MonitorTable(v.id)
+		for i := range table.Native {
+			table.Native[i].At.RawDLC = 9
+		}
+		evals := evaluateSelectorTable(t, v, table, roles)
+		if len(evals) != len(table.Native) || len(evals) == 0 {
+			t.Fatalf("%s: %d evaluations for %d rows", v.name, len(evals), len(table.Native))
+		}
+		if got := unmatchedRows(evals); len(got) != len(evals) {
+			t.Fatalf("%s: %d of %d rows with a missed selector are reported as unmatched", v.name, len(got), len(evals))
 		}
 		checked++
 	}

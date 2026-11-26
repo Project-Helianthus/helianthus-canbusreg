@@ -350,22 +350,24 @@ func TestDiagnosticRowsRefuseNeighbouringIdentifierWrongLengthAndExtendedFormat(
 			f := diagFrame(t, c.id, c.extended, c.payload)
 			if !c.dtc {
 				in := diagSummaryInput(c.s, f, true)
-				if len(canbusreg.DecodePCSSummaries(c.s, in).Bits) != 0 {
+				dec := canbusreg.DecodePCSSummaries(c.s, in)
+				if len(dec.Bits) != 0 {
 					t.Fatal("decoder admits a frame that must be refused")
 				}
 				res, reason, err := EvaluateSummaryBits(c.s, in)
-				if err != nil || reason == "" || len(res.Rows) != 0 {
-					t.Fatalf("rows applied: reason %q err %v rows %d", reason, err, len(res.Rows))
+				if err != nil || reason == "" || reason != roweval.Reason(dec.Status) || len(res.Rows) != 0 {
+					t.Fatalf("rows applied or status differs: reason %q decoder %q err %v rows %d", reason, dec.Status, err, len(res.Rows))
 				}
 				return
 			}
 			in := diagLinkInput(c.s, f)
-			if _, ok := canbusreg.DecodeDTC(c.s, in, 0).Fields[dtcSelectedWord]; ok {
+			dec := canbusreg.DecodeDTC(c.s, in, 0)
+			if _, ok := dec.Fields[dtcSelectedWord]; ok {
 				t.Fatal("decoder admits a frame that must be refused")
 			}
 			res, reason, err := EvaluateDTC(c.s, in, 0)
-			if err != nil || reason == "" || len(res.Rows) != 0 {
-				t.Fatalf("rows applied: reason %q err %v rows %d", reason, err, len(res.Rows))
+			if err != nil || reason == "" || reason != roweval.Reason(dec.Status) || len(res.Rows) != 0 {
+				t.Fatalf("rows applied or status differs: reason %q decoder %q err %v rows %d", reason, dec.Status, err, len(res.Rows))
 			}
 		})
 	}
@@ -505,5 +507,94 @@ func TestDiagnosticResultsKeepAttribution(t *testing.T) {
 	}
 	if resA.Attribution == resB.Attribution {
 		t.Errorf("distinct associations share one attribution: %+v", resA.Attribution)
+	}
+}
+
+// TestDiagnosticWordOffsetsFollowFrameLayout checks that a diagnostic row exists
+// only at a word position the frame family carries: 0x333 at offsets 2 and 4,
+// 0x52X at 1 and 3, and the LINK 1853 frame at 0 and 2. The caller-offset
+// decoder accepts a valid word at offset 0 of a 0x333 frame, and no row applies.
+func TestDiagnosticWordOffsetsFollowFrameLayout(t *testing.T) {
+	pcs := diagSelection(t, diagVectorSelection{Flavor: "pcs-standard", Bank: "ordinary", Project: "QAAA", Release: "0011", Scope: "local", Endpoint: "coordinator"})
+	parallel := diagSelection(t, diagVectorSelection{Flavor: "pcs-parallel", Bank: "parallel", Project: "QAAA", Release: "0011", Scope: "local", Endpoint: "coordinator", Group: "2", Slot: "3"})
+	link := diagSelection(t, diagVectorSelection{Flavor: "link", PCSFlavor: "pcs-standard", Bank: "ordinary", Project: "QAAA", Release: "0011", Scope: "local", Endpoint: "1A"})
+	cases := []struct {
+		name     string
+		s        canbusreg.Selection
+		id       string
+		extended bool
+		payload  string
+		offset   int
+		applies  bool
+	}{
+		{"333-word-at-offset-0-no-row", pcs, "0x333", false, "1009000000000000", 0, false},
+		{"333-word-at-offset-2-row", pcs, "0x333", false, "0000100900000000", 2, true},
+		{"333-word-at-offset-4-row", pcs, "0x333", false, "0000000010090000", 4, true},
+		{"333-word-at-offset-1-no-row", pcs, "0x333", false, "0010090000000000", 1, false},
+		{"52X-word-at-offset-0-no-row", parallel, "0x522", false, "0310620000000000", 0, false},
+		{"52X-word-at-offset-1-row", parallel, "0x522", false, "0310620000000000", 1, true},
+		{"52X-word-at-offset-3-row", parallel, "0x522", false, "0300001062000000", 3, true},
+		{"link-word-at-offset-0-row", link, "0x1853F41A", true, "0910000000000000", 0, true},
+		{"link-word-at-offset-1-no-row", link, "0x1853F41A", true, "0009100000000000", 1, false},
+	}
+	for _, c := range cases {
+		t.Run(c.name, func(t *testing.T) {
+			f := diagFrame(t, c.id, c.extended, c.payload)
+			in := diagLinkInput(c.s, f)
+			dec := canbusreg.DecodeDTC(c.s, in, c.offset)
+			res, reason, err := EvaluateDTC(c.s, in, c.offset)
+			if err != nil {
+				t.Fatal(err)
+			}
+			if c.applies {
+				if reason != "" || len(res.Rows) != 2 {
+					t.Fatalf("expected rows at a word position: reason %q rows %d", reason, len(res.Rows))
+				}
+				return
+			}
+			if len(res.Rows) != 0 || reason != roweval.ReasonNoMatch {
+				t.Fatalf("row applied at a non-word position: reason %q rows %d", reason, len(res.Rows))
+			}
+			if _, ok := dec.Fields[dtcSelectedWord]; c.offset == 0 && c.id == "0x333" && !ok {
+				t.Fatal("caller-offset decoder must accept the word; the test relies on that distinction")
+			}
+		})
+	}
+}
+
+// TestDiagnosticParallelWordAttributedToSelectedMember checks that a 0x52X word
+// is a selected-member value only when the frame's group nibble and slot byte are
+// the selection's own, as the parallel frame decoder requires. A word of another
+// slot, or of another group, gives "invalid" and no row.
+func TestDiagnosticParallelWordAttributedToSelectedMember(t *testing.T) {
+	parallel := diagSelection(t, diagVectorSelection{Flavor: "pcs-parallel", Bank: "parallel", Project: "QAAA", Release: "0011", Scope: "local", Endpoint: "coordinator", Group: "2", Slot: "3"})
+	cases := []struct {
+		name    string
+		id      string
+		payload string
+		applies bool
+	}{
+		{"own-group-and-slot", "0x522", "0310620000000000", true},
+		{"other-slot-same-group", "0x522", "0410620000000000", false},
+		{"other-group-same-slot", "0x523", "0310620000000000", false},
+	}
+	for _, c := range cases {
+		t.Run(c.name, func(t *testing.T) {
+			f := diagFrame(t, c.id, false, c.payload)
+			in := diagLinkInput(parallel, f)
+			res, reason, err := EvaluateDTC(parallel, in, 1)
+			if err != nil {
+				t.Fatal(err)
+			}
+			if c.applies {
+				if reason != "" || len(res.Rows) != 2 {
+					t.Fatalf("own member refused: reason %q rows %d", reason, len(res.Rows))
+				}
+				return
+			}
+			if reason != roweval.Reason("invalid") || len(res.Rows) != 0 {
+				t.Fatalf("another member's word attributed: reason %q rows %d", reason, len(res.Rows))
+			}
+		})
 	}
 }

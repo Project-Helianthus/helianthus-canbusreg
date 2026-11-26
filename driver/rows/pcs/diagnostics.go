@@ -143,11 +143,11 @@ func EvaluateSummaryBits(s canbusreg.Selection, in canbusreg.PCSSummaryPCSInput)
 	frame := in.Evidence.Frame
 	decoded := canbusreg.DecodePCSSummaries(s, in)
 	res.Diagnostics = decoded.Diagnostics
-	if !diagSummaryFrame(frame) {
-		return res, roweval.ReasonNoMatch, nil
-	}
 	if len(decoded.Bits) == 0 {
 		return res, roweval.Reason(decoded.Status), nil
+	}
+	if !diagSummaryFrame(frame) {
+		return res, roweval.ReasonNoMatch, nil
 	}
 	c := s.SelectionSpecValue()
 	q := roweval.Qualifiers{Values: map[string]string{qFlavor: c.Flavor, qBank: c.Bank}}
@@ -196,6 +196,35 @@ type diagDTCFamily struct {
 	order                     string
 	// specRef is the family the frame is admitted from, as the row declares it.
 	specRef string
+	// offsets are the caller word offsets at which the frame family carries a
+	// selected code word, as the frame decoders locate them. Other offsets are
+	// not word positions of the family and have no rows.
+	offsets []int
+}
+
+// diagWordOffsetOf reports whether a caller offset is an established code word
+// position of the family.
+func diagWordOffsetOf(fam diagDTCFamily, offset int) bool {
+	for _, o := range fam.offsets {
+		if o == offset {
+			return true
+		}
+	}
+	return false
+}
+
+// diagParallelAttributed admits a 0x52X word only for the group nibble and the
+// slot byte the selection names, as the parallel frame decoder does. Another
+// member's code is not attributed to the selected member.
+func diagParallelAttributed(member canbusreg.Selection, frame canbus.Frame) bool {
+	c := member.SelectionSpecValue()
+	g, e := strconv.ParseUint(c.Group, 10, 8)
+	slot, es := strconv.ParseUint(c.Slot, 10, 8)
+	if e != nil || es != nil || g > 7 || c.Group != strconv.FormatUint(g, 10) || c.Slot != strconv.FormatUint(slot, 10) {
+		return false
+	}
+	data := frame.Data()
+	return len(data) > 0 && frame.ID().Value()&0xf == uint32(g) && data[0] == byte(slot)
 }
 
 // diagDTCFamilyOf admits the 0x333 frame, the 0x520 to 0x52F frames and the
@@ -209,14 +238,14 @@ func diagDTCFamilyOf(f canbus.Frame) (diagDTCFamily, bool) {
 	if !f.ID().Extended() {
 		switch {
 		case id == 0x333:
-			return diagDTCFamily{token: "333", path: "pcs.standard", flavor: "pcs-standard", bank: "ordinary", order: bigEndian, specRef: "CAN 0x333"}, true
+			return diagDTCFamily{token: "333", path: "pcs.standard", flavor: "pcs-standard", bank: "ordinary", order: bigEndian, specRef: "CAN 0x333", offsets: []int{2, 4}}, true
 		case id >= 0x520 && id <= 0x52F:
-			return diagDTCFamily{token: "52X", path: "pcs.parallel", flavor: "pcs-parallel", bank: "parallel", order: bigEndian, specRef: "CAN 0x520-0x52F"}, true
+			return diagDTCFamily{token: "52X", path: "pcs.parallel", flavor: "pcs-parallel", bank: "parallel", order: bigEndian, specRef: "CAN 0x520-0x52F", offsets: []int{1, 3}}, true
 		}
 		return diagDTCFamily{}, false
 	}
 	if id>>16 == 0x1853 {
-		return diagDTCFamily{token: "1853", path: "link", flavor: "link", order: littleEndian, specRef: "CAN 0x1853xxxx extended"}, true
+		return diagDTCFamily{token: "1853", path: "link", flavor: "link", order: littleEndian, specRef: "CAN 0x1853xxxx extended", offsets: []int{0, 2}}, true
 	}
 	return diagDTCFamily{}, false
 }
@@ -297,17 +326,23 @@ func diagDTCSpecs(fam diagDTCFamily, member canbusreg.Selection, offset int, fra
 
 // EvaluateDTC evaluates the selected_word and numeric_index rows of one
 // diagnostic word at the caller's offset. A frame, member or offset the decoder
-// refuses gives the decoder's status and no rows.
+// refuses gives the decoder's status and no rows. An offset that is not a word
+// position of the frame family gives roweval.ReasonNoMatch, and a 0x52X word
+// not attributed to the selected group and slot gives "invalid", as the frame
+// decoder refuses it.
 func EvaluateDTC(member canbusreg.Selection, in canbusreg.LINKInput, offset int) (DiagnosticResult, roweval.Reason, error) {
 	res := DiagnosticResult{Evidence: in.Evidence, Attribution: diagAttribution(in), Rows: make(map[string]roweval.Evaluation)}
 	frame := in.Evidence.Frame
-	fam, ok := diagDTCFamilyOf(frame)
-	if !ok {
-		return res, roweval.ReasonNoMatch, nil
-	}
 	decoded := canbusreg.DecodeDTC(member, in, offset)
 	if _, ok := decoded.Fields[dtcSelectedWord]; !ok {
 		return res, roweval.Reason(decoded.Status), nil
+	}
+	fam, ok := diagDTCFamilyOf(frame)
+	if !ok || !diagWordOffsetOf(fam, offset) {
+		return res, roweval.ReasonNoMatch, nil
+	}
+	if fam.token == "52X" && !diagParallelAttributed(member, frame) {
+		return res, roweval.Reason("invalid"), nil
 	}
 	c := member.SelectionSpecValue()
 	dictionary := "absent"

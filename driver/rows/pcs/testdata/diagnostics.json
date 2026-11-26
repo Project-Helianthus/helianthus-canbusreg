@@ -95,8 +95,8 @@
       "kind": "dtc",
       "identifier": "0x333",
       "extended": false,
-      "payload": "1009000000000000",
-      "offset": 0,
+      "payload": "0000100900000000",
+      "offset": 2,
       "selection": {"flavor": "pcs-standard", "bank": "ordinary", "project": "QAAA", "release": "0011", "scope": "local", "endpoint": "coordinator", "group": "", "slot": ""},
       "expect": {
         "selected_word": {"status": "accepted", "raw": "4105", "value": "4105"},
@@ -121,8 +121,8 @@
       "kind": "dtc",
       "identifier": "0x333",
       "extended": false,
-      "payload": "1234000000000000",
-      "offset": 0,
+      "payload": "0000123400000000",
+      "offset": 2,
       "selection": {"flavor": "pcs-standard", "bank": "ordinary", "project": "QAAA", "release": "0011", "scope": "local", "endpoint": "coordinator", "group": "", "slot": ""},
       "expect": {
         "selected_word": {"status": "unknown", "raw": "4660", "value": "4660"},
@@ -135,7 +135,7 @@
       "identifier": "0x333",
       "extended": false,
       "payload": "0000000000000000",
-      "offset": 0,
+      "offset": 2,
       "selection": {"flavor": "pcs-standard", "bank": "ordinary", "project": "QAAA", "release": "0011", "scope": "local", "endpoint": "coordinator", "group": "", "slot": ""},
       "expect": {
         "selected_word": {"status": "empty", "raw": "0", "value": "0"},
@@ -145,11 +145,11 @@
     {
       "name": "parallel-word-index-62",
       "kind": "dtc",
-      "identifier": "0x52A",
+      "identifier": "0x522",
       "extended": false,
-      "payload": "1062000000000000",
-      "offset": 0,
-      "selection": {"flavor": "pcs-parallel", "bank": "parallel", "project": "QAAA", "release": "0011", "scope": "local", "endpoint": "coordinator", "group": "", "slot": ""},
+      "payload": "0310620000000000",
+      "offset": 1,
+      "selection": {"flavor": "pcs-parallel", "bank": "parallel", "project": "QAAA", "release": "0011", "scope": "local", "endpoint": "coordinator", "group": "2", "slot": "3"},
       "expect": {
         "selected_word": {"status": "accepted", "raw": "4194", "value": "4194"},
         "numeric_index": {"status": "accepted", "raw": "4194", "value": "62"}

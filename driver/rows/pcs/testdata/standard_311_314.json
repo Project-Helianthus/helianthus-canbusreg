@@ -197,6 +197,19 @@
       }
     },
     {
+      "name": "capacity-words-asymmetric-bytes-314",
+      "identifier": "0x314",
+      "payload": "12340064012C0102",
+      "selection": {"project": "QAAA", "release": "0006", "flavor": "pcs-standard", "bank": "ordinary", "scope": "local", "endpoint": "coordinator", "group": "0", "slot": "1"},
+      "input": {"measurement_valid": true, "temperature_valid": true, "count_valid": true, "count": 2},
+      "expect": {
+        "remaining_capacity": {"status": "accepted", "value": "46.6"},
+        "full_capacity": {"status": "accepted", "value": "1"},
+        "spread": {"status": "accepted", "value": "300"},
+        "cycles": {"status": "accepted", "value": "258"}
+      }
+    },
+    {
       "name": "unmeasured-capacity-314-is-raw",
       "identifier": "0x314",
       "payload": "04d2000000080009",

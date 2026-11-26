@@ -26,6 +26,12 @@ func coordinate(r reg.GreeVRFDictionaryRow) Coordinate {
 	return Coordinate{r.Type, r.Coordinate, r.Kind}
 }
 
+// ReadbackCoordinate identifies the native report a setting method listens for.
+type ReadbackCoordinate struct {
+	Family reg.GreeVRFIdentifierFamily
+	Coordinate
+}
+
 // CommandRow describes one native method and its wire extent.
 type CommandRow struct {
 	Name                string
@@ -36,6 +42,7 @@ type CommandRow struct {
 	LabelOnly           bool
 	Conflict            bool
 	SynchronousReadback bool
+	Readback            *ReadbackCoordinate // nil means none stated.
 }
 
 var settingTypes = [...]uint8{0x6d, 0x6e, 0x6f, 0x71, 0x72, 0x73, 0x78, 0x79, 0x7b, 0x7c, 0x7d}
@@ -51,7 +58,7 @@ func CommandRows() []CommandRow {
 				continue
 			}
 			c := coordinate(r)
-			rows = append(rows, CommandRow{Name: "setting." + c.String(), Setting: &c, Width: r.Width + 2, LabelOnly: r.LabelOnly, Conflict: r.Conflict != "", SynchronousReadback: true})
+			rows = append(rows, CommandRow{Name: "setting." + c.String(), Setting: &c, Width: r.Width + 2, LabelOnly: r.LabelOnly, Conflict: r.Conflict != "", SynchronousReadback: true, Readback: &ReadbackCoordinate{Family: reg.GreeVRFData, Coordinate: c}})
 		}
 	}
 	for id := range 256 {
@@ -63,7 +70,7 @@ func CommandRows() []CommandRow {
 				kind = reg.GreeVRFDictionaryBit
 			}
 			r, _ := reg.LookupGreeVRFDictionary(typ, uint16(f.Data[0]), kind)
-			rows = append(rows, CommandRow{Name: fmt.Sprintf("property.%02x", p), Property: &p, Width: len(f.Data), LabelOnly: r.LabelOnly, Conflict: r.Conflict != ""})
+			rows = append(rows, CommandRow{Name: fmt.Sprintf("property.%02x", p), Property: &p, Width: len(f.Data), LabelOnly: r.LabelOnly, Conflict: r.Conflict != "", Readback: nil})
 		}
 	}
 	return append(rows, CommandRow{Name: "time", ClockID: 0x04820000, Width: 8}, CommandRow{Name: "clock", ClockID: 0x04820084, Width: 8})

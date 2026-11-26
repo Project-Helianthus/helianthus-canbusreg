@@ -1,0 +1,301 @@
+{
+  "description": "Synthetic standard PCS frames 0x319, 0x322 and 0x330. Each expectation is written by hand from the frame layout and the decoder's rules: value is the exact decimal of the native value, status is the decoder field status (accepted, raw, invalid). Cases whose name starts with index- exercise the index validity condition.",
+  "cases": [
+    {
+      "name": "local-extrema-319",
+      "identifier": "0x319",
+      "payload": "5A0D2F0D20030B01",
+      "selection": {"project": "QAAA", "release": "0006", "flavor": "pcs-standard", "bank": "ordinary", "scope": "local", "endpoint": "coordinator", "group": "0", "slot": "1"},
+      "input": {"measurement_valid": true, "temperature_valid": true, "count_valid": true, "count": 2},
+      "index": {"valid": true, "scope": "local", "minimum": 0, "maximum": 20},
+      "expect": {
+        "state_0": {"status": "raw", "value": "90"},
+        "maximum_cell": {"status": "accepted", "value": "3375"},
+        "minimum_cell": {"status": "accepted", "value": "3360"},
+        "maximum_index": {"status": "accepted", "value": "3"},
+        "minimum_index": {"status": "accepted", "value": "11"},
+        "state_7": {"status": "raw", "value": "1"}
+      }
+    },
+    {
+      "name": "index-above-maximum-319",
+      "identifier": "0x319",
+      "payload": "5A0D2F0D20030B01",
+      "selection": {"project": "QAAA", "release": "0006", "flavor": "pcs-standard", "bank": "ordinary", "scope": "local", "endpoint": "coordinator", "group": "0", "slot": "1"},
+      "input": {"measurement_valid": true, "temperature_valid": true, "count_valid": true, "count": 2},
+      "index": {"valid": true, "scope": "local", "minimum": 0, "maximum": 10},
+      "expect": {
+        "state_0": {"status": "raw", "value": "90"},
+        "maximum_cell": {"status": "accepted", "value": "3375"},
+        "minimum_cell": {"status": "accepted", "value": "3360"},
+        "maximum_index": {"status": "accepted", "value": "3"},
+        "minimum_index": {"status": "raw", "value": "11"},
+        "state_7": {"status": "raw", "value": "1"}
+      }
+    },
+    {
+      "name": "index-below-minimum-319",
+      "identifier": "0x319",
+      "payload": "5A0D2F0D20030B01",
+      "selection": {"project": "QAAA", "release": "0006", "flavor": "pcs-standard", "bank": "ordinary", "scope": "local", "endpoint": "coordinator", "group": "0", "slot": "1"},
+      "input": {"measurement_valid": true, "temperature_valid": true, "count_valid": true, "count": 2},
+      "index": {"valid": true, "scope": "local", "minimum": 4, "maximum": 20},
+      "expect": {
+        "state_0": {"status": "raw", "value": "90"},
+        "maximum_cell": {"status": "accepted", "value": "3375"},
+        "minimum_cell": {"status": "accepted", "value": "3360"},
+        "maximum_index": {"status": "raw", "value": "3"},
+        "minimum_index": {"status": "accepted", "value": "11"},
+        "state_7": {"status": "raw", "value": "1"}
+      }
+    },
+    {
+      "name": "index-boundary-values-319",
+      "identifier": "0x319",
+      "payload": "5A0D2F0D20030B01",
+      "selection": {"project": "QAAA", "release": "0006", "flavor": "pcs-standard", "bank": "ordinary", "scope": "local", "endpoint": "coordinator", "group": "0", "slot": "1"},
+      "input": {"measurement_valid": true, "temperature_valid": true, "count_valid": true, "count": 2},
+      "index": {"valid": true, "scope": "local", "minimum": 3, "maximum": 11},
+      "expect": {
+        "state_0": {"status": "raw", "value": "90"},
+        "maximum_cell": {"status": "accepted", "value": "3375"},
+        "minimum_cell": {"status": "accepted", "value": "3360"},
+        "maximum_index": {"status": "accepted", "value": "3"},
+        "minimum_index": {"status": "accepted", "value": "11"},
+        "state_7": {"status": "raw", "value": "1"}
+      }
+    },
+    {
+      "name": "index-invalid-319",
+      "identifier": "0x319",
+      "payload": "5A0D2F0D20030B01",
+      "selection": {"project": "QAAA", "release": "0006", "flavor": "pcs-standard", "bank": "ordinary", "scope": "local", "endpoint": "coordinator", "group": "0", "slot": "1"},
+      "input": {"measurement_valid": true, "temperature_valid": true, "count_valid": true, "count": 2},
+      "index": {"valid": false, "scope": "local", "minimum": 0, "maximum": 20},
+      "expect": {
+        "state_0": {"status": "raw", "value": "90"},
+        "maximum_cell": {"status": "accepted", "value": "3375"},
+        "minimum_cell": {"status": "accepted", "value": "3360"},
+        "maximum_index": {"status": "raw", "value": "3"},
+        "minimum_index": {"status": "raw", "value": "11"},
+        "state_7": {"status": "raw", "value": "1"}
+      }
+    },
+    {
+      "name": "index-scope-mismatch-319",
+      "identifier": "0x319",
+      "payload": "5A0D2F0D20030B01",
+      "selection": {"project": "QAAA", "release": "0006", "flavor": "pcs-standard", "bank": "ordinary", "scope": "local", "endpoint": "coordinator", "group": "0", "slot": "1"},
+      "input": {"measurement_valid": true, "temperature_valid": true, "count_valid": true, "count": 2},
+      "index": {"valid": true, "scope": "aggregate", "minimum": 0, "maximum": 20},
+      "expect": {
+        "state_0": {"status": "raw", "value": "90"},
+        "maximum_cell": {"status": "accepted", "value": "3375"},
+        "minimum_cell": {"status": "accepted", "value": "3360"},
+        "maximum_index": {"status": "raw", "value": "3"},
+        "minimum_index": {"status": "raw", "value": "11"},
+        "state_7": {"status": "raw", "value": "1"}
+      }
+    },
+    {
+      "name": "index-inverted-bounds-319",
+      "identifier": "0x319",
+      "payload": "5A0D2F0D20030B01",
+      "selection": {"project": "QAAA", "release": "0006", "flavor": "pcs-standard", "bank": "ordinary", "scope": "local", "endpoint": "coordinator", "group": "0", "slot": "1"},
+      "input": {"measurement_valid": true, "temperature_valid": true, "count_valid": true, "count": 2},
+      "index": {"valid": true, "scope": "local", "minimum": 5, "maximum": 4},
+      "expect": {
+        "state_0": {"status": "raw", "value": "90"},
+        "maximum_cell": {"status": "accepted", "value": "3375"},
+        "minimum_cell": {"status": "accepted", "value": "3360"},
+        "maximum_index": {"status": "raw", "value": "3"},
+        "minimum_index": {"status": "raw", "value": "11"},
+        "state_7": {"status": "raw", "value": "1"}
+      }
+    },
+    {
+      "name": "measurement-invalid-319",
+      "identifier": "0x319",
+      "payload": "5A0D2F0D20030B01",
+      "selection": {"project": "QAAA", "release": "0006", "flavor": "pcs-standard", "bank": "ordinary", "scope": "local", "endpoint": "coordinator", "group": "0", "slot": "1"},
+      "input": {"measurement_valid": false, "temperature_valid": true, "count_valid": true, "count": 2},
+      "index": {"valid": true, "scope": "local", "minimum": 0, "maximum": 20},
+      "expect": {
+        "state_0": {"status": "raw", "value": "90"},
+        "maximum_cell": {"status": "raw", "value": "3375"},
+        "minimum_cell": {"status": "raw", "value": "3360"},
+        "maximum_index": {"status": "accepted", "value": "3"},
+        "minimum_index": {"status": "accepted", "value": "11"},
+        "state_7": {"status": "raw", "value": "1"}
+      }
+    },
+    {
+      "name": "release-11-extrema-319",
+      "identifier": "0x319",
+      "payload": "5A0D2F0D20030B01",
+      "selection": {"project": "QAAA", "release": "0011", "flavor": "pcs-standard", "bank": "ordinary", "scope": "local", "endpoint": "coordinator", "group": "0", "slot": "1"},
+      "input": {"measurement_valid": true, "temperature_valid": true, "count_valid": true, "count": 5},
+      "index": {"valid": true, "scope": "local", "minimum": 0, "maximum": 20},
+      "expect": {
+        "state_0": {"status": "raw", "value": "90"},
+        "maximum_cell": {"status": "accepted", "value": "3375"},
+        "minimum_cell": {"status": "accepted", "value": "3360"},
+        "maximum_index": {"status": "accepted", "value": "3"},
+        "minimum_index": {"status": "accepted", "value": "11"},
+        "state_7": {"status": "raw", "value": "1"}
+      }
+    },
+    {
+      "name": "release-11-temperature-322",
+      "identifier": "0x322",
+      "payload": "00FAFFF602056465",
+      "selection": {"project": "QAAA", "release": "0011", "flavor": "pcs-standard", "bank": "ordinary", "scope": "local", "endpoint": "coordinator", "group": "0", "slot": "1"},
+      "input": {"measurement_valid": true, "temperature_valid": true, "count_valid": true, "count": 5},
+      "index": {"valid": true, "scope": "local", "minimum": 0, "maximum": 20},
+      "expect": {
+        "temperature_maximum": {"status": "accepted", "value": "25"},
+        "temperature_minimum": {"status": "accepted", "value": "-1"},
+        "maximum_temperature_index": {"status": "accepted", "value": "2"},
+        "minimum_temperature_index": {"status": "accepted", "value": "5"},
+        "extra_6": {"status": "raw", "value": "100"},
+        "extra_7": {"status": "raw", "value": "101"}
+      }
+    },
+    {
+      "name": "measured-temperature-invalid-322",
+      "identifier": "0x322",
+      "payload": "00FAFFF602056465",
+      "selection": {"project": "QAAA", "release": "0011", "flavor": "pcs-standard", "bank": "ordinary", "scope": "local", "endpoint": "coordinator", "group": "0", "slot": "1"},
+      "input": {"measurement_valid": true, "temperature_valid": false, "count_valid": true, "count": 5},
+      "index": {"valid": true, "scope": "local", "minimum": 0, "maximum": 20},
+      "expect": {
+        "temperature_maximum": {"status": "raw", "value": "25"},
+        "temperature_minimum": {"status": "raw", "value": "-1"},
+        "maximum_temperature_index": {"status": "accepted", "value": "2"},
+        "minimum_temperature_index": {"status": "accepted", "value": "5"},
+        "extra_6": {"status": "raw", "value": "100"},
+        "extra_7": {"status": "raw", "value": "101"}
+      }
+    },
+    {
+      "name": "gateway-soc-extrema-322",
+      "identifier": "0x322",
+      "payload": "00FAFFF602056465",
+      "selection": {"project": "QCAA", "release": "0001", "flavor": "pcs-standard", "bank": "ordinary", "scope": "aggregate", "endpoint": "coordinator", "group": "0", "slot": "1"},
+      "input": {"measurement_valid": true, "temperature_valid": true, "count_valid": true, "count": 5},
+      "index": {"valid": true, "scope": "aggregate", "minimum": 0, "maximum": 20},
+      "expect": {
+        "temperature_maximum": {"status": "raw", "value": "25"},
+        "temperature_minimum": {"status": "raw", "value": "-1"},
+        "maximum_temperature_index": {"status": "accepted", "value": "2"},
+        "minimum_temperature_index": {"status": "accepted", "value": "5"},
+        "extra_6": {"status": "accepted", "value": "100"},
+        "extra_7": {"status": "invalid", "value": "101"}
+      }
+    },
+    {
+      "name": "gateway-soc-extrema-in-domain-322",
+      "identifier": "0x322",
+      "payload": "00FAFFF602053250",
+      "selection": {"project": "QCAA", "release": "0001", "flavor": "pcs-standard", "bank": "ordinary", "scope": "aggregate", "endpoint": "coordinator", "group": "0", "slot": "1"},
+      "input": {"measurement_valid": true, "temperature_valid": true, "count_valid": true, "count": 5},
+      "index": {"valid": true, "scope": "aggregate", "minimum": 0, "maximum": 20},
+      "expect": {
+        "temperature_maximum": {"status": "raw", "value": "25"},
+        "temperature_minimum": {"status": "raw", "value": "-1"},
+        "maximum_temperature_index": {"status": "accepted", "value": "2"},
+        "minimum_temperature_index": {"status": "accepted", "value": "5"},
+        "extra_6": {"status": "accepted", "value": "50"},
+        "extra_7": {"status": "accepted", "value": "80"}
+      }
+    },
+    {
+      "name": "gateway-soc-extrema-measurement-invalid-322",
+      "identifier": "0x322",
+      "payload": "00FAFFF602056465",
+      "selection": {"project": "QCAA", "release": "0001", "flavor": "pcs-standard", "bank": "ordinary", "scope": "aggregate", "endpoint": "coordinator", "group": "0", "slot": "1"},
+      "input": {"measurement_valid": false, "temperature_valid": true, "count_valid": true, "count": 5},
+      "index": {"valid": true, "scope": "aggregate", "minimum": 0, "maximum": 20},
+      "expect": {
+        "temperature_maximum": {"status": "raw", "value": "25"},
+        "temperature_minimum": {"status": "raw", "value": "-1"},
+        "maximum_temperature_index": {"status": "accepted", "value": "2"},
+        "minimum_temperature_index": {"status": "accepted", "value": "5"},
+        "extra_6": {"status": "raw", "value": "100"},
+        "extra_7": {"status": "raw", "value": "101"}
+      }
+    },
+    {
+      "name": "fixed-aggregate-330",
+      "identifier": "0x330",
+      "payload": "010402070D480D16",
+      "selection": {"project": "QAAB", "release": "0004", "flavor": "pcs-standard", "bank": "ordinary", "scope": "aggregate", "endpoint": "coordinator", "group": "0", "slot": "1"},
+      "input": {"measurement_valid": true, "temperature_valid": true, "count_valid": true, "count": 0},
+      "index": {"valid": true, "scope": "aggregate", "minimum": 0, "maximum": 20},
+      "expect": {
+        "maximum_location": {"status": "raw", "value": "1"},
+        "maximum_location_fixed_aggregate": {"status": "accepted", "value": "1"},
+        "maximum_index": {"status": "accepted", "value": "4"},
+        "minimum_location": {"status": "raw", "value": "2"},
+        "minimum_location_fixed_aggregate": {"status": "raw", "value": "2"},
+        "minimum_index": {"status": "accepted", "value": "7"},
+        "maximum_cell": {"status": "raw", "value": "3400"},
+        "minimum_cell": {"status": "raw", "value": "3350"}
+      }
+    },
+    {
+      "name": "local-extrema-330",
+      "identifier": "0x330",
+      "payload": "010402070D480D16",
+      "selection": {"project": "QAAA", "release": "0006", "flavor": "pcs-standard", "bank": "ordinary", "scope": "local", "endpoint": "coordinator", "group": "0", "slot": "1"},
+      "input": {"measurement_valid": true, "temperature_valid": true, "count_valid": true, "count": 2},
+      "index": {"valid": true, "scope": "local", "minimum": 0, "maximum": 20},
+      "expect": {
+        "maximum_location": {"status": "raw", "value": "1"},
+        "maximum_location_fixed_aggregate": {"status": "raw", "value": "1"},
+        "maximum_index": {"status": "accepted", "value": "4"},
+        "minimum_location": {"status": "raw", "value": "2"},
+        "minimum_location_fixed_aggregate": {"status": "raw", "value": "2"},
+        "minimum_index": {"status": "accepted", "value": "7"},
+        "maximum_cell": {"status": "accepted", "value": "3400"},
+        "minimum_cell": {"status": "accepted", "value": "3350"}
+      }
+    },
+    {
+      "name": "fixed-aggregate-minimum-location-one-330",
+      "identifier": "0x330",
+      "payload": "010401070D480D16",
+      "selection": {"project": "QAAB", "release": "0004", "flavor": "pcs-standard", "bank": "ordinary", "scope": "aggregate", "endpoint": "coordinator", "group": "0", "slot": "1"},
+      "input": {"measurement_valid": true, "temperature_valid": true, "count_valid": true, "count": 0},
+      "index": {"valid": true, "scope": "aggregate", "minimum": 0, "maximum": 20},
+      "expect": {
+        "maximum_location": {"status": "raw", "value": "1"},
+        "maximum_location_fixed_aggregate": {"status": "accepted", "value": "1"},
+        "maximum_index": {"status": "accepted", "value": "4"},
+        "minimum_location": {"status": "raw", "value": "1"},
+        "minimum_location_fixed_aggregate": {"status": "accepted", "value": "1"},
+        "minimum_index": {"status": "accepted", "value": "7"},
+        "maximum_cell": {"status": "raw", "value": "3400"},
+        "minimum_cell": {"status": "raw", "value": "3350"}
+      }
+    },
+    {
+      "name": "index-invalid-fixed-aggregate-330",
+      "identifier": "0x330",
+      "payload": "010402070D480D16",
+      "selection": {"project": "QAAB", "release": "0004", "flavor": "pcs-standard", "bank": "ordinary", "scope": "aggregate", "endpoint": "coordinator", "group": "0", "slot": "1"},
+      "input": {"measurement_valid": true, "temperature_valid": true, "count_valid": true, "count": 0},
+      "index": {"valid": false, "scope": "aggregate", "minimum": 0, "maximum": 20},
+      "expect": {
+        "maximum_location": {"status": "raw", "value": "1"},
+        "maximum_location_fixed_aggregate": {"status": "raw", "value": "1"},
+        "maximum_index": {"status": "raw", "value": "4"},
+        "minimum_location": {"status": "raw", "value": "2"},
+        "minimum_location_fixed_aggregate": {"status": "raw", "value": "2"},
+        "minimum_index": {"status": "raw", "value": "7"},
+        "maximum_cell": {"status": "raw", "value": "3400"},
+        "minimum_cell": {"status": "raw", "value": "3350"}
+      }
+    }
+  ]
+}

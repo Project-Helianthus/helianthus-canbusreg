@@ -399,3 +399,85 @@ func TestIdentityRowsRefuseNeighbouringIdentifierWrongLengthAndExtendedFormat(t 
 		}
 	}
 }
+
+// TestIdentityRowIDsFollowFrameAndField checks the row identifiers: each is the
+// frame and the field the decoder names, with no selection layout segment, except
+// the aggregate gateway count, whose selection differs from the direct count. A
+// byte of 0x321 on the placeholder path is growatt.bms.pcs.standard.321.byte_0, and
+// the zero placeholder of each frame is named by its field.
+func TestIdentityRowIDsFollowFrameAndField(t *testing.T) {
+	for _, sp := range identitySpecs() {
+		want := fmt.Sprintf("%s%X.%s", rowPrefix, sp.frame, sp.field)
+		if sp.layout == "gateway" {
+			want = fmt.Sprintf("%s%X.gateway.%s", rowPrefix, sp.frame, sp.field)
+		}
+		if got := identityRowID(sp); got != want {
+			t.Errorf("row %s, want %s", got, want)
+		}
+	}
+	rows, _, _ := identityRows()
+	ids := make(map[string]bool, len(rows))
+	for _, r := range rows {
+		ids[r.ID] = true
+	}
+	for _, id := range []string{
+		rowPrefix + "321.byte_0",
+		rowPrefix + "321.placeholder",
+		rowPrefix + "324.placeholder",
+		rowPrefix + "325.placeholder",
+		rowPrefix + "323.gateway.count",
+	} {
+		if !ids[id] {
+			t.Errorf("row %s is not defined", id)
+		}
+	}
+}
+
+// TestIdentityGradeNamesOnlyApplicableRow checks that the evidence grade is kept
+// only for the row that applies to the observation: on an aggregate 0x323 the
+// gateway count is graded and the direct count, whose selection does not match, is
+// not; on a local 0x323 the direct count is graded and the gateway count is not.
+func TestIdentityGradeNamesOnlyApplicableRow(t *testing.T) {
+	agg := vectorSelection{Project: "QCAA", Release: "0001", Flavor: "pcs-standard", Bank: "ordinary", Scope: "aggregate", Endpoint: "gateway", Group: "", Slot: ""}
+	s, in, _ := buildIdentity(t, agg, "0x323", []byte{0x03, 0x00, 0x0a, 0x02, 0x11, 0x22, 0x33, 0x44}, identityVectorInput{}, 7, 9*time.Second)
+	res, reason, err := EvaluateIdentity(s, in)
+	if err != nil || reason != "" {
+		t.Fatalf("aggregate: reason %q err %v", reason, err)
+	}
+	if got := res.Grades["growatt.bms.pcs.standard.323.gateway.count"]; got != "Hypothesis" {
+		t.Errorf("gateway count grade %q, want Hypothesis", got)
+	}
+	if got, ok := res.Grades["growatt.bms.pcs.standard.323.count"]; ok {
+		t.Errorf("direct count graded %q on an aggregate observation it does not apply to", got)
+	}
+
+	local := vectorSelection{Project: "QAAA", Release: "0006", Flavor: "pcs-standard", Bank: "ordinary", Scope: "local", Endpoint: "coordinator", Group: "0", Slot: "1"}
+	s, in, _ = buildIdentity(t, local, "0x323", []byte{0x03, 0x00, 0x0a, 0x00, 0x11, 0x22, 0x33, 0x44}, identityVectorInput{}, 7, 9*time.Second)
+	res, reason, err = EvaluateIdentity(s, in)
+	if err != nil || reason != "" {
+		t.Fatalf("local: reason %q err %v", reason, err)
+	}
+	if got := res.Grades["growatt.bms.pcs.standard.323.count"]; got != "Proven" {
+		t.Errorf("direct count grade %q, want Proven", got)
+	}
+	if got, ok := res.Grades["growatt.bms.pcs.standard.323.gateway.count"]; ok {
+		t.Errorf("gateway count graded %q on a local observation it does not apply to", got)
+	}
+}
+
+// TestGatewayCountDeclaresBothBytes checks the declaration of the aggregate gateway
+// count: its row states that the value reads B0 and adds 256 times B3, and B3 stays
+// its own raw row.
+func TestGatewayCountDeclaresBothBytes(t *testing.T) {
+	rows, _, _ := identityRows()
+	for _, r := range rows {
+		if r.ID != rowPrefix+"323.gateway.count" {
+			continue
+		}
+		if !strings.Contains(r.SpecRef, "B0") || !strings.Contains(r.SpecRef, "256 x B3") {
+			t.Errorf("gateway count declares %q, want B0 and 256 x B3", r.SpecRef)
+		}
+		return
+	}
+	t.Fatal("gateway count row is not defined")
+}

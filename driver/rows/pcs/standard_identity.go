@@ -127,6 +127,8 @@ type identitySpec struct {
 	// sum marks the aggregate count of 0x323: B0 + 256 x B3, the high byte read
 	// from the qualifier qGatewayHigh.
 	sum bool
+	// spec is the specification reference of the row; empty takes the frame.
+	spec string
 }
 
 // bigDWord is the big-endian 32-bit word of four bytes from a bit offset.
@@ -135,10 +137,10 @@ func bigDWord(at uint16) signalSlice { return signalSlice{offset: at, width: 32,
 func identitySpecs() []identitySpec {
 	sel := func(c identityCtx) bool { return c.selected }
 	zeroPayload := func(c identityCtx) bool { return c.payload == [8]byte{} }
-	byteRows := func(frame uint32, layout string, cond []string) []identitySpec {
+	byteRows := func(frame uint32, cond []string) []identitySpec {
 		out := make([]identitySpec, 0, 8)
 		for at := uint16(0); at < 8; at++ {
-			out = append(out, identitySpec{frame: frame, layout: layout, field: fmt.Sprintf("byte_%d", at), slice: byteAt(at * 8), raw: true, cond: cond})
+			out = append(out, identitySpec{frame: frame, field: fmt.Sprintf("byte_%d", at), slice: byteAt(at * 8), raw: true, cond: cond})
 		}
 		return out
 	}
@@ -166,13 +168,13 @@ func identitySpecs() []identitySpec {
 		identitySpec{frame: 0x321, field: "reserved_5", slice: byteAt(40), raw: true, cond: fieldPath},
 		identitySpec{frame: 0x321, field: "tail", slice: bigWord(48), gate: sel, cond: fieldPath},
 	)
-	specs = append(specs, byteRows(0x321, "placeholder", placeholderPath)...)
-	specs = append(specs, identitySpec{frame: 0x321, layout: "placeholder", field: "placeholder", slice: byteAt(0), zero: true, gate: zeroPayload, cond: placeholderPath})
+	specs = append(specs, byteRows(0x321, placeholderPath)...)
+	specs = append(specs, identitySpec{frame: 0x321, field: "placeholder", slice: byteAt(0), zero: true, gate: zeroPayload, cond: placeholderPath})
 
 	// 0x323: configuration count, parameter, threshold and synthesized bytes.
 	specs = append(specs,
 		identitySpec{frame: 0x323, field: "count", slice: byteAt(0), gate: sel, cond: []string{"gateway", "false"}},
-		identitySpec{frame: 0x323, layout: "gateway", field: "count", slice: byteAt(0), sum: true, gate: func(c identityCtx) bool { return c.gateway }, cond: []string{"gateway", "true"}},
+		identitySpec{frame: 0x323, layout: "gateway", field: "count", slice: byteAt(0), sum: true, spec: "CAN 0x323 B0 + 256 x B3", gate: func(c identityCtx) bool { return c.gateway }, cond: []string{"gateway", "true"}},
 		identitySpec{frame: 0x323, field: "parameter", slice: bigWord(8), raw: true},
 		identitySpec{frame: 0x323, field: "separate_3", slice: byteAt(24), raw: true},
 		identitySpec{frame: 0x323, field: "synthesized_4", slice: byteAt(32), gate: sel},
@@ -185,12 +187,12 @@ func identitySpecs() []identitySpec {
 	)
 
 	// 0x324: the serial fragments, each byte a raw row; the placeholder path adds the zero row.
-	specs = append(specs, byteRows(0x324, "", nil)...)
-	specs = append(specs, identitySpec{frame: 0x324, layout: "placeholder", field: "placeholder", slice: byteAt(0), zero: true, gate: zeroPayload, cond: placeholderPath})
+	specs = append(specs, byteRows(0x324, nil)...)
+	specs = append(specs, identitySpec{frame: 0x324, field: "placeholder", slice: byteAt(0), zero: true, gate: zeroPayload, cond: placeholderPath})
 
 	// 0x325: the history bytes; the placeholder path adds the zero row.
-	specs = append(specs, byteRows(0x325, "", nil)...)
-	specs = append(specs, identitySpec{frame: 0x325, layout: "placeholder", field: "placeholder", slice: byteAt(0), zero: true, gate: zeroPayload, cond: placeholderPath})
+	specs = append(specs, byteRows(0x325, nil)...)
+	specs = append(specs, identitySpec{frame: 0x325, field: "placeholder", slice: byteAt(0), zero: true, gate: zeroPayload, cond: placeholderPath})
 	return specs
 }
 
@@ -282,10 +284,14 @@ func identityRow(sp identitySpec) roweval.NativeRow[Selector] {
 	if sp.zero {
 		num = 0
 	}
+	spec := sp.spec
+	if spec == "" {
+		spec = fmt.Sprintf("CAN %#x", sp.frame)
+	}
 	row := roweval.NativeRow[Selector]{
 		ID:      identityRowID(sp),
 		Unit:    sp.unit,
-		SpecRef: fmt.Sprintf("CAN %#x", sp.frame),
+		SpecRef: spec,
 		At:      Selector{Identifier: sp.frame, DLC: 8, RawDLC: 8, Slice: sp.slice},
 		When:    roweval.When{Equal: when(sp.cond...)},
 		Wire:    roweval.Layout{BitOffset: sp.slice.offset, Width: sp.slice.width, Codec: "unsigned", ByteOrder: sp.slice.order, BitOrder: "lsb0", WordOrder: "single"},
@@ -404,13 +410,9 @@ func EvaluateIdentity(s canbusreg.Selection, in canbusreg.PCSIdentityPCSInput) (
 	rows, hooks, rawRows := identityRows()
 	res.Rows = make(map[string]roweval.Evaluation)
 	res.Grades = make(map[string]string)
+	fieldOfRow := make(map[string]string)
 	for _, sp := range identitySpecs() {
-		if sp.frame != frame.ID().Value() {
-			continue
-		}
-		if f, ok := decoded.Fields[sp.field]; ok {
-			res.Grades[identityRowID(sp)] = f.Grade
-		}
+		fieldOfRow[identityRowID(sp)] = sp.field
 	}
 	for _, row := range rows {
 		if row.At.Identifier != frame.ID().Value() {
@@ -423,6 +425,10 @@ func EvaluateIdentity(s canbusreg.Selection, in canbusreg.PCSIdentityPCSInput) (
 			return res, "", err
 		}
 		if ev.Native != nil {
+			// The grade of the decoder field is kept for the row that applies only.
+			if f, ok := decoded.Fields[fieldOfRow[row.ID]]; ok {
+				res.Grades[row.ID] = f.Grade
+			}
 			if ev.Native.Reason != "" {
 				ev.Native.Value = nil
 				ev.Native.Unit = ""

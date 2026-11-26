@@ -375,6 +375,11 @@ type IdentityResult struct {
 	Evidence    canbusreg.Evidence
 	Attribution Attribution
 	Rows        map[string]roweval.Evaluation
+	// Grades is the evidence grade the decoder gives each field, keyed by row
+	// identifier: Proven, Hypothesis or Unknown. It is independent of the
+	// disposition of the row, so a Hypothesis value that is accepted stays
+	// distinguishable from a Proven one.
+	Grades map[string]string
 }
 
 // EvaluateIdentity evaluates the native rows of one identity observation under
@@ -398,6 +403,15 @@ func EvaluateIdentity(s canbusreg.Selection, in canbusreg.PCSIdentityPCSInput) (
 	q := identityQualifiers(s, in)
 	rows, hooks, rawRows := identityRows()
 	res.Rows = make(map[string]roweval.Evaluation)
+	res.Grades = make(map[string]string)
+	for _, sp := range identitySpecs() {
+		if sp.frame != frame.ID().Value() {
+			continue
+		}
+		if f, ok := decoded.Fields[sp.field]; ok {
+			res.Grades[identityRowID(sp)] = f.Grade
+		}
+	}
 	for _, row := range rows {
 		if row.At.Identifier != frame.ID().Value() {
 			continue

@@ -232,6 +232,9 @@ func TestIdentityRowsMatchDecoder(t *testing.T) {
 				if df.Status != exp.Status {
 					t.Errorf("%s: decoder status %q, want %q", name, df.Status, exp.Status)
 				}
+				if got := res.Grades[ids[0]]; got != df.Grade {
+					t.Errorf("%s: grade %q, decoder grade %q", ids[0], got, df.Grade)
+				}
 				if !zeroRow(ids[0]) && !sumRow(ids[0]) && row.Raw != uint64(df.Numerator) {
 					t.Errorf("%s: raw %d, decoder numerator %d", ids[0], row.Raw, df.Numerator)
 				}
@@ -251,6 +254,46 @@ func TestIdentityRowsMatchDecoder(t *testing.T) {
 				}
 			}
 		})
+	}
+}
+
+// TestIdentityRowsKeepDecoderGradeWithDisposition checks that an accepted row
+// keeps the evidence grade the decoder gives its field: the 0x323 threshold and
+// the aggregate gateway count are Hypothesis although accepted, the 0x321 family
+// is Proven. The grade is read from the result, not from the disposition.
+func TestIdentityRowsKeepDecoderGradeWithDisposition(t *testing.T) {
+	want := map[string]struct{ field, grade string }{
+		"identity-323-threshold-accepted-contract-l8":    {"threshold", "Hypothesis"},
+		"identity-323-gateway-aggregate-count-high-byte": {"count", "Hypothesis"},
+		"identity-321-family-capable-contract-l8":        {"family", "Proven"},
+	}
+	found := 0
+	for _, c := range loadIdentityVectors(t) {
+		w, ok := want[c.Name]
+		if !ok {
+			continue
+		}
+		found++
+		t.Run(c.Name, func(t *testing.T) {
+			s, in := buildIdentityCase(t, c)
+			res, reason, err := EvaluateIdentity(s, in)
+			if err != nil || reason != "" {
+				t.Fatalf("evaluator reason %q err %v", reason, err)
+			}
+			ids := applicableRows(res)[w.field]
+			if len(ids) != 1 {
+				t.Fatalf("field %s: %d applicable rows, want 1", w.field, len(ids))
+			}
+			if got := identityStatus(res.Rows[ids[0]].Native); got != "accepted" {
+				t.Fatalf("%s: disposition %q, want accepted", ids[0], got)
+			}
+			if got := res.Grades[ids[0]]; got != w.grade {
+				t.Errorf("%s: grade %q, want %q", ids[0], got, w.grade)
+			}
+		})
+	}
+	if found != len(want) {
+		t.Fatalf("found %d of %d named vectors", found, len(want))
 	}
 }
 

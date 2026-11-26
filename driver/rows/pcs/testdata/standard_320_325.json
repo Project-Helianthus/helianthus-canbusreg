@@ -34,7 +34,7 @@
     {
       "name": "identity-321-family-capable-contract-l8",
       "identifier": "0x321",
-      "payload": "0047525731000000",
+      "payload": "0047525731000102",
       "selection": {"project": "QAAA", "release": "0011", "flavor": "pcs-standard", "bank": "ordinary", "scope": "local", "endpoint": "coordinator", "group": "0", "slot": "1"},
       "input": {},
       "expect": {
@@ -42,7 +42,7 @@
         "family_omitted": {"status": "raw", "value": ""},
         "reserved_0": {"status": "raw", "value": "0"},
         "reserved_5": {"status": "raw", "value": "0"},
-        "tail": {"status": "accepted", "value": "0"}
+        "tail": {"status": "accepted", "value": "258"}
       }
     },
     {

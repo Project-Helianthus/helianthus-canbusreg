@@ -1,0 +1,1102 @@
+{
+ "cases": [
+  {
+   "name": "module flag bytes",
+   "family": "1800",
+   "payload": "0102030405060708",
+   "selection": {
+    "project": "QAAA",
+    "release": "0006",
+    "choice": "",
+    "group": "",
+    "slot": "",
+    "bank": "ordinary",
+    "source": "02",
+    "destination": "F4"
+   },
+   "status": "accepted",
+   "reason": "",
+   "rows": {
+    "growatt.bms.link.bitmap_0": {
+     "value": "1",
+     "unit": "",
+     "disposition": "raw",
+     "raw": "1"
+    },
+    "growatt.bms.link.role_flags": {
+     "value": "2",
+     "unit": "",
+     "disposition": "raw",
+     "raw": "2"
+    },
+    "growatt.bms.link.cells": {
+     "value": "3",
+     "unit": "",
+     "disposition": "raw",
+     "raw": "3"
+    },
+    "growatt.bms.link.sensors": {
+     "value": "4",
+     "unit": "",
+     "disposition": "raw",
+     "raw": "4"
+    },
+    "growatt.bms.link.bitmap_4": {
+     "value": "5",
+     "unit": "",
+     "disposition": "raw",
+     "raw": "5"
+    },
+    "growatt.bms.link.mode": {
+     "value": "6",
+     "unit": "",
+     "disposition": "raw",
+     "raw": "6"
+    },
+    "growatt.bms.link.io": {
+     "value": "7",
+     "unit": "",
+     "disposition": "raw",
+     "raw": "7"
+    },
+    "growatt.bms.link.soc_status": {
+     "value": "8",
+     "unit": "",
+     "disposition": "raw",
+     "raw": "8"
+    }
+   }
+  },
+  {
+   "name": "module flag bytes under parallel bank and topology context",
+   "family": "1800",
+   "payload": "0102030405060708",
+   "selection": {
+    "project": "QAAA",
+    "release": "0006",
+    "choice": "",
+    "group": "3",
+    "slot": "5",
+    "bank": "parallel",
+    "source": "0A",
+    "destination": "F4"
+   },
+   "status": "accepted",
+   "reason": "",
+   "rows": {
+    "growatt.bms.link.bitmap_0": {
+     "value": "1",
+     "unit": "",
+     "disposition": "raw",
+     "raw": "1"
+    },
+    "growatt.bms.link.role_flags": {
+     "value": "2",
+     "unit": "",
+     "disposition": "raw",
+     "raw": "2"
+    },
+    "growatt.bms.link.cells": {
+     "value": "3",
+     "unit": "",
+     "disposition": "raw",
+     "raw": "3"
+    },
+    "growatt.bms.link.sensors": {
+     "value": "4",
+     "unit": "",
+     "disposition": "raw",
+     "raw": "4"
+    },
+    "growatt.bms.link.bitmap_4": {
+     "value": "5",
+     "unit": "",
+     "disposition": "raw",
+     "raw": "5"
+    },
+    "growatt.bms.link.mode": {
+     "value": "6",
+     "unit": "",
+     "disposition": "raw",
+     "raw": "6"
+    },
+    "growatt.bms.link.io": {
+     "value": "7",
+     "unit": "",
+     "disposition": "raw",
+     "raw": "7"
+    },
+    "growatt.bms.link.soc_status": {
+     "value": "8",
+     "unit": "",
+     "disposition": "raw",
+     "raw": "8"
+    }
+   },
+   "attribution": {
+    "bank": "parallel",
+    "group": "3",
+    "slot": "5",
+    "has_group": true,
+    "has_slot": true
+   }
+  },
+  {
+   "name": "balance word and cache bytes",
+   "family": "1801",
+   "payload": "3412567890abcd00",
+   "selection": {
+    "project": "QAAA",
+    "release": "0006",
+    "choice": "",
+    "group": "",
+    "slot": "",
+    "bank": "ordinary",
+    "source": "02",
+    "destination": "F4"
+   },
+   "status": "accepted",
+   "reason": "",
+   "rows": {
+    "growatt.bms.link.1801.mask": {
+     "value": "4660",
+     "unit": "",
+     "disposition": "raw",
+     "raw": "4660"
+    },
+    "growatt.bms.link.algorithm_soc": {
+     "value": "86",
+     "unit": "",
+     "disposition": "raw",
+     "raw": "86"
+    },
+    "growatt.bms.link.mixed": {
+     "value": "30864",
+     "unit": "",
+     "disposition": "raw",
+     "raw": "30864"
+    },
+    "growatt.bms.link.cache": {
+     "value": "171",
+     "unit": "",
+     "disposition": "raw",
+     "raw": "171"
+    },
+    "growatt.bms.link.version": {
+     "value": "205",
+     "unit": "",
+     "disposition": "raw",
+     "raw": "205"
+    },
+    "growatt.bms.link.1801.reserved": {
+     "value": "0",
+     "unit": "",
+     "disposition": "raw",
+     "raw": "0"
+    }
+   }
+  },
+  {
+   "name": "exact identity words",
+   "family": "1802",
+   "payload": "5141414130303036",
+   "selection": {
+    "project": "QAAA",
+    "release": "0006",
+    "choice": "",
+    "group": "",
+    "slot": "",
+    "bank": "ordinary",
+    "source": "02",
+    "destination": "F4"
+   },
+   "status": "accepted",
+   "reason": "",
+   "rows": {
+    "growatt.bms.link.project_code": {
+     "value": "1363231041",
+     "unit": "",
+     "disposition": "raw",
+     "raw": "1363231041"
+    },
+    "growatt.bms.link.release": {
+     "value": "808464438",
+     "unit": "",
+     "disposition": "raw",
+     "raw": "808464438"
+    }
+   },
+   "ascii": "QAAA0006"
+  },
+  {
+   "name": "mixed case identity selected on the exact token",
+   "family": "1802",
+   "payload": "5141416139303131",
+   "selection": {
+    "project": "QAAa",
+    "release": "9011",
+    "choice": "release11",
+    "group": "",
+    "slot": "",
+    "bank": "ordinary",
+    "source": "02",
+    "destination": "F4"
+   },
+   "status": "accepted",
+   "reason": "",
+   "rows": {
+    "growatt.bms.link.project_code": {
+     "value": "1363231073",
+     "unit": "",
+     "disposition": "raw",
+     "raw": "1363231073"
+    },
+    "growatt.bms.link.release": {
+     "value": "959459633",
+     "unit": "",
+     "disposition": "raw",
+     "raw": "959459633"
+    }
+   },
+   "ascii": "QAAa9011"
+  },
+  {
+   "name": "case mismatch keeps the conflict status",
+   "family": "1802",
+   "payload": "5141416130303036",
+   "selection": {
+    "project": "QAAA",
+    "release": "0006",
+    "choice": "",
+    "group": "",
+    "slot": "",
+    "bank": "ordinary",
+    "source": "02",
+    "destination": "F4"
+   },
+   "status": "conflict",
+   "reason": "",
+   "rows": {
+    "growatt.bms.link.project_code": {
+     "value": "1363231073",
+     "unit": "",
+     "disposition": "raw",
+     "raw": "1363231073"
+    },
+    "growatt.bms.link.release": {
+     "value": "808464438",
+     "unit": "",
+     "disposition": "raw",
+     "raw": "808464438"
+    }
+   },
+   "ascii": "QAAa0006"
+  },
+  {
+   "name": "non ascii identity byte is invalid",
+   "family": "1802",
+   "payload": "5141414130300036",
+   "selection": {
+    "project": "QAAA",
+    "release": "0006",
+    "choice": "",
+    "group": "",
+    "slot": "",
+    "bank": "ordinary",
+    "source": "02",
+    "destination": "F4"
+   },
+   "status": "invalid",
+   "reason": "",
+   "rows": {
+    "growatt.bms.link.project_code": {
+     "value": "",
+     "unit": "",
+     "disposition": "invalid",
+     "raw": "1363231041"
+    },
+    "growatt.bms.link.release": {
+     "value": "",
+     "unit": "",
+     "disposition": "invalid",
+     "raw": "808452150"
+    }
+   }
+  },
+  {
+   "name": "full charge capacity in tenths of ampere hour under the local profile",
+   "family": "1803",
+   "payload": "01010203e8030607",
+   "selection": {
+    "project": "QAAA",
+    "release": "0006",
+    "choice": "",
+    "group": "",
+    "slot": "",
+    "bank": "ordinary",
+    "source": "02",
+    "destination": "F4"
+   },
+   "status": "accepted",
+   "reason": "",
+   "rows": {
+    "growatt.bms.link.capacity": {
+     "value": "100",
+     "unit": "Ah",
+     "disposition": "accepted",
+     "raw": "1000"
+    },
+    "growatt.bms.link.1803.b0": {
+     "value": "1",
+     "unit": "",
+     "disposition": "raw",
+     "raw": "1"
+    },
+    "growatt.bms.link.1803.b1": {
+     "value": "1",
+     "unit": "",
+     "disposition": "raw",
+     "raw": "1"
+    },
+    "growatt.bms.link.1803.b2": {
+     "value": "2",
+     "unit": "",
+     "disposition": "raw",
+     "raw": "2"
+    },
+    "growatt.bms.link.1803.b3": {
+     "value": "3",
+     "unit": "",
+     "disposition": "raw",
+     "raw": "3"
+    },
+    "growatt.bms.link.1803.b6": {
+     "value": "6",
+     "unit": "",
+     "disposition": "raw",
+     "raw": "6"
+    },
+    "growatt.bms.link.1803.b7": {
+     "value": "7",
+     "unit": "",
+     "disposition": "raw",
+     "raw": "7"
+    }
+   }
+  },
+  {
+   "name": "configuration byte other than one is invalid under the local profile",
+   "family": "1803",
+   "payload": "02010203e8030607",
+   "selection": {
+    "project": "QAAA",
+    "release": "0006",
+    "choice": "",
+    "group": "",
+    "slot": "",
+    "bank": "ordinary",
+    "source": "02",
+    "destination": "F4"
+   },
+   "status": "accepted",
+   "reason": "",
+   "rows": {
+    "growatt.bms.link.capacity": {
+     "value": "100",
+     "unit": "Ah",
+     "disposition": "accepted",
+     "raw": "1000"
+    },
+    "growatt.bms.link.1803.b1": {
+     "value": "1",
+     "unit": "",
+     "disposition": "raw",
+     "raw": "1"
+    },
+    "growatt.bms.link.1803.b2": {
+     "value": "2",
+     "unit": "",
+     "disposition": "raw",
+     "raw": "2"
+    },
+    "growatt.bms.link.1803.b3": {
+     "value": "3",
+     "unit": "",
+     "disposition": "raw",
+     "raw": "3"
+    },
+    "growatt.bms.link.1803.b6": {
+     "value": "6",
+     "unit": "",
+     "disposition": "raw",
+     "raw": "6"
+    },
+    "growatt.bms.link.1803.b7": {
+     "value": "7",
+     "unit": "",
+     "disposition": "raw",
+     "raw": "7"
+    },
+    "growatt.bms.link.1803.b0": {
+     "value": "",
+     "unit": "",
+     "disposition": "invalid",
+     "raw": "2"
+    }
+   }
+  },
+  {
+   "name": "release eleven configuration word and raw capacity",
+   "family": "1803",
+   "payload": "01020203e8030607",
+   "selection": {
+    "project": "QAAA",
+    "release": "0011",
+    "choice": "",
+    "group": "",
+    "slot": "",
+    "bank": "ordinary",
+    "source": "02",
+    "destination": "F4"
+   },
+   "status": "accepted",
+   "reason": "",
+   "rows": {
+    "growatt.bms.link.capacity": {
+     "value": "1000",
+     "unit": "",
+     "disposition": "raw",
+     "raw": "1000"
+    },
+    "growatt.bms.link.configuration": {
+     "value": "258",
+     "unit": "",
+     "disposition": "raw",
+     "raw": "258"
+    },
+    "growatt.bms.link.1803.b2": {
+     "value": "2",
+     "unit": "",
+     "disposition": "raw",
+     "raw": "2"
+    },
+    "growatt.bms.link.1803.b3": {
+     "value": "3",
+     "unit": "",
+     "disposition": "raw",
+     "raw": "3"
+    },
+    "growatt.bms.link.1803.b6": {
+     "value": "6",
+     "unit": "",
+     "disposition": "raw",
+     "raw": "6"
+    },
+    "growatt.bms.link.1803.b7": {
+     "value": "7",
+     "unit": "",
+     "disposition": "raw",
+     "raw": "7"
+    }
+   }
+  },
+  {
+   "name": "other group keeps raw capacity and configuration bytes",
+   "family": "1803",
+   "payload": "05060203e8030607",
+   "selection": {
+    "project": "QAAA",
+    "release": "0007",
+    "choice": "",
+    "group": "",
+    "slot": "",
+    "bank": "ordinary",
+    "source": "02",
+    "destination": "F4"
+   },
+   "status": "accepted",
+   "reason": "",
+   "rows": {
+    "growatt.bms.link.capacity": {
+     "value": "1000",
+     "unit": "",
+     "disposition": "raw",
+     "raw": "1000"
+    },
+    "growatt.bms.link.1803.b0": {
+     "value": "5",
+     "unit": "",
+     "disposition": "raw",
+     "raw": "5"
+    },
+    "growatt.bms.link.1803.b1": {
+     "value": "6",
+     "unit": "",
+     "disposition": "raw",
+     "raw": "6"
+    },
+    "growatt.bms.link.1803.b2": {
+     "value": "2",
+     "unit": "",
+     "disposition": "raw",
+     "raw": "2"
+    },
+    "growatt.bms.link.1803.b3": {
+     "value": "3",
+     "unit": "",
+     "disposition": "raw",
+     "raw": "3"
+    },
+    "growatt.bms.link.1803.b6": {
+     "value": "6",
+     "unit": "",
+     "disposition": "raw",
+     "raw": "6"
+    },
+    "growatt.bms.link.1803.b7": {
+     "value": "7",
+     "unit": "",
+     "disposition": "raw",
+     "raw": "7"
+    }
+   }
+  },
+  {
+   "name": "accumulator words",
+   "family": "1804",
+   "payload": "78563412efbeadde",
+   "selection": {
+    "project": "QAAA",
+    "release": "0006",
+    "choice": "",
+    "group": "",
+    "slot": "",
+    "bank": "ordinary",
+    "source": "02",
+    "destination": "F4"
+   },
+   "status": "accepted",
+   "reason": "",
+   "rows": {
+    "growatt.bms.link.1804.word_0": {
+     "value": "305419896",
+     "unit": "",
+     "disposition": "raw",
+     "raw": "305419896"
+    },
+    "growatt.bms.link.1804.word_1": {
+     "value": "3735928559",
+     "unit": "",
+     "disposition": "raw",
+     "raw": "3735928559"
+    }
+   }
+  },
+  {
+   "name": "packed status with differing pack and port voltage",
+   "family": "1805",
+   "payload": "1282ea9b10feffff",
+   "selection": {
+    "project": "QAAA",
+    "release": "0006",
+    "choice": "",
+    "group": "",
+    "slot": "",
+    "bank": "ordinary",
+    "source": "02",
+    "destination": "F4"
+   },
+   "status": "accepted",
+   "reason": "",
+   "rows": {
+    "growatt.bms.link.pack_voltage": {
+     "value": "53",
+     "unit": "V",
+     "disposition": "accepted",
+     "raw": "530"
+    },
+    "growatt.bms.link.1805.current": {
+     "value": "1",
+     "unit": "A",
+     "disposition": "accepted",
+     "raw": "4010"
+    },
+    "growatt.bms.link.port_voltage": {
+     "value": "53.1",
+     "unit": "V",
+     "disposition": "accepted",
+     "raw": "531"
+    },
+    "growatt.bms.link.discharge_limit": {
+     "value": "4095",
+     "unit": "",
+     "disposition": "raw",
+     "raw": "4095"
+    },
+    "growatt.bms.link.charge_limit": {
+     "value": "2047",
+     "unit": "",
+     "disposition": "raw",
+     "raw": "2047"
+    }
+   }
+  },
+  {
+   "name": "packed status negative current",
+   "family": "1805",
+   "payload": "1282e59b10feffff",
+   "selection": {
+    "project": "QAAA",
+    "release": "0006",
+    "choice": "",
+    "group": "",
+    "slot": "",
+    "bank": "ordinary",
+    "source": "02",
+    "destination": "F4"
+   },
+   "status": "accepted",
+   "reason": "",
+   "rows": {
+    "growatt.bms.link.pack_voltage": {
+     "value": "53",
+     "unit": "V",
+     "disposition": "accepted",
+     "raw": "530"
+    },
+    "growatt.bms.link.1805.current": {
+     "value": "-1",
+     "unit": "A",
+     "disposition": "accepted",
+     "raw": "3990"
+    },
+    "growatt.bms.link.port_voltage": {
+     "value": "53.1",
+     "unit": "V",
+     "disposition": "accepted",
+     "raw": "531"
+    },
+    "growatt.bms.link.discharge_limit": {
+     "value": "4095",
+     "unit": "",
+     "disposition": "raw",
+     "raw": "4095"
+    },
+    "growatt.bms.link.charge_limit": {
+     "value": "2047",
+     "unit": "",
+     "disposition": "raw",
+     "raw": "2047"
+    }
+   }
+  },
+  {
+   "name": "packed status raw under other group",
+   "family": "1805",
+   "payload": "1282ea9b10feffff",
+   "selection": {
+    "project": "QAAA",
+    "release": "0007",
+    "choice": "",
+    "group": "",
+    "slot": "",
+    "bank": "ordinary",
+    "source": "02",
+    "destination": "F4"
+   },
+   "status": "accepted",
+   "reason": "",
+   "rows": {
+    "growatt.bms.link.pack_voltage": {
+     "value": "530",
+     "unit": "",
+     "disposition": "raw",
+     "raw": "530"
+    },
+    "growatt.bms.link.1805.current": {
+     "value": "4010",
+     "unit": "",
+     "disposition": "raw",
+     "raw": "4010"
+    },
+    "growatt.bms.link.port_voltage": {
+     "value": "531",
+     "unit": "",
+     "disposition": "raw",
+     "raw": "531"
+    },
+    "growatt.bms.link.discharge_limit": {
+     "value": "4095",
+     "unit": "",
+     "disposition": "raw",
+     "raw": "4095"
+    },
+    "growatt.bms.link.charge_limit": {
+     "value": "2047",
+     "unit": "",
+     "disposition": "raw",
+     "raw": "2047"
+    }
+   }
+  },
+  {
+   "name": "packed status under release eleven",
+   "family": "1805",
+   "payload": "1202e89b10feffff",
+   "selection": {
+    "project": "QAAA",
+    "release": "0011",
+    "choice": "",
+    "group": "",
+    "slot": "",
+    "bank": "ordinary",
+    "source": "02",
+    "destination": "F4"
+   },
+   "status": "accepted",
+   "reason": "",
+   "rows": {
+    "growatt.bms.link.pack_voltage": {
+     "value": "53",
+     "unit": "V",
+     "disposition": "accepted",
+     "raw": "530"
+    },
+    "growatt.bms.link.1805.current": {
+     "value": "0",
+     "unit": "A",
+     "disposition": "accepted",
+     "raw": "4000"
+    },
+    "growatt.bms.link.port_voltage": {
+     "value": "53.1",
+     "unit": "V",
+     "disposition": "accepted",
+     "raw": "531"
+    },
+    "growatt.bms.link.discharge_limit": {
+     "value": "4095",
+     "unit": "",
+     "disposition": "raw",
+     "raw": "4095"
+    },
+    "growatt.bms.link.charge_limit": {
+     "value": "2047",
+     "unit": "",
+     "disposition": "raw",
+     "raw": "2047"
+    }
+   }
+  },
+  {
+   "name": "cell extrema words",
+   "family": "1806",
+   "payload": "10e40c03800cb20c",
+   "selection": {
+    "project": "QAAA",
+    "release": "0006",
+    "choice": "",
+    "group": "",
+    "slot": "",
+    "bank": "ordinary",
+    "source": "02",
+    "destination": "F4"
+   },
+   "status": "accepted",
+   "reason": "",
+   "rows": {
+    "growatt.bms.link.spread_low": {
+     "value": "16",
+     "unit": "",
+     "disposition": "raw",
+     "raw": "16"
+    },
+    "growatt.bms.link.maximum": {
+     "value": "3300",
+     "unit": "",
+     "disposition": "raw",
+     "raw": "3300"
+    },
+    "growatt.bms.link.1806.minimum_index": {
+     "value": "3",
+     "unit": "",
+     "disposition": "raw",
+     "raw": "3"
+    },
+    "growatt.bms.link.minimum": {
+     "value": "3200",
+     "unit": "",
+     "disposition": "raw",
+     "raw": "3200"
+    },
+    "growatt.bms.link.1806.tail": {
+     "value": "3250",
+     "unit": "",
+     "disposition": "raw",
+     "raw": "3250"
+    }
+   }
+  },
+  {
+   "name": "fine state of charge in tenths of percent under release eleven",
+   "family": "1807",
+   "payload": "1000020355035507",
+   "selection": {
+    "project": "QAAA",
+    "release": "0011",
+    "choice": "",
+    "group": "",
+    "slot": "",
+    "bank": "ordinary",
+    "source": "02",
+    "destination": "F4"
+   },
+   "status": "accepted",
+   "reason": "",
+   "rows": {
+    "growatt.bms.link.1807.spread": {
+     "value": "16",
+     "unit": "",
+     "disposition": "raw",
+     "raw": "16"
+    },
+    "growatt.bms.link.count_b2": {
+     "value": "2",
+     "unit": "",
+     "disposition": "raw",
+     "raw": "2"
+    },
+    "growatt.bms.link.count_b3": {
+     "value": "3",
+     "unit": "",
+     "disposition": "raw",
+     "raw": "3"
+    },
+    "growatt.bms.link.whole_estimate": {
+     "value": "85",
+     "unit": "",
+     "disposition": "raw",
+     "raw": "85"
+    },
+    "growatt.bms.link.auxiliary": {
+     "value": "7",
+     "unit": "",
+     "disposition": "raw",
+     "raw": "7"
+    },
+    "growatt.bms.link.1807.b4": {
+     "value": "85.3",
+     "unit": "percent",
+     "disposition": "accepted",
+     "raw": "853"
+    }
+   }
+  },
+  {
+   "name": "fine state word stays raw under the local profile",
+   "family": "1807",
+   "payload": "1000020355035507",
+   "selection": {
+    "project": "QAAA",
+    "release": "0006",
+    "choice": "",
+    "group": "",
+    "slot": "",
+    "bank": "ordinary",
+    "source": "02",
+    "destination": "F4"
+   },
+   "status": "accepted",
+   "reason": "",
+   "rows": {
+    "growatt.bms.link.1807.spread": {
+     "value": "16",
+     "unit": "",
+     "disposition": "raw",
+     "raw": "16"
+    },
+    "growatt.bms.link.count_b2": {
+     "value": "2",
+     "unit": "",
+     "disposition": "raw",
+     "raw": "2"
+    },
+    "growatt.bms.link.count_b3": {
+     "value": "3",
+     "unit": "",
+     "disposition": "raw",
+     "raw": "3"
+    },
+    "growatt.bms.link.whole_estimate": {
+     "value": "85",
+     "unit": "",
+     "disposition": "raw",
+     "raw": "85"
+    },
+    "growatt.bms.link.auxiliary": {
+     "value": "7",
+     "unit": "",
+     "disposition": "raw",
+     "raw": "7"
+    },
+    "growatt.bms.link.1807.b4": {
+     "value": "853",
+     "unit": "",
+     "disposition": "raw",
+     "raw": "853"
+    }
+   }
+  },
+  {
+   "name": "temperature codes minus forty under the local profile",
+   "family": "1808",
+   "payload": "014602323c140102",
+   "selection": {
+    "project": "QAAA",
+    "release": "0006",
+    "choice": "",
+    "group": "",
+    "slot": "",
+    "bank": "ordinary",
+    "source": "02",
+    "destination": "F4"
+   },
+   "status": "accepted",
+   "reason": "",
+   "rows": {
+    "growatt.bms.link.1808.maximum_index": {
+     "value": "1",
+     "unit": "",
+     "disposition": "raw",
+     "raw": "1"
+    },
+    "growatt.bms.link.maximum_code": {
+     "value": "70",
+     "unit": "",
+     "disposition": "raw",
+     "raw": "70"
+    },
+    "growatt.bms.link.1808.minimum_index": {
+     "value": "2",
+     "unit": "",
+     "disposition": "raw",
+     "raw": "2"
+    },
+    "growatt.bms.link.minimum_code": {
+     "value": "50",
+     "unit": "",
+     "disposition": "raw",
+     "raw": "50"
+    },
+    "growatt.bms.link.extra_average": {
+     "value": "60",
+     "unit": "",
+     "disposition": "raw",
+     "raw": "60"
+    },
+    "growatt.bms.link.1808.spread": {
+     "value": "20",
+     "unit": "",
+     "disposition": "raw",
+     "raw": "20"
+    },
+    "growatt.bms.link.1808.b6": {
+     "value": "1",
+     "unit": "",
+     "disposition": "raw",
+     "raw": "1"
+    },
+    "growatt.bms.link.1808.b7": {
+     "value": "2",
+     "unit": "",
+     "disposition": "raw",
+     "raw": "2"
+    },
+    "growatt.bms.link.temperature_maximum": {
+     "value": "30",
+     "unit": "C",
+     "disposition": "accepted",
+     "raw": "70"
+    },
+    "growatt.bms.link.temperature_minimum": {
+     "value": "10",
+     "unit": "C",
+     "disposition": "accepted",
+     "raw": "50"
+    }
+   },
+   "absent": []
+  },
+  {
+   "name": "temperature codes stay raw under another group",
+   "family": "1808",
+   "payload": "014602323c140102",
+   "selection": {
+    "project": "QAAA",
+    "release": "0007",
+    "choice": "",
+    "group": "",
+    "slot": "",
+    "bank": "ordinary",
+    "source": "02",
+    "destination": "F4"
+   },
+   "status": "accepted",
+   "reason": "",
+   "rows": {
+    "growatt.bms.link.1808.maximum_index": {
+     "value": "1",
+     "unit": "",
+     "disposition": "raw",
+     "raw": "1"
+    },
+    "growatt.bms.link.maximum_code": {
+     "value": "70",
+     "unit": "",
+     "disposition": "raw",
+     "raw": "70"
+    },
+    "growatt.bms.link.1808.minimum_index": {
+     "value": "2",
+     "unit": "",
+     "disposition": "raw",
+     "raw": "2"
+    },
+    "growatt.bms.link.minimum_code": {
+     "value": "50",
+     "unit": "",
+     "disposition": "raw",
+     "raw": "50"
+    },
+    "growatt.bms.link.extra_average": {
+     "value": "60",
+     "unit": "",
+     "disposition": "raw",
+     "raw": "60"
+    },
+    "growatt.bms.link.1808.spread": {
+     "value": "20",
+     "unit": "",
+     "disposition": "raw",
+     "raw": "20"
+    },
+    "growatt.bms.link.1808.b6": {
+     "value": "1",
+     "unit": "",
+     "disposition": "raw",
+     "raw": "1"
+    },
+    "growatt.bms.link.1808.b7": {
+     "value": "2",
+     "unit": "",
+     "disposition": "raw",
+     "raw": "2"
+    }
+   },
+   "absent": [
+    "growatt.bms.link.temperature_maximum",
+    "growatt.bms.link.temperature_minimum"
+   ]
+  }
+ ]
+}

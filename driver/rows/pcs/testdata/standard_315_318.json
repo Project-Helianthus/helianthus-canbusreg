@@ -81,6 +81,14 @@
       }
     },
     {
+      "name": "placeholder-315-parallel-qaab-nonzero-payload",
+      "identifier": "0x315",
+      "payload": "1388002A00350043",
+      "selection": {"project": "QAAB", "release": "0002", "flavor": "pcs-parallel", "bank": "parallel", "scope": "local", "endpoint": "coordinator", "group": "0", "slot": "1"},
+      "input": {},
+      "expect": {"byte_0": {"status": "raw", "value": "19"}, "byte_1": {"status": "raw", "value": "136"}, "byte_3": {"status": "raw", "value": "42"}, "byte_5": {"status": "raw", "value": "53"}, "byte_7": {"status": "raw", "value": "67"}, "placeholder": {"status": "raw", "value": "0"}}
+    },
+    {
       "name": "placeholder-317-zero-payload",
       "identifier": "0x317",
       "payload": "0000000000000000",

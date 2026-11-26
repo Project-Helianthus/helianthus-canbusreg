@@ -4,6 +4,7 @@ import (
 	"encoding/binary"
 	"fmt"
 	"strconv"
+	"strings"
 
 	"github.com/Project-Helianthus/helianthus-canbus"
 	"github.com/Project-Helianthus/helianthus-canbusreg"
@@ -62,6 +63,31 @@ const (
 type gaugeSpec struct {
 	rowSpec
 	bitOf string
+	// parallel marks a row of the pcs-parallel flavor on the parallel bank; its
+	// identifier carries the parallel flavor token in place of the standard one.
+	parallel bool
+	// numerator marks a row whose raw word is the decoder's own numerator for
+	// its field, not the payload slice the row reads (the placeholder).
+	numerator bool
+}
+
+// gaugeNativeRow builds the native row of a gauge spec. A parallel-bank row
+// takes the parallel flavor token in its identifier.
+func gaugeNativeRow(s gaugeSpec) roweval.NativeRow[Selector] {
+	row := nativeRow(s.rowSpec)
+	if s.parallel {
+		row.ID = "growatt.bms.pcs.parallel." + strings.TrimPrefix(row.ID, rowPrefix)
+		row.Decode.Hook = rowHookPrefix + row.ID
+	}
+	return row
+}
+
+// gaugeParallelWhen is the selection pairing of a parallel-bank row: the
+// pcs-parallel flavor and the parallel bank, plus the extra conditions.
+func gaugeParallelWhen(extra ...string) map[string]string {
+	m := when(extra...)
+	m[qFlavor], m[qBank] = "pcs-parallel", "parallel"
+	return m
 }
 
 // gaugeBranch returns the decoder branch of the frame under the contract group.
@@ -114,8 +140,11 @@ func gaugeQualifiers(s canbusreg.Selection, in canbusreg.PCSIdentityPCSInput) ro
 	selected := c.Flavor == "pcs-standard" && group != ""
 	valid := selected && local && in.MeasurementValid
 	gateway := id == "QCAA0001" && c.Scope == "aggregate"
+	// The decoder takes its placeholder branch on the gateway aggregate and, on
+	// 0x315 only, on the parallel bank of the QAAB and QAAb projects.
+	parallelPlaceholder := c.Flavor == "pcs-parallel" && (c.ProjectCode == "QAAB" || c.ProjectCode == "QAAb") && group != "" && in.Evidence.Frame.ID().Value() == 0x315
 	v := q.Values
-	v[qGaugeBranch] = gaugeBranch(in.Evidence.Frame.ID().Value(), group, gateway)
+	v[qGaugeBranch] = gaugeBranch(in.Evidence.Frame.ID().Value(), group, gateway || parallelPlaceholder)
 	v[qGaugeValid] = boolText(valid)
 	v[qGaugeValidRelease] = boolText(valid && id == "QAAA0006")
 	for pos := 5; pos <= 8; pos++ {
@@ -168,7 +197,7 @@ func gaugeBitFields() map[string]string {
 	out := make(map[string]string)
 	for _, s := range gaugeSpecs() {
 		if s.bitOf != "" {
-			out[nativeRow(s.rowSpec).ID] = s.field
+			out[gaugeNativeRow(s).ID] = s.field
 		}
 	}
 	return out
@@ -301,7 +330,38 @@ func gaugeSpecs() []gaugeSpec {
 		for at := 0; at < 8; at++ {
 			add(gaugeRawRow(frame, "", branchPlaceholder, fmt.Sprintf("byte_%d", at), byteAt(uint16(8*at))))
 		}
-		add(gaugeRow(frame, "", branchPlaceholder, "placeholder", byteAt(0), "", 1, qGaugeZeroPayload))
+		placeholder := gaugeRow(frame, "", branchPlaceholder, "placeholder", byteAt(0), "", 1, qGaugeZeroPayload)
+		placeholder.numerator = true
+		add(placeholder)
+	}
+	add(gaugeParallelPlaceholderSpecs()...)
+	return out
+}
+
+// gaugeParallelPlaceholderSpecs are the parallel-bank rows of frame 0x315 on the
+// QAAB and QAAb projects: the eight raw bytes and the zero placeholder the decoder
+// emits on that selection, under the pcs-parallel flavor and the parallel bank.
+func gaugeParallelPlaceholderSpecs() []gaugeSpec {
+	const frame315 = 0x315
+	var out []gaugeSpec
+	for at := 0; at < 8; at++ {
+		s := gaugeRawRow(frame315, "", branchPlaceholder, fmt.Sprintf("byte_%d", at), byteAt(uint16(8*at)))
+		s.parallel, s.when = true, gaugeParallelWhen(qGaugeBranch, branchPlaceholder)
+		out = append(out, s)
+	}
+	s := gaugeRow(frame315, "", branchPlaceholder, "placeholder", byteAt(0), "", 1, qGaugeZeroPayload)
+	s.parallel, s.numerator, s.when = true, true, gaugeParallelWhen(qGaugeBranch, branchPlaceholder)
+	return append(out, s)
+}
+
+// gaugeNumeratorIDs returns the decoder field name of every row whose raw word
+// is the decoder's numerator, keyed by row identifier.
+func gaugeNumeratorIDs() map[string]string {
+	out := make(map[string]string)
+	for _, s := range gaugeSpecs() {
+		if s.numerator {
+			out[gaugeNativeRow(s).ID] = s.field
+		}
 	}
 	return out
 }
@@ -327,7 +387,7 @@ func gaugeTable() roweval.Table[Selector] {
 	rows := make([]roweval.NativeRow[Selector], 0, len(specs))
 	hooks := make(map[string]roweval.RowHook, len(specs))
 	for _, s := range specs {
-		row := nativeRow(s.rowSpec)
+		row := gaugeNativeRow(s)
 		rows = append(rows, row)
 		if s.bitOf != "" {
 			hooks[row.Decode.Hook] = gaugeBitHook(s.bitOf)
@@ -343,7 +403,7 @@ func gaugeRawIDs() map[string]bool {
 	raw := make(map[string]bool)
 	for _, s := range gaugeSpecs() {
 		if s.raw {
-			raw[nativeRow(s.rowSpec).ID] = true
+			raw[gaugeNativeRow(s).ID] = true
 		}
 	}
 	return raw
@@ -387,7 +447,7 @@ func EvaluateGauge(s canbusreg.Selection, in canbusreg.PCSIdentityPCSInput) (Gau
 	if reason := gaugeFrameDisposition(frame); reason != "" {
 		return res, reason, nil
 	}
-	rows, err := evaluateGaugeRows(gaugeTable(), frame, gaugeQualifiers(s, in), gaugeRawIDs(), gaugeBitFields(), decoded.Fields)
+	rows, err := evaluateGaugeRows(gaugeTable(), frame, gaugeQualifiers(s, in), gaugeRawIDs(), gaugeBitFields(), gaugeNumeratorIDs(), decoded.Fields)
 	res.Rows = rows
 	return res, "", err
 }
@@ -398,7 +458,7 @@ func EvaluateGauge(s canbusreg.Selection, in canbusreg.PCSIdentityPCSInput) (Gau
 // ambiguous match. A row whose conditions do not hold, or whose hook gives no
 // applicable value, is not in the result. A retained fault bit row takes the
 // accepted or raw disposition the decoder gives its field in fields.
-func evaluateGaugeRows(t roweval.Table[Selector], frame canbus.Frame, q roweval.Qualifiers, raw map[string]bool, bits map[string]string, fields map[string]canbusreg.NativeField) (map[string]roweval.Evaluation, error) {
+func evaluateGaugeRows(t roweval.Table[Selector], frame canbus.Frame, q roweval.Qualifiers, raw map[string]bool, bits, numerators map[string]string, fields map[string]canbusreg.NativeField) (map[string]roweval.Evaluation, error) {
 	out := make(map[string]roweval.Evaluation)
 	for _, row := range t.Native {
 		if row.At.Identifier != frame.ID().Value() {
@@ -416,6 +476,12 @@ func evaluateGaugeRows(t roweval.Table[Selector], frame canbus.Frame, q roweval.
 		if ev.Native.Reason != "" {
 			ev.Native.Value = nil
 			ev.Native.Unit = ""
+		}
+		// A numerator row keeps the decoder's raw zero, not the byte its slice reads.
+		if field, ok := numerators[ev.Native.RowID]; ok {
+			if df, ok := fields[field]; ok {
+				ev.Native.Raw = uint64(df.Numerator)
+			}
 		}
 		ev.Native.Disposition = disposition(ev.Native, raw[ev.Native.RowID])
 		if key, ok := bits[ev.Native.RowID]; ok && ev.Native.Reason == "" {

@@ -124,7 +124,7 @@ func gaugeInput(iface canbus.InterfaceIdentity, spec canbusreg.SelectionSpec, fr
 func gaugeGated() map[string]bool {
 	gated := make(map[string]bool)
 	for _, s := range gaugeSpecs() {
-		gated[nativeRow(s.rowSpec).ID] = s.gate != ""
+		gated[gaugeNativeRow(s).ID] = s.gate != ""
 	}
 	return gated
 }
@@ -165,7 +165,7 @@ func checkGaugeField(t *testing.T, name, field string, df canbusreg.NativeField,
 	if nat == nil {
 		t.Fatalf("%s: %s has no native evaluation", name, field)
 	}
-	if field != "placeholder" && int64(nat.Raw) != df.Numerator {
+	if int64(nat.Raw) != df.Numerator {
 		t.Errorf("%s: %s raw %d, decoder %d", name, field, nat.Raw, df.Numerator)
 	}
 	if strings.HasPrefix(field, "retained_fault_bit_") {
@@ -301,7 +301,7 @@ func TestGaugeRowsMatchDecoder(t *testing.T) {
 func TestGaugeRowIDsAreUnique(t *testing.T) {
 	seen := make(map[string]bool)
 	for _, s := range gaugeSpecs() {
-		id := nativeRow(s.rowSpec).ID
+		id := gaugeNativeRow(s).ID
 		if seen[id] {
 			t.Errorf("row identifier %s is declared twice", id)
 		}
@@ -318,7 +318,7 @@ func TestGaugeVectorsCoverEveryRow(t *testing.T) {
 		}
 	}
 	for _, s := range gaugeSpecs() {
-		if id := nativeRow(s.rowSpec).ID; !covered[id] {
+		if id := gaugeNativeRow(s).ID; !covered[id] {
 			t.Errorf("row %s applies to no vector", id)
 		}
 	}
@@ -518,6 +518,68 @@ func TestGaugeRowsRefuseNeighbouringIdentifierWrongLengthAndExtendedFormat(t *te
 				t.Errorf("%s: reason %q with decoder %q and %d rows", tc.name, reason, r.Status, len(res.Rows))
 			}
 		})
+	}
+}
+
+// TestGaugeParallelPlaceholderRowsApplyUnderParallelBank replays the frame 0x315
+// on the parallel bank of a QAAB0002 selection. The decoder emits nine fields
+// there (eight raw bytes and the placeholder), and each must have one row under
+// the parallel identifiers, so the evaluator is not silent on an admitted frame.
+func TestGaugeParallelPlaceholderRowsApplyUnderParallelBank(t *testing.T) {
+	c := gaugeVectorCase{
+		Name:       "replay-315-parallel-qaab",
+		Identifier: "0x315",
+		Payload:    frame316Payload,
+		Selection:  vectorSelection{Project: "QAAB", Release: "0002", Flavor: "pcs-parallel", Bank: "parallel", Scope: "local", Endpoint: "coordinator", Group: "0", Slot: "1"},
+	}
+	s, in, _ := buildGauge(t, c)
+	r := canbusreg.DecodePCSGauge(s, in)
+	if r.Status != "decoded" || len(r.Fields) != 9 {
+		t.Fatalf("decoder status %q with %d fields", r.Status, len(r.Fields))
+	}
+	res, reason, err := EvaluateGauge(s, in)
+	if err != nil || reason != "" {
+		t.Fatalf("evaluate refused: %v %v", reason, err)
+	}
+	for name := range r.Fields {
+		id := "growatt.bms.pcs.parallel.315." + name
+		ev, ok := res.Rows[id]
+		if !ok || ev.Native == nil {
+			t.Errorf("%s: no parallel row applies", id)
+			continue
+		}
+		if ev.Native.Reason != "" && name != "placeholder" {
+			t.Errorf("%s: reason %q", id, ev.Native.Reason)
+		}
+	}
+	if raw := res.Rows["growatt.bms.pcs.parallel.315.byte_0"].Native.Raw; raw != 19 {
+		t.Errorf("byte_0 raw %d, want 19", raw)
+	}
+	if ev := res.Rows["growatt.bms.pcs.parallel.315.placeholder"]; ev.Native == nil || ev.Native.Raw != 0 {
+		t.Errorf("placeholder raw %v, want 0", ev.Native)
+	}
+	if _, ok := res.Rows["growatt.bms.pcs.standard.315.placeholder"]; ok {
+		t.Error("a standard-bank placeholder row applies on the parallel bank")
+	}
+	checkGaugeEvidence(t, c.Name, res, in, r)
+}
+
+// TestGaugePlaceholderRawIsDecoderZeroNotByteZero replays a nonzero gateway
+// frame 0x316: the placeholder keeps the decoder's raw zero, while byte_0 keeps
+// its own raw word 19. The withheld placeholder has no value.
+func TestGaugePlaceholderRawIsDecoderZeroNotByteZero(t *testing.T) {
+	c := gaugeCaseNamed(t, "placeholder-316-nonzero-payload")
+	s, in, _ := buildGauge(t, c)
+	res, reason, err := EvaluateGauge(s, in)
+	if err != nil || reason != "" {
+		t.Fatalf("evaluate refused: %v %v", reason, err)
+	}
+	ph := res.Rows["growatt.bms.pcs.standard.316.placeholder"].Native
+	if ph == nil || ph.Raw != 0 || ph.Value != nil || ph.Reason != gateWithheld {
+		t.Errorf("placeholder %+v, want raw 0 withheld", ph)
+	}
+	if first := res.Rows["growatt.bms.pcs.standard.316.byte_0"].Native; first == nil || first.Raw != 19 {
+		t.Errorf("byte_0 %+v, want raw 19", first)
 	}
 }
 

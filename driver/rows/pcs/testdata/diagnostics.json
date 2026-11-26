@@ -104,6 +104,19 @@
       }
     },
     {
+      "name": "standard-word-index-10-trailing-zero",
+      "kind": "dtc",
+      "identifier": "0x333",
+      "extended": false,
+      "payload": "0000101000000000",
+      "offset": 2,
+      "selection": {"flavor": "pcs-standard", "bank": "ordinary", "project": "QAAA", "release": "0011", "scope": "local", "endpoint": "coordinator", "group": "", "slot": ""},
+      "expect": {
+        "selected_word": {"status": "accepted", "raw": "4112", "value": "4112"},
+        "numeric_index": {"status": "accepted", "raw": "4112", "value": "10"}
+      }
+    },
+    {
       "name": "standard-word-index-131-offset-2",
       "kind": "dtc",
       "identifier": "0x333",

@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"math/big"
 	"strconv"
+	"strings"
 
 	"github.com/Project-Helianthus/helianthus-canbus"
 	"github.com/Project-Helianthus/helianthus-canbusreg"
@@ -227,6 +228,24 @@ func diagParallelAttributed(member canbusreg.Selection, frame canbus.Frame) bool
 	return len(data) > 0 && frame.ID().Value()&0xf == uint32(g) && data[0] == byte(slot)
 }
 
+// diagStandardAttributed admits a 0x333 word only for the group and slot bytes
+// the selection names, as the standard frame decoder does. A selection that
+// names neither has no member group or slot to compare, and keeps the decoder's
+// own admission. A frame of another member keeps no attributed index.
+func diagStandardAttributed(member canbusreg.Selection, frame canbus.Frame) bool {
+	c := member.SelectionSpecValue()
+	if c.Group == "" && c.Slot == "" {
+		return true
+	}
+	g, e := strconv.ParseUint(c.Group, 10, 8)
+	slot, es := strconv.ParseUint(c.Slot, 10, 8)
+	if e != nil || es != nil || c.Group != strconv.FormatUint(g, 10) || c.Slot != strconv.FormatUint(slot, 10) {
+		return false
+	}
+	data := frame.Data()
+	return len(data) > 1 && data[0] == byte(g) && data[1] == byte(slot)
+}
+
 // diagDTCFamilyOf admits the 0x333 frame, the 0x520 to 0x52F frames and the
 // extended LINK-scoped 1853 frames with DLC 8 and raw DLC 8. The bank is empty
 // for LINK, which pairs with no PCS bank.
@@ -250,9 +269,16 @@ func diagDTCFamilyOf(f canbus.Frame) (diagDTCFamily, bool) {
 	return diagDTCFamily{}, false
 }
 
-// diagIndexValue is the numeric index as a unitless quantity.
+// diagIndexValue is the numeric index as a unitless quantity. The decimal is
+// normalised as the semreg decimal rules require: a coefficient ends in no zero
+// digit, so trailing zeros move into the exponent, as in 10 = 1e1.
 func diagIndexValue(index int) semreg.Value {
-	return semreg.Value{Kind: semreg.ValueQuantity, Quantity: &semreg.Quantity{Number: semreg.Decimal{Coefficient: strconv.Itoa(index)}}}
+	coefficient, exponent := strconv.Itoa(index), int32(0)
+	for index != 0 && strings.HasSuffix(coefficient, "0") {
+		coefficient = strings.TrimSuffix(coefficient, "0")
+		exponent++
+	}
+	return semreg.Value{Kind: semreg.ValueQuantity, Quantity: &semreg.Quantity{Number: semreg.Decimal{Coefficient: coefficient, Exponent10: exponent}}}
 }
 
 // diagWord reads the unsigned integer of a quantity; a fractional or negative
@@ -329,7 +355,8 @@ func diagDTCSpecs(fam diagDTCFamily, member canbusreg.Selection, offset int, fra
 // refuses gives the decoder's status and no rows. An offset that is not a word
 // position of the frame family gives roweval.ReasonNoMatch, and a 0x52X word
 // not attributed to the selected group and slot gives "invalid", as the frame
-// decoder refuses it.
+// decoder refuses it. A 0x333 word of another group or slot than the selection's
+// is refused the same way.
 func EvaluateDTC(member canbusreg.Selection, in canbusreg.LINKInput, offset int) (DiagnosticResult, roweval.Reason, error) {
 	res := DiagnosticResult{Evidence: in.Evidence, Attribution: diagAttribution(in), Rows: make(map[string]roweval.Evaluation)}
 	frame := in.Evidence.Frame
@@ -342,6 +369,9 @@ func EvaluateDTC(member canbusreg.Selection, in canbusreg.LINKInput, offset int)
 		return res, roweval.ReasonNoMatch, nil
 	}
 	if fam.token == "52X" && !diagParallelAttributed(member, frame) {
+		return res, roweval.Reason("invalid"), nil
+	}
+	if fam.token == "333" && !diagStandardAttributed(member, frame) {
 		return res, roweval.Reason("invalid"), nil
 	}
 	c := member.SelectionSpecValue()

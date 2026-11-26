@@ -598,3 +598,42 @@ func TestDiagnosticParallelWordAttributedToSelectedMember(t *testing.T) {
 		})
 	}
 }
+
+// TestDiagnosticStandardWordAttributedToSelectedMember checks that a 0x333 word
+// is attributed to the selected member only when the frame's group and slot
+// bytes are that member's; another member's word yields no attributed index.
+func TestDiagnosticStandardWordAttributedToSelectedMember(t *testing.T) {
+	standard := diagSelection(t, diagVectorSelection{Flavor: "pcs-standard", Bank: "ordinary", Project: "QAAA", Release: "0011", Scope: "local", Endpoint: "coordinator", Group: "2", Slot: "3"})
+	cases := []struct {
+		name    string
+		payload string
+		applies bool
+	}{
+		{"own-group-and-slot", "0203100900000000", true},
+		{"other-slot-same-group", "0204100900000000", false},
+		{"other-group-same-slot", "0103100900000000", false},
+	}
+	for _, c := range cases {
+		t.Run(c.name, func(t *testing.T) {
+			f := diagFrame(t, "0x333", false, c.payload)
+			in := diagLinkInput(standard, f)
+			res, reason, err := EvaluateDTC(standard, in, 2)
+			if err != nil {
+				t.Fatal(err)
+			}
+			if c.applies {
+				if reason != "" || len(res.Rows) != 2 {
+					t.Fatalf("own member refused: reason %q rows %d", reason, len(res.Rows))
+				}
+				numID := "growatt.bms.pcs.standard.333.offset2.numeric_index"
+				if ev := res.Rows[numID]; ev.Native == nil || ev.Native.Value == nil {
+					t.Fatalf("own member index withheld: %+v", ev.Native)
+				}
+				return
+			}
+			if reason != roweval.Reason("invalid") || len(res.Rows) != 0 {
+				t.Fatalf("another member's word attributed: reason %q rows %d", reason, len(res.Rows))
+			}
+		})
+	}
+}

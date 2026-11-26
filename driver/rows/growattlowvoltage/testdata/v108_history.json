@@ -1,0 +1,17 @@
+{
+ "source": "V1.08 contract page, Frame map 0x212 and 0x325 and section 0x212 request and response; witnesses written by hand from the documented byte table",
+ "query": [
+  {"name": "battery 1", "battery_id": 1, "identifier": "0x212", "payload": "0201000000000000"},
+  {"name": "battery 0", "battery_id": 0, "identifier": "0x212", "payload": "0200000000000000"},
+  {"name": "battery 255", "battery_id": 255, "identifier": "0x212", "payload": "02ff000000000000"}
+ ],
+ "response": [
+  {"name": "frame 0 for battery 1", "battery_id": 1, "frame": "0001a1a2a3a4a5a6", "body": "a1a2a3a4a5a6"},
+  {"name": "frame 0 for battery 9, zero body", "battery_id": 9, "frame": "0009000000000000", "body": "000000000000"}
+ ],
+ "not_response": [
+  {"name": "other frame number", "battery_id": 1, "frame": "0101a1a2a3a4a5a6"},
+  {"name": "other battery id", "battery_id": 1, "frame": "0002a1a2a3a4a5a6"},
+  {"name": "battery id in the frame number position", "battery_id": 1, "frame": "0100a1a2a3a4a5a6"}
+ ]
+}

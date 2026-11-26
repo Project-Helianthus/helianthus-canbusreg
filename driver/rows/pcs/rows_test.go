@@ -708,3 +708,50 @@ func TestStandardRawRowsAreRawDispositions(t *testing.T) {
 		t.Errorf("accepted voltage disposition %+v", nat)
 	}
 }
+
+// TestIntegerCodecRefusesUnrepresentableValues pins that the integer codec
+// refuses a value outside the declared wire width instead of wrapping it.
+func TestIntegerCodecRefusesUnrepresentableValues(t *testing.T) {
+	descs := Descriptors()
+	unsigned := descs.Codecs["unsigned"]
+	signed := descs.Codecs["signed"]
+	refuse := []struct {
+		name  string
+		codec roweval.Codec
+		value semreg.Decimal
+		width uint16
+	}{
+		{"unsigned 8-bit 256", unsigned, semreg.Decimal{Coefficient: "256"}, 8},
+		{"unsigned 8-bit 26 x 10", unsigned, semreg.Decimal{Coefficient: "26", Exponent10: 1}, 8},
+		{"unsigned 8-bit negative", unsigned, semreg.Decimal{Coefficient: "-1"}, 8},
+		{"signed 16-bit 32768", signed, semreg.Decimal{Coefficient: "32768"}, 16},
+		{"signed 16-bit -32769", signed, semreg.Decimal{Coefficient: "-32769"}, 16},
+		{"signed 16-bit 3277 x 10", signed, semreg.Decimal{Coefficient: "3277", Exponent10: 1}, 16},
+		{"zero width", unsigned, semreg.Decimal{Coefficient: "0"}, 0},
+		{"huge exponent", unsigned, semreg.Decimal{Coefficient: "1", Exponent10: 1000000}, 16},
+	}
+	for _, c := range refuse {
+		if _, err := c.codec.Encode(c.value, c.width); err == nil {
+			t.Errorf("%s: encode succeeded, want refusal", c.name)
+		}
+	}
+	accept := []struct {
+		name  string
+		codec roweval.Codec
+		value semreg.Decimal
+		width uint16
+		want  uint64
+	}{
+		{"unsigned 8-bit 255", unsigned, semreg.Decimal{Coefficient: "255"}, 8, 0xFF},
+		{"signed 16-bit 32767", signed, semreg.Decimal{Coefficient: "32767"}, 16, 0x7FFF},
+		{"signed 16-bit -32768", signed, semreg.Decimal{Coefficient: "-32768"}, 16, 0x8000},
+		{"signed 8-bit -1", signed, semreg.Decimal{Coefficient: "-1"}, 8, 0xFF},
+		{"unsigned 16-bit 1234 x 10^0", unsigned, semreg.Decimal{Coefficient: "1234"}, 16, 0x04D2},
+	}
+	for _, c := range accept {
+		got, err := c.codec.Encode(c.value, c.width)
+		if err != nil || got != c.want {
+			t.Errorf("%s: got %#x, %v; want %#x", c.name, got, err, c.want)
+		}
+	}
+}

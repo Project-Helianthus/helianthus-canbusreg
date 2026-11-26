@@ -2,6 +2,7 @@ package pcs
 
 import (
 	"fmt"
+	"math/big"
 	"math/bits"
 	"strconv"
 
@@ -190,17 +191,41 @@ func integerCodec(signed bool) roweval.Codec {
 			return d, nil
 		},
 		Encode: func(number semreg.Decimal, width uint16) (uint64, error) {
+			if width == 0 || width > 64 {
+				return 0, fmt.Errorf("integer width %d outside 1..64", width)
+			}
 			if number.Exponent10 < 0 {
 				return 0, fmt.Errorf("fractional integer %s", number.Coefficient)
 			}
-			n, err := strconv.ParseInt(number.Coefficient, 10, 64)
-			if err != nil {
-				return 0, err
+			n, ok := new(big.Int).SetString(number.Coefficient, 10)
+			if !ok {
+				return 0, fmt.Errorf("integer coefficient %q", number.Coefficient)
 			}
-			for e := int32(0); e < number.Exponent10; e++ {
-				n *= 10
+			if n.Sign() != 0 {
+				// A nonzero coefficient times 10^65 or more is outside every
+				// width this table uses; refuse before building the power.
+				if number.Exponent10 > 64 {
+					return 0, fmt.Errorf("integer %s x 10^%d outside %d-bit range", number.Coefficient, number.Exponent10, width)
+				}
+				pow := new(big.Int).Exp(big.NewInt(10), big.NewInt(int64(number.Exponent10)), nil)
+				n.Mul(n, pow)
 			}
-			return uint64(n) & (1<<width - 1), nil
+			lo, hi := new(big.Int), new(big.Int)
+			one := big.NewInt(1)
+			if signed {
+				half := new(big.Int).Lsh(one, uint(width-1))
+				lo.Neg(half)
+				hi.Sub(half, one)
+			} else {
+				hi.Sub(new(big.Int).Lsh(one, uint(width)), one)
+			}
+			if n.Cmp(lo) < 0 || n.Cmp(hi) > 0 {
+				return 0, fmt.Errorf("integer %s x 10^%d outside %d-bit range", number.Coefficient, number.Exponent10, width)
+			}
+			// big.Int And uses two's complement for negative values, so the
+			// masked result is the field's wire pattern.
+			mask := new(big.Int).Sub(new(big.Int).Lsh(one, uint(width)), one)
+			return new(big.Int).And(n, mask).Uint64(), nil
 		},
 	}
 }

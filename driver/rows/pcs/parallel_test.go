@@ -12,11 +12,11 @@ import (
 	"github.com/Project-Helianthus/helianthus-semreg/semreg/v1/roweval"
 )
 
-type parallelVectorFile struct {
-	Cases []parallelVectorCase `json:"cases"`
+type parallelIdentityVectorFile struct {
+	Cases []parallelIdentityVectorCase `json:"cases"`
 }
 
-type parallelVectorCase struct {
+type parallelIdentityVectorCase struct {
 	Name       string                    `json:"name"`
 	Identifier string                    `json:"identifier"`
 	Extended   bool                      `json:"extended"`
@@ -26,13 +26,13 @@ type parallelVectorCase struct {
 	Refused    string                    `json:"refused"`
 }
 
-func parallelLoadVectors(t *testing.T) []parallelVectorCase {
+func parallelLoadVectors(t *testing.T) []parallelIdentityVectorCase {
 	t.Helper()
 	raw, err := os.ReadFile("testdata/parallel_identity.json")
 	if err != nil {
 		t.Fatal(err)
 	}
-	var f parallelVectorFile
+	var f parallelIdentityVectorFile
 	if err := json.Unmarshal(raw, &f); err != nil {
 		t.Fatal(err)
 	}
@@ -50,7 +50,7 @@ func parallelRowID(identifier, key string) string {
 	return fmt.Sprintf("%s%X.%s", parallelPrefix, uint32(id)&^15, key)
 }
 
-func parallelEvaluate(t *testing.T, c parallelVectorCase) (canbusreg.NativeResult, ParallelResult, roweval.Reason) {
+func parallelEvaluate(t *testing.T, c parallelIdentityVectorCase) (canbusreg.NativeResult, ParallelResult, roweval.Reason) {
 	t.Helper()
 	s := diagSelection(t, c.Selection)
 	in := diagLinkInput(s, diagFrame(t, c.Identifier, c.Extended, c.Payload))
@@ -195,7 +195,7 @@ func TestParallelIdentityFaultBitRowsMatchDecoder(t *testing.T) {
 	for _, f := range families {
 		for _, payload := range []string{"0000000000000000", "ffffffffffffffff", "0180040820408010"} {
 			t.Run(fmt.Sprintf("%X-%s", f.family, payload), func(t *testing.T) {
-				c := parallelVectorCase{Identifier: f.identifier, Payload: payload, Selection: sel(f.project)}
+				c := parallelIdentityVectorCase{Identifier: f.identifier, Payload: payload, Selection: sel(f.project)}
 				dec, res, reason := parallelEvaluate(t, c)
 				if reason != "" {
 					t.Fatalf("evaluate refused: %v", reason)
@@ -243,7 +243,7 @@ func sel(project [2]string) diagVectorSelection {
 // bit payloads and checks that each row of the table applied at least once.
 func TestParallelIdentityEveryRowHasAVector(t *testing.T) {
 	seen := map[string]bool{}
-	mark := func(c parallelVectorCase) {
+	mark := func(c parallelIdentityVectorCase) {
 		_, res, _ := parallelEvaluate(t, c)
 		for id, ev := range res.Rows {
 			if ev.Native != nil {
@@ -255,7 +255,7 @@ func TestParallelIdentityEveryRowHasAVector(t *testing.T) {
 		mark(c)
 	}
 	for _, id := range []string{"0x503", "0x663", "0x673"} {
-		mark(parallelVectorCase{Identifier: id, Payload: "0000000000000000", Selection: sel([2]string{"QAAB", "0004"})})
+		mark(parallelIdentityVectorCase{Identifier: id, Payload: "0000000000000000", Selection: sel([2]string{"QAAB", "0004"})})
 	}
 	for _, row := range ParallelIdentityTable().Native {
 		if !seen[row.ID] {

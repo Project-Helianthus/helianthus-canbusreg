@@ -189,7 +189,7 @@ func parallelSummaryCount(s canbusreg.Selection) int {
 	return count
 }
 
-func parallelQualifiers(s canbusreg.Selection, in canbusreg.LINKInput, dec canbusreg.NativeResult, family uint32) roweval.Qualifiers {
+func parallelIdentityQualifiers(s canbusreg.Selection, in canbusreg.LINKInput, dec canbusreg.NativeResult, family uint32) roweval.Qualifiers {
 	c := s.SelectionSpecValue()
 	frame := in.Evidence.Frame
 	group, _ := strconv.ParseUint(c.Group, 10, 8)
@@ -227,7 +227,7 @@ func EvaluateParallelIdentity(s canbusreg.Selection, in canbusreg.LINKInput) (Pa
 	}
 	frame := in.Evidence.Frame
 	family := frame.ID().Value() &^ 15
-	q := parallelQualifiers(s, in, dec, family)
+	q := parallelIdentityQualifiers(s, in, dec, family)
 	for _, spec := range parallelSpecs() {
 		if spec.family != family {
 			continue

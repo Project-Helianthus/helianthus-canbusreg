@@ -1,0 +1,9 @@
+{
+  "description": "Synthetic expectations for the addressed clock-setting frame 188A, written by hand from the page layout before the encoder ran. Identifiers are extended, payloads are eight bytes of hexadecimal.",
+  "clock": [
+    {"name": "typical", "args": {"destination": 245, "source": 1, "year": 2026, "month": 11, "day": 26, "hour": 13, "minute": 45, "second": 30, "extra": 7}, "identifier": "0x188AF501", "payload": "ea070b1a0d2d1e07"},
+    {"name": "year-high-byte", "args": {"destination": 244, "source": 2, "year": 4660, "month": 1, "day": 2, "hour": 3, "minute": 4, "second": 5, "extra": 6}, "identifier": "0x188AF402", "payload": "3412010203040506"},
+    {"name": "all-zero", "args": {"destination": 0, "source": 0, "year": 0, "month": 0, "day": 0, "hour": 0, "minute": 0, "second": 0, "extra": 0}, "identifier": "0x188A0000", "payload": "0000000000000000"},
+    {"name": "all-set", "args": {"destination": 255, "source": 255, "year": 65535, "month": 255, "day": 255, "hour": 255, "minute": 255, "second": 255, "extra": 255}, "identifier": "0x188AFFFF", "payload": "ffffffffffffffff"}
+  ]
+}

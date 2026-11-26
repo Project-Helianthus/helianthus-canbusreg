@@ -134,6 +134,22 @@
       }
     },
     {
+      "name": "unmeasured-local-311-withholds-limits",
+      "identifier": "0x311",
+      "payload": "1388006400320041",
+      "selection": {"project": "QAAA", "release": "0006", "flavor": "pcs-standard", "bank": "ordinary", "scope": "local", "endpoint": "coordinator", "group": "0", "slot": "1"},
+      "input": {"measurement_valid": false, "temperature_valid": true, "count_valid": true, "count": 2},
+      "expect": {
+        "voltage_limit": {"status": "raw", "value": "500"},
+        "charge_limit": {"status": "raw", "value": "100"},
+        "discharge_limit": {"status": "raw", "value": "50"},
+        "status": {"status": "raw", "value": "65"},
+        "raw_state": {"status": "accepted", "value": "1"},
+        "charge_hint": {"status": "accepted", "value": "1"},
+        "fault_hint": {"status": "accepted", "value": "0"}
+      }
+    },
+    {
       "name": "gateway-aggregate-313-is-raw",
       "identifier": "0x313",
       "payload": "14beFFF6FFF664E4",

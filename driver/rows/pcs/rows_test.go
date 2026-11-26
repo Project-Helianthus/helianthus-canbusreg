@@ -689,6 +689,37 @@ func TestStandardTemperatureWithheldWithoutTemperatureValidity(t *testing.T) {
 	}
 }
 
+// TestStandardLimitRowsWithheldWithoutMeasurementValidity pins that an
+// unvalidated local 0x311 gives no typed limit: the voltage limit and the local
+// charge and discharge limits are withheld with their raw words kept, while the
+// hint bits, which the decoder gates on the local scope alone, stay accepted.
+// The gate is the decoder's measurement validity: removing it from the row makes
+// the limits accepted and fails this test and the parity vector that carries
+// measurement_valid false.
+func TestStandardLimitRowsWithheldWithoutMeasurementValidity(t *testing.T) {
+	_, res, _ := evaluateCase(t, caseNamed(t, "unmeasured-local-311-withholds-limits"))
+	withheld := map[string]uint64{
+		rowPrefix + "311.voltage_limit":          0x1388,
+		rowPrefix + "311.direct.charge_limit":    0x0064,
+		rowPrefix + "311.direct.discharge_limit": 0x0032,
+	}
+	for id, raw := range withheld {
+		nat := res.Rows[id].Native
+		if nat == nil || nat.Value != nil || nat.Unit != "" || nat.Reason != gateWithheld || nat.Disposition != dispositionRaw {
+			t.Fatalf("%s: unvalidated limit gives a typed value: %+v", id, nat)
+		}
+		if nat.Raw != raw {
+			t.Errorf("%s: raw %#x, want %#x", id, nat.Raw, raw)
+		}
+	}
+	for _, id := range []string{rowPrefix + "311.raw_state", rowPrefix + "311.charge_hint"} {
+		nat := res.Rows[id].Native
+		if nat == nil || nat.Reason != "" || nat.Value == nil || nat.Value.Quantity == nil {
+			t.Errorf("%s: hint withheld with measurement invalid (reason %v)", id, res.Rows[id].Reason)
+		}
+	}
+}
+
 // attributionOf evaluates one admitted vector and returns the attribution its
 // evaluation retains.
 func attributionOf(t *testing.T, c vectorCase) Attribution {

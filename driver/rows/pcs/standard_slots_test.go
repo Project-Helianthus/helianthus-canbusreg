@@ -4,9 +4,13 @@ import (
 	"encoding/hex"
 	"encoding/json"
 	"errors"
+	"go/ast"
+	"go/parser"
+	"go/token"
 	"math/big"
 	"os"
 	"reflect"
+	"regexp"
 	"strconv"
 	"strings"
 	"testing"
@@ -584,5 +588,43 @@ func TestSlotRowsRefuseNeighbouringIdentifierWrongLengthAndExtendedFormat(t *tes
 		if reason == "" || res.Rows != nil {
 			t.Errorf("%s: evaluated with reason %q and %d rows", name, reason, len(res.Rows))
 		}
+	}
+}
+
+// TestSlotAcceptanceFilterSelectsEverySlotTest keeps the focused acceptance
+// filter and the test names aligned: the filter is built from the names the
+// ticket requires, and each must be a test function of this file that the
+// filter selects. The bank-offset test carries its numbers spelled out, so a
+// filter written with digits would silently skip it.
+func TestSlotAcceptanceFilterSelectsEverySlotTest(t *testing.T) {
+	required := []string{
+		"TestSlotRowsMatchDecoder",
+		"TestSlotCurrentWordOfFourThousandIsZeroOnOrdinaryBankAndMinusSixHundredOnParallelBank",
+		"TestSlotCurrentAndSystemCurrentAreDistinctRowsOnOneSelection",
+		"TestSlotRowsRefuseUnpairedFlavorAndBank",
+		"TestSlotRowsKeepGroupAndSlotAbsentOrPresent",
+		"TestSlotRowsRefuseNeighbouringIdentifierWrongLengthAndExtendedFormat",
+	}
+	file, err := parser.ParseFile(token.NewFileSet(), "standard_slots_test.go", nil, 0)
+	if err != nil {
+		t.Fatal(err)
+	}
+	declared := map[string]bool{}
+	for _, d := range file.Decls {
+		if fn, ok := d.(*ast.FuncDecl); ok {
+			declared[fn.Name.Name] = true
+		}
+	}
+	filter := regexp.MustCompile(strings.Join(required, "|"))
+	for _, name := range required {
+		if !declared[name] {
+			t.Errorf("required test %s is not declared", name)
+		}
+		if got := filter.FindString(name); got != name {
+			t.Errorf("filter selects %q for %s", got, name)
+		}
+	}
+	if !declared["TestSlotAcceptanceFilterSelectsEverySlotTest"] {
+		t.Error("filter guard not declared")
 	}
 }

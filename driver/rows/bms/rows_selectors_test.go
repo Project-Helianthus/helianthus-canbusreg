@@ -429,10 +429,12 @@ func TestMonitorFamiliesMatchOnlyTheirOwnAddressedRows(t *testing.T) {
 				t.Fatalf("%s: row %s belongs to another family", v.name, id)
 			}
 		}
-		// The same bytes at another address. The BCU is the low byte of both
-		// forms and is varied for every frame; the BMU (bits 20 to 23) is varied
-		// for the module form too. Each variant must keep the family and must not
-		// give the frame any row through the table of the other address.
+		// The same bytes at another address, each address changed on its own. The
+		// BCU is the low byte of both forms and is varied for every frame; the BMU
+		// (bits 20 to 23) is varied for the module form too. Each variant runs
+		// through the production entry point, which runs the frame gate, so a gate
+		// that rejects another address fails here. The variant must keep the family,
+		// be admitted, and give exactly the family's rows, all at its own address.
 		flips := []uint32{0x1} // the BCU, the low byte of both forms
 		if v.id>>24 != 0x04 {
 			flips = append(flips, 0x00100000) // the BMU, bits 20 to 23 of the module form
@@ -447,8 +449,20 @@ func TestMonitorFamiliesMatchOnlyTheirOwnAddressedRows(t *testing.T) {
 			if got := evaluateSelectorTable(t, v, MonitorTable(other.id), roles); len(got) != 0 {
 				t.Fatalf("%s: the table of address %#x evaluated a frame of %#x: %d rows", v.name, other.id, v.id, len(got))
 			}
-			if got := evaluateSelectorTable(t, other, MonitorTable(other.id), roles); len(got) != len(own) {
-				t.Fatalf("%s: the table of its own address gives %d rows, want %d", v.name, len(got), len(own))
+			otherEvals, otherReason := other.evaluate(t, roles)
+			if otherReason != "" || len(otherEvals) != len(own) {
+				t.Fatalf("%s: address %#x gives %d rows with reason %q, its family has %d", v.name, other.id, len(otherEvals), otherReason, len(own))
+			}
+			atOther := map[string]bool{}
+			for _, row := range MonitorTable(other.id).Native {
+				if row.At.Identifier == other.id {
+					atOther[row.ID] = true
+				}
+			}
+			for id := range otherEvals {
+				if !atOther[id] || !own[strings.TrimPrefix(id, MonitorProfile+".")] {
+					t.Fatalf("%s: row %s is not a row of its family at address %#x", v.name, id, other.id)
+				}
 			}
 		}
 		for _, row := range MonitorTable(v.id).Native {

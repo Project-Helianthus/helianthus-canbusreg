@@ -1,0 +1,1600 @@
+{
+ "cases": [
+  {
+   "name": "legacy dictionary names the first block",
+   "family": "1850",
+   "payload": "0100008000000080",
+   "selection": {
+    "project": "QAAA",
+    "release": "0011",
+    "choice": "",
+    "group": "0",
+    "slot": "1",
+    "bank": "ordinary",
+    "source": "02",
+    "destination": "F4",
+    "direction": "module-to-coordinator",
+    "scope": "local"
+   },
+   "status": "accepted",
+   "faults": {
+    "block": 0,
+    "set": [
+     0,
+     31,
+     63
+    ],
+    "named": [
+     0,
+     1,
+     2,
+     3,
+     4,
+     5,
+     6,
+     7,
+     8,
+     9,
+     11,
+     12,
+     13,
+     14,
+     15,
+     16,
+     17,
+     20,
+     21,
+     22,
+     23,
+     30,
+     33,
+     34,
+     38,
+     39,
+     40,
+     41,
+     42,
+     44,
+     45,
+     52,
+     57,
+     58,
+     60,
+     61,
+     62
+    ]
+   },
+   "rows": {},
+   "absent": []
+  },
+  {
+   "name": "legacy dictionary leaves modern-only names raw",
+   "family": "1850",
+   "payload": "0000008008000000",
+   "selection": {
+    "project": "QAAA",
+    "release": "0011",
+    "choice": "",
+    "group": "0",
+    "slot": "1",
+    "bank": "ordinary",
+    "source": "02",
+    "destination": "F4",
+    "direction": "module-to-coordinator",
+    "scope": "local"
+   },
+   "status": "accepted",
+   "faults": {
+    "block": 0,
+    "set": [
+     31,
+     35
+    ],
+    "named": [
+     0,
+     1,
+     2,
+     3,
+     4,
+     5,
+     6,
+     7,
+     8,
+     9,
+     11,
+     12,
+     13,
+     14,
+     15,
+     16,
+     17,
+     20,
+     21,
+     22,
+     23,
+     30,
+     33,
+     34,
+     38,
+     39,
+     40,
+     41,
+     42,
+     44,
+     45,
+     52,
+     57,
+     58,
+     60,
+     61,
+     62
+    ]
+   },
+   "rows": {},
+   "absent": []
+  },
+  {
+   "name": "modern dictionary names the modern-only bits",
+   "family": "1850",
+   "payload": "0000008008000040",
+   "selection": {
+    "project": "QAAa",
+    "release": "9011",
+    "choice": "release11",
+    "group": "0",
+    "slot": "1",
+    "bank": "ordinary",
+    "source": "02",
+    "destination": "F4",
+    "direction": "module-to-coordinator",
+    "scope": "local"
+   },
+   "status": "accepted",
+   "faults": {
+    "block": 0,
+    "set": [
+     31,
+     35,
+     62
+    ],
+    "named": [
+     0,
+     1,
+     2,
+     3,
+     4,
+     5,
+     6,
+     7,
+     8,
+     9,
+     11,
+     12,
+     13,
+     14,
+     15,
+     16,
+     17,
+     20,
+     21,
+     22,
+     23,
+     30,
+     33,
+     34,
+     38,
+     39,
+     40,
+     41,
+     42,
+     44,
+     45,
+     52,
+     57,
+     58,
+     60,
+     61,
+     62,
+     31,
+     35
+    ]
+   },
+   "rows": {},
+   "absent": []
+  },
+  {
+   "name": "parallel bank with group and slot absent",
+   "family": "1850",
+   "payload": "0400000000000000",
+   "selection": {
+    "project": "QAAA",
+    "release": "0011",
+    "choice": "",
+    "group": "",
+    "slot": "",
+    "bank": "parallel",
+    "source": "0A",
+    "destination": "F4",
+    "direction": "module-to-coordinator",
+    "scope": "local"
+   },
+   "status": "accepted",
+   "faults": {
+    "block": 0,
+    "set": [
+     2
+    ],
+    "named": [
+     0,
+     1,
+     2,
+     3,
+     4,
+     5,
+     6,
+     7,
+     8,
+     9,
+     11,
+     12,
+     13,
+     14,
+     15,
+     16,
+     17,
+     20,
+     21,
+     22,
+     23,
+     30,
+     33,
+     34,
+     38,
+     39,
+     40,
+     41,
+     42,
+     44,
+     45,
+     52,
+     57,
+     58,
+     60,
+     61,
+     62
+    ]
+   },
+   "rows": {},
+   "absent": []
+  },
+  {
+   "name": "selection without a numeric dictionary keeps every fault bit raw",
+   "family": "1850",
+   "payload": "0200000000010000",
+   "selection": {
+    "project": "QAAA",
+    "release": "0007",
+    "choice": "",
+    "group": "",
+    "slot": "",
+    "bank": "ordinary",
+    "source": "02",
+    "destination": "F4",
+    "direction": "module-to-coordinator",
+    "scope": "local"
+   },
+   "status": "accepted",
+   "faults": {
+    "block": 0,
+    "set": [
+     1,
+     40
+    ],
+    "named": []
+   },
+   "rows": {},
+   "absent": []
+  },
+  {
+   "name": "second block under the modern dictionary",
+   "family": "1851",
+   "payload": "0100002840000000",
+   "selection": {
+    "project": "QAAa",
+    "release": "9011",
+    "choice": "release11",
+    "group": "0",
+    "slot": "1",
+    "bank": "ordinary",
+    "source": "02",
+    "destination": "F4",
+    "direction": "module-to-coordinator",
+    "scope": "local"
+   },
+   "status": "accepted",
+   "faults": {
+    "block": 1,
+    "set": [
+     91,
+     93,
+     102,
+     64
+    ],
+    "named": [
+     91,
+     93,
+     102,
+     103
+    ]
+   },
+   "rows": {},
+   "absent": []
+  },
+  {
+   "name": "second block under the legacy dictionary",
+   "family": "1851",
+   "payload": "0100002840000000",
+   "selection": {
+    "project": "QAAA",
+    "release": "0011",
+    "choice": "",
+    "group": "0",
+    "slot": "1",
+    "bank": "ordinary",
+    "source": "02",
+    "destination": "F4",
+    "direction": "module-to-coordinator",
+    "scope": "local"
+   },
+   "status": "accepted",
+   "faults": {
+    "block": 1,
+    "set": [
+     91,
+     93,
+     102,
+     64
+    ],
+    "named": []
+   },
+   "rows": {},
+   "absent": []
+  },
+  {
+   "name": "third block under the modern dictionary",
+   "family": "1852",
+   "payload": "ef00000000000080",
+   "selection": {
+    "project": "QAAa",
+    "release": "9011",
+    "choice": "release11",
+    "group": "0",
+    "slot": "1",
+    "bank": "ordinary",
+    "source": "02",
+    "destination": "F4",
+    "direction": "module-to-coordinator",
+    "scope": "local"
+   },
+   "status": "accepted",
+   "faults": {
+    "block": 2,
+    "set": [
+     128,
+     129,
+     130,
+     131,
+     133,
+     134,
+     135,
+     191
+    ],
+    "named": [
+     129,
+     130,
+     128,
+     131,
+     133,
+     134,
+     135
+    ]
+   },
+   "rows": {},
+   "absent": []
+  },
+  {
+   "name": "third block under the legacy dictionary",
+   "family": "1852",
+   "payload": "ef00000000000080",
+   "selection": {
+    "project": "QAAA",
+    "release": "0011",
+    "choice": "",
+    "group": "0",
+    "slot": "1",
+    "bank": "ordinary",
+    "source": "02",
+    "destination": "F4",
+    "direction": "module-to-coordinator",
+    "scope": "local"
+   },
+   "status": "accepted",
+   "faults": {
+    "block": 2,
+    "set": [
+     128,
+     129,
+     130,
+     131,
+     133,
+     134,
+     135,
+     191
+    ],
+    "named": [
+     129,
+     130
+    ]
+   },
+   "rows": {},
+   "absent": []
+  },
+  {
+   "name": "third block on a group the page gives three blocks",
+   "family": "1852",
+   "payload": "0002000000000000",
+   "selection": {
+    "project": "QAAA",
+    "release": "0007",
+    "choice": "",
+    "group": "",
+    "slot": "",
+    "bank": "ordinary",
+    "source": "02",
+    "destination": "F4",
+    "direction": "module-to-coordinator",
+    "scope": "local"
+   },
+   "status": "accepted",
+   "faults": {
+    "block": 2,
+    "set": [
+     137
+    ],
+    "named": []
+   },
+   "rows": {},
+   "absent": []
+  },
+  {
+   "name": "second block is absent on the first group",
+   "family": "1851",
+   "payload": "0200000000000000",
+   "selection": {
+    "project": "QAAA",
+    "release": "0002",
+    "choice": "",
+    "group": "",
+    "slot": "",
+    "bank": "ordinary",
+    "source": "02",
+    "destination": "F4",
+    "direction": "module-to-coordinator",
+    "scope": "local"
+   },
+   "status": "unsupported",
+   "faults": null,
+   "rows": {},
+   "absent": []
+  },
+  {
+   "name": "third block is absent on a two-block group",
+   "family": "1852",
+   "payload": "0200000000000000",
+   "selection": {
+    "project": "QAAA",
+    "release": "0006",
+    "choice": "",
+    "group": "",
+    "slot": "",
+    "bank": "ordinary",
+    "source": "02",
+    "destination": "F4",
+    "direction": "module-to-coordinator",
+    "scope": "local"
+   },
+   "status": "unsupported",
+   "faults": null,
+   "rows": {},
+   "absent": []
+  },
+  {
+   "name": "third block is absent on the second group",
+   "family": "1852",
+   "payload": "0200000000000000",
+   "selection": {
+    "project": "QAAA",
+    "release": "0005",
+    "choice": "",
+    "group": "",
+    "slot": "",
+    "bank": "ordinary",
+    "source": "02",
+    "destination": "F4",
+    "direction": "module-to-coordinator",
+    "scope": "local"
+   },
+   "status": "unsupported",
+   "faults": null,
+   "rows": {},
+   "absent": []
+  },
+  {
+   "name": "first block is carried by the first group",
+   "family": "1850",
+   "payload": "8000000000000000",
+   "selection": {
+    "project": "QAAA",
+    "release": "0002",
+    "choice": "",
+    "group": "",
+    "slot": "",
+    "bank": "ordinary",
+    "source": "02",
+    "destination": "F4",
+    "direction": "module-to-coordinator",
+    "scope": "local"
+   },
+   "status": "accepted",
+   "faults": {
+    "block": 0,
+    "set": [
+     7
+    ],
+    "named": []
+   },
+   "rows": {},
+   "absent": []
+  },
+  {
+   "name": "second block is carried by the second group",
+   "family": "1851",
+   "payload": "8000000000000000",
+   "selection": {
+    "project": "QAAA",
+    "release": "0005",
+    "choice": "",
+    "group": "",
+    "slot": "",
+    "bank": "ordinary",
+    "source": "02",
+    "destination": "F4",
+    "direction": "module-to-coordinator",
+    "scope": "local"
+   },
+   "status": "accepted",
+   "faults": {
+    "block": 1,
+    "set": [
+     71
+    ],
+    "named": []
+   },
+   "rows": {},
+   "absent": []
+  },
+  {
+   "name": "neighbouring family above the fault blocks",
+   "family": "1854",
+   "payload": "0200000000000000",
+   "selection": {
+    "project": "QAAA",
+    "release": "0011",
+    "choice": "",
+    "group": "0",
+    "slot": "1",
+    "bank": "ordinary",
+    "source": "02",
+    "destination": "F4",
+    "direction": "module-to-coordinator",
+    "scope": "local"
+   },
+   "status": "unsupported",
+   "faults": null,
+   "rows": {},
+   "absent": []
+  },
+  {
+   "name": "selected words in the modern dictionary resolve to indices",
+   "family": "1853",
+   "payload": "a104000001000000",
+   "selection": {
+    "project": "QAAa",
+    "release": "9011",
+    "choice": "release11",
+    "group": "0",
+    "slot": "1",
+    "bank": "ordinary",
+    "source": "02",
+    "destination": "F4",
+    "direction": "module-to-coordinator",
+    "scope": "local"
+   },
+   "status": "accepted",
+   "faults": null,
+   "rows": {
+    "growatt.bms.link.selected_a": {
+     "value": "1185",
+     "unit": "",
+     "disposition": "accepted",
+     "raw": "1185",
+     "grade": "Proven"
+    },
+    "growatt.bms.link.selected_b": {
+     "value": "0",
+     "unit": "",
+     "disposition": "empty",
+     "raw": "0",
+     "grade": "Proven"
+    },
+    "growatt.bms.link.selected_a_index": {
+     "value": "131",
+     "unit": "",
+     "disposition": "accepted",
+     "raw": "1185",
+     "grade": "Proven"
+    },
+    "growatt.bms.link.selected_b_index": {
+     "value": "",
+     "unit": "",
+     "disposition": "empty",
+     "raw": "0",
+     "grade": "Proven"
+    },
+    "growatt.bms.link.1853.reserved_4": {
+     "value": "1",
+     "unit": "",
+     "disposition": "invalid",
+     "raw": "1",
+     "grade": "Proven"
+    },
+    "growatt.bms.link.1853.reserved_5": {
+     "value": "0",
+     "unit": "",
+     "disposition": "accepted",
+     "raw": "0",
+     "grade": "Proven"
+    },
+    "growatt.bms.link.1853.reserved_6": {
+     "value": "0",
+     "unit": "",
+     "disposition": "accepted",
+     "raw": "0",
+     "grade": "Proven"
+    },
+    "growatt.bms.link.1853.reserved_7": {
+     "value": "0",
+     "unit": "",
+     "disposition": "accepted",
+     "raw": "0",
+     "grade": "Proven"
+    }
+   },
+   "absent": []
+  },
+  {
+   "name": "empty selected word and nonzero reserved bytes",
+   "family": "1853",
+   "payload": "0000e80301020304",
+   "selection": {
+    "project": "QAAa",
+    "release": "9011",
+    "choice": "release11",
+    "group": "0",
+    "slot": "1",
+    "bank": "ordinary",
+    "source": "02",
+    "destination": "F4",
+    "direction": "module-to-coordinator",
+    "scope": "local"
+   },
+   "status": "accepted",
+   "faults": null,
+   "rows": {
+    "growatt.bms.link.selected_a": {
+     "value": "0",
+     "unit": "",
+     "disposition": "empty",
+     "raw": "0",
+     "grade": "Proven"
+    },
+    "growatt.bms.link.selected_b": {
+     "value": "1000",
+     "unit": "",
+     "disposition": "accepted",
+     "raw": "1000",
+     "grade": "Proven"
+    },
+    "growatt.bms.link.selected_a_index": {
+     "value": "",
+     "unit": "",
+     "disposition": "empty",
+     "raw": "0",
+     "grade": "Proven"
+    },
+    "growatt.bms.link.selected_b_index": {
+     "value": "0",
+     "unit": "",
+     "disposition": "accepted",
+     "raw": "1000",
+     "grade": "Proven"
+    },
+    "growatt.bms.link.1853.reserved_4": {
+     "value": "1",
+     "unit": "",
+     "disposition": "invalid",
+     "raw": "1",
+     "grade": "Proven"
+    },
+    "growatt.bms.link.1853.reserved_5": {
+     "value": "2",
+     "unit": "",
+     "disposition": "invalid",
+     "raw": "2",
+     "grade": "Proven"
+    },
+    "growatt.bms.link.1853.reserved_6": {
+     "value": "3",
+     "unit": "",
+     "disposition": "invalid",
+     "raw": "3",
+     "grade": "Proven"
+    },
+    "growatt.bms.link.1853.reserved_7": {
+     "value": "4",
+     "unit": "",
+     "disposition": "invalid",
+     "raw": "4",
+     "grade": "Proven"
+    }
+   },
+   "absent": []
+  },
+  {
+   "name": "selected words in the legacy dictionary are packed decimal digits",
+   "family": "1853",
+   "payload": "0010331100000000",
+   "selection": {
+    "project": "QAAA",
+    "release": "0011",
+    "choice": "",
+    "group": "0",
+    "slot": "1",
+    "bank": "ordinary",
+    "source": "02",
+    "destination": "F4",
+    "direction": "module-to-coordinator",
+    "scope": "local"
+   },
+   "status": "accepted",
+   "faults": null,
+   "rows": {
+    "growatt.bms.link.selected_a": {
+     "value": "4096",
+     "unit": "",
+     "disposition": "accepted",
+     "raw": "4096",
+     "grade": "Proven"
+    },
+    "growatt.bms.link.selected_b": {
+     "value": "4403",
+     "unit": "",
+     "disposition": "accepted",
+     "raw": "4403",
+     "grade": "Proven"
+    },
+    "growatt.bms.link.selected_a_index": {
+     "value": "0",
+     "unit": "",
+     "disposition": "accepted",
+     "raw": "4096",
+     "grade": "Proven"
+    },
+    "growatt.bms.link.selected_b_index": {
+     "value": "133",
+     "unit": "",
+     "disposition": "accepted",
+     "raw": "4403",
+     "grade": "Proven"
+    },
+    "growatt.bms.link.1853.reserved_4": {
+     "value": "0",
+     "unit": "",
+     "disposition": "accepted",
+     "raw": "0",
+     "grade": "Proven"
+    },
+    "growatt.bms.link.1853.reserved_5": {
+     "value": "0",
+     "unit": "",
+     "disposition": "accepted",
+     "raw": "0",
+     "grade": "Proven"
+    },
+    "growatt.bms.link.1853.reserved_6": {
+     "value": "0",
+     "unit": "",
+     "disposition": "accepted",
+     "raw": "0",
+     "grade": "Proven"
+    },
+    "growatt.bms.link.1853.reserved_7": {
+     "value": "0",
+     "unit": "",
+     "disposition": "accepted",
+     "raw": "0",
+     "grade": "Proven"
+    }
+   },
+   "absent": []
+  },
+  {
+   "name": "a selected word outside the dictionary keeps its word and has no index",
+   "family": "1853",
+   "payload": "6b04ffff00000000",
+   "selection": {
+    "project": "QAAa",
+    "release": "9011",
+    "choice": "release11",
+    "group": "0",
+    "slot": "1",
+    "bank": "ordinary",
+    "source": "02",
+    "destination": "F4",
+    "direction": "module-to-coordinator",
+    "scope": "local"
+   },
+   "status": "accepted",
+   "faults": null,
+   "rows": {
+    "growatt.bms.link.selected_a": {
+     "value": "1131",
+     "unit": "",
+     "disposition": "accepted",
+     "raw": "1131",
+     "grade": "Proven"
+    },
+    "growatt.bms.link.selected_b": {
+     "value": "65535",
+     "unit": "",
+     "disposition": "accepted",
+     "raw": "65535",
+     "grade": "Proven"
+    },
+    "growatt.bms.link.selected_a_index": {
+     "value": "",
+     "unit": "",
+     "disposition": "unknown",
+     "raw": "1131",
+     "grade": "Proven"
+    },
+    "growatt.bms.link.selected_b_index": {
+     "value": "",
+     "unit": "",
+     "disposition": "unknown",
+     "raw": "65535",
+     "grade": "Proven"
+    },
+    "growatt.bms.link.1853.reserved_4": {
+     "value": "0",
+     "unit": "",
+     "disposition": "accepted",
+     "raw": "0",
+     "grade": "Proven"
+    },
+    "growatt.bms.link.1853.reserved_5": {
+     "value": "0",
+     "unit": "",
+     "disposition": "accepted",
+     "raw": "0",
+     "grade": "Proven"
+    },
+    "growatt.bms.link.1853.reserved_6": {
+     "value": "0",
+     "unit": "",
+     "disposition": "accepted",
+     "raw": "0",
+     "grade": "Proven"
+    },
+    "growatt.bms.link.1853.reserved_7": {
+     "value": "0",
+     "unit": "",
+     "disposition": "accepted",
+     "raw": "0",
+     "grade": "Proven"
+    }
+   },
+   "absent": []
+  },
+  {
+   "name": "selected words are absent on a group without the numeric dictionary",
+   "family": "1853",
+   "payload": "a104000000000000",
+   "selection": {
+    "project": "QAAA",
+    "release": "0007",
+    "choice": "",
+    "group": "",
+    "slot": "",
+    "bank": "ordinary",
+    "source": "02",
+    "destination": "F4",
+    "direction": "module-to-coordinator",
+    "scope": "local"
+   },
+   "status": "unsupported",
+   "faults": null,
+   "rows": {},
+   "absent": []
+  },
+  {
+   "name": "selected words are absent on a release without the modern choice",
+   "family": "1853",
+   "payload": "a104000000000000",
+   "selection": {
+    "project": "QAAa",
+    "release": "9011",
+    "choice": "legacy19",
+    "group": "",
+    "slot": "",
+    "bank": "ordinary",
+    "source": "02",
+    "destination": "F4",
+    "direction": "module-to-coordinator",
+    "scope": "local"
+   },
+   "status": "unsupported",
+   "faults": null,
+   "rows": {},
+   "absent": []
+  },
+  {
+   "name": "module state frame on the first release-eleven path ignores the additional state byte",
+   "family": "1861",
+   "payload": "010203ff00000007",
+   "selection": {
+    "project": "QAAA",
+    "release": "0011",
+    "choice": "",
+    "group": "0",
+    "slot": "1",
+    "bank": "ordinary",
+    "source": "02",
+    "destination": "F4",
+    "direction": "module-to-coordinator",
+    "scope": "local"
+   },
+   "status": "accepted",
+   "faults": null,
+   "rows": {
+    "growatt.bms.link.1861.state_0": {
+     "value": "1",
+     "unit": "",
+     "disposition": "raw",
+     "raw": "1",
+     "grade": "Unknown"
+    },
+    "growatt.bms.link.1861.state_1": {
+     "value": "2",
+     "unit": "",
+     "disposition": "raw",
+     "raw": "2",
+     "grade": "Unknown"
+    },
+    "growatt.bms.link.1861.state_2": {
+     "value": "3",
+     "unit": "",
+     "disposition": "raw",
+     "raw": "3",
+     "grade": "Unknown"
+    },
+    "growatt.bms.link.1861.counter": {
+     "value": "255",
+     "unit": "",
+     "disposition": "accepted",
+     "raw": "255",
+     "grade": "Proven"
+    },
+    "growatt.bms.link.1861.reserved_4": {
+     "value": "0",
+     "unit": "",
+     "disposition": "accepted",
+     "raw": "0",
+     "grade": "Proven"
+    },
+    "growatt.bms.link.1861.reserved_5": {
+     "value": "0",
+     "unit": "",
+     "disposition": "accepted",
+     "raw": "0",
+     "grade": "Proven"
+    },
+    "growatt.bms.link.1861.reserved_6": {
+     "value": "0",
+     "unit": "",
+     "disposition": "accepted",
+     "raw": "0",
+     "grade": "Proven"
+    },
+    "growatt.bms.link.1861.additional_state": {
+     "value": "7",
+     "unit": "",
+     "disposition": "ignored",
+     "raw": "7",
+     "grade": "Unknown"
+    }
+   },
+   "absent": []
+  },
+  {
+   "name": "module state frame on the modern path keeps the additional state byte raw",
+   "family": "1861",
+   "payload": "010203fe00000007",
+   "selection": {
+    "project": "QAAa",
+    "release": "9011",
+    "choice": "release11",
+    "group": "0",
+    "slot": "1",
+    "bank": "ordinary",
+    "source": "02",
+    "destination": "F4",
+    "direction": "module-to-coordinator",
+    "scope": "local"
+   },
+   "status": "accepted",
+   "faults": null,
+   "rows": {
+    "growatt.bms.link.1861.state_0": {
+     "value": "1",
+     "unit": "",
+     "disposition": "raw",
+     "raw": "1",
+     "grade": "Unknown"
+    },
+    "growatt.bms.link.1861.state_1": {
+     "value": "2",
+     "unit": "",
+     "disposition": "raw",
+     "raw": "2",
+     "grade": "Unknown"
+    },
+    "growatt.bms.link.1861.state_2": {
+     "value": "3",
+     "unit": "",
+     "disposition": "raw",
+     "raw": "3",
+     "grade": "Unknown"
+    },
+    "growatt.bms.link.1861.counter": {
+     "value": "254",
+     "unit": "",
+     "disposition": "accepted",
+     "raw": "254",
+     "grade": "Proven"
+    },
+    "growatt.bms.link.1861.reserved_4": {
+     "value": "0",
+     "unit": "",
+     "disposition": "accepted",
+     "raw": "0",
+     "grade": "Proven"
+    },
+    "growatt.bms.link.1861.reserved_5": {
+     "value": "0",
+     "unit": "",
+     "disposition": "accepted",
+     "raw": "0",
+     "grade": "Proven"
+    },
+    "growatt.bms.link.1861.reserved_6": {
+     "value": "0",
+     "unit": "",
+     "disposition": "accepted",
+     "raw": "0",
+     "grade": "Proven"
+    },
+    "growatt.bms.link.1861.additional_state": {
+     "value": "7",
+     "unit": "",
+     "disposition": "raw",
+     "raw": "7",
+     "grade": "Unknown"
+    }
+   },
+   "absent": []
+  },
+  {
+   "name": "module state frame with nonzero reserved bytes marks them invalid",
+   "family": "1861",
+   "payload": "0908070001020305",
+   "selection": {
+    "project": "QAAB",
+    "release": "0006",
+    "choice": "",
+    "group": "",
+    "slot": "",
+    "bank": "ordinary",
+    "source": "02",
+    "destination": "F4",
+    "direction": "module-to-coordinator",
+    "scope": "local"
+   },
+   "status": "accepted",
+   "faults": null,
+   "rows": {
+    "growatt.bms.link.1861.state_0": {
+     "value": "9",
+     "unit": "",
+     "disposition": "raw",
+     "raw": "9",
+     "grade": "Unknown"
+    },
+    "growatt.bms.link.1861.state_1": {
+     "value": "8",
+     "unit": "",
+     "disposition": "raw",
+     "raw": "8",
+     "grade": "Unknown"
+    },
+    "growatt.bms.link.1861.state_2": {
+     "value": "7",
+     "unit": "",
+     "disposition": "raw",
+     "raw": "7",
+     "grade": "Unknown"
+    },
+    "growatt.bms.link.1861.counter": {
+     "value": "0",
+     "unit": "",
+     "disposition": "accepted",
+     "raw": "0",
+     "grade": "Proven"
+    },
+    "growatt.bms.link.1861.reserved_4": {
+     "value": "1",
+     "unit": "",
+     "disposition": "invalid",
+     "raw": "1",
+     "grade": "Proven"
+    },
+    "growatt.bms.link.1861.reserved_5": {
+     "value": "2",
+     "unit": "",
+     "disposition": "invalid",
+     "raw": "2",
+     "grade": "Proven"
+    },
+    "growatt.bms.link.1861.reserved_6": {
+     "value": "3",
+     "unit": "",
+     "disposition": "invalid",
+     "raw": "3",
+     "grade": "Proven"
+    },
+    "growatt.bms.link.1861.additional_state": {
+     "value": "5",
+     "unit": "",
+     "disposition": "raw",
+     "raw": "5",
+     "grade": "Unknown"
+    }
+   },
+   "absent": []
+  },
+  {
+   "name": "module state frame is absent below the state groups",
+   "family": "1861",
+   "payload": "0102030400000000",
+   "selection": {
+    "project": "QAAA",
+    "release": "0006",
+    "choice": "",
+    "group": "",
+    "slot": "",
+    "bank": "ordinary",
+    "source": "02",
+    "destination": "F4",
+    "direction": "module-to-coordinator",
+    "scope": "local"
+   },
+   "status": "unsupported",
+   "faults": null,
+   "rows": {},
+   "absent": []
+  },
+  {
+   "name": "monitor state frame on the first release-eleven path",
+   "family": "1869",
+   "payload": "0102033412785609",
+   "selection": {
+    "project": "QAAA",
+    "release": "0011",
+    "choice": "",
+    "group": "",
+    "slot": "",
+    "bank": "ordinary",
+    "source": "02",
+    "destination": "F5",
+    "direction": "module-to-coordinator",
+    "scope": "local"
+   },
+   "status": "accepted",
+   "faults": null,
+   "rows": {
+    "growatt.bms.link.1869.state_0": {
+     "value": "1",
+     "unit": "",
+     "disposition": "raw",
+     "raw": "1",
+     "grade": "Unknown"
+    },
+    "growatt.bms.link.1869.state_1": {
+     "value": "2",
+     "unit": "",
+     "disposition": "raw",
+     "raw": "2",
+     "grade": "Unknown"
+    },
+    "growatt.bms.link.1869.state_2": {
+     "value": "3",
+     "unit": "",
+     "disposition": "raw",
+     "raw": "3",
+     "grade": "Unknown"
+    },
+    "growatt.bms.link.word_3": {
+     "value": "4660",
+     "unit": "",
+     "disposition": "raw",
+     "raw": "4660",
+     "grade": "Unknown"
+    },
+    "growatt.bms.link.word_5": {
+     "value": "22136",
+     "unit": "",
+     "disposition": "raw",
+     "raw": "22136",
+     "grade": "Unknown"
+    },
+    "growatt.bms.link.1869.additional_state": {
+     "value": "9",
+     "unit": "",
+     "disposition": "ignored",
+     "raw": "9",
+     "grade": "Unknown"
+    }
+   },
+   "absent": []
+  },
+  {
+   "name": "monitor state frame on the modern path",
+   "family": "1869",
+   "payload": "0102033412785609",
+   "selection": {
+    "project": "QAAa",
+    "release": "9011",
+    "choice": "release11",
+    "group": "",
+    "slot": "",
+    "bank": "ordinary",
+    "source": "02",
+    "destination": "F5",
+    "direction": "module-to-coordinator",
+    "scope": "local"
+   },
+   "status": "accepted",
+   "faults": null,
+   "rows": {
+    "growatt.bms.link.1869.state_0": {
+     "value": "1",
+     "unit": "",
+     "disposition": "raw",
+     "raw": "1",
+     "grade": "Unknown"
+    },
+    "growatt.bms.link.1869.state_1": {
+     "value": "2",
+     "unit": "",
+     "disposition": "raw",
+     "raw": "2",
+     "grade": "Unknown"
+    },
+    "growatt.bms.link.1869.state_2": {
+     "value": "3",
+     "unit": "",
+     "disposition": "raw",
+     "raw": "3",
+     "grade": "Unknown"
+    },
+    "growatt.bms.link.word_3": {
+     "value": "4660",
+     "unit": "",
+     "disposition": "raw",
+     "raw": "4660",
+     "grade": "Unknown"
+    },
+    "growatt.bms.link.word_5": {
+     "value": "22136",
+     "unit": "",
+     "disposition": "raw",
+     "raw": "22136",
+     "grade": "Unknown"
+    },
+    "growatt.bms.link.1869.additional_state": {
+     "value": "9",
+     "unit": "",
+     "disposition": "raw",
+     "raw": "9",
+     "grade": "Unknown"
+    }
+   },
+   "absent": []
+  },
+  {
+   "name": "monitor state frame on a seven-group release",
+   "family": "1869",
+   "payload": "0102033412785609",
+   "selection": {
+    "project": "QAAB",
+    "release": "0006",
+    "choice": "",
+    "group": "",
+    "slot": "",
+    "bank": "ordinary",
+    "source": "02",
+    "destination": "F5",
+    "direction": "module-to-coordinator",
+    "scope": "local"
+   },
+   "status": "accepted",
+   "faults": null,
+   "rows": {
+    "growatt.bms.link.1869.state_0": {
+     "value": "1",
+     "unit": "",
+     "disposition": "raw",
+     "raw": "1",
+     "grade": "Unknown"
+    },
+    "growatt.bms.link.1869.state_1": {
+     "value": "2",
+     "unit": "",
+     "disposition": "raw",
+     "raw": "2",
+     "grade": "Unknown"
+    },
+    "growatt.bms.link.1869.state_2": {
+     "value": "3",
+     "unit": "",
+     "disposition": "raw",
+     "raw": "3",
+     "grade": "Unknown"
+    },
+    "growatt.bms.link.word_3": {
+     "value": "4660",
+     "unit": "",
+     "disposition": "raw",
+     "raw": "4660",
+     "grade": "Unknown"
+    },
+    "growatt.bms.link.word_5": {
+     "value": "22136",
+     "unit": "",
+     "disposition": "raw",
+     "raw": "22136",
+     "grade": "Unknown"
+    },
+    "growatt.bms.link.1869.additional_state": {
+     "value": "9",
+     "unit": "",
+     "disposition": "raw",
+     "raw": "9",
+     "grade": "Unknown"
+    }
+   },
+   "absent": []
+  },
+  {
+   "name": "coordinator state frame keeps the coordinator prefix on the modern path",
+   "family": "1869",
+   "payload": "0102033412785609",
+   "selection": {
+    "project": "QAAa",
+    "release": "9011",
+    "choice": "release11",
+    "group": "",
+    "slot": "",
+    "bank": "ordinary",
+    "source": "F4",
+    "destination": "DF",
+    "direction": "coordinator-to-module",
+    "scope": "aggregate"
+   },
+   "status": "accepted",
+   "faults": null,
+   "rows": {
+    "growatt.bms.link.coordinator_state_0": {
+     "value": "1",
+     "unit": "",
+     "disposition": "raw",
+     "raw": "1",
+     "grade": "Unknown"
+    },
+    "growatt.bms.link.coordinator_state_1": {
+     "value": "2",
+     "unit": "",
+     "disposition": "raw",
+     "raw": "2",
+     "grade": "Unknown"
+    },
+    "growatt.bms.link.coordinator_state_2": {
+     "value": "3",
+     "unit": "",
+     "disposition": "raw",
+     "raw": "3",
+     "grade": "Unknown"
+    },
+    "growatt.bms.link.coordinator_word_3": {
+     "value": "4660",
+     "unit": "",
+     "disposition": "raw",
+     "raw": "4660",
+     "grade": "Unknown"
+    },
+    "growatt.bms.link.coordinator_word_5": {
+     "value": "22136",
+     "unit": "",
+     "disposition": "raw",
+     "raw": "22136",
+     "grade": "Unknown"
+    },
+    "growatt.bms.link.coordinator_additional_state": {
+     "value": "9",
+     "unit": "",
+     "disposition": "raw",
+     "raw": "9",
+     "grade": "Unknown"
+    }
+   },
+   "absent": []
+  },
+  {
+   "name": "coordinator state frame on the first release-eleven path",
+   "family": "1869",
+   "payload": "0102033412785609",
+   "selection": {
+    "project": "QAAA",
+    "release": "0011",
+    "choice": "",
+    "group": "",
+    "slot": "",
+    "bank": "ordinary",
+    "source": "F4",
+    "destination": "DF",
+    "direction": "coordinator-to-module",
+    "scope": "aggregate"
+   },
+   "status": "accepted",
+   "faults": null,
+   "rows": {
+    "growatt.bms.link.coordinator_state_0": {
+     "value": "1",
+     "unit": "",
+     "disposition": "raw",
+     "raw": "1",
+     "grade": "Unknown"
+    },
+    "growatt.bms.link.coordinator_state_1": {
+     "value": "2",
+     "unit": "",
+     "disposition": "raw",
+     "raw": "2",
+     "grade": "Unknown"
+    },
+    "growatt.bms.link.coordinator_state_2": {
+     "value": "3",
+     "unit": "",
+     "disposition": "raw",
+     "raw": "3",
+     "grade": "Unknown"
+    },
+    "growatt.bms.link.coordinator_word_3": {
+     "value": "4660",
+     "unit": "",
+     "disposition": "raw",
+     "raw": "4660",
+     "grade": "Unknown"
+    },
+    "growatt.bms.link.coordinator_word_5": {
+     "value": "22136",
+     "unit": "",
+     "disposition": "raw",
+     "raw": "22136",
+     "grade": "Unknown"
+    },
+    "growatt.bms.link.coordinator_additional_state": {
+     "value": "9",
+     "unit": "",
+     "disposition": "ignored",
+     "raw": "9",
+     "grade": "Unknown"
+    }
+   },
+   "absent": []
+  },
+  {
+   "name": "state frame to the module destination is not a monitor frame",
+   "family": "1869",
+   "payload": "0102033412785609",
+   "selection": {
+    "project": "QAAa",
+    "release": "9011",
+    "choice": "release11",
+    "group": "0",
+    "slot": "1",
+    "bank": "ordinary",
+    "source": "02",
+    "destination": "F4",
+    "direction": "module-to-coordinator",
+    "scope": "local"
+   },
+   "status": "unsupported",
+   "faults": null,
+   "rows": {},
+   "absent": []
+  },
+  {
+   "name": "coordinator route to the monitor destination is refused",
+   "family": "1869",
+   "payload": "0102033412785609",
+   "selection": {
+    "project": "QAAa",
+    "release": "9011",
+    "choice": "release11",
+    "group": "",
+    "slot": "",
+    "bank": "ordinary",
+    "source": "F4",
+    "destination": "F5",
+    "direction": "coordinator-to-module",
+    "scope": "aggregate"
+   },
+   "status": "invalid",
+   "faults": null,
+   "rows": {},
+   "absent": []
+  },
+  {
+   "name": "neighbouring family below the state frames",
+   "family": "1860",
+   "payload": "0102033412785609",
+   "selection": {
+    "project": "QAAa",
+    "release": "9011",
+    "choice": "release11",
+    "group": "0",
+    "slot": "1",
+    "bank": "ordinary",
+    "source": "02",
+    "destination": "F4",
+    "direction": "module-to-coordinator",
+    "scope": "local"
+   },
+   "status": "unsupported",
+   "faults": null,
+   "rows": {},
+   "absent": []
+  }
+ ]
+}

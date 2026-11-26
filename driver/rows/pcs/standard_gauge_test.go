@@ -625,3 +625,89 @@ func TestGaugeRetainedFaultBitDispositionFollowsDecoder(t *testing.T) {
 		t.Fatal("no retained fault bit is accepted by the decoder under the named selection")
 	}
 }
+
+// TestGaugeParallelBankFramesKeepEveryDecoderField replays the admitted QAAB0002
+// parallel-bank frames 0x316, 0x317 and 0x318. The decoder emits seven, eight and
+// eight fields there, each raw, and every field must have one applying row under
+// the parallel identifiers with the same raw word and the raw disposition.
+func TestGaugeParallelBankFramesKeepEveryDecoderField(t *testing.T) {
+	for _, tc := range []struct {
+		name   string
+		fields int
+	}{
+		{"parallel-316-l6-raw-at-l2-positions", 7},
+		{"parallel-317-other-soh-and-slot", 8},
+		{"parallel-318-other-retained-bytes", 8},
+	} {
+		t.Run(tc.name, func(t *testing.T) {
+			c := gaugeCaseNamed(t, tc.name)
+			if c.Selection.Flavor != "pcs-parallel" {
+				t.Fatalf("%s is not a parallel-bank vector", tc.name)
+			}
+			s, in, frame := buildGauge(t, c)
+			r := canbusreg.DecodePCSGauge(s, in)
+			if r.Status != "decoded" || len(r.Fields) != tc.fields {
+				t.Fatalf("decoder status %q with %d fields, want %d", r.Status, len(r.Fields), tc.fields)
+			}
+			res, reason, err := EvaluateGauge(s, in)
+			if err != nil || reason != "" {
+				t.Fatalf("evaluate refused: %v %v", reason, err)
+			}
+			applied := 0
+			for id, ev := range res.Rows {
+				if ev.Reason != roweval.ReasonNoMatch {
+					if !strings.HasPrefix(id, "growatt.bms.pcs.parallel.") {
+						t.Errorf("%s applies on the parallel bank", id)
+					}
+					applied++
+				}
+			}
+			if applied != tc.fields {
+				t.Errorf("%d rows apply, want %d", applied, tc.fields)
+			}
+			for name, df := range r.Fields {
+				id := ""
+				for candidate, ev := range res.Rows {
+					if ev.Reason != roweval.ReasonNoMatch && fieldOf(candidate) == name {
+						id = candidate
+					}
+				}
+				if id == "" {
+					t.Errorf("%s: no parallel row applies", name)
+					continue
+				}
+				checkGaugeField(t, c.Name, name, df, gaugeRowsByID()[id], gaugeGated()[id], res.Rows[id].Native, frame)
+			}
+		})
+	}
+}
+
+// TestGaugeParallelL6CapacityAndCyclesStayRawUnderParallelBank checks that the
+// L6 words at the L2 byte positions keep their raw evidence on the parallel bank,
+// under the parallel L6 identifiers, as raw words with no unit and no L2 capacity
+// or cycles name.
+func TestGaugeParallelBankSixthLayoutWordsStayRaw(t *testing.T) {
+	c := gaugeCaseNamed(t, "parallel-316-l6-raw-at-l2-positions")
+	s, in, _ := buildGauge(t, c)
+	res, reason, err := EvaluateGauge(s, in)
+	if err != nil || reason != "" {
+		t.Fatalf("evaluate refused: %v %v", reason, err)
+	}
+	for id, raw := range map[string]uint64{
+		"growatt.bms.pcs.parallel.316.l6.capacity": 42,
+		"growatt.bms.pcs.parallel.316.l6.cycles":   53,
+	} {
+		ev := res.Rows[id]
+		if ev.Native == nil || ev.Native.Raw != raw || ev.Native.Disposition != dispositionRaw || ev.Native.Reason != "" {
+			t.Errorf("%s: %+v, want raw %d with the raw disposition", id, ev.Native, raw)
+		}
+		if ev.Native != nil && ev.Native.Unit != "" {
+			t.Errorf("%s: unit %q, want none (raw word, not Ah or cycles)", id, ev.Native.Unit)
+		}
+	}
+	for id := range res.Rows {
+		if strings.HasPrefix(id, "growatt.bms.pcs.standard.") {
+			t.Errorf("standard row %s applies on the parallel bank", id)
+		}
+	}
+}

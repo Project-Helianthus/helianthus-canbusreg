@@ -394,6 +394,154 @@
         "retained_1": {"status": "raw", "value": "129"},
         "retained_7": {"status": "raw", "value": "128"}
       }
+    },
+    {
+      "name": "placeholder-315-parallel-qaab-nonzero-payload",
+      "identifier": "0x315",
+      "payload": "1388002A00350043",
+      "selection": {"project": "QAAB", "release": "0002", "flavor": "pcs-parallel", "bank": "parallel", "scope": "local", "endpoint": "coordinator", "group": "0", "slot": "1"},
+      "input": {},
+      "expect": {
+        "byte_0": {"status": "raw", "value": "19"},
+        "byte_1": {"status": "raw", "value": "136"},
+        "byte_3": {"status": "raw", "value": "42"},
+        "byte_5": {"status": "raw", "value": "53"},
+        "byte_7": {"status": "raw", "value": "67"},
+        "placeholder": {"status": "raw", "value": "0"}
+      }
+    },
+    {
+      "name": "parallel-315-l2-capacity-withheld",
+      "identifier": "0x315",
+      "payload": "000A0014001E012C",
+      "selection": {"project": "QAAA", "release": "0006", "flavor": "pcs-parallel", "bank": "parallel", "scope": "local", "endpoint": "coordinator", "group": "0", "slot": "1"},
+      "input": {"measurement_valid": true},
+      "expect": {
+        "cell_word": {"status": "raw", "value": "10"},
+        "capacity": {"status": "raw", "value": "300"}
+      }
+    },
+    {
+      "name": "parallel-315-gateway-placeholder-zero",
+      "identifier": "0x315",
+      "payload": "0000000000000000",
+      "selection": {"project": "QCAA", "release": "0001", "flavor": "pcs-parallel", "bank": "parallel", "scope": "aggregate", "endpoint": "coordinator", "group": "0", "slot": "1"},
+      "input": {},
+      "expect": {
+        "byte_0": {"status": "raw", "value": "0"},
+        "placeholder": {"status": "accepted", "value": "0"}
+      }
+    },
+    {
+      "name": "parallel-316-l5-capacity-and-gauge-bytes",
+      "identifier": "0x316",
+      "payload": "0001000203040506",
+      "selection": {"project": "QAAb", "release": "5004", "flavor": "pcs-parallel", "bank": "parallel", "scope": "local", "endpoint": "coordinator", "group": "0", "slot": "1"},
+      "input": {"measurement_valid": true},
+      "expect": {
+        "capacity_byte": {"status": "raw", "value": "3"},
+        "gauge_byte": {"status": "raw", "value": "4"}
+      }
+    },
+    {
+      "name": "parallel-316-l6-raw-at-l2-positions",
+      "identifier": "0x316",
+      "payload": "1388002A00350043",
+      "selection": {"project": "QAAB", "release": "0002", "flavor": "pcs-parallel", "bank": "parallel", "scope": "local", "endpoint": "coordinator", "group": "0", "slot": "1"},
+      "input": {"measurement_valid": true, "zero_integration": true, "failed_precheck": true},
+      "expect": {
+        "capacity": {"status": "raw", "value": "42"},
+        "cycles": {"status": "raw", "value": "53"},
+        "state": {"status": "raw", "value": "0"}
+      }
+    },
+    {
+      "name": "parallel-316-l7-capacity-and-gauge-bytes",
+      "identifier": "0x316",
+      "payload": "0001000203040506",
+      "selection": {"project": "QAAB", "release": "0006", "flavor": "pcs-parallel", "bank": "parallel", "scope": "local", "endpoint": "coordinator", "group": "0", "slot": "1"},
+      "input": {"measurement_valid": true},
+      "expect": {
+        "capacity_byte": {"status": "raw", "value": "3"},
+        "word_6": {"status": "raw", "value": "1286"}
+      }
+    },
+    {
+      "name": "parallel-316-l8-capacity-and-cycles",
+      "identifier": "0x316",
+      "payload": "1388002A00350043",
+      "selection": {"project": "QAAA", "release": "0011", "flavor": "pcs-parallel", "bank": "parallel", "scope": "local", "endpoint": "coordinator", "group": "0", "slot": "1"},
+      "input": {"measurement_valid": true},
+      "expect": {
+        "word_2": {"status": "raw", "value": "42"},
+        "capacity": {"status": "raw", "value": "53"},
+        "cycles": {"status": "raw", "value": "67"}
+      }
+    },
+    {
+      "name": "parallel-316-other-empty-group-words",
+      "identifier": "0x316",
+      "payload": "1388002A00350043",
+      "selection": {"project": "QAAA", "release": "0003", "flavor": "pcs-parallel", "bank": "parallel", "scope": "local", "endpoint": "coordinator", "group": "0", "slot": "1"},
+      "input": {"measurement_valid": true},
+      "expect": {
+        "word_0": {"status": "raw", "value": "5000"},
+        "word_6": {"status": "raw", "value": "67"}
+      }
+    },
+    {
+      "name": "parallel-316-gateway-placeholder-bytes",
+      "identifier": "0x316",
+      "payload": "1388002A00350043",
+      "selection": {"project": "QCAA", "release": "0001", "flavor": "pcs-parallel", "bank": "parallel", "scope": "aggregate", "endpoint": "coordinator", "group": "0", "slot": "1"},
+      "input": {},
+      "expect": {
+        "byte_0": {"status": "raw", "value": "19"},
+        "placeholder": {"status": "raw", "value": "0"}
+      }
+    },
+    {
+      "name": "parallel-317-other-soh-and-slot",
+      "identifier": "0x317",
+      "payload": "0102040810205000",
+      "selection": {"project": "QAAB", "release": "0002", "flavor": "pcs-parallel", "bank": "parallel", "scope": "local", "endpoint": "coordinator", "group": "0", "slot": "1"},
+      "input": {"measurement_valid": true},
+      "expect": {
+        "retained_8": {"status": "raw", "value": "1"},
+        "soh_truncated": {"status": "raw", "value": "80"},
+        "slot": {"status": "raw", "value": "0"}
+      }
+    },
+    {
+      "name": "parallel-317-gateway-placeholder-bytes",
+      "identifier": "0x317",
+      "payload": "0102030405060708",
+      "selection": {"project": "QCAA", "release": "0001", "flavor": "pcs-parallel", "bank": "parallel", "scope": "aggregate", "endpoint": "coordinator", "group": "0", "slot": "1"},
+      "input": {},
+      "expect": {
+        "byte_7": {"status": "raw", "value": "8"}
+      }
+    },
+    {
+      "name": "parallel-318-other-retained-bytes",
+      "identifier": "0x318",
+      "payload": "0181040810204080",
+      "selection": {"project": "QAAA", "release": "0006", "flavor": "pcs-parallel", "bank": "parallel", "scope": "local", "endpoint": "coordinator", "group": "0", "slot": "1"},
+      "input": {"measurement_valid": true},
+      "expect": {
+        "retained_0": {"status": "raw", "value": "1"},
+        "retained_7": {"status": "raw", "value": "128"}
+      }
+    },
+    {
+      "name": "parallel-318-gateway-placeholder-bytes",
+      "identifier": "0x318",
+      "payload": "0102030405060708",
+      "selection": {"project": "QCAA", "release": "0001", "flavor": "pcs-parallel", "bank": "parallel", "scope": "aggregate", "endpoint": "coordinator", "group": "0", "slot": "1"},
+      "input": {},
+      "expect": {
+        "byte_0": {"status": "raw", "value": "1"}
+      }
     }
   ]
 }

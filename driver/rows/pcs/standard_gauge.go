@@ -82,12 +82,36 @@ func gaugeNativeRow(s gaugeSpec) roweval.NativeRow[Selector] {
 	return row
 }
 
-// gaugeParallelWhen is the selection pairing of a parallel-bank row: the
-// pcs-parallel flavor and the parallel bank, plus the extra conditions.
-func gaugeParallelWhen(extra ...string) map[string]string {
-	m := when(extra...)
-	m[qFlavor], m[qBank] = "pcs-parallel", "parallel"
-	return m
+// gaugeParallelBankSpecs returns the parallel-bank twin of every standard gauge
+// row that is not a retained fault bit and whose branch the pcs-parallel flavor
+// can select. The frozen decoder admits the pcs-parallel flavor on every gauge
+// frame and emits the same field keys as on the ordinary bank; its gate
+// qualifiers are never met on that flavor (selected is false), so each gated
+// field is raw and no retained fault bit is accepted. The twin keeps the branch,
+// the gate and the raw evidence of its standard row, under the pcs-parallel
+// flavor and the parallel bank. NewSelection drops the contract groups L0 to L4
+// on that flavor, so the early, L0, L1, L2, L3 and L4 branches are never selected
+// there and have no twin.
+func gaugeParallelBankSpecs(standard []gaugeSpec) []gaugeSpec {
+	var out []gaugeSpec
+	for _, s := range standard {
+		if s.bitOf != "" {
+			continue
+		}
+		switch s.when[qGaugeBranch] {
+		case branchEarly, "l0", "l1", "l2", "l3", "l4":
+			continue
+		}
+		p := s
+		p.parallel = true
+		p.when = make(map[string]string, len(s.when))
+		for k, v := range s.when {
+			p.when[k] = v
+		}
+		p.when[qFlavor], p.when[qBank] = "pcs-parallel", "parallel"
+		out = append(out, p)
+	}
+	return out
 }
 
 // gaugeBranch returns the decoder branch of the frame under the contract group.
@@ -334,24 +358,8 @@ func gaugeSpecs() []gaugeSpec {
 		placeholder.numerator = true
 		add(placeholder)
 	}
-	add(gaugeParallelPlaceholderSpecs()...)
+	add(gaugeParallelBankSpecs(out)...)
 	return out
-}
-
-// gaugeParallelPlaceholderSpecs are the parallel-bank rows of frame 0x315 on the
-// QAAB and QAAb projects: the eight raw bytes and the zero placeholder the decoder
-// emits on that selection, under the pcs-parallel flavor and the parallel bank.
-func gaugeParallelPlaceholderSpecs() []gaugeSpec {
-	const frame315 = 0x315
-	var out []gaugeSpec
-	for at := 0; at < 8; at++ {
-		s := gaugeRawRow(frame315, "", branchPlaceholder, fmt.Sprintf("byte_%d", at), byteAt(uint16(8*at)))
-		s.parallel, s.when = true, gaugeParallelWhen(qGaugeBranch, branchPlaceholder)
-		out = append(out, s)
-	}
-	s := gaugeRow(frame315, "", branchPlaceholder, "placeholder", byteAt(0), "", 1, qGaugeZeroPayload)
-	s.parallel, s.numerator, s.when = true, true, gaugeParallelWhen(qGaugeBranch, branchPlaceholder)
-	return append(out, s)
 }
 
 // gaugeNumeratorIDs returns the decoder field name of every row whose raw word

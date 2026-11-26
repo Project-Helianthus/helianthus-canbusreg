@@ -1,0 +1,27 @@
+{
+  "description": "Synthetic expectations for the host input frames 0x211, 0x37F and 0x6F0, written by hand from the page layouts before the encoders ran. Payloads are hexadecimal, eight bytes each.",
+  "clock": [
+    {"name": "typical", "args": {"year_offset": 26, "month": 11, "day": 26, "hour": 13, "minute": 45, "second": 30}, "identifier": "0x211", "payload": "001a0b1a0d2d1e00"},
+    {"name": "lower-bounds", "args": {"year_offset": 0, "month": 1, "day": 1, "hour": 0, "minute": 0, "second": 0}, "identifier": "0x211", "payload": "0000010100000000"},
+    {"name": "upper-bounds", "args": {"year_offset": 255, "month": 12, "day": 31, "hour": 23, "minute": 59, "second": 59}, "identifier": "0x211", "payload": "00ff0c1f173b3b00"}
+  ],
+  "clock_refused": [
+    {"name": "month-zero", "args": {"year_offset": 26, "month": 0, "day": 1, "hour": 0, "minute": 0, "second": 0}},
+    {"name": "month-thirteen", "args": {"year_offset": 26, "month": 13, "day": 1, "hour": 0, "minute": 0, "second": 0}},
+    {"name": "day-zero", "args": {"year_offset": 26, "month": 1, "day": 0, "hour": 0, "minute": 0, "second": 0}},
+    {"name": "day-thirty-two", "args": {"year_offset": 26, "month": 1, "day": 32, "hour": 0, "minute": 0, "second": 0}},
+    {"name": "hour-twenty-four", "args": {"year_offset": 26, "month": 1, "day": 1, "hour": 24, "minute": 0, "second": 0}},
+    {"name": "minute-sixty", "args": {"year_offset": 26, "month": 1, "day": 1, "hour": 0, "minute": 60, "second": 0}},
+    {"name": "second-sixty", "args": {"year_offset": 26, "month": 1, "day": 1, "hour": 0, "minute": 0, "second": 60}}
+  ],
+  "parallel": [
+    {"name": "distinct-bytes", "args": {"flags": 1, "profile": [2, 3, 4, 5, 6, 7], "configuration": 8}, "identifier": "0x37F", "payload": "0102030405060708"},
+    {"name": "all-zero", "args": {"flags": 0, "profile": [0, 0, 0, 0, 0, 0], "configuration": 0}, "identifier": "0x37F", "payload": "0000000000000000"},
+    {"name": "all-set", "args": {"flags": 255, "profile": [255, 255, 255, 255, 255, 255], "configuration": 255}, "identifier": "0x37F", "payload": "ffffffffffffffff"}
+  ],
+  "discovery": [
+    {"name": "distinct-bytes", "args": {"phase": 3, "parameter": 9}, "identifier": "0x6F0", "payload": "0309000000000000"},
+    {"name": "all-zero", "args": {"phase": 0, "parameter": 0}, "identifier": "0x6F0", "payload": "0000000000000000"},
+    {"name": "all-set", "args": {"phase": 255, "parameter": 255}, "identifier": "0x6F0", "payload": "ffff000000000000"}
+  ]
+}

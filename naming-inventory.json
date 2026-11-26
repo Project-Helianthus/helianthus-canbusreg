@@ -97,7 +97,9 @@
     "scripts/tests/test_behavior_name_gate.py",
     "scripts/tests/test_go_lint_baseline.py",
     "scripts/tests/test_size_ratchet.py",
-    "testdata/growatt_project_conformance.json"
+    "testdata/growatt_project_conformance.json",
+    "driver/can_factory.go",
+    "driver/can_factory_config.go"
   ],
   "rows": [
     {
@@ -69780,6 +69782,390 @@
         "matterreg/docs/target-profile/evse.md",
         "tinyebus/README.md"
       ]
+    },
+    {
+      "identity": "driver/can_factory.go:go_type:package:Factory",
+      "owning_file": "driver/can_factory.go",
+      "kind": "go_type",
+      "current_name": "Factory",
+      "target": "Factory",
+      "status": "unchanged",
+      "role_decomposition": "unresolved",
+      "evidence": [
+        "driver/can_factory.go"
+      ],
+      "value_class": "unresolved",
+      "unit_metadata": "unresolved; see source",
+      "open_question": "Review identity, role, vocabulary, value class and units against the owning source and native public contract.",
+      "consumer_files": []
+    },
+    {
+      "identity": "driver/can_factory.go:go_function:package:NewFactory",
+      "owning_file": "driver/can_factory.go",
+      "kind": "go_function",
+      "current_name": "NewFactory",
+      "target": "NewFactory",
+      "status": "unchanged",
+      "role_decomposition": "unresolved",
+      "evidence": [
+        "driver/can_factory.go"
+      ],
+      "value_class": "unresolved",
+      "unit_metadata": "unresolved; see source",
+      "open_question": "Review identity, role, vocabulary, value class and units against the owning source and native public contract.",
+      "consumer_files": []
+    },
+    {
+      "identity": "driver/can_factory.go:go_function:package_or_receiver:Descriptor",
+      "owning_file": "driver/can_factory.go",
+      "kind": "go_function",
+      "current_name": "Descriptor",
+      "target": "Descriptor",
+      "status": "unchanged",
+      "role_decomposition": "unresolved",
+      "evidence": [
+        "driver/can_factory.go"
+      ],
+      "value_class": "unresolved",
+      "unit_metadata": "unresolved; see source",
+      "open_question": "Review identity, role, vocabulary, value class and units against the owning source and native public contract.",
+      "consumer_files": []
+    },
+    {
+      "identity": "driver/can_factory.go:go_function:package_or_receiver:Plan",
+      "owning_file": "driver/can_factory.go",
+      "kind": "go_function",
+      "current_name": "Plan",
+      "target": "Plan",
+      "status": "unchanged",
+      "role_decomposition": "unresolved",
+      "evidence": [
+        "driver/can_factory.go"
+      ],
+      "value_class": "unresolved",
+      "unit_metadata": "unresolved; see source",
+      "open_question": "Review identity, role, vocabulary, value class and units against the owning source and native public contract.",
+      "consumer_files": []
+    },
+    {
+      "identity": "driver/can_factory.go:go_function:package_or_receiver:Construct",
+      "owning_file": "driver/can_factory.go",
+      "kind": "go_function",
+      "current_name": "Construct",
+      "target": "Construct",
+      "status": "unchanged",
+      "role_decomposition": "unresolved",
+      "evidence": [
+        "driver/can_factory.go"
+      ],
+      "value_class": "unresolved",
+      "unit_metadata": "unresolved; see source",
+      "open_question": "Review identity, role, vocabulary, value class and units against the owning source and native public contract.",
+      "consumer_files": []
+    },
+    {
+      "identity": "driver/can_factory.go:go_constant_or_variable:package:Kind",
+      "owning_file": "driver/can_factory.go",
+      "kind": "go_constant_or_variable",
+      "current_name": "Kind",
+      "target": "Kind",
+      "status": "unchanged",
+      "role_decomposition": "unresolved",
+      "evidence": [
+        "driver/can_factory.go"
+      ],
+      "value_class": "unresolved",
+      "unit_metadata": "unresolved; see source",
+      "open_question": "Review identity, role, vocabulary, value class and units against the owning source and native public contract.",
+      "consumer_files": []
+    },
+    {
+      "identity": "driver/can_factory_config.go:go_type:package:Profile",
+      "owning_file": "driver/can_factory_config.go",
+      "kind": "go_type",
+      "current_name": "Profile",
+      "target": "Profile",
+      "status": "unchanged",
+      "role_decomposition": "unresolved",
+      "evidence": [
+        "driver/can_factory_config.go"
+      ],
+      "value_class": "unresolved",
+      "unit_metadata": "unresolved; see source",
+      "open_question": "Review identity, role, vocabulary, value class and units against the owning source and native public contract.",
+      "consumer_files": []
+    },
+    {
+      "identity": "driver/can_factory_config.go:go_constant_or_variable:package:ProfileV104",
+      "owning_file": "driver/can_factory_config.go",
+      "kind": "go_constant_or_variable",
+      "current_name": "ProfileV104",
+      "target": "ProfileV104",
+      "status": "unchanged",
+      "role_decomposition": "unresolved",
+      "evidence": [
+        "driver/can_factory_config.go"
+      ],
+      "value_class": "unresolved",
+      "unit_metadata": "unresolved; see source",
+      "open_question": "Review identity, role, vocabulary, value class and units against the owning source and native public contract.",
+      "consumer_files": []
+    },
+    {
+      "identity": "driver/can_factory_config.go:go_constant_or_variable:package:ProfileV108",
+      "owning_file": "driver/can_factory_config.go",
+      "kind": "go_constant_or_variable",
+      "current_name": "ProfileV108",
+      "target": "ProfileV108",
+      "status": "unchanged",
+      "role_decomposition": "unresolved",
+      "evidence": [
+        "driver/can_factory_config.go"
+      ],
+      "value_class": "unresolved",
+      "unit_metadata": "unresolved; see source",
+      "open_question": "Review identity, role, vocabulary, value class and units against the owning source and native public contract.",
+      "consumer_files": []
+    },
+    {
+      "identity": "driver/can_factory_config.go:go_constant_or_variable:package:ProfileCommon",
+      "owning_file": "driver/can_factory_config.go",
+      "kind": "go_constant_or_variable",
+      "current_name": "ProfileCommon",
+      "target": "ProfileCommon",
+      "status": "unchanged",
+      "role_decomposition": "unresolved",
+      "evidence": [
+        "driver/can_factory_config.go"
+      ],
+      "value_class": "unresolved",
+      "unit_metadata": "unresolved; see source",
+      "open_question": "Review identity, role, vocabulary, value class and units against the owning source and native public contract.",
+      "consumer_files": []
+    },
+    {
+      "identity": "driver/can_factory_config.go:go_constant_or_variable:package:ProfileMonitor",
+      "owning_file": "driver/can_factory_config.go",
+      "kind": "go_constant_or_variable",
+      "current_name": "ProfileMonitor",
+      "target": "ProfileMonitor",
+      "status": "unchanged",
+      "role_decomposition": "unresolved",
+      "evidence": [
+        "driver/can_factory_config.go"
+      ],
+      "value_class": "unresolved",
+      "unit_metadata": "unresolved; see source",
+      "open_question": "Review identity, role, vocabulary, value class and units against the owning source and native public contract.",
+      "consumer_files": []
+    },
+    {
+      "identity": "driver/can_factory_config.go:go_type:package:V104Role",
+      "owning_file": "driver/can_factory_config.go",
+      "kind": "go_type",
+      "current_name": "V104Role",
+      "target": "V104Role",
+      "status": "unchanged",
+      "role_decomposition": "unresolved",
+      "evidence": [
+        "driver/can_factory_config.go"
+      ],
+      "value_class": "unresolved",
+      "unit_metadata": "unresolved; see source",
+      "open_question": "Review identity, role, vocabulary, value class and units against the owning source and native public contract.",
+      "consumer_files": []
+    },
+    {
+      "identity": "driver/can_factory_config.go:go_constant_or_variable:package:RoleInverter",
+      "owning_file": "driver/can_factory_config.go",
+      "kind": "go_constant_or_variable",
+      "current_name": "RoleInverter",
+      "target": "RoleInverter",
+      "status": "unchanged",
+      "role_decomposition": "unresolved",
+      "evidence": [
+        "driver/can_factory_config.go"
+      ],
+      "value_class": "unresolved",
+      "unit_metadata": "unresolved; see source",
+      "open_question": "Review identity, role, vocabulary, value class and units against the owning source and native public contract.",
+      "consumer_files": []
+    },
+    {
+      "identity": "driver/can_factory_config.go:go_type:package:TransportConfig",
+      "owning_file": "driver/can_factory_config.go",
+      "kind": "go_type",
+      "current_name": "TransportConfig",
+      "target": "TransportConfig",
+      "status": "unchanged",
+      "role_decomposition": "unresolved",
+      "evidence": [
+        "driver/can_factory_config.go"
+      ],
+      "value_class": "unresolved",
+      "unit_metadata": "unresolved; see source",
+      "open_question": "Review identity, role, vocabulary, value class and units against the owning source and native public contract.",
+      "consumer_files": []
+    },
+    {
+      "identity": "driver/can_factory_config.go:go_field:TransportConfig:Interface",
+      "owning_file": "driver/can_factory_config.go",
+      "kind": "go_field",
+      "current_name": "Interface",
+      "target": "Interface",
+      "status": "unchanged",
+      "role_decomposition": "unresolved",
+      "evidence": [
+        "driver/can_factory_config.go"
+      ],
+      "value_class": "unresolved",
+      "unit_metadata": "unresolved; see source",
+      "open_question": "Review identity, role, vocabulary, value class and units against the owning source and native public contract.",
+      "consumer_files": []
+    },
+    {
+      "identity": "driver/can_factory_config.go:go_type:package:CommonSelection",
+      "owning_file": "driver/can_factory_config.go",
+      "kind": "go_type",
+      "current_name": "CommonSelection",
+      "target": "CommonSelection",
+      "status": "unchanged",
+      "role_decomposition": "unresolved",
+      "evidence": [
+        "driver/can_factory_config.go"
+      ],
+      "value_class": "unresolved",
+      "unit_metadata": "unresolved; see source",
+      "open_question": "Review identity, role, vocabulary, value class and units against the owning source and native public contract.",
+      "consumer_files": []
+    },
+    {
+      "identity": "driver/can_factory_config.go:go_type:package:Options",
+      "owning_file": "driver/can_factory_config.go",
+      "kind": "go_type",
+      "current_name": "Options",
+      "target": "Options",
+      "status": "unchanged",
+      "role_decomposition": "unresolved",
+      "evidence": [
+        "driver/can_factory_config.go"
+      ],
+      "value_class": "unresolved",
+      "unit_metadata": "unresolved; see source",
+      "open_question": "Review identity, role, vocabulary, value class and units against the owning source and native public contract.",
+      "consumer_files": []
+    },
+    {
+      "identity": "driver/can_factory_config.go:go_field:Options:Profile",
+      "owning_file": "driver/can_factory_config.go",
+      "kind": "go_field",
+      "current_name": "Profile",
+      "target": "Profile",
+      "status": "unchanged",
+      "role_decomposition": "unresolved",
+      "evidence": [
+        "driver/can_factory_config.go"
+      ],
+      "value_class": "unresolved",
+      "unit_metadata": "unresolved; see source",
+      "open_question": "Review identity, role, vocabulary, value class and units against the owning source and native public contract.",
+      "consumer_files": []
+    },
+    {
+      "identity": "driver/can_factory_config.go:go_field:Options:V104Role",
+      "owning_file": "driver/can_factory_config.go",
+      "kind": "go_field",
+      "current_name": "V104Role",
+      "target": "V104Role",
+      "status": "unchanged",
+      "role_decomposition": "unresolved",
+      "evidence": [
+        "driver/can_factory_config.go"
+      ],
+      "value_class": "unresolved",
+      "unit_metadata": "unresolved; see source",
+      "open_question": "Review identity, role, vocabulary, value class and units against the owning source and native public contract.",
+      "consumer_files": []
+    },
+    {
+      "identity": "driver/can_factory_config.go:go_field:Options:Selection",
+      "owning_file": "driver/can_factory_config.go",
+      "kind": "go_field",
+      "current_name": "Selection",
+      "target": "Selection",
+      "status": "unchanged",
+      "role_decomposition": "unresolved",
+      "evidence": [
+        "driver/can_factory_config.go"
+      ],
+      "value_class": "unresolved",
+      "unit_metadata": "unresolved; see source",
+      "open_question": "Review identity, role, vocabulary, value class and units against the owning source and native public contract.",
+      "consumer_files": []
+    },
+    {
+      "identity": "driver/can_factory_config.go:go_type:package:InstanceConfig",
+      "owning_file": "driver/can_factory_config.go",
+      "kind": "go_type",
+      "current_name": "InstanceConfig",
+      "target": "InstanceConfig",
+      "status": "unchanged",
+      "role_decomposition": "unresolved",
+      "evidence": [
+        "driver/can_factory_config.go"
+      ],
+      "value_class": "unresolved",
+      "unit_metadata": "unresolved; see source",
+      "open_question": "Review identity, role, vocabulary, value class and units against the owning source and native public contract.",
+      "consumer_files": []
+    },
+    {
+      "identity": "driver/can_factory_config.go:go_field:InstanceConfig:Interface",
+      "owning_file": "driver/can_factory_config.go",
+      "kind": "go_field",
+      "current_name": "Interface",
+      "target": "Interface",
+      "status": "unchanged",
+      "role_decomposition": "unresolved",
+      "evidence": [
+        "driver/can_factory_config.go"
+      ],
+      "value_class": "unresolved",
+      "unit_metadata": "unresolved; see source",
+      "open_question": "Review identity, role, vocabulary, value class and units against the owning source and native public contract.",
+      "consumer_files": []
+    },
+    {
+      "identity": "driver/can_factory_config.go:go_field:InstanceConfig:Options",
+      "owning_file": "driver/can_factory_config.go",
+      "kind": "go_field",
+      "current_name": "Options",
+      "target": "Options",
+      "status": "unchanged",
+      "role_decomposition": "unresolved",
+      "evidence": [
+        "driver/can_factory_config.go"
+      ],
+      "value_class": "unresolved",
+      "unit_metadata": "unresolved; see source",
+      "open_question": "Review identity, role, vocabulary, value class and units against the owning source and native public contract.",
+      "consumer_files": []
+    },
+    {
+      "identity": "driver/can_factory_config.go:go_function:package:ParseConfig",
+      "owning_file": "driver/can_factory_config.go",
+      "kind": "go_function",
+      "current_name": "ParseConfig",
+      "target": "ParseConfig",
+      "status": "unchanged",
+      "role_decomposition": "unresolved",
+      "evidence": [
+        "driver/can_factory_config.go"
+      ],
+      "value_class": "unresolved",
+      "unit_metadata": "unresolved; see source",
+      "open_question": "Review identity, role, vocabulary, value class and units against the owning source and native public contract.",
+      "consumer_files": []
     }
   ]
 }

@@ -42,9 +42,10 @@ func nativeOnlyVectors(profile string) []nativeOnlyVector {
 	}
 	limits := map[string]string{"charge_voltage_limit": "570", "charge_current_limit": "123", "discharge_current_limit": "345"}
 	bound := []string{"pack_voltage", "pack_current", "soc", "soh"}
-	if profile == Profile {
+	switch profile {
+	case Profile:
 		bound = append(bound, "maximum_cell_temperature")
-	} else if profile == V108Profile {
+	case V108Profile:
 		bound = append(bound, "average_temperature")
 	}
 	vectors := []nativeOnlyVector{

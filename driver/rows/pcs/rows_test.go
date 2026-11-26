@@ -298,6 +298,9 @@ func checkField(t *testing.T, name, field string, df canbusreg.NativeField, row 
 		if df.Unit != row.Unit {
 			t.Errorf("%s: %s unit %q, row %q", name, field, df.Unit, row.Unit)
 		}
+		if nat.Unit != df.Unit || string(nat.Value.Quantity.Unit) != df.Unit {
+			t.Errorf("%s: %s returned units %q and %q, decoder %q", name, field, nat.Unit, nat.Value.Quantity.Unit, df.Unit)
+		}
 		if decimalRat(t, nat.Value.Quantity.Number).Cmp(new(big.Rat).SetFrac64(df.Numerator, df.Denominator)) != 0 {
 			t.Errorf("%s: %s row value differs from the decoder %d/%d", name, field, df.Numerator, df.Denominator)
 		}
@@ -830,6 +833,50 @@ func TestIntegerCodecRefusesUnrepresentableValues(t *testing.T) {
 		got, err := c.codec.Encode(c.value, c.width)
 		if err != nil || got != c.want {
 			t.Errorf("%s: got %#x, %v; want %#x", c.name, got, err, c.want)
+		}
+	}
+}
+
+func rowSpecID(field string, frame uint32) string {
+	for _, s := range standardSpecs() {
+		if s.frame == frame && s.field == field && s.layout != "gateway" && s.layout != "release11" {
+			return nativeRow(s).ID
+		}
+	}
+	return ""
+}
+
+func TestStandardResultsKeepEvidenceGradeApartFromAcceptance(t *testing.T) {
+	dec, res, _ := evaluateCase(t, caseNamed(t, "legacy-local-311-limits-and-hints"))
+	hint := rowSpecID("charge_hint", 0x311)
+	if res.Rows[hint].Native.Disposition != dispositionAccepted || res.Grades[hint] != "Hypothesis" {
+		t.Errorf("accepted hint: disposition %q grade %q", res.Rows[hint].Native.Disposition, res.Grades[hint])
+	}
+	_, mres, _ := evaluateCase(t, caseNamed(t, "legacy-local-measured-313"))
+	volt := rowSpecID("voltage", 0x313)
+	if mres.Rows[volt].Native.Disposition != dispositionAccepted || mres.Grades[volt] != "Proven" {
+		t.Errorf("accepted voltage: disposition %q grade %q", mres.Rows[volt].Native.Disposition, mres.Grades[volt])
+	}
+	for id, g := range res.Grades {
+		if want := dec.Fields[rowField(id)].Grade; g != want {
+			t.Errorf("%s grade %q, decoder %q", id, g, want)
+		}
+	}
+}
+
+func TestIntegerCodecUnsignedRoundTripsFullRange(t *testing.T) {
+	codec := Descriptors().Codecs["unsigned"]
+	for _, v := range []uint64{0, 1, 10, 1<<63 - 1, 1 << 63, 1<<63 + 1, 10000000000000000000, 1<<64 - 1} {
+		d, err := codec.Decode(v, 64)
+		if err != nil {
+			t.Fatal(err)
+		}
+		if strings.HasPrefix(d.Coefficient, "-") {
+			t.Errorf("%d decoded negative: %+v", v, d)
+		}
+		back, err := codec.Encode(d, 64)
+		if err != nil || back != v {
+			t.Errorf("%d round trip gave %d, %v", v, back, err)
 		}
 	}
 }

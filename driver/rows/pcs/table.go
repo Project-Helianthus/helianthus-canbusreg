@@ -5,6 +5,7 @@ import (
 	"math/big"
 	"math/bits"
 	"strconv"
+	"strings"
 
 	"github.com/Project-Helianthus/helianthus-canbus"
 	"github.com/Project-Helianthus/helianthus-canbusreg"
@@ -178,11 +179,19 @@ func Descriptors() roweval.Descriptors[Selector] {
 func integerCodec(signed bool) roweval.Codec {
 	return roweval.Codec{
 		Decode: func(raw uint64, width uint16) (semreg.Decimal, error) {
+			d := semreg.Decimal{}
+			if !signed {
+				for raw != 0 && raw%10 == 0 {
+					raw /= 10
+					d.Exponent10++
+				}
+				d.Coefficient = strconv.FormatUint(raw, 10)
+				return d, nil
+			}
 			n := int64(raw)
-			if signed && raw&(1<<(width-1)) != 0 {
+			if raw&(1<<(width-1)) != 0 {
 				n -= 1 << width
 			}
-			d := semreg.Decimal{}
 			for n != 0 && n%10 == 0 {
 				n /= 10
 				d.Exponent10++
@@ -277,6 +286,11 @@ type Result struct {
 	Evidence    canbusreg.Evidence
 	Attribution Attribution
 	Rows        map[string]roweval.Evaluation
+	// Grades is the evidence grade the decoder gives each applied field, keyed
+	// by row identifier: Proven, Hypothesis or Unknown. It is independent of the
+	// disposition of the row, so an accepted Hypothesis value stays
+	// distinguishable from an accepted Proven one.
+	Grades map[string]string
 	// Diagnostics is the native record supplied separately from the transport
 	// evidence, as the decoder retains it; empty when none was supplied.
 	Diagnostics []byte
@@ -307,8 +321,16 @@ func Evaluate(s canbusreg.Selection, in canbusreg.PCSStandardPCSInput) (Result, 
 	}
 	rows, reason, err := evaluateRows(Table(), frame, Qualifiers(s, in))
 	res.Rows = rows
+	res.Grades = make(map[string]string)
+	for id, ev := range rows {
+		if f, ok := decoded.Fields[rowField(id)]; ok && ev.Reason != roweval.ReasonNoMatch {
+			res.Grades[id] = f.Grade
+		}
+	}
 	return res, reason, err
 }
+
+func rowField(id string) string { return id[strings.LastIndex(id, ".")+1:] }
 
 // frameSelector is the selector the frame presents for one row: the identifier,
 // the format, the DLC and the raw DLC of the frame, with the field slice of the

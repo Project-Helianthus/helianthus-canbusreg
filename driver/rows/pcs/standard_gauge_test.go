@@ -172,8 +172,8 @@ func checkGaugeField(t *testing.T, name, field string, df canbusreg.NativeField,
 		if nat.Reason != "" || nat.Value == nil || nat.Value.Quantity == nil {
 			t.Fatalf("%s: %s row reason %q, no bit value", name, field, nat.Reason)
 		}
-		if nat.Disposition != dispositionRaw {
-			t.Errorf("%s: %s row disposition %q, want raw", name, field, nat.Disposition)
+		if want := gaugeBitDisposition(df.Status); nat.Disposition != want {
+			t.Errorf("%s: %s row disposition %q, decoder status %q wants %q", name, field, nat.Disposition, df.Status, want)
 		}
 		if decimalRat(t, nat.Value.Quantity.Number).Cmp(new(big.Rat).SetFrac64(df.Numerator, df.Denominator)) != 0 {
 			t.Errorf("%s: %s row value differs from the decoder bit %d", name, field, df.Numerator)
@@ -349,7 +349,7 @@ func replay316(t *testing.T, identity string, measurementValid bool) (canbusreg.
 // TestFrame316ReplayGivesCapacityAndCyclesForL2AndL8 replays the frame 0x316 under
 // the L2 selection of QAAA0006 and the L8 selection of QAAA0011 and checks the
 // values under their separate row identifiers, with the raw evidence unchanged.
-func TestFrame316ReplayGivesCapacityAndCyclesForL2AndL8(t *testing.T) {
+func TestFrame316ReplayGivesCapacityAndCyclesForEachLayout(t *testing.T) {
 	for _, tc := range []struct {
 		identity                       string
 		capacityID, cyclesID           string
@@ -394,7 +394,7 @@ func TestFrame316ReplayGivesCapacityAndCyclesForL2AndL8(t *testing.T) {
 // TestFrame316L3AndL4KeepRawWordsWithoutCapacityOrCycles checks that the L3 and
 // L4 selections keep the words of frame 0x316 as raw evidence, without capacity
 // or cycles names, and that the decoder gives no capacity or cycles field.
-func TestFrame316L3AndL4KeepRawWordsWithoutCapacityOrCycles(t *testing.T) {
+func TestFrame316OtherLayoutsKeepRawWordsWithoutCapacityOrCycles(t *testing.T) {
 	for _, identity := range []string{"QAAA0007", "QAAA0009"} {
 		t.Run(identity, func(t *testing.T) {
 			_, _, _, res, r := replay316(t, identity, true)
@@ -518,5 +518,48 @@ func TestGaugeRowsRefuseNeighbouringIdentifierWrongLengthAndExtendedFormat(t *te
 				t.Errorf("%s: reason %q with decoder %q and %d rows", tc.name, reason, r.Status, len(res.Rows))
 			}
 		})
+	}
+}
+
+// TestGaugeRetainedFaultBitDispositionFollowsDecoder replays a 0x318 frame whose
+// retained byte is all ones under the release-11 selection and checks that each
+// retained fault bit row keeps the accepted or raw disposition the decoder gives
+// its field, and that at least one named bit is accepted.
+func TestGaugeRetainedFaultBitDispositionFollowsDecoder(t *testing.T) {
+	c := gaugeVectorCase{
+		Name:       "retained-bits-318-l8-named",
+		Identifier: "0x318",
+		Payload:    "FF00000000000000",
+		Selection:  vectorSelection{Project: "QAAA", Release: "0011", Flavor: "pcs-standard", Bank: "ordinary", Scope: "local", Endpoint: "coordinator", Group: "0", Slot: "1"},
+		Input:      gaugeVectorInput{MeasurementValid: true},
+	}
+	s, in, _ := buildGauge(t, c)
+	r := canbusreg.DecodePCSGauge(s, in)
+	if r.Status != "decoded" {
+		t.Fatalf("decoder status %q", r.Status)
+	}
+	res, reason, err := EvaluateGauge(s, in)
+	if err != nil || reason != "" {
+		t.Fatalf("evaluate refused: %v %v", reason, err)
+	}
+	accepted := 0
+	for id, field := range gaugeBitFields() {
+		df, ok := r.Fields[field]
+		if !ok {
+			continue
+		}
+		ev, ok := res.Rows[id]
+		if !ok || ev.Native == nil {
+			continue
+		}
+		if ev.Native.Disposition != gaugeBitDisposition(df.Status) {
+			t.Errorf("%s: row disposition %q, decoder status %q", field, ev.Native.Disposition, df.Status)
+		}
+		if df.Status == "accepted" {
+			accepted++
+		}
+	}
+	if accepted == 0 {
+		t.Fatal("no retained fault bit is accepted by the decoder under the named selection")
 	}
 }

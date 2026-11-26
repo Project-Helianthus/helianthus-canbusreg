@@ -144,12 +144,34 @@ func gaugeRawRow(frame uint32, layout, branch, field string, slice signalSlice) 
 }
 
 // gaugeBit is a retained fault bit of byte k of the payload, published under the
-// decoder's index 8*(byteOffset)+bit for the retained byte named byteField.
+// decoder's index 8*(byteOffset)+bit for the retained byte named byteField. Its
+// disposition is the decoder's own: accepted when the selected dictionary names
+// the bit, raw otherwise (see gaugeBitDisposition).
 func gaugeBit(frame uint32, layout, branch string, index int, slice signalSlice, byteField string) gaugeSpec {
 	s := gaugeRow(frame, layout, branch, fmt.Sprintf("retained_fault_bit_%d", index), slice, "", 1, "")
-	s.raw = true
 	s.bitOf = byteField
 	return s
+}
+
+// gaugeBitDisposition maps the decoder's status of a retained fault bit to the
+// row disposition: the decoder's accepted bit stays accepted, every other bit is raw.
+func gaugeBitDisposition(status string) string {
+	if status == "accepted" {
+		return dispositionAccepted
+	}
+	return dispositionRaw
+}
+
+// gaugeBitFields returns the decoder field name of every retained fault bit row,
+// keyed by row identifier.
+func gaugeBitFields() map[string]string {
+	out := make(map[string]string)
+	for _, s := range gaugeSpecs() {
+		if s.bitOf != "" {
+			out[nativeRow(s.rowSpec).ID] = s.field
+		}
+	}
+	return out
 }
 
 // gaugeSpecs returns the row specifications of frames 0x315 to 0x318 for the
@@ -365,7 +387,7 @@ func EvaluateGauge(s canbusreg.Selection, in canbusreg.PCSIdentityPCSInput) (Gau
 	if reason := gaugeFrameDisposition(frame); reason != "" {
 		return res, reason, nil
 	}
-	rows, err := evaluateGaugeRows(gaugeTable(), frame, gaugeQualifiers(s, in), gaugeRawIDs())
+	rows, err := evaluateGaugeRows(gaugeTable(), frame, gaugeQualifiers(s, in), gaugeRawIDs(), gaugeBitFields(), decoded.Fields)
 	res.Rows = rows
 	return res, "", err
 }
@@ -374,8 +396,9 @@ func EvaluateGauge(s canbusreg.Selection, in canbusreg.PCSIdentityPCSInput) (Gau
 // evaluated on its own: rows that read the same payload slice under different
 // fields are distinct native fields, so the evaluator never sees them as one
 // ambiguous match. A row whose conditions do not hold, or whose hook gives no
-// applicable value, is not in the result.
-func evaluateGaugeRows(t roweval.Table[Selector], frame canbus.Frame, q roweval.Qualifiers, raw map[string]bool) (map[string]roweval.Evaluation, error) {
+// applicable value, is not in the result. A retained fault bit row takes the
+// accepted or raw disposition the decoder gives its field in fields.
+func evaluateGaugeRows(t roweval.Table[Selector], frame canbus.Frame, q roweval.Qualifiers, raw map[string]bool, bits map[string]string, fields map[string]canbusreg.NativeField) (map[string]roweval.Evaluation, error) {
 	out := make(map[string]roweval.Evaluation)
 	for _, row := range t.Native {
 		if row.At.Identifier != frame.ID().Value() {
@@ -395,6 +418,9 @@ func evaluateGaugeRows(t roweval.Table[Selector], frame canbus.Frame, q roweval.
 			ev.Native.Unit = ""
 		}
 		ev.Native.Disposition = disposition(ev.Native, raw[ev.Native.RowID])
+		if key, ok := bits[ev.Native.RowID]; ok && ev.Native.Reason == "" {
+			ev.Native.Disposition = gaugeBitDisposition(fields[key].Status)
+		}
 		out[ev.Native.RowID] = ev
 	}
 	return out, nil

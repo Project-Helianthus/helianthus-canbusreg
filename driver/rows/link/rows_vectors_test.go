@@ -248,7 +248,7 @@ func meanCase(release string) vectorCase {
 	return vectorCase{Name: "mean", Family: "1806", Selection: vectorSelection{Project: "QAAA", Release: release, Bank: "ordinary", Source: "02", Destination: "F4"}}
 }
 
-func contributors(t *testing.T, release string, count int) canbusreg.VectorSnapshot {
+func vectorContributors(t *testing.T, release string, count int) canbusreg.VectorSnapshot {
 	t.Helper()
 	c := meanCase(release)
 	c.Family = "1810"
@@ -294,7 +294,7 @@ func TestCellMeanRowFollowsTheDecoderAcceptance(t *testing.T) {
 	}
 	for _, c := range cases {
 		t.Run(c.name, func(t *testing.T) {
-			snapshot := contributors(t, c.release, 4)
+			snapshot := vectorContributors(t, c.release, 4)
 			s, in := meanFrame(t, c.release, c.mean)
 			res, reason, err := EvaluateCellMean(s, in, c.gate, snapshot, false)
 			if err != nil || reason != "" {
@@ -322,7 +322,7 @@ func TestCellMeanRowFollowsTheDecoderAcceptance(t *testing.T) {
 }
 
 func TestCellMeanRowRefusesWhatTheDecoderRefuses(t *testing.T) {
-	snapshot := contributors(t, "0011", 4)
+	snapshot := vectorContributors(t, "0011", 4)
 	s, in := meanFrame(t, "0011", 3301)
 	other := in
 	other.Evidence.Frame = mustFrame(t, 0x18100000|uint32(0xf4)<<8|2, 8)

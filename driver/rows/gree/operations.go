@@ -76,6 +76,16 @@ type TemperatureEncoding struct {
 	LimitsState TemperatureLimitsState
 }
 
+// SendTemperature evaluates the set-temperature operation and sends one frame
+// to the uniquely resolved owner. Sending does not update readback.
+func SendTemperature(zoneRef driver.NodeRef, owner driver.AnchorKey, units []SettingTarget, argument semreg.Quantity, limits *driver.ValueLimits, send func(reg.GreeVRFCommand) error) error {
+	f, err := EncodeTemperature(zoneRef, owner, units, argument, limits)
+	if err != nil {
+		return err
+	}
+	return send(f)
+}
+
 // EncodeTemperature returns the frame for the uniquely resolved owner.
 func EncodeTemperature(zoneRef driver.NodeRef, owner driver.AnchorKey, units []SettingTarget, argument semreg.Quantity, limits *driver.ValueLimits) (reg.GreeVRFCommand, error) {
 	result, err := EncodeTemperatureWithLimitsState(zoneRef, owner, units, argument, limits)

@@ -5,6 +5,7 @@ import (
 	"math/big"
 	"math/bits"
 	"strconv"
+	"time"
 
 	"github.com/Project-Helianthus/helianthus-canbus"
 	"github.com/Project-Helianthus/helianthus-canbusreg"
@@ -386,6 +387,17 @@ type IdentityResult struct {
 	// disposition of the row, so a Hypothesis value that is accepted stays
 	// distinguishable from a Proven one.
 	Grades map[string]string
+	// Ages is the effective age the decoder gives each field, keyed by row
+	// identifier: the per-field age of the input where it names the field, else
+	// the age of the observation. A row with no value has no entry.
+	Ages map[string]time.Duration
+}
+
+// IdentityTable returns the declared native rows of the identity frames 0x320,
+// 0x321, 0x323, 0x324 and 0x325 and the row hooks they name, without any frame.
+func IdentityTable() roweval.Table[Selector] {
+	rows, hooks, _ := identityRows()
+	return roweval.Table[Selector]{Native: rows, Hooks: hooks}
 }
 
 // EvaluateIdentity evaluates the native rows of one identity observation under
@@ -410,6 +422,7 @@ func EvaluateIdentity(s canbusreg.Selection, in canbusreg.PCSIdentityPCSInput) (
 	rows, hooks, rawRows := identityRows()
 	res.Rows = make(map[string]roweval.Evaluation)
 	res.Grades = make(map[string]string)
+	res.Ages = make(map[string]time.Duration)
 	fieldOfRow := make(map[string]string)
 	for _, sp := range identitySpecs() {
 		fieldOfRow[identityRowID(sp)] = sp.field
@@ -428,6 +441,9 @@ func EvaluateIdentity(s canbusreg.Selection, in canbusreg.PCSIdentityPCSInput) (
 			// The grade of the decoder field is kept for the row that applies only.
 			if f, ok := decoded.Fields[fieldOfRow[row.ID]]; ok {
 				res.Grades[row.ID] = f.Grade
+				if ev.Native.Reason == "" {
+					res.Ages[row.ID] = f.Age
+				}
 			}
 			if ev.Native.Reason != "" {
 				ev.Native.Value = nil

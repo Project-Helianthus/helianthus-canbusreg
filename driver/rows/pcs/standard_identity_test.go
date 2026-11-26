@@ -481,3 +481,100 @@ func TestGatewayCountDeclaresBothBytes(t *testing.T) {
 	}
 	t.Fatal("gateway count row is not defined")
 }
+
+// TestIdentityRowsKeepDecoderEffectiveFieldAge decodes two frames that differ only
+// in the FieldAges of one applicable field. The result carries the decoder's
+// effective age for that field, the other fields keep the observation age, and a
+// field the gate withholds exposes neither value nor age.
+func TestIdentityRowsKeepDecoderEffectiveFieldAge(t *testing.T) {
+	sel := vectorSelection{Project: "QAAA", Release: "0006", Flavor: "pcs-standard", Bank: "ordinary", Scope: "local", Endpoint: "coordinator", Group: "0", Slot: "1"}
+	payload := []byte{0x11, 0x22, 0x33, 0x01, 0x02, 0x03, 0x04, 0x00}
+	hardware := rowPrefix + "320.hardware"
+	product := rowPrefix + "320.product_0"
+	eval := func(age time.Duration, has bool) IdentityResult {
+		s, in, _ := buildIdentity(t, sel, "0x320", payload, identityVectorInput{}, 7, 9*time.Second)
+		if has {
+			in.FieldAges = map[string]time.Duration{"hardware": age}
+		}
+		res, reason, err := EvaluateIdentity(s, in)
+		if err != nil || reason != "" {
+			t.Fatalf("reason %q err %v", reason, err)
+		}
+		decoded := canbusreg.DecodePCSIdentity(s, in)
+		if got, want := res.Ages[hardware], decoded.Fields["hardware"].Age; got != want {
+			t.Fatalf("hardware age %v, decoder %v", got, want)
+		}
+		return res
+	}
+	two, nine, none := eval(2*time.Second, true), eval(9*time.Second, true), eval(0, false)
+	if two.Ages[hardware] != 2*time.Second || nine.Ages[hardware] != 9*time.Second {
+		t.Errorf("ages %v and %v, want 2s and 9s", two.Ages[hardware], nine.Ages[hardware])
+	}
+	if two.Ages[product] != time.Second || nine.Ages[product] != time.Second || none.Ages[hardware] != time.Second {
+		t.Errorf("fields without an override must keep the observation age of 1s")
+	}
+
+	s, in, _ := buildIdentity(t, sel, "0x320", []byte{0x11, 0x22, 0x33, 0x01, 0x02, 0x03, 0x04, 0x01}, identityVectorInput{}, 7, 9*time.Second)
+	res, reason, err := EvaluateIdentity(s, in)
+	if err != nil || reason != "" {
+		t.Fatalf("withheld: reason %q err %v", reason, err)
+	}
+	reserved := rowPrefix + "320.reserved_7"
+	ev := res.Rows[reserved]
+	if ev.Native == nil || ev.Native.Reason == "" || ev.Native.Value != nil {
+		t.Fatalf("reserved_7 must be withheld without a value, got %+v", ev.Native)
+	}
+	if age, ok := res.Ages[reserved]; ok {
+		t.Errorf("withheld field exposes age %v", age)
+	}
+}
+
+// TestIdentityTableDeclaresIdentityRowsWithoutAFrame enumerates the declarations
+// with no frame: every identity frame family is present with the ids the replay
+// tests use, the count rows differ by their gateway condition and declaration, the
+// raw rows and the zero rows are marked as the evaluation treats them, and none of
+// the identity ids is in the standard table.
+func TestIdentityTableDeclaresIdentityRowsWithoutAFrame(t *testing.T) {
+	tab := IdentityTable()
+	byID := make(map[string]roweval.NativeRow[Selector], len(tab.Native))
+	frames := make(map[uint32]int)
+	for _, r := range tab.Native {
+		if _, dup := byID[r.ID]; dup {
+			t.Errorf("row %s declared twice", r.ID)
+		}
+		byID[r.ID] = r
+		frames[r.At.Identifier]++
+		if _, ok := tab.Hooks[r.Decode.Hook]; !ok {
+			t.Errorf("row %s names hook %q that the table does not carry", r.ID, r.Decode.Hook)
+		}
+	}
+	for _, f := range []uint32{0x320, 0x321, 0x323, 0x324, 0x325} {
+		if frames[f] == 0 {
+			t.Errorf("no declared row for frame %#x", f)
+		}
+	}
+	for _, id := range []string{
+		rowPrefix + "320.hardware", rowPrefix + "321.family", rowPrefix + "321.byte_0",
+		rowPrefix + "323.count", rowPrefix + "323.gateway.count", rowPrefix + "323.threshold",
+		rowPrefix + "324.byte_7", rowPrefix + "324.placeholder", rowPrefix + "325.byte_0", rowPrefix + "325.placeholder",
+	} {
+		if _, ok := byID[id]; !ok {
+			t.Errorf("row %s is not declared", id)
+		}
+	}
+	if got := byID[rowPrefix+"323.count"].When.Equal[qGateway]; got != "false" {
+		t.Errorf("direct count gateway condition %q, want false", got)
+	}
+	gw := byID[rowPrefix+"323.gateway.count"]
+	if gw.When.Equal[qGateway] != "true" || !strings.Contains(gw.SpecRef, "256 x B3") {
+		t.Errorf("gateway count declares condition %q and %q", gw.When.Equal[qGateway], gw.SpecRef)
+	}
+	if got := byID[rowPrefix+"321.byte_0"].When.Equal[qPlaceholderPath]; got != "true" {
+		t.Errorf("0x321 byte row placeholder-path condition %q, want true", got)
+	}
+	for _, r := range Table().Native {
+		if _, dup := byID[r.ID]; dup {
+			t.Errorf("identity row %s also in the standard table", r.ID)
+		}
+	}
+}

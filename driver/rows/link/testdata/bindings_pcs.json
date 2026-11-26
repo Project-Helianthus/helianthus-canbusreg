@@ -1,0 +1,916 @@
+{
+ "description": "Synthetic vectors of the PCS slot and cell extremum bindings. Every expectation is written by hand from the frame layout of the public PCS page and the registry unit: fact is the SemReg fact with its exact SI decimal and the subject role, native is a native row with no binding, unresolved is a bound native row whose cell role the caller did not resolve (native value retained, no candidate), withheld is a value the native row withholds, and no_match is a row whose selection conditions do not hold.",
+ "cases": [
+  {
+   "name": "slot-326-ordinary-positive-current",
+   "frame": "326",
+   "payload": "0214BE109ADA0000",
+   "selection": {
+    "project": "QAAA",
+    "release": "0011",
+    "flavor": "pcs-standard",
+    "bank": "ordinary",
+    "scope": "local",
+    "endpoint": "coordinator",
+    "group": "0",
+    "slot": "2"
+   },
+   "input": {
+    "measurement_valid": true,
+    "slot_ok": true
+   },
+   "resolve": {
+    "maximum": true,
+    "minimum": true
+   },
+   "expect": {
+    "growatt.bms.pcs.standard.326.voltage": {
+     "outcome": "fact",
+     "fact": "storage.pack.voltage",
+     "unit": "unit.volt",
+     "value": "53.1",
+     "role": "pack"
+    },
+    "growatt.bms.pcs.standard.326.current": {
+     "outcome": "fact",
+     "fact": "storage.pack.current",
+     "unit": "unit.ampere",
+     "value": "25",
+     "role": "pack"
+    },
+    "growatt.bms.pcs.standard.326.soc_low": {
+     "outcome": "native",
+     "native": "218"
+    },
+    "growatt.bms.pcs.standard.326.slot": {
+     "outcome": "native",
+     "native": "2"
+    },
+    "growatt.bms.pcs.parallel.326.voltage": {
+     "outcome": "no_match"
+    },
+    "growatt.bms.pcs.parallel.326.current": {
+     "outcome": "no_match"
+    }
+   }
+  },
+  {
+   "name": "slot-326-ordinary-negative-current",
+   "frame": "326",
+   "payload": "0214BE0F3CDA0000",
+   "selection": {
+    "project": "QAAA",
+    "release": "0011",
+    "flavor": "pcs-standard",
+    "bank": "ordinary",
+    "scope": "local",
+    "endpoint": "coordinator",
+    "group": "0",
+    "slot": "2"
+   },
+   "input": {
+    "measurement_valid": true,
+    "slot_ok": true
+   },
+   "resolve": {
+    "maximum": true,
+    "minimum": true
+   },
+   "expect": {
+    "growatt.bms.pcs.standard.326.voltage": {
+     "outcome": "fact",
+     "fact": "storage.pack.voltage",
+     "unit": "unit.volt",
+     "value": "53.1",
+     "role": "pack"
+    },
+    "growatt.bms.pcs.standard.326.current": {
+     "outcome": "fact",
+     "fact": "storage.pack.current",
+     "unit": "unit.ampere",
+     "value": "-10",
+     "role": "pack"
+    },
+    "growatt.bms.pcs.standard.326.soc_low": {
+     "outcome": "native",
+     "native": "218"
+    }
+   }
+  },
+  {
+   "name": "slot-326-ordinary-group-and-slot-absent",
+   "frame": "326",
+   "payload": "0214BE109ADA0000",
+   "selection": {
+    "project": "QAAA",
+    "release": "0011",
+    "flavor": "pcs-standard",
+    "bank": "ordinary",
+    "scope": "local",
+    "endpoint": "coordinator",
+    "group": "",
+    "slot": ""
+   },
+   "input": {
+    "measurement_valid": true,
+    "slot_ok": true
+   },
+   "resolve": {
+    "maximum": true,
+    "minimum": true
+   },
+   "expect": {
+    "growatt.bms.pcs.standard.326.voltage": {
+     "outcome": "fact",
+     "fact": "storage.pack.voltage",
+     "unit": "unit.volt",
+     "value": "53.1",
+     "role": "pack"
+    },
+    "growatt.bms.pcs.standard.326.current": {
+     "outcome": "fact",
+     "fact": "storage.pack.current",
+     "unit": "unit.ampere",
+     "value": "25",
+     "role": "pack"
+    }
+   }
+  },
+  {
+   "name": "slot-326-parallel-positive-current",
+   "frame": "326",
+   "payload": "0214BE280ADA0000",
+   "selection": {
+    "project": "QAAA",
+    "release": "0011",
+    "flavor": "pcs-parallel",
+    "bank": "parallel",
+    "scope": "local",
+    "endpoint": "coordinator",
+    "group": "0",
+    "slot": "2"
+   },
+   "input": {
+    "measurement_valid": true,
+    "slot_ok": true
+   },
+   "resolve": {
+    "maximum": true,
+    "minimum": true
+   },
+   "expect": {
+    "growatt.bms.pcs.parallel.326.voltage": {
+     "outcome": "fact",
+     "fact": "storage.pack.voltage",
+     "unit": "unit.volt",
+     "value": "53.1",
+     "role": "pack"
+    },
+    "growatt.bms.pcs.parallel.326.current": {
+     "outcome": "fact",
+     "fact": "storage.pack.current",
+     "unit": "unit.ampere",
+     "value": "25",
+     "role": "pack"
+    },
+    "growatt.bms.pcs.parallel.326.soc_low": {
+     "outcome": "native",
+     "native": "218"
+    },
+    "growatt.bms.pcs.standard.326.voltage": {
+     "outcome": "no_match"
+    },
+    "growatt.bms.pcs.standard.326.current": {
+     "outcome": "no_match"
+    }
+   }
+  },
+  {
+   "name": "slot-326-parallel-code-of-the-ordinary-bank-is-not-reread",
+   "frame": "326",
+   "payload": "0214BE109ADA0000",
+   "selection": {
+    "project": "QAAA",
+    "release": "0011",
+    "flavor": "pcs-parallel",
+    "bank": "parallel",
+    "scope": "local",
+    "endpoint": "coordinator",
+    "group": "0",
+    "slot": "2"
+   },
+   "input": {
+    "measurement_valid": true,
+    "slot_ok": true
+   },
+   "resolve": {
+    "maximum": true,
+    "minimum": true
+   },
+   "expect": {
+    "growatt.bms.pcs.parallel.326.voltage": {
+     "outcome": "fact",
+     "fact": "storage.pack.voltage",
+     "unit": "unit.volt",
+     "value": "53.1",
+     "role": "pack"
+    },
+    "growatt.bms.pcs.parallel.326.current": {
+     "outcome": "fact",
+     "fact": "storage.pack.current",
+     "unit": "unit.ampere",
+     "value": "-575",
+     "role": "pack"
+    }
+   }
+  },
+  {
+   "name": "slot-326-measurement-invalid",
+   "frame": "326",
+   "payload": "0214BE109ADA0000",
+   "selection": {
+    "project": "QAAA",
+    "release": "0011",
+    "flavor": "pcs-standard",
+    "bank": "ordinary",
+    "scope": "local",
+    "endpoint": "coordinator",
+    "group": "0",
+    "slot": "2"
+   },
+   "input": {
+    "measurement_valid": false,
+    "slot_ok": true
+   },
+   "resolve": {
+    "maximum": true,
+    "minimum": true
+   },
+   "expect": {
+    "growatt.bms.pcs.standard.326.voltage": {
+     "outcome": "withheld",
+     "reason": "gate_withheld"
+    },
+    "growatt.bms.pcs.standard.326.current": {
+     "outcome": "withheld",
+     "reason": "gate_withheld"
+    },
+    "growatt.bms.pcs.standard.326.soc_low": {
+     "outcome": "native",
+     "native": "218"
+    }
+   }
+  },
+  {
+   "name": "slot-326-slot-mismatch",
+   "frame": "326",
+   "payload": "0214BE109ADA0000",
+   "selection": {
+    "project": "QAAA",
+    "release": "0011",
+    "flavor": "pcs-standard",
+    "bank": "ordinary",
+    "scope": "local",
+    "endpoint": "coordinator",
+    "group": "0",
+    "slot": "2"
+   },
+   "input": {
+    "measurement_valid": true,
+    "slot_ok": false
+   },
+   "resolve": {
+    "maximum": true,
+    "minimum": true
+   },
+   "expect": {
+    "growatt.bms.pcs.standard.326.voltage": {
+     "outcome": "withheld",
+     "reason": "gate_withheld"
+    },
+    "growatt.bms.pcs.standard.326.current": {
+     "outcome": "withheld",
+     "reason": "gate_withheld"
+    }
+   }
+  },
+  {
+   "name": "slot-327-ordinary-both-cell-facts-resolved",
+   "frame": "327",
+   "payload": "020CE40C80050700",
+   "selection": {
+    "project": "QAAA",
+    "release": "0011",
+    "flavor": "pcs-standard",
+    "bank": "ordinary",
+    "scope": "local",
+    "endpoint": "coordinator",
+    "group": "0",
+    "slot": "2"
+   },
+   "input": {
+    "measurement_valid": true,
+    "slot_ok": true
+   },
+   "resolve": {
+    "maximum": true,
+    "minimum": true
+   },
+   "expect": {
+    "growatt.bms.pcs.standard.327.maximum_cell": {
+     "outcome": "fact",
+     "fact": "storage.cell.voltage_maximum",
+     "unit": "unit.volt",
+     "value": "3.3",
+     "role": "cell.maximum"
+    },
+    "growatt.bms.pcs.standard.327.minimum_cell": {
+     "outcome": "fact",
+     "fact": "storage.cell.voltage_minimum",
+     "unit": "unit.volt",
+     "value": "3.2",
+     "role": "cell.minimum"
+    },
+    "growatt.bms.pcs.standard.327.maximum_index": {
+     "outcome": "native",
+     "native": "5"
+    },
+    "growatt.bms.pcs.standard.327.minimum_index": {
+     "outcome": "native",
+     "native": "7"
+    },
+    "growatt.bms.pcs.standard.327.slot": {
+     "outcome": "native",
+     "native": "2"
+    },
+    "growatt.bms.pcs.parallel.327.maximum_cell": {
+     "outcome": "no_match"
+    }
+   }
+  },
+  {
+   "name": "slot-327-parallel-both-cell-facts-resolved",
+   "frame": "327",
+   "payload": "020CE40C80050700",
+   "selection": {
+    "project": "QAAA",
+    "release": "0011",
+    "flavor": "pcs-parallel",
+    "bank": "parallel",
+    "scope": "local",
+    "endpoint": "coordinator",
+    "group": "0",
+    "slot": "2"
+   },
+   "input": {
+    "measurement_valid": true,
+    "slot_ok": true
+   },
+   "resolve": {
+    "maximum": true,
+    "minimum": true
+   },
+   "expect": {
+    "growatt.bms.pcs.parallel.327.maximum_cell": {
+     "outcome": "fact",
+     "fact": "storage.cell.voltage_maximum",
+     "unit": "unit.volt",
+     "value": "3.3",
+     "role": "cell.maximum"
+    },
+    "growatt.bms.pcs.parallel.327.minimum_cell": {
+     "outcome": "fact",
+     "fact": "storage.cell.voltage_minimum",
+     "unit": "unit.volt",
+     "value": "3.2",
+     "role": "cell.minimum"
+    },
+    "growatt.bms.pcs.parallel.327.maximum_index": {
+     "outcome": "native",
+     "native": "5"
+    },
+    "growatt.bms.pcs.parallel.327.minimum_index": {
+     "outcome": "native",
+     "native": "7"
+    },
+    "growatt.bms.pcs.standard.327.minimum_cell": {
+     "outcome": "no_match"
+    }
+   }
+  },
+  {
+   "name": "slot-327-association-unresolved-keeps-native-values-and-indices",
+   "frame": "327",
+   "payload": "020CE40C80050700",
+   "selection": {
+    "project": "QAAA",
+    "release": "0011",
+    "flavor": "pcs-standard",
+    "bank": "ordinary",
+    "scope": "local",
+    "endpoint": "coordinator",
+    "group": "0",
+    "slot": "2"
+   },
+   "input": {
+    "measurement_valid": true,
+    "slot_ok": true
+   },
+   "resolve": {
+    "maximum": false,
+    "minimum": false
+   },
+   "expect": {
+    "growatt.bms.pcs.standard.327.maximum_cell": {
+     "outcome": "unresolved",
+     "native": "3300"
+    },
+    "growatt.bms.pcs.standard.327.minimum_cell": {
+     "outcome": "unresolved",
+     "native": "3200"
+    },
+    "growatt.bms.pcs.standard.327.maximum_index": {
+     "outcome": "native",
+     "native": "5"
+    },
+    "growatt.bms.pcs.standard.327.minimum_index": {
+     "outcome": "native",
+     "native": "7"
+    }
+   }
+  },
+  {
+   "name": "slot-327-only-the-maximum-resolves",
+   "frame": "327",
+   "payload": "020CE40C80050700",
+   "selection": {
+    "project": "QAAA",
+    "release": "0011",
+    "flavor": "pcs-standard",
+    "bank": "ordinary",
+    "scope": "local",
+    "endpoint": "coordinator",
+    "group": "0",
+    "slot": "2"
+   },
+   "input": {
+    "measurement_valid": true,
+    "slot_ok": true
+   },
+   "resolve": {
+    "maximum": true,
+    "minimum": false
+   },
+   "expect": {
+    "growatt.bms.pcs.standard.327.maximum_cell": {
+     "outcome": "fact",
+     "fact": "storage.cell.voltage_maximum",
+     "unit": "unit.volt",
+     "value": "3.3",
+     "role": "cell.maximum"
+    },
+    "growatt.bms.pcs.standard.327.minimum_cell": {
+     "outcome": "unresolved",
+     "native": "3200"
+    }
+   }
+  },
+  {
+   "name": "slot-327-only-the-minimum-resolves",
+   "frame": "327",
+   "payload": "020CE40C80050700",
+   "selection": {
+    "project": "QAAA",
+    "release": "0011",
+    "flavor": "pcs-standard",
+    "bank": "ordinary",
+    "scope": "local",
+    "endpoint": "coordinator",
+    "group": "0",
+    "slot": "2"
+   },
+   "input": {
+    "measurement_valid": true,
+    "slot_ok": true
+   },
+   "resolve": {
+    "maximum": false,
+    "minimum": true
+   },
+   "expect": {
+    "growatt.bms.pcs.standard.327.maximum_cell": {
+     "outcome": "unresolved",
+     "native": "3300"
+    },
+    "growatt.bms.pcs.standard.327.minimum_cell": {
+     "outcome": "fact",
+     "fact": "storage.cell.voltage_minimum",
+     "unit": "unit.volt",
+     "value": "3.2",
+     "role": "cell.minimum"
+    }
+   }
+  },
+  {
+   "name": "slot-327-measurement-invalid",
+   "frame": "327",
+   "payload": "020CE40C80050700",
+   "selection": {
+    "project": "QAAA",
+    "release": "0011",
+    "flavor": "pcs-standard",
+    "bank": "ordinary",
+    "scope": "local",
+    "endpoint": "coordinator",
+    "group": "0",
+    "slot": "2"
+   },
+   "input": {
+    "measurement_valid": false,
+    "slot_ok": true
+   },
+   "resolve": {
+    "maximum": true,
+    "minimum": true
+   },
+   "expect": {
+    "growatt.bms.pcs.standard.327.maximum_cell": {
+     "outcome": "withheld",
+     "reason": "gate_withheld"
+    },
+    "growatt.bms.pcs.standard.327.minimum_cell": {
+     "outcome": "withheld",
+     "reason": "gate_withheld"
+    },
+    "growatt.bms.pcs.standard.327.maximum_index": {
+     "outcome": "native",
+     "native": "5"
+    }
+   }
+  },
+  {
+   "name": "slot-327-group-and-slot-absent",
+   "frame": "327",
+   "payload": "020CE40C80050700",
+   "selection": {
+    "project": "QAAA",
+    "release": "0011",
+    "flavor": "pcs-standard",
+    "bank": "ordinary",
+    "scope": "local",
+    "endpoint": "coordinator",
+    "group": "",
+    "slot": ""
+   },
+   "input": {
+    "measurement_valid": true,
+    "slot_ok": true
+   },
+   "resolve": {
+    "maximum": true,
+    "minimum": true
+   },
+   "expect": {
+    "growatt.bms.pcs.standard.327.maximum_cell": {
+     "outcome": "fact",
+     "fact": "storage.cell.voltage_maximum",
+     "unit": "unit.volt",
+     "value": "3.3",
+     "role": "cell.maximum"
+    },
+    "growatt.bms.pcs.standard.327.minimum_cell": {
+     "outcome": "fact",
+     "fact": "storage.cell.voltage_minimum",
+     "unit": "unit.volt",
+     "value": "3.2",
+     "role": "cell.minimum"
+    }
+   }
+  },
+  {
+   "name": "slot-327-wrong-dlc",
+   "frame": "327",
+   "payload": "020CE40C800507",
+   "selection": {
+    "project": "QAAA",
+    "release": "0011",
+    "flavor": "pcs-standard",
+    "bank": "ordinary",
+    "scope": "local",
+    "endpoint": "coordinator",
+    "group": "0",
+    "slot": "2"
+   },
+   "input": {
+    "measurement_valid": true,
+    "slot_ok": true
+   },
+   "resolve": {
+    "maximum": true,
+    "minimum": true
+   },
+   "expect": {
+    "growatt.bms.pcs.standard.327.maximum_cell": {
+     "outcome": "no_match"
+    },
+    "growatt.bms.pcs.standard.327.minimum_cell": {
+     "outcome": "no_match"
+    }
+   }
+  },
+  {
+   "name": "extrema-319-both-cell-facts-resolved",
+   "frame": "319",
+   "payload": "5A0CE40C80050601",
+   "selection": {
+    "project": "QAAA",
+    "release": "0006",
+    "flavor": "pcs-standard",
+    "bank": "ordinary",
+    "scope": "local",
+    "endpoint": "coordinator",
+    "group": "0",
+    "slot": "1"
+   },
+   "input": {
+    "measurement_valid": true,
+    "slot_ok": true
+   },
+   "index": {
+    "valid": true,
+    "scope": "local",
+    "minimum": 0,
+    "maximum": 20
+   },
+   "resolve": {
+    "maximum": true,
+    "minimum": true
+   },
+   "expect": {
+    "growatt.bms.pcs.standard.319.maximum_cell": {
+     "outcome": "fact",
+     "fact": "storage.cell.voltage_maximum",
+     "unit": "unit.volt",
+     "value": "3.3",
+     "role": "cell.maximum"
+    },
+    "growatt.bms.pcs.standard.319.minimum_cell": {
+     "outcome": "fact",
+     "fact": "storage.cell.voltage_minimum",
+     "unit": "unit.volt",
+     "value": "3.2",
+     "role": "cell.minimum"
+    },
+    "growatt.bms.pcs.standard.319.maximum_index": {
+     "outcome": "decoded",
+     "native": "5"
+    },
+    "growatt.bms.pcs.standard.319.minimum_index": {
+     "outcome": "decoded",
+     "native": "6"
+    }
+   }
+  },
+  {
+   "name": "extrema-319-association-unresolved",
+   "frame": "319",
+   "payload": "5A0CE40C80050601",
+   "selection": {
+    "project": "QAAA",
+    "release": "0006",
+    "flavor": "pcs-standard",
+    "bank": "ordinary",
+    "scope": "local",
+    "endpoint": "coordinator",
+    "group": "0",
+    "slot": "1"
+   },
+   "input": {
+    "measurement_valid": true,
+    "slot_ok": true
+   },
+   "index": {
+    "valid": true,
+    "scope": "local",
+    "minimum": 0,
+    "maximum": 20
+   },
+   "resolve": {
+    "maximum": false,
+    "minimum": false
+   },
+   "expect": {
+    "growatt.bms.pcs.standard.319.maximum_cell": {
+     "outcome": "unresolved",
+     "native": "3300"
+    },
+    "growatt.bms.pcs.standard.319.minimum_cell": {
+     "outcome": "unresolved",
+     "native": "3200"
+    },
+    "growatt.bms.pcs.standard.319.maximum_index": {
+     "outcome": "decoded",
+     "native": "5"
+    },
+    "growatt.bms.pcs.standard.319.minimum_index": {
+     "outcome": "decoded",
+     "native": "6"
+    }
+   }
+  },
+  {
+   "name": "extrema-319-measurement-invalid",
+   "frame": "319",
+   "payload": "5A0CE40C80050601",
+   "selection": {
+    "project": "QAAA",
+    "release": "0006",
+    "flavor": "pcs-standard",
+    "bank": "ordinary",
+    "scope": "local",
+    "endpoint": "coordinator",
+    "group": "0",
+    "slot": "1"
+   },
+   "input": {
+    "measurement_valid": false,
+    "slot_ok": true
+   },
+   "index": {
+    "valid": true,
+    "scope": "local",
+    "minimum": 0,
+    "maximum": 20
+   },
+   "resolve": {
+    "maximum": true,
+    "minimum": true
+   },
+   "expect": {
+    "growatt.bms.pcs.standard.319.maximum_cell": {
+     "outcome": "withheld",
+     "reason": "gate_withheld"
+    },
+    "growatt.bms.pcs.standard.319.minimum_cell": {
+     "outcome": "withheld",
+     "reason": "gate_withheld"
+    }
+   }
+  },
+  {
+   "name": "extrema-330-both-cell-facts-resolved",
+   "frame": "330",
+   "payload": "010402070D480D16",
+   "selection": {
+    "project": "QAAA",
+    "release": "0006",
+    "flavor": "pcs-standard",
+    "bank": "ordinary",
+    "scope": "local",
+    "endpoint": "coordinator",
+    "group": "0",
+    "slot": "1"
+   },
+   "input": {
+    "measurement_valid": true,
+    "slot_ok": true
+   },
+   "index": {
+    "valid": true,
+    "scope": "local",
+    "minimum": 0,
+    "maximum": 20
+   },
+   "resolve": {
+    "maximum": true,
+    "minimum": true
+   },
+   "expect": {
+    "growatt.bms.pcs.standard.330.maximum_cell": {
+     "outcome": "fact",
+     "fact": "storage.cell.voltage_maximum",
+     "unit": "unit.volt",
+     "value": "3.4",
+     "role": "cell.maximum"
+    },
+    "growatt.bms.pcs.standard.330.minimum_cell": {
+     "outcome": "fact",
+     "fact": "storage.cell.voltage_minimum",
+     "unit": "unit.volt",
+     "value": "3.35",
+     "role": "cell.minimum"
+    },
+    "growatt.bms.pcs.standard.330.maximum_index": {
+     "outcome": "decoded",
+     "native": "4"
+    },
+    "growatt.bms.pcs.standard.330.minimum_index": {
+     "outcome": "decoded",
+     "native": "7"
+    },
+    "growatt.bms.pcs.standard.330.maximum_location": {
+     "outcome": "decoded",
+     "native": "1"
+    },
+    "growatt.bms.pcs.standard.330.minimum_location": {
+     "outcome": "decoded",
+     "native": "2"
+    }
+   }
+  },
+  {
+   "name": "extrema-330-association-unresolved",
+   "frame": "330",
+   "payload": "010402070D480D16",
+   "selection": {
+    "project": "QAAA",
+    "release": "0006",
+    "flavor": "pcs-standard",
+    "bank": "ordinary",
+    "scope": "local",
+    "endpoint": "coordinator",
+    "group": "0",
+    "slot": "1"
+   },
+   "input": {
+    "measurement_valid": true,
+    "slot_ok": true
+   },
+   "index": {
+    "valid": true,
+    "scope": "local",
+    "minimum": 0,
+    "maximum": 20
+   },
+   "resolve": {
+    "maximum": false,
+    "minimum": false
+   },
+   "expect": {
+    "growatt.bms.pcs.standard.330.maximum_cell": {
+     "outcome": "unresolved",
+     "native": "3400"
+    },
+    "growatt.bms.pcs.standard.330.minimum_cell": {
+     "outcome": "unresolved",
+     "native": "3350"
+    },
+    "growatt.bms.pcs.standard.330.maximum_location": {
+     "outcome": "decoded",
+     "native": "1"
+    },
+    "growatt.bms.pcs.standard.330.maximum_index": {
+     "outcome": "decoded",
+     "native": "4"
+    }
+   }
+  },
+  {
+   "name": "extrema-330-fixed-aggregate-location-one-is-not-measured",
+   "frame": "330",
+   "payload": "010401010D480D16",
+   "selection": {
+    "project": "QAAB",
+    "release": "0004",
+    "flavor": "pcs-standard",
+    "bank": "ordinary",
+    "scope": "aggregate",
+    "endpoint": "coordinator",
+    "group": "0",
+    "slot": "1"
+   },
+   "input": {
+    "measurement_valid": true,
+    "slot_ok": true
+   },
+   "index": {
+    "valid": true,
+    "scope": "aggregate",
+    "minimum": 0,
+    "maximum": 20
+   },
+   "resolve": {
+    "maximum": true,
+    "minimum": true
+   },
+   "expect": {
+    "growatt.bms.pcs.standard.330.maximum_cell": {
+     "outcome": "withheld",
+     "reason": "gate_withheld"
+    },
+    "growatt.bms.pcs.standard.330.minimum_cell": {
+     "outcome": "withheld",
+     "reason": "gate_withheld"
+    },
+    "growatt.bms.pcs.standard.330.maximum_location": {
+     "outcome": "decoded",
+     "native": "1"
+    },
+    "growatt.bms.pcs.standard.330.minimum_location": {
+     "outcome": "decoded",
+     "native": "1"
+    }
+   }
+  }
+ ]
+}

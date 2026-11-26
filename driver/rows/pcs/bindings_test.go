@@ -353,7 +353,7 @@ func TestLegacyMinimumTemperatureStaysNative(t *testing.T) {
 	}
 }
 
-func TestLimitWordsOf311HaveNoBinding(t *testing.T) {
+func TestChargeFrameLimitWordsHaveNoBinding(t *testing.T) {
 	checkNamed(t, "legacy-local-311-limit-words")
 	for _, b := range Bindings() {
 		if strings.Contains(b.NativeID, ".311.") {

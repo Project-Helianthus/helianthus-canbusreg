@@ -1,0 +1,3476 @@
+{
+ "description": "Synthetic extended PCS frames 0x1905 to 0x1909 and the gateway state record 0x1910. Every expectation is written by hand from the frame layout: status is accepted, raw (word kept; a unit-gated voltage keeps no typed value) or invalid; raw is the little-endian wire word, byte or bit; value is the exact decimal where the row presents one. The fault blocks are 0x1907 (fault bytes 0 to 7, bits 0 to 63) and 0x1908 (fault bytes 8 to 15, bits 64 to 127); the extended flavor admits no dictionary, so every fault bit is raw.",
+ "cases": [
+  {
+   "name": "1905-local-l2",
+   "identifier": "0x1905F202",
+   "payload": "0300d00c05002c0b",
+   "selection": {
+    "project": "QAAA",
+    "release": "0006",
+    "flavor": "pcs-extended19",
+    "bank": "ordinary",
+    "scope": "local",
+    "endpoint": "coordinator",
+    "group": "0",
+    "slot": "1",
+    "destination": 242,
+    "source": 2
+   },
+   "expect": {
+    "maximum_index": {
+     "status": "accepted",
+     "raw": 3,
+     "value": "3"
+    },
+    "minimum_index": {
+     "status": "accepted",
+     "raw": 5,
+     "value": "5"
+    },
+    "maximum_voltage": {
+     "status": "accepted",
+     "raw": 3280,
+     "value": "3280"
+    },
+    "minimum_voltage": {
+     "status": "accepted",
+     "raw": 2860,
+     "value": "2860"
+    }
+   }
+  },
+  {
+   "name": "1905-local-l2-maximum-words",
+   "identifier": "0x1905F202",
+   "payload": "ffffffffffffffff",
+   "selection": {
+    "project": "QAAA",
+    "release": "0006",
+    "flavor": "pcs-extended19",
+    "bank": "ordinary",
+    "scope": "local",
+    "endpoint": "coordinator",
+    "group": "0",
+    "slot": "1",
+    "destination": 242,
+    "source": 2
+   },
+   "expect": {
+    "maximum_index": {
+     "status": "accepted",
+     "raw": 65535,
+     "value": "65535"
+    },
+    "minimum_index": {
+     "status": "accepted",
+     "raw": 65535,
+     "value": "65535"
+    },
+    "maximum_voltage": {
+     "status": "accepted",
+     "raw": 65535,
+     "value": "65535"
+    },
+    "minimum_voltage": {
+     "status": "accepted",
+     "raw": 65535,
+     "value": "65535"
+    }
+   }
+  },
+  {
+   "name": "1905-local-other-release-raw",
+   "identifier": "0x1905F202",
+   "payload": "0300d00c05002c0b",
+   "selection": {
+    "project": "QAAA",
+    "release": "0007",
+    "flavor": "pcs-extended19",
+    "bank": "ordinary",
+    "scope": "local",
+    "endpoint": "coordinator",
+    "group": "0",
+    "slot": "1",
+    "destination": 242,
+    "source": 2
+   },
+   "expect": {
+    "maximum_index": {
+     "status": "accepted",
+     "raw": 3,
+     "value": "3"
+    },
+    "minimum_index": {
+     "status": "accepted",
+     "raw": 5,
+     "value": "5"
+    },
+    "maximum_voltage": {
+     "status": "raw",
+     "raw": 3280,
+     "value": ""
+    },
+    "minimum_voltage": {
+     "status": "raw",
+     "raw": 2860,
+     "value": ""
+    }
+   }
+  },
+  {
+   "name": "1905-aggregate-raw",
+   "identifier": "0x1905DFF2",
+   "payload": "0300d00c05002c0b",
+   "selection": {
+    "project": "QAAA",
+    "release": "0006",
+    "flavor": "pcs-extended19",
+    "bank": "ordinary",
+    "scope": "aggregate",
+    "endpoint": "coordinator",
+    "group": "0",
+    "slot": "1",
+    "destination": 223,
+    "source": 242
+   },
+   "expect": {
+    "maximum_index": {
+     "status": "accepted",
+     "raw": 3,
+     "value": "3"
+    },
+    "minimum_index": {
+     "status": "accepted",
+     "raw": 5,
+     "value": "5"
+    },
+    "maximum_voltage": {
+     "status": "raw",
+     "raw": 3280,
+     "value": ""
+    },
+    "minimum_voltage": {
+     "status": "raw",
+     "raw": 2860,
+     "value": ""
+    }
+   }
+  },
+  {
+   "name": "1905-aggregate-folded-1915-raw",
+   "identifier": "0x1915DFF2",
+   "payload": "0300d00c05002c0b",
+   "selection": {
+    "project": "QAAA",
+    "release": "0006",
+    "flavor": "pcs-extended19",
+    "bank": "ordinary",
+    "scope": "aggregate",
+    "endpoint": "coordinator",
+    "group": "0",
+    "slot": "1",
+    "destination": 223,
+    "source": 242
+   },
+   "expect": {
+    "maximum_index": {
+     "status": "accepted",
+     "raw": 3,
+     "value": "3"
+    },
+    "minimum_index": {
+     "status": "accepted",
+     "raw": 5,
+     "value": "5"
+    },
+    "maximum_voltage": {
+     "status": "raw",
+     "raw": 3280,
+     "value": ""
+    },
+    "minimum_voltage": {
+     "status": "raw",
+     "raw": 2860,
+     "value": ""
+    }
+   }
+  },
+  {
+   "name": "1905-gateway-endpoint-raw",
+   "identifier": "0x1905F203",
+   "payload": "0300d00c05002c0b",
+   "selection": {
+    "project": "QCAA",
+    "release": "0001",
+    "flavor": "pcs-extended19",
+    "bank": "ordinary",
+    "scope": "local",
+    "endpoint": "gateway",
+    "group": "",
+    "slot": "",
+    "destination": 242,
+    "source": 3
+   },
+   "expect": {
+    "maximum_index": {
+     "status": "accepted",
+     "raw": 3,
+     "value": "3"
+    },
+    "minimum_index": {
+     "status": "accepted",
+     "raw": 5,
+     "value": "5"
+    },
+    "maximum_voltage": {
+     "status": "raw",
+     "raw": 3280,
+     "value": ""
+    },
+    "minimum_voltage": {
+     "status": "raw",
+     "raw": 2860,
+     "value": ""
+    }
+   }
+  },
+  {
+   "name": "1906-local-l2",
+   "identifier": "0x1906F202",
+   "payload": "0200550700460164",
+   "selection": {
+    "project": "QAAA",
+    "release": "0006",
+    "flavor": "pcs-extended19",
+    "bank": "ordinary",
+    "scope": "local",
+    "endpoint": "coordinator",
+    "group": "0",
+    "slot": "1",
+    "destination": 242,
+    "source": 2
+   },
+   "expect": {
+    "maximum_index": {
+     "status": "accepted",
+     "raw": 2,
+     "value": "2"
+    },
+    "maximum_temperature_code": {
+     "status": "raw",
+     "raw": 85,
+     "value": "85"
+    },
+    "minimum_index": {
+     "status": "accepted",
+     "raw": 7,
+     "value": "7"
+    },
+    "minimum_temperature_code": {
+     "status": "raw",
+     "raw": 70,
+     "value": "70"
+    },
+    "extra": {
+     "status": "raw",
+     "raw": 1,
+     "value": "1"
+    },
+    "soh_like": {
+     "status": "raw",
+     "raw": 100,
+     "value": "100"
+    }
+   }
+  },
+  {
+   "name": "1906-aggregate-folded-1916",
+   "identifier": "0x1916DFF2",
+   "payload": "0200550700460164",
+   "selection": {
+    "project": "QAAA",
+    "release": "0006",
+    "flavor": "pcs-extended19",
+    "bank": "ordinary",
+    "scope": "aggregate",
+    "endpoint": "coordinator",
+    "group": "0",
+    "slot": "1",
+    "destination": 223,
+    "source": 242
+   },
+   "expect": {
+    "maximum_index": {
+     "status": "accepted",
+     "raw": 2,
+     "value": "2"
+    },
+    "maximum_temperature_code": {
+     "status": "raw",
+     "raw": 85,
+     "value": "85"
+    },
+    "minimum_index": {
+     "status": "accepted",
+     "raw": 7,
+     "value": "7"
+    },
+    "minimum_temperature_code": {
+     "status": "raw",
+     "raw": 70,
+     "value": "70"
+    },
+    "extra": {
+     "status": "raw",
+     "raw": 1,
+     "value": "1"
+    },
+    "soh_like": {
+     "status": "raw",
+     "raw": 100,
+     "value": "100"
+    }
+   }
+  },
+  {
+   "name": "1907-local-l2-single-bits",
+   "identifier": "0x1907F202",
+   "payload": "0102040810204080",
+   "selection": {
+    "project": "QAAA",
+    "release": "0006",
+    "flavor": "pcs-extended19",
+    "bank": "ordinary",
+    "scope": "local",
+    "endpoint": "coordinator",
+    "group": "0",
+    "slot": "1",
+    "destination": 242,
+    "source": 2
+   },
+   "expect": {
+    "current_fault_0": {
+     "status": "accepted",
+     "raw": 1,
+     "value": "1"
+    },
+    "current_fault_bit_0": {
+     "status": "raw",
+     "raw": 1,
+     "value": "1"
+    },
+    "current_fault_bit_1": {
+     "status": "raw",
+     "raw": 0,
+     "value": "0"
+    },
+    "current_fault_bit_2": {
+     "status": "raw",
+     "raw": 0,
+     "value": "0"
+    },
+    "current_fault_bit_3": {
+     "status": "raw",
+     "raw": 0,
+     "value": "0"
+    },
+    "current_fault_bit_4": {
+     "status": "raw",
+     "raw": 0,
+     "value": "0"
+    },
+    "current_fault_bit_5": {
+     "status": "raw",
+     "raw": 0,
+     "value": "0"
+    },
+    "current_fault_bit_6": {
+     "status": "raw",
+     "raw": 0,
+     "value": "0"
+    },
+    "current_fault_bit_7": {
+     "status": "raw",
+     "raw": 0,
+     "value": "0"
+    },
+    "current_fault_1": {
+     "status": "accepted",
+     "raw": 2,
+     "value": "2"
+    },
+    "current_fault_bit_8": {
+     "status": "raw",
+     "raw": 0,
+     "value": "0"
+    },
+    "current_fault_bit_9": {
+     "status": "raw",
+     "raw": 1,
+     "value": "1"
+    },
+    "current_fault_bit_10": {
+     "status": "raw",
+     "raw": 0,
+     "value": "0"
+    },
+    "current_fault_bit_11": {
+     "status": "raw",
+     "raw": 0,
+     "value": "0"
+    },
+    "current_fault_bit_12": {
+     "status": "raw",
+     "raw": 0,
+     "value": "0"
+    },
+    "current_fault_bit_13": {
+     "status": "raw",
+     "raw": 0,
+     "value": "0"
+    },
+    "current_fault_bit_14": {
+     "status": "raw",
+     "raw": 0,
+     "value": "0"
+    },
+    "current_fault_bit_15": {
+     "status": "raw",
+     "raw": 0,
+     "value": "0"
+    },
+    "current_fault_2": {
+     "status": "accepted",
+     "raw": 4,
+     "value": "4"
+    },
+    "current_fault_bit_16": {
+     "status": "raw",
+     "raw": 0,
+     "value": "0"
+    },
+    "current_fault_bit_17": {
+     "status": "raw",
+     "raw": 0,
+     "value": "0"
+    },
+    "current_fault_bit_18": {
+     "status": "raw",
+     "raw": 1,
+     "value": "1"
+    },
+    "current_fault_bit_19": {
+     "status": "raw",
+     "raw": 0,
+     "value": "0"
+    },
+    "current_fault_bit_20": {
+     "status": "raw",
+     "raw": 0,
+     "value": "0"
+    },
+    "current_fault_bit_21": {
+     "status": "raw",
+     "raw": 0,
+     "value": "0"
+    },
+    "current_fault_bit_22": {
+     "status": "raw",
+     "raw": 0,
+     "value": "0"
+    },
+    "current_fault_bit_23": {
+     "status": "raw",
+     "raw": 0,
+     "value": "0"
+    },
+    "current_fault_3": {
+     "status": "accepted",
+     "raw": 8,
+     "value": "8"
+    },
+    "current_fault_bit_24": {
+     "status": "raw",
+     "raw": 0,
+     "value": "0"
+    },
+    "current_fault_bit_25": {
+     "status": "raw",
+     "raw": 0,
+     "value": "0"
+    },
+    "current_fault_bit_26": {
+     "status": "raw",
+     "raw": 0,
+     "value": "0"
+    },
+    "current_fault_bit_27": {
+     "status": "raw",
+     "raw": 1,
+     "value": "1"
+    },
+    "current_fault_bit_28": {
+     "status": "raw",
+     "raw": 0,
+     "value": "0"
+    },
+    "current_fault_bit_29": {
+     "status": "raw",
+     "raw": 0,
+     "value": "0"
+    },
+    "current_fault_bit_30": {
+     "status": "raw",
+     "raw": 0,
+     "value": "0"
+    },
+    "current_fault_bit_31": {
+     "status": "raw",
+     "raw": 0,
+     "value": "0"
+    },
+    "current_fault_4": {
+     "status": "accepted",
+     "raw": 16,
+     "value": "16"
+    },
+    "current_fault_bit_32": {
+     "status": "raw",
+     "raw": 0,
+     "value": "0"
+    },
+    "current_fault_bit_33": {
+     "status": "raw",
+     "raw": 0,
+     "value": "0"
+    },
+    "current_fault_bit_34": {
+     "status": "raw",
+     "raw": 0,
+     "value": "0"
+    },
+    "current_fault_bit_35": {
+     "status": "raw",
+     "raw": 0,
+     "value": "0"
+    },
+    "current_fault_bit_36": {
+     "status": "raw",
+     "raw": 1,
+     "value": "1"
+    },
+    "current_fault_bit_37": {
+     "status": "raw",
+     "raw": 0,
+     "value": "0"
+    },
+    "current_fault_bit_38": {
+     "status": "raw",
+     "raw": 0,
+     "value": "0"
+    },
+    "current_fault_bit_39": {
+     "status": "raw",
+     "raw": 0,
+     "value": "0"
+    },
+    "current_fault_5": {
+     "status": "accepted",
+     "raw": 32,
+     "value": "32"
+    },
+    "current_fault_bit_40": {
+     "status": "raw",
+     "raw": 0,
+     "value": "0"
+    },
+    "current_fault_bit_41": {
+     "status": "raw",
+     "raw": 0,
+     "value": "0"
+    },
+    "current_fault_bit_42": {
+     "status": "raw",
+     "raw": 0,
+     "value": "0"
+    },
+    "current_fault_bit_43": {
+     "status": "raw",
+     "raw": 0,
+     "value": "0"
+    },
+    "current_fault_bit_44": {
+     "status": "raw",
+     "raw": 0,
+     "value": "0"
+    },
+    "current_fault_bit_45": {
+     "status": "raw",
+     "raw": 1,
+     "value": "1"
+    },
+    "current_fault_bit_46": {
+     "status": "raw",
+     "raw": 0,
+     "value": "0"
+    },
+    "current_fault_bit_47": {
+     "status": "raw",
+     "raw": 0,
+     "value": "0"
+    },
+    "current_fault_6": {
+     "status": "accepted",
+     "raw": 64,
+     "value": "64"
+    },
+    "current_fault_bit_48": {
+     "status": "raw",
+     "raw": 0,
+     "value": "0"
+    },
+    "current_fault_bit_49": {
+     "status": "raw",
+     "raw": 0,
+     "value": "0"
+    },
+    "current_fault_bit_50": {
+     "status": "raw",
+     "raw": 0,
+     "value": "0"
+    },
+    "current_fault_bit_51": {
+     "status": "raw",
+     "raw": 0,
+     "value": "0"
+    },
+    "current_fault_bit_52": {
+     "status": "raw",
+     "raw": 0,
+     "value": "0"
+    },
+    "current_fault_bit_53": {
+     "status": "raw",
+     "raw": 0,
+     "value": "0"
+    },
+    "current_fault_bit_54": {
+     "status": "raw",
+     "raw": 1,
+     "value": "1"
+    },
+    "current_fault_bit_55": {
+     "status": "raw",
+     "raw": 0,
+     "value": "0"
+    },
+    "current_fault_7": {
+     "status": "accepted",
+     "raw": 128,
+     "value": "128"
+    },
+    "current_fault_bit_56": {
+     "status": "raw",
+     "raw": 0,
+     "value": "0"
+    },
+    "current_fault_bit_57": {
+     "status": "raw",
+     "raw": 0,
+     "value": "0"
+    },
+    "current_fault_bit_58": {
+     "status": "raw",
+     "raw": 0,
+     "value": "0"
+    },
+    "current_fault_bit_59": {
+     "status": "raw",
+     "raw": 0,
+     "value": "0"
+    },
+    "current_fault_bit_60": {
+     "status": "raw",
+     "raw": 0,
+     "value": "0"
+    },
+    "current_fault_bit_61": {
+     "status": "raw",
+     "raw": 0,
+     "value": "0"
+    },
+    "current_fault_bit_62": {
+     "status": "raw",
+     "raw": 0,
+     "value": "0"
+    },
+    "current_fault_bit_63": {
+     "status": "raw",
+     "raw": 1,
+     "value": "1"
+    }
+   }
+  },
+  {
+   "name": "1908-local-l2-mixed-bits",
+   "identifier": "0x1908F202",
+   "payload": "ff00a55a00000180",
+   "selection": {
+    "project": "QAAA",
+    "release": "0006",
+    "flavor": "pcs-extended19",
+    "bank": "ordinary",
+    "scope": "local",
+    "endpoint": "coordinator",
+    "group": "0",
+    "slot": "1",
+    "destination": 242,
+    "source": 2
+   },
+   "expect": {
+    "current_fault_8": {
+     "status": "accepted",
+     "raw": 255,
+     "value": "255"
+    },
+    "current_fault_bit_64": {
+     "status": "raw",
+     "raw": 1,
+     "value": "1"
+    },
+    "current_fault_bit_65": {
+     "status": "raw",
+     "raw": 1,
+     "value": "1"
+    },
+    "current_fault_bit_66": {
+     "status": "raw",
+     "raw": 1,
+     "value": "1"
+    },
+    "current_fault_bit_67": {
+     "status": "raw",
+     "raw": 1,
+     "value": "1"
+    },
+    "current_fault_bit_68": {
+     "status": "raw",
+     "raw": 1,
+     "value": "1"
+    },
+    "current_fault_bit_69": {
+     "status": "raw",
+     "raw": 1,
+     "value": "1"
+    },
+    "current_fault_bit_70": {
+     "status": "raw",
+     "raw": 1,
+     "value": "1"
+    },
+    "current_fault_bit_71": {
+     "status": "raw",
+     "raw": 1,
+     "value": "1"
+    },
+    "current_fault_9": {
+     "status": "accepted",
+     "raw": 0,
+     "value": "0"
+    },
+    "current_fault_bit_72": {
+     "status": "raw",
+     "raw": 0,
+     "value": "0"
+    },
+    "current_fault_bit_73": {
+     "status": "raw",
+     "raw": 0,
+     "value": "0"
+    },
+    "current_fault_bit_74": {
+     "status": "raw",
+     "raw": 0,
+     "value": "0"
+    },
+    "current_fault_bit_75": {
+     "status": "raw",
+     "raw": 0,
+     "value": "0"
+    },
+    "current_fault_bit_76": {
+     "status": "raw",
+     "raw": 0,
+     "value": "0"
+    },
+    "current_fault_bit_77": {
+     "status": "raw",
+     "raw": 0,
+     "value": "0"
+    },
+    "current_fault_bit_78": {
+     "status": "raw",
+     "raw": 0,
+     "value": "0"
+    },
+    "current_fault_bit_79": {
+     "status": "raw",
+     "raw": 0,
+     "value": "0"
+    },
+    "current_fault_10": {
+     "status": "accepted",
+     "raw": 165,
+     "value": "165"
+    },
+    "current_fault_bit_80": {
+     "status": "raw",
+     "raw": 1,
+     "value": "1"
+    },
+    "current_fault_bit_81": {
+     "status": "raw",
+     "raw": 0,
+     "value": "0"
+    },
+    "current_fault_bit_82": {
+     "status": "raw",
+     "raw": 1,
+     "value": "1"
+    },
+    "current_fault_bit_83": {
+     "status": "raw",
+     "raw": 0,
+     "value": "0"
+    },
+    "current_fault_bit_84": {
+     "status": "raw",
+     "raw": 0,
+     "value": "0"
+    },
+    "current_fault_bit_85": {
+     "status": "raw",
+     "raw": 1,
+     "value": "1"
+    },
+    "current_fault_bit_86": {
+     "status": "raw",
+     "raw": 0,
+     "value": "0"
+    },
+    "current_fault_bit_87": {
+     "status": "raw",
+     "raw": 1,
+     "value": "1"
+    },
+    "current_fault_11": {
+     "status": "accepted",
+     "raw": 90,
+     "value": "90"
+    },
+    "current_fault_bit_88": {
+     "status": "raw",
+     "raw": 0,
+     "value": "0"
+    },
+    "current_fault_bit_89": {
+     "status": "raw",
+     "raw": 1,
+     "value": "1"
+    },
+    "current_fault_bit_90": {
+     "status": "raw",
+     "raw": 0,
+     "value": "0"
+    },
+    "current_fault_bit_91": {
+     "status": "raw",
+     "raw": 1,
+     "value": "1"
+    },
+    "current_fault_bit_92": {
+     "status": "raw",
+     "raw": 1,
+     "value": "1"
+    },
+    "current_fault_bit_93": {
+     "status": "raw",
+     "raw": 0,
+     "value": "0"
+    },
+    "current_fault_bit_94": {
+     "status": "raw",
+     "raw": 1,
+     "value": "1"
+    },
+    "current_fault_bit_95": {
+     "status": "raw",
+     "raw": 0,
+     "value": "0"
+    },
+    "current_fault_12": {
+     "status": "accepted",
+     "raw": 0,
+     "value": "0"
+    },
+    "current_fault_bit_96": {
+     "status": "raw",
+     "raw": 0,
+     "value": "0"
+    },
+    "current_fault_bit_97": {
+     "status": "raw",
+     "raw": 0,
+     "value": "0"
+    },
+    "current_fault_bit_98": {
+     "status": "raw",
+     "raw": 0,
+     "value": "0"
+    },
+    "current_fault_bit_99": {
+     "status": "raw",
+     "raw": 0,
+     "value": "0"
+    },
+    "current_fault_bit_100": {
+     "status": "raw",
+     "raw": 0,
+     "value": "0"
+    },
+    "current_fault_bit_101": {
+     "status": "raw",
+     "raw": 0,
+     "value": "0"
+    },
+    "current_fault_bit_102": {
+     "status": "raw",
+     "raw": 0,
+     "value": "0"
+    },
+    "current_fault_bit_103": {
+     "status": "raw",
+     "raw": 0,
+     "value": "0"
+    },
+    "current_fault_13": {
+     "status": "accepted",
+     "raw": 0,
+     "value": "0"
+    },
+    "current_fault_bit_104": {
+     "status": "raw",
+     "raw": 0,
+     "value": "0"
+    },
+    "current_fault_bit_105": {
+     "status": "raw",
+     "raw": 0,
+     "value": "0"
+    },
+    "current_fault_bit_106": {
+     "status": "raw",
+     "raw": 0,
+     "value": "0"
+    },
+    "current_fault_bit_107": {
+     "status": "raw",
+     "raw": 0,
+     "value": "0"
+    },
+    "current_fault_bit_108": {
+     "status": "raw",
+     "raw": 0,
+     "value": "0"
+    },
+    "current_fault_bit_109": {
+     "status": "raw",
+     "raw": 0,
+     "value": "0"
+    },
+    "current_fault_bit_110": {
+     "status": "raw",
+     "raw": 0,
+     "value": "0"
+    },
+    "current_fault_bit_111": {
+     "status": "raw",
+     "raw": 0,
+     "value": "0"
+    },
+    "current_fault_14": {
+     "status": "accepted",
+     "raw": 1,
+     "value": "1"
+    },
+    "current_fault_bit_112": {
+     "status": "raw",
+     "raw": 1,
+     "value": "1"
+    },
+    "current_fault_bit_113": {
+     "status": "raw",
+     "raw": 0,
+     "value": "0"
+    },
+    "current_fault_bit_114": {
+     "status": "raw",
+     "raw": 0,
+     "value": "0"
+    },
+    "current_fault_bit_115": {
+     "status": "raw",
+     "raw": 0,
+     "value": "0"
+    },
+    "current_fault_bit_116": {
+     "status": "raw",
+     "raw": 0,
+     "value": "0"
+    },
+    "current_fault_bit_117": {
+     "status": "raw",
+     "raw": 0,
+     "value": "0"
+    },
+    "current_fault_bit_118": {
+     "status": "raw",
+     "raw": 0,
+     "value": "0"
+    },
+    "current_fault_bit_119": {
+     "status": "raw",
+     "raw": 0,
+     "value": "0"
+    },
+    "current_fault_15": {
+     "status": "accepted",
+     "raw": 128,
+     "value": "128"
+    },
+    "current_fault_bit_120": {
+     "status": "raw",
+     "raw": 0,
+     "value": "0"
+    },
+    "current_fault_bit_121": {
+     "status": "raw",
+     "raw": 0,
+     "value": "0"
+    },
+    "current_fault_bit_122": {
+     "status": "raw",
+     "raw": 0,
+     "value": "0"
+    },
+    "current_fault_bit_123": {
+     "status": "raw",
+     "raw": 0,
+     "value": "0"
+    },
+    "current_fault_bit_124": {
+     "status": "raw",
+     "raw": 0,
+     "value": "0"
+    },
+    "current_fault_bit_125": {
+     "status": "raw",
+     "raw": 0,
+     "value": "0"
+    },
+    "current_fault_bit_126": {
+     "status": "raw",
+     "raw": 0,
+     "value": "0"
+    },
+    "current_fault_bit_127": {
+     "status": "raw",
+     "raw": 1,
+     "value": "1"
+    }
+   }
+  },
+  {
+   "name": "1907-local-l2-clear",
+   "identifier": "0x1907F202",
+   "payload": "0000000000000000",
+   "selection": {
+    "project": "QAAA",
+    "release": "0006",
+    "flavor": "pcs-extended19",
+    "bank": "ordinary",
+    "scope": "local",
+    "endpoint": "coordinator",
+    "group": "0",
+    "slot": "1",
+    "destination": 242,
+    "source": 2
+   },
+   "expect": {
+    "current_fault_0": {
+     "status": "accepted",
+     "raw": 0,
+     "value": "0"
+    },
+    "current_fault_bit_0": {
+     "status": "raw",
+     "raw": 0,
+     "value": "0"
+    },
+    "current_fault_bit_1": {
+     "status": "raw",
+     "raw": 0,
+     "value": "0"
+    },
+    "current_fault_bit_2": {
+     "status": "raw",
+     "raw": 0,
+     "value": "0"
+    },
+    "current_fault_bit_3": {
+     "status": "raw",
+     "raw": 0,
+     "value": "0"
+    },
+    "current_fault_bit_4": {
+     "status": "raw",
+     "raw": 0,
+     "value": "0"
+    },
+    "current_fault_bit_5": {
+     "status": "raw",
+     "raw": 0,
+     "value": "0"
+    },
+    "current_fault_bit_6": {
+     "status": "raw",
+     "raw": 0,
+     "value": "0"
+    },
+    "current_fault_bit_7": {
+     "status": "raw",
+     "raw": 0,
+     "value": "0"
+    },
+    "current_fault_1": {
+     "status": "accepted",
+     "raw": 0,
+     "value": "0"
+    },
+    "current_fault_bit_8": {
+     "status": "raw",
+     "raw": 0,
+     "value": "0"
+    },
+    "current_fault_bit_9": {
+     "status": "raw",
+     "raw": 0,
+     "value": "0"
+    },
+    "current_fault_bit_10": {
+     "status": "raw",
+     "raw": 0,
+     "value": "0"
+    },
+    "current_fault_bit_11": {
+     "status": "raw",
+     "raw": 0,
+     "value": "0"
+    },
+    "current_fault_bit_12": {
+     "status": "raw",
+     "raw": 0,
+     "value": "0"
+    },
+    "current_fault_bit_13": {
+     "status": "raw",
+     "raw": 0,
+     "value": "0"
+    },
+    "current_fault_bit_14": {
+     "status": "raw",
+     "raw": 0,
+     "value": "0"
+    },
+    "current_fault_bit_15": {
+     "status": "raw",
+     "raw": 0,
+     "value": "0"
+    },
+    "current_fault_2": {
+     "status": "accepted",
+     "raw": 0,
+     "value": "0"
+    },
+    "current_fault_bit_16": {
+     "status": "raw",
+     "raw": 0,
+     "value": "0"
+    },
+    "current_fault_bit_17": {
+     "status": "raw",
+     "raw": 0,
+     "value": "0"
+    },
+    "current_fault_bit_18": {
+     "status": "raw",
+     "raw": 0,
+     "value": "0"
+    },
+    "current_fault_bit_19": {
+     "status": "raw",
+     "raw": 0,
+     "value": "0"
+    },
+    "current_fault_bit_20": {
+     "status": "raw",
+     "raw": 0,
+     "value": "0"
+    },
+    "current_fault_bit_21": {
+     "status": "raw",
+     "raw": 0,
+     "value": "0"
+    },
+    "current_fault_bit_22": {
+     "status": "raw",
+     "raw": 0,
+     "value": "0"
+    },
+    "current_fault_bit_23": {
+     "status": "raw",
+     "raw": 0,
+     "value": "0"
+    },
+    "current_fault_3": {
+     "status": "accepted",
+     "raw": 0,
+     "value": "0"
+    },
+    "current_fault_bit_24": {
+     "status": "raw",
+     "raw": 0,
+     "value": "0"
+    },
+    "current_fault_bit_25": {
+     "status": "raw",
+     "raw": 0,
+     "value": "0"
+    },
+    "current_fault_bit_26": {
+     "status": "raw",
+     "raw": 0,
+     "value": "0"
+    },
+    "current_fault_bit_27": {
+     "status": "raw",
+     "raw": 0,
+     "value": "0"
+    },
+    "current_fault_bit_28": {
+     "status": "raw",
+     "raw": 0,
+     "value": "0"
+    },
+    "current_fault_bit_29": {
+     "status": "raw",
+     "raw": 0,
+     "value": "0"
+    },
+    "current_fault_bit_30": {
+     "status": "raw",
+     "raw": 0,
+     "value": "0"
+    },
+    "current_fault_bit_31": {
+     "status": "raw",
+     "raw": 0,
+     "value": "0"
+    },
+    "current_fault_4": {
+     "status": "accepted",
+     "raw": 0,
+     "value": "0"
+    },
+    "current_fault_bit_32": {
+     "status": "raw",
+     "raw": 0,
+     "value": "0"
+    },
+    "current_fault_bit_33": {
+     "status": "raw",
+     "raw": 0,
+     "value": "0"
+    },
+    "current_fault_bit_34": {
+     "status": "raw",
+     "raw": 0,
+     "value": "0"
+    },
+    "current_fault_bit_35": {
+     "status": "raw",
+     "raw": 0,
+     "value": "0"
+    },
+    "current_fault_bit_36": {
+     "status": "raw",
+     "raw": 0,
+     "value": "0"
+    },
+    "current_fault_bit_37": {
+     "status": "raw",
+     "raw": 0,
+     "value": "0"
+    },
+    "current_fault_bit_38": {
+     "status": "raw",
+     "raw": 0,
+     "value": "0"
+    },
+    "current_fault_bit_39": {
+     "status": "raw",
+     "raw": 0,
+     "value": "0"
+    },
+    "current_fault_5": {
+     "status": "accepted",
+     "raw": 0,
+     "value": "0"
+    },
+    "current_fault_bit_40": {
+     "status": "raw",
+     "raw": 0,
+     "value": "0"
+    },
+    "current_fault_bit_41": {
+     "status": "raw",
+     "raw": 0,
+     "value": "0"
+    },
+    "current_fault_bit_42": {
+     "status": "raw",
+     "raw": 0,
+     "value": "0"
+    },
+    "current_fault_bit_43": {
+     "status": "raw",
+     "raw": 0,
+     "value": "0"
+    },
+    "current_fault_bit_44": {
+     "status": "raw",
+     "raw": 0,
+     "value": "0"
+    },
+    "current_fault_bit_45": {
+     "status": "raw",
+     "raw": 0,
+     "value": "0"
+    },
+    "current_fault_bit_46": {
+     "status": "raw",
+     "raw": 0,
+     "value": "0"
+    },
+    "current_fault_bit_47": {
+     "status": "raw",
+     "raw": 0,
+     "value": "0"
+    },
+    "current_fault_6": {
+     "status": "accepted",
+     "raw": 0,
+     "value": "0"
+    },
+    "current_fault_bit_48": {
+     "status": "raw",
+     "raw": 0,
+     "value": "0"
+    },
+    "current_fault_bit_49": {
+     "status": "raw",
+     "raw": 0,
+     "value": "0"
+    },
+    "current_fault_bit_50": {
+     "status": "raw",
+     "raw": 0,
+     "value": "0"
+    },
+    "current_fault_bit_51": {
+     "status": "raw",
+     "raw": 0,
+     "value": "0"
+    },
+    "current_fault_bit_52": {
+     "status": "raw",
+     "raw": 0,
+     "value": "0"
+    },
+    "current_fault_bit_53": {
+     "status": "raw",
+     "raw": 0,
+     "value": "0"
+    },
+    "current_fault_bit_54": {
+     "status": "raw",
+     "raw": 0,
+     "value": "0"
+    },
+    "current_fault_bit_55": {
+     "status": "raw",
+     "raw": 0,
+     "value": "0"
+    },
+    "current_fault_7": {
+     "status": "accepted",
+     "raw": 0,
+     "value": "0"
+    },
+    "current_fault_bit_56": {
+     "status": "raw",
+     "raw": 0,
+     "value": "0"
+    },
+    "current_fault_bit_57": {
+     "status": "raw",
+     "raw": 0,
+     "value": "0"
+    },
+    "current_fault_bit_58": {
+     "status": "raw",
+     "raw": 0,
+     "value": "0"
+    },
+    "current_fault_bit_59": {
+     "status": "raw",
+     "raw": 0,
+     "value": "0"
+    },
+    "current_fault_bit_60": {
+     "status": "raw",
+     "raw": 0,
+     "value": "0"
+    },
+    "current_fault_bit_61": {
+     "status": "raw",
+     "raw": 0,
+     "value": "0"
+    },
+    "current_fault_bit_62": {
+     "status": "raw",
+     "raw": 0,
+     "value": "0"
+    },
+    "current_fault_bit_63": {
+     "status": "raw",
+     "raw": 0,
+     "value": "0"
+    }
+   }
+  },
+  {
+   "name": "1907-local-l2-all-set",
+   "identifier": "0x1907F202",
+   "payload": "ffffffffffffffff",
+   "selection": {
+    "project": "QAAA",
+    "release": "0006",
+    "flavor": "pcs-extended19",
+    "bank": "ordinary",
+    "scope": "local",
+    "endpoint": "coordinator",
+    "group": "0",
+    "slot": "1",
+    "destination": 242,
+    "source": 2
+   },
+   "expect": {
+    "current_fault_0": {
+     "status": "accepted",
+     "raw": 255,
+     "value": "255"
+    },
+    "current_fault_bit_0": {
+     "status": "raw",
+     "raw": 1,
+     "value": "1"
+    },
+    "current_fault_bit_1": {
+     "status": "raw",
+     "raw": 1,
+     "value": "1"
+    },
+    "current_fault_bit_2": {
+     "status": "raw",
+     "raw": 1,
+     "value": "1"
+    },
+    "current_fault_bit_3": {
+     "status": "raw",
+     "raw": 1,
+     "value": "1"
+    },
+    "current_fault_bit_4": {
+     "status": "raw",
+     "raw": 1,
+     "value": "1"
+    },
+    "current_fault_bit_5": {
+     "status": "raw",
+     "raw": 1,
+     "value": "1"
+    },
+    "current_fault_bit_6": {
+     "status": "raw",
+     "raw": 1,
+     "value": "1"
+    },
+    "current_fault_bit_7": {
+     "status": "raw",
+     "raw": 1,
+     "value": "1"
+    },
+    "current_fault_1": {
+     "status": "accepted",
+     "raw": 255,
+     "value": "255"
+    },
+    "current_fault_bit_8": {
+     "status": "raw",
+     "raw": 1,
+     "value": "1"
+    },
+    "current_fault_bit_9": {
+     "status": "raw",
+     "raw": 1,
+     "value": "1"
+    },
+    "current_fault_bit_10": {
+     "status": "raw",
+     "raw": 1,
+     "value": "1"
+    },
+    "current_fault_bit_11": {
+     "status": "raw",
+     "raw": 1,
+     "value": "1"
+    },
+    "current_fault_bit_12": {
+     "status": "raw",
+     "raw": 1,
+     "value": "1"
+    },
+    "current_fault_bit_13": {
+     "status": "raw",
+     "raw": 1,
+     "value": "1"
+    },
+    "current_fault_bit_14": {
+     "status": "raw",
+     "raw": 1,
+     "value": "1"
+    },
+    "current_fault_bit_15": {
+     "status": "raw",
+     "raw": 1,
+     "value": "1"
+    },
+    "current_fault_2": {
+     "status": "accepted",
+     "raw": 255,
+     "value": "255"
+    },
+    "current_fault_bit_16": {
+     "status": "raw",
+     "raw": 1,
+     "value": "1"
+    },
+    "current_fault_bit_17": {
+     "status": "raw",
+     "raw": 1,
+     "value": "1"
+    },
+    "current_fault_bit_18": {
+     "status": "raw",
+     "raw": 1,
+     "value": "1"
+    },
+    "current_fault_bit_19": {
+     "status": "raw",
+     "raw": 1,
+     "value": "1"
+    },
+    "current_fault_bit_20": {
+     "status": "raw",
+     "raw": 1,
+     "value": "1"
+    },
+    "current_fault_bit_21": {
+     "status": "raw",
+     "raw": 1,
+     "value": "1"
+    },
+    "current_fault_bit_22": {
+     "status": "raw",
+     "raw": 1,
+     "value": "1"
+    },
+    "current_fault_bit_23": {
+     "status": "raw",
+     "raw": 1,
+     "value": "1"
+    },
+    "current_fault_3": {
+     "status": "accepted",
+     "raw": 255,
+     "value": "255"
+    },
+    "current_fault_bit_24": {
+     "status": "raw",
+     "raw": 1,
+     "value": "1"
+    },
+    "current_fault_bit_25": {
+     "status": "raw",
+     "raw": 1,
+     "value": "1"
+    },
+    "current_fault_bit_26": {
+     "status": "raw",
+     "raw": 1,
+     "value": "1"
+    },
+    "current_fault_bit_27": {
+     "status": "raw",
+     "raw": 1,
+     "value": "1"
+    },
+    "current_fault_bit_28": {
+     "status": "raw",
+     "raw": 1,
+     "value": "1"
+    },
+    "current_fault_bit_29": {
+     "status": "raw",
+     "raw": 1,
+     "value": "1"
+    },
+    "current_fault_bit_30": {
+     "status": "raw",
+     "raw": 1,
+     "value": "1"
+    },
+    "current_fault_bit_31": {
+     "status": "raw",
+     "raw": 1,
+     "value": "1"
+    },
+    "current_fault_4": {
+     "status": "accepted",
+     "raw": 255,
+     "value": "255"
+    },
+    "current_fault_bit_32": {
+     "status": "raw",
+     "raw": 1,
+     "value": "1"
+    },
+    "current_fault_bit_33": {
+     "status": "raw",
+     "raw": 1,
+     "value": "1"
+    },
+    "current_fault_bit_34": {
+     "status": "raw",
+     "raw": 1,
+     "value": "1"
+    },
+    "current_fault_bit_35": {
+     "status": "raw",
+     "raw": 1,
+     "value": "1"
+    },
+    "current_fault_bit_36": {
+     "status": "raw",
+     "raw": 1,
+     "value": "1"
+    },
+    "current_fault_bit_37": {
+     "status": "raw",
+     "raw": 1,
+     "value": "1"
+    },
+    "current_fault_bit_38": {
+     "status": "raw",
+     "raw": 1,
+     "value": "1"
+    },
+    "current_fault_bit_39": {
+     "status": "raw",
+     "raw": 1,
+     "value": "1"
+    },
+    "current_fault_5": {
+     "status": "accepted",
+     "raw": 255,
+     "value": "255"
+    },
+    "current_fault_bit_40": {
+     "status": "raw",
+     "raw": 1,
+     "value": "1"
+    },
+    "current_fault_bit_41": {
+     "status": "raw",
+     "raw": 1,
+     "value": "1"
+    },
+    "current_fault_bit_42": {
+     "status": "raw",
+     "raw": 1,
+     "value": "1"
+    },
+    "current_fault_bit_43": {
+     "status": "raw",
+     "raw": 1,
+     "value": "1"
+    },
+    "current_fault_bit_44": {
+     "status": "raw",
+     "raw": 1,
+     "value": "1"
+    },
+    "current_fault_bit_45": {
+     "status": "raw",
+     "raw": 1,
+     "value": "1"
+    },
+    "current_fault_bit_46": {
+     "status": "raw",
+     "raw": 1,
+     "value": "1"
+    },
+    "current_fault_bit_47": {
+     "status": "raw",
+     "raw": 1,
+     "value": "1"
+    },
+    "current_fault_6": {
+     "status": "accepted",
+     "raw": 255,
+     "value": "255"
+    },
+    "current_fault_bit_48": {
+     "status": "raw",
+     "raw": 1,
+     "value": "1"
+    },
+    "current_fault_bit_49": {
+     "status": "raw",
+     "raw": 1,
+     "value": "1"
+    },
+    "current_fault_bit_50": {
+     "status": "raw",
+     "raw": 1,
+     "value": "1"
+    },
+    "current_fault_bit_51": {
+     "status": "raw",
+     "raw": 1,
+     "value": "1"
+    },
+    "current_fault_bit_52": {
+     "status": "raw",
+     "raw": 1,
+     "value": "1"
+    },
+    "current_fault_bit_53": {
+     "status": "raw",
+     "raw": 1,
+     "value": "1"
+    },
+    "current_fault_bit_54": {
+     "status": "raw",
+     "raw": 1,
+     "value": "1"
+    },
+    "current_fault_bit_55": {
+     "status": "raw",
+     "raw": 1,
+     "value": "1"
+    },
+    "current_fault_7": {
+     "status": "accepted",
+     "raw": 255,
+     "value": "255"
+    },
+    "current_fault_bit_56": {
+     "status": "raw",
+     "raw": 1,
+     "value": "1"
+    },
+    "current_fault_bit_57": {
+     "status": "raw",
+     "raw": 1,
+     "value": "1"
+    },
+    "current_fault_bit_58": {
+     "status": "raw",
+     "raw": 1,
+     "value": "1"
+    },
+    "current_fault_bit_59": {
+     "status": "raw",
+     "raw": 1,
+     "value": "1"
+    },
+    "current_fault_bit_60": {
+     "status": "raw",
+     "raw": 1,
+     "value": "1"
+    },
+    "current_fault_bit_61": {
+     "status": "raw",
+     "raw": 1,
+     "value": "1"
+    },
+    "current_fault_bit_62": {
+     "status": "raw",
+     "raw": 1,
+     "value": "1"
+    },
+    "current_fault_bit_63": {
+     "status": "raw",
+     "raw": 1,
+     "value": "1"
+    }
+   }
+  },
+  {
+   "name": "1908-local-l2-all-set",
+   "identifier": "0x1908F202",
+   "payload": "ffffffffffffffff",
+   "selection": {
+    "project": "QAAA",
+    "release": "0006",
+    "flavor": "pcs-extended19",
+    "bank": "ordinary",
+    "scope": "local",
+    "endpoint": "coordinator",
+    "group": "0",
+    "slot": "1",
+    "destination": 242,
+    "source": 2
+   },
+   "expect": {
+    "current_fault_8": {
+     "status": "accepted",
+     "raw": 255,
+     "value": "255"
+    },
+    "current_fault_bit_64": {
+     "status": "raw",
+     "raw": 1,
+     "value": "1"
+    },
+    "current_fault_bit_65": {
+     "status": "raw",
+     "raw": 1,
+     "value": "1"
+    },
+    "current_fault_bit_66": {
+     "status": "raw",
+     "raw": 1,
+     "value": "1"
+    },
+    "current_fault_bit_67": {
+     "status": "raw",
+     "raw": 1,
+     "value": "1"
+    },
+    "current_fault_bit_68": {
+     "status": "raw",
+     "raw": 1,
+     "value": "1"
+    },
+    "current_fault_bit_69": {
+     "status": "raw",
+     "raw": 1,
+     "value": "1"
+    },
+    "current_fault_bit_70": {
+     "status": "raw",
+     "raw": 1,
+     "value": "1"
+    },
+    "current_fault_bit_71": {
+     "status": "raw",
+     "raw": 1,
+     "value": "1"
+    },
+    "current_fault_9": {
+     "status": "accepted",
+     "raw": 255,
+     "value": "255"
+    },
+    "current_fault_bit_72": {
+     "status": "raw",
+     "raw": 1,
+     "value": "1"
+    },
+    "current_fault_bit_73": {
+     "status": "raw",
+     "raw": 1,
+     "value": "1"
+    },
+    "current_fault_bit_74": {
+     "status": "raw",
+     "raw": 1,
+     "value": "1"
+    },
+    "current_fault_bit_75": {
+     "status": "raw",
+     "raw": 1,
+     "value": "1"
+    },
+    "current_fault_bit_76": {
+     "status": "raw",
+     "raw": 1,
+     "value": "1"
+    },
+    "current_fault_bit_77": {
+     "status": "raw",
+     "raw": 1,
+     "value": "1"
+    },
+    "current_fault_bit_78": {
+     "status": "raw",
+     "raw": 1,
+     "value": "1"
+    },
+    "current_fault_bit_79": {
+     "status": "raw",
+     "raw": 1,
+     "value": "1"
+    },
+    "current_fault_10": {
+     "status": "accepted",
+     "raw": 255,
+     "value": "255"
+    },
+    "current_fault_bit_80": {
+     "status": "raw",
+     "raw": 1,
+     "value": "1"
+    },
+    "current_fault_bit_81": {
+     "status": "raw",
+     "raw": 1,
+     "value": "1"
+    },
+    "current_fault_bit_82": {
+     "status": "raw",
+     "raw": 1,
+     "value": "1"
+    },
+    "current_fault_bit_83": {
+     "status": "raw",
+     "raw": 1,
+     "value": "1"
+    },
+    "current_fault_bit_84": {
+     "status": "raw",
+     "raw": 1,
+     "value": "1"
+    },
+    "current_fault_bit_85": {
+     "status": "raw",
+     "raw": 1,
+     "value": "1"
+    },
+    "current_fault_bit_86": {
+     "status": "raw",
+     "raw": 1,
+     "value": "1"
+    },
+    "current_fault_bit_87": {
+     "status": "raw",
+     "raw": 1,
+     "value": "1"
+    },
+    "current_fault_11": {
+     "status": "accepted",
+     "raw": 255,
+     "value": "255"
+    },
+    "current_fault_bit_88": {
+     "status": "raw",
+     "raw": 1,
+     "value": "1"
+    },
+    "current_fault_bit_89": {
+     "status": "raw",
+     "raw": 1,
+     "value": "1"
+    },
+    "current_fault_bit_90": {
+     "status": "raw",
+     "raw": 1,
+     "value": "1"
+    },
+    "current_fault_bit_91": {
+     "status": "raw",
+     "raw": 1,
+     "value": "1"
+    },
+    "current_fault_bit_92": {
+     "status": "raw",
+     "raw": 1,
+     "value": "1"
+    },
+    "current_fault_bit_93": {
+     "status": "raw",
+     "raw": 1,
+     "value": "1"
+    },
+    "current_fault_bit_94": {
+     "status": "raw",
+     "raw": 1,
+     "value": "1"
+    },
+    "current_fault_bit_95": {
+     "status": "raw",
+     "raw": 1,
+     "value": "1"
+    },
+    "current_fault_12": {
+     "status": "accepted",
+     "raw": 255,
+     "value": "255"
+    },
+    "current_fault_bit_96": {
+     "status": "raw",
+     "raw": 1,
+     "value": "1"
+    },
+    "current_fault_bit_97": {
+     "status": "raw",
+     "raw": 1,
+     "value": "1"
+    },
+    "current_fault_bit_98": {
+     "status": "raw",
+     "raw": 1,
+     "value": "1"
+    },
+    "current_fault_bit_99": {
+     "status": "raw",
+     "raw": 1,
+     "value": "1"
+    },
+    "current_fault_bit_100": {
+     "status": "raw",
+     "raw": 1,
+     "value": "1"
+    },
+    "current_fault_bit_101": {
+     "status": "raw",
+     "raw": 1,
+     "value": "1"
+    },
+    "current_fault_bit_102": {
+     "status": "raw",
+     "raw": 1,
+     "value": "1"
+    },
+    "current_fault_bit_103": {
+     "status": "raw",
+     "raw": 1,
+     "value": "1"
+    },
+    "current_fault_13": {
+     "status": "accepted",
+     "raw": 255,
+     "value": "255"
+    },
+    "current_fault_bit_104": {
+     "status": "raw",
+     "raw": 1,
+     "value": "1"
+    },
+    "current_fault_bit_105": {
+     "status": "raw",
+     "raw": 1,
+     "value": "1"
+    },
+    "current_fault_bit_106": {
+     "status": "raw",
+     "raw": 1,
+     "value": "1"
+    },
+    "current_fault_bit_107": {
+     "status": "raw",
+     "raw": 1,
+     "value": "1"
+    },
+    "current_fault_bit_108": {
+     "status": "raw",
+     "raw": 1,
+     "value": "1"
+    },
+    "current_fault_bit_109": {
+     "status": "raw",
+     "raw": 1,
+     "value": "1"
+    },
+    "current_fault_bit_110": {
+     "status": "raw",
+     "raw": 1,
+     "value": "1"
+    },
+    "current_fault_bit_111": {
+     "status": "raw",
+     "raw": 1,
+     "value": "1"
+    },
+    "current_fault_14": {
+     "status": "accepted",
+     "raw": 255,
+     "value": "255"
+    },
+    "current_fault_bit_112": {
+     "status": "raw",
+     "raw": 1,
+     "value": "1"
+    },
+    "current_fault_bit_113": {
+     "status": "raw",
+     "raw": 1,
+     "value": "1"
+    },
+    "current_fault_bit_114": {
+     "status": "raw",
+     "raw": 1,
+     "value": "1"
+    },
+    "current_fault_bit_115": {
+     "status": "raw",
+     "raw": 1,
+     "value": "1"
+    },
+    "current_fault_bit_116": {
+     "status": "raw",
+     "raw": 1,
+     "value": "1"
+    },
+    "current_fault_bit_117": {
+     "status": "raw",
+     "raw": 1,
+     "value": "1"
+    },
+    "current_fault_bit_118": {
+     "status": "raw",
+     "raw": 1,
+     "value": "1"
+    },
+    "current_fault_bit_119": {
+     "status": "raw",
+     "raw": 1,
+     "value": "1"
+    },
+    "current_fault_15": {
+     "status": "accepted",
+     "raw": 255,
+     "value": "255"
+    },
+    "current_fault_bit_120": {
+     "status": "raw",
+     "raw": 1,
+     "value": "1"
+    },
+    "current_fault_bit_121": {
+     "status": "raw",
+     "raw": 1,
+     "value": "1"
+    },
+    "current_fault_bit_122": {
+     "status": "raw",
+     "raw": 1,
+     "value": "1"
+    },
+    "current_fault_bit_123": {
+     "status": "raw",
+     "raw": 1,
+     "value": "1"
+    },
+    "current_fault_bit_124": {
+     "status": "raw",
+     "raw": 1,
+     "value": "1"
+    },
+    "current_fault_bit_125": {
+     "status": "raw",
+     "raw": 1,
+     "value": "1"
+    },
+    "current_fault_bit_126": {
+     "status": "raw",
+     "raw": 1,
+     "value": "1"
+    },
+    "current_fault_bit_127": {
+     "status": "raw",
+     "raw": 1,
+     "value": "1"
+    }
+   }
+  },
+  {
+   "name": "1907-gateway-endpoint",
+   "identifier": "0x1907F203",
+   "payload": "8001000000000000",
+   "selection": {
+    "project": "QCAA",
+    "release": "0001",
+    "flavor": "pcs-extended19",
+    "bank": "ordinary",
+    "scope": "local",
+    "endpoint": "gateway",
+    "group": "",
+    "slot": "",
+    "destination": 242,
+    "source": 3
+   },
+   "expect": {
+    "current_fault_0": {
+     "status": "accepted",
+     "raw": 128,
+     "value": "128"
+    },
+    "current_fault_bit_0": {
+     "status": "raw",
+     "raw": 0,
+     "value": "0"
+    },
+    "current_fault_bit_1": {
+     "status": "raw",
+     "raw": 0,
+     "value": "0"
+    },
+    "current_fault_bit_2": {
+     "status": "raw",
+     "raw": 0,
+     "value": "0"
+    },
+    "current_fault_bit_3": {
+     "status": "raw",
+     "raw": 0,
+     "value": "0"
+    },
+    "current_fault_bit_4": {
+     "status": "raw",
+     "raw": 0,
+     "value": "0"
+    },
+    "current_fault_bit_5": {
+     "status": "raw",
+     "raw": 0,
+     "value": "0"
+    },
+    "current_fault_bit_6": {
+     "status": "raw",
+     "raw": 0,
+     "value": "0"
+    },
+    "current_fault_bit_7": {
+     "status": "raw",
+     "raw": 1,
+     "value": "1"
+    },
+    "current_fault_1": {
+     "status": "accepted",
+     "raw": 1,
+     "value": "1"
+    },
+    "current_fault_bit_8": {
+     "status": "raw",
+     "raw": 1,
+     "value": "1"
+    },
+    "current_fault_bit_9": {
+     "status": "raw",
+     "raw": 0,
+     "value": "0"
+    },
+    "current_fault_bit_10": {
+     "status": "raw",
+     "raw": 0,
+     "value": "0"
+    },
+    "current_fault_bit_11": {
+     "status": "raw",
+     "raw": 0,
+     "value": "0"
+    },
+    "current_fault_bit_12": {
+     "status": "raw",
+     "raw": 0,
+     "value": "0"
+    },
+    "current_fault_bit_13": {
+     "status": "raw",
+     "raw": 0,
+     "value": "0"
+    },
+    "current_fault_bit_14": {
+     "status": "raw",
+     "raw": 0,
+     "value": "0"
+    },
+    "current_fault_bit_15": {
+     "status": "raw",
+     "raw": 0,
+     "value": "0"
+    },
+    "current_fault_2": {
+     "status": "accepted",
+     "raw": 0,
+     "value": "0"
+    },
+    "current_fault_bit_16": {
+     "status": "raw",
+     "raw": 0,
+     "value": "0"
+    },
+    "current_fault_bit_17": {
+     "status": "raw",
+     "raw": 0,
+     "value": "0"
+    },
+    "current_fault_bit_18": {
+     "status": "raw",
+     "raw": 0,
+     "value": "0"
+    },
+    "current_fault_bit_19": {
+     "status": "raw",
+     "raw": 0,
+     "value": "0"
+    },
+    "current_fault_bit_20": {
+     "status": "raw",
+     "raw": 0,
+     "value": "0"
+    },
+    "current_fault_bit_21": {
+     "status": "raw",
+     "raw": 0,
+     "value": "0"
+    },
+    "current_fault_bit_22": {
+     "status": "raw",
+     "raw": 0,
+     "value": "0"
+    },
+    "current_fault_bit_23": {
+     "status": "raw",
+     "raw": 0,
+     "value": "0"
+    },
+    "current_fault_3": {
+     "status": "accepted",
+     "raw": 0,
+     "value": "0"
+    },
+    "current_fault_bit_24": {
+     "status": "raw",
+     "raw": 0,
+     "value": "0"
+    },
+    "current_fault_bit_25": {
+     "status": "raw",
+     "raw": 0,
+     "value": "0"
+    },
+    "current_fault_bit_26": {
+     "status": "raw",
+     "raw": 0,
+     "value": "0"
+    },
+    "current_fault_bit_27": {
+     "status": "raw",
+     "raw": 0,
+     "value": "0"
+    },
+    "current_fault_bit_28": {
+     "status": "raw",
+     "raw": 0,
+     "value": "0"
+    },
+    "current_fault_bit_29": {
+     "status": "raw",
+     "raw": 0,
+     "value": "0"
+    },
+    "current_fault_bit_30": {
+     "status": "raw",
+     "raw": 0,
+     "value": "0"
+    },
+    "current_fault_bit_31": {
+     "status": "raw",
+     "raw": 0,
+     "value": "0"
+    },
+    "current_fault_4": {
+     "status": "accepted",
+     "raw": 0,
+     "value": "0"
+    },
+    "current_fault_bit_32": {
+     "status": "raw",
+     "raw": 0,
+     "value": "0"
+    },
+    "current_fault_bit_33": {
+     "status": "raw",
+     "raw": 0,
+     "value": "0"
+    },
+    "current_fault_bit_34": {
+     "status": "raw",
+     "raw": 0,
+     "value": "0"
+    },
+    "current_fault_bit_35": {
+     "status": "raw",
+     "raw": 0,
+     "value": "0"
+    },
+    "current_fault_bit_36": {
+     "status": "raw",
+     "raw": 0,
+     "value": "0"
+    },
+    "current_fault_bit_37": {
+     "status": "raw",
+     "raw": 0,
+     "value": "0"
+    },
+    "current_fault_bit_38": {
+     "status": "raw",
+     "raw": 0,
+     "value": "0"
+    },
+    "current_fault_bit_39": {
+     "status": "raw",
+     "raw": 0,
+     "value": "0"
+    },
+    "current_fault_5": {
+     "status": "accepted",
+     "raw": 0,
+     "value": "0"
+    },
+    "current_fault_bit_40": {
+     "status": "raw",
+     "raw": 0,
+     "value": "0"
+    },
+    "current_fault_bit_41": {
+     "status": "raw",
+     "raw": 0,
+     "value": "0"
+    },
+    "current_fault_bit_42": {
+     "status": "raw",
+     "raw": 0,
+     "value": "0"
+    },
+    "current_fault_bit_43": {
+     "status": "raw",
+     "raw": 0,
+     "value": "0"
+    },
+    "current_fault_bit_44": {
+     "status": "raw",
+     "raw": 0,
+     "value": "0"
+    },
+    "current_fault_bit_45": {
+     "status": "raw",
+     "raw": 0,
+     "value": "0"
+    },
+    "current_fault_bit_46": {
+     "status": "raw",
+     "raw": 0,
+     "value": "0"
+    },
+    "current_fault_bit_47": {
+     "status": "raw",
+     "raw": 0,
+     "value": "0"
+    },
+    "current_fault_6": {
+     "status": "accepted",
+     "raw": 0,
+     "value": "0"
+    },
+    "current_fault_bit_48": {
+     "status": "raw",
+     "raw": 0,
+     "value": "0"
+    },
+    "current_fault_bit_49": {
+     "status": "raw",
+     "raw": 0,
+     "value": "0"
+    },
+    "current_fault_bit_50": {
+     "status": "raw",
+     "raw": 0,
+     "value": "0"
+    },
+    "current_fault_bit_51": {
+     "status": "raw",
+     "raw": 0,
+     "value": "0"
+    },
+    "current_fault_bit_52": {
+     "status": "raw",
+     "raw": 0,
+     "value": "0"
+    },
+    "current_fault_bit_53": {
+     "status": "raw",
+     "raw": 0,
+     "value": "0"
+    },
+    "current_fault_bit_54": {
+     "status": "raw",
+     "raw": 0,
+     "value": "0"
+    },
+    "current_fault_bit_55": {
+     "status": "raw",
+     "raw": 0,
+     "value": "0"
+    },
+    "current_fault_7": {
+     "status": "accepted",
+     "raw": 0,
+     "value": "0"
+    },
+    "current_fault_bit_56": {
+     "status": "raw",
+     "raw": 0,
+     "value": "0"
+    },
+    "current_fault_bit_57": {
+     "status": "raw",
+     "raw": 0,
+     "value": "0"
+    },
+    "current_fault_bit_58": {
+     "status": "raw",
+     "raw": 0,
+     "value": "0"
+    },
+    "current_fault_bit_59": {
+     "status": "raw",
+     "raw": 0,
+     "value": "0"
+    },
+    "current_fault_bit_60": {
+     "status": "raw",
+     "raw": 0,
+     "value": "0"
+    },
+    "current_fault_bit_61": {
+     "status": "raw",
+     "raw": 0,
+     "value": "0"
+    },
+    "current_fault_bit_62": {
+     "status": "raw",
+     "raw": 0,
+     "value": "0"
+    },
+    "current_fault_bit_63": {
+     "status": "raw",
+     "raw": 0,
+     "value": "0"
+    }
+   }
+  },
+  {
+   "name": "1908-aggregate-folded-1918-clear",
+   "identifier": "0x1918DFF2",
+   "payload": "0000000000000000",
+   "selection": {
+    "project": "QAAA",
+    "release": "0006",
+    "flavor": "pcs-extended19",
+    "bank": "ordinary",
+    "scope": "aggregate",
+    "endpoint": "coordinator",
+    "group": "0",
+    "slot": "1",
+    "destination": 223,
+    "source": 242
+   },
+   "expect": {
+    "current_fault_8": {
+     "status": "accepted",
+     "raw": 0,
+     "value": "0"
+    },
+    "current_fault_bit_64": {
+     "status": "raw",
+     "raw": 0,
+     "value": "0"
+    },
+    "current_fault_bit_65": {
+     "status": "raw",
+     "raw": 0,
+     "value": "0"
+    },
+    "current_fault_bit_66": {
+     "status": "raw",
+     "raw": 0,
+     "value": "0"
+    },
+    "current_fault_bit_67": {
+     "status": "raw",
+     "raw": 0,
+     "value": "0"
+    },
+    "current_fault_bit_68": {
+     "status": "raw",
+     "raw": 0,
+     "value": "0"
+    },
+    "current_fault_bit_69": {
+     "status": "raw",
+     "raw": 0,
+     "value": "0"
+    },
+    "current_fault_bit_70": {
+     "status": "raw",
+     "raw": 0,
+     "value": "0"
+    },
+    "current_fault_bit_71": {
+     "status": "raw",
+     "raw": 0,
+     "value": "0"
+    },
+    "current_fault_9": {
+     "status": "accepted",
+     "raw": 0,
+     "value": "0"
+    },
+    "current_fault_bit_72": {
+     "status": "raw",
+     "raw": 0,
+     "value": "0"
+    },
+    "current_fault_bit_73": {
+     "status": "raw",
+     "raw": 0,
+     "value": "0"
+    },
+    "current_fault_bit_74": {
+     "status": "raw",
+     "raw": 0,
+     "value": "0"
+    },
+    "current_fault_bit_75": {
+     "status": "raw",
+     "raw": 0,
+     "value": "0"
+    },
+    "current_fault_bit_76": {
+     "status": "raw",
+     "raw": 0,
+     "value": "0"
+    },
+    "current_fault_bit_77": {
+     "status": "raw",
+     "raw": 0,
+     "value": "0"
+    },
+    "current_fault_bit_78": {
+     "status": "raw",
+     "raw": 0,
+     "value": "0"
+    },
+    "current_fault_bit_79": {
+     "status": "raw",
+     "raw": 0,
+     "value": "0"
+    },
+    "current_fault_10": {
+     "status": "accepted",
+     "raw": 0,
+     "value": "0"
+    },
+    "current_fault_bit_80": {
+     "status": "raw",
+     "raw": 0,
+     "value": "0"
+    },
+    "current_fault_bit_81": {
+     "status": "raw",
+     "raw": 0,
+     "value": "0"
+    },
+    "current_fault_bit_82": {
+     "status": "raw",
+     "raw": 0,
+     "value": "0"
+    },
+    "current_fault_bit_83": {
+     "status": "raw",
+     "raw": 0,
+     "value": "0"
+    },
+    "current_fault_bit_84": {
+     "status": "raw",
+     "raw": 0,
+     "value": "0"
+    },
+    "current_fault_bit_85": {
+     "status": "raw",
+     "raw": 0,
+     "value": "0"
+    },
+    "current_fault_bit_86": {
+     "status": "raw",
+     "raw": 0,
+     "value": "0"
+    },
+    "current_fault_bit_87": {
+     "status": "raw",
+     "raw": 0,
+     "value": "0"
+    },
+    "current_fault_11": {
+     "status": "accepted",
+     "raw": 0,
+     "value": "0"
+    },
+    "current_fault_bit_88": {
+     "status": "raw",
+     "raw": 0,
+     "value": "0"
+    },
+    "current_fault_bit_89": {
+     "status": "raw",
+     "raw": 0,
+     "value": "0"
+    },
+    "current_fault_bit_90": {
+     "status": "raw",
+     "raw": 0,
+     "value": "0"
+    },
+    "current_fault_bit_91": {
+     "status": "raw",
+     "raw": 0,
+     "value": "0"
+    },
+    "current_fault_bit_92": {
+     "status": "raw",
+     "raw": 0,
+     "value": "0"
+    },
+    "current_fault_bit_93": {
+     "status": "raw",
+     "raw": 0,
+     "value": "0"
+    },
+    "current_fault_bit_94": {
+     "status": "raw",
+     "raw": 0,
+     "value": "0"
+    },
+    "current_fault_bit_95": {
+     "status": "raw",
+     "raw": 0,
+     "value": "0"
+    },
+    "current_fault_12": {
+     "status": "accepted",
+     "raw": 0,
+     "value": "0"
+    },
+    "current_fault_bit_96": {
+     "status": "raw",
+     "raw": 0,
+     "value": "0"
+    },
+    "current_fault_bit_97": {
+     "status": "raw",
+     "raw": 0,
+     "value": "0"
+    },
+    "current_fault_bit_98": {
+     "status": "raw",
+     "raw": 0,
+     "value": "0"
+    },
+    "current_fault_bit_99": {
+     "status": "raw",
+     "raw": 0,
+     "value": "0"
+    },
+    "current_fault_bit_100": {
+     "status": "raw",
+     "raw": 0,
+     "value": "0"
+    },
+    "current_fault_bit_101": {
+     "status": "raw",
+     "raw": 0,
+     "value": "0"
+    },
+    "current_fault_bit_102": {
+     "status": "raw",
+     "raw": 0,
+     "value": "0"
+    },
+    "current_fault_bit_103": {
+     "status": "raw",
+     "raw": 0,
+     "value": "0"
+    },
+    "current_fault_13": {
+     "status": "accepted",
+     "raw": 0,
+     "value": "0"
+    },
+    "current_fault_bit_104": {
+     "status": "raw",
+     "raw": 0,
+     "value": "0"
+    },
+    "current_fault_bit_105": {
+     "status": "raw",
+     "raw": 0,
+     "value": "0"
+    },
+    "current_fault_bit_106": {
+     "status": "raw",
+     "raw": 0,
+     "value": "0"
+    },
+    "current_fault_bit_107": {
+     "status": "raw",
+     "raw": 0,
+     "value": "0"
+    },
+    "current_fault_bit_108": {
+     "status": "raw",
+     "raw": 0,
+     "value": "0"
+    },
+    "current_fault_bit_109": {
+     "status": "raw",
+     "raw": 0,
+     "value": "0"
+    },
+    "current_fault_bit_110": {
+     "status": "raw",
+     "raw": 0,
+     "value": "0"
+    },
+    "current_fault_bit_111": {
+     "status": "raw",
+     "raw": 0,
+     "value": "0"
+    },
+    "current_fault_14": {
+     "status": "accepted",
+     "raw": 0,
+     "value": "0"
+    },
+    "current_fault_bit_112": {
+     "status": "raw",
+     "raw": 0,
+     "value": "0"
+    },
+    "current_fault_bit_113": {
+     "status": "raw",
+     "raw": 0,
+     "value": "0"
+    },
+    "current_fault_bit_114": {
+     "status": "raw",
+     "raw": 0,
+     "value": "0"
+    },
+    "current_fault_bit_115": {
+     "status": "raw",
+     "raw": 0,
+     "value": "0"
+    },
+    "current_fault_bit_116": {
+     "status": "raw",
+     "raw": 0,
+     "value": "0"
+    },
+    "current_fault_bit_117": {
+     "status": "raw",
+     "raw": 0,
+     "value": "0"
+    },
+    "current_fault_bit_118": {
+     "status": "raw",
+     "raw": 0,
+     "value": "0"
+    },
+    "current_fault_bit_119": {
+     "status": "raw",
+     "raw": 0,
+     "value": "0"
+    },
+    "current_fault_15": {
+     "status": "accepted",
+     "raw": 0,
+     "value": "0"
+    },
+    "current_fault_bit_120": {
+     "status": "raw",
+     "raw": 0,
+     "value": "0"
+    },
+    "current_fault_bit_121": {
+     "status": "raw",
+     "raw": 0,
+     "value": "0"
+    },
+    "current_fault_bit_122": {
+     "status": "raw",
+     "raw": 0,
+     "value": "0"
+    },
+    "current_fault_bit_123": {
+     "status": "raw",
+     "raw": 0,
+     "value": "0"
+    },
+    "current_fault_bit_124": {
+     "status": "raw",
+     "raw": 0,
+     "value": "0"
+    },
+    "current_fault_bit_125": {
+     "status": "raw",
+     "raw": 0,
+     "value": "0"
+    },
+    "current_fault_bit_126": {
+     "status": "raw",
+     "raw": 0,
+     "value": "0"
+    },
+    "current_fault_bit_127": {
+     "status": "raw",
+     "raw": 0,
+     "value": "0"
+    }
+   }
+  },
+  {
+   "name": "1909-local-l2",
+   "identifier": "0x1909F202",
+   "payload": "0100020003000405",
+   "selection": {
+    "project": "QAAA",
+    "release": "0006",
+    "flavor": "pcs-extended19",
+    "bank": "ordinary",
+    "scope": "local",
+    "endpoint": "coordinator",
+    "group": "0",
+    "slot": "1",
+    "destination": 242,
+    "source": 2
+   },
+   "expect": {
+    "limit_0": {
+     "status": "raw",
+     "raw": 1,
+     "value": "1"
+    },
+    "limit_2": {
+     "status": "raw",
+     "raw": 2,
+     "value": "2"
+    },
+    "derived": {
+     "status": "raw",
+     "raw": 3,
+     "value": "3"
+    },
+    "flag_6": {
+     "status": "raw",
+     "raw": 4,
+     "value": "4"
+    },
+    "flag_7": {
+     "status": "raw",
+     "raw": 5,
+     "value": "5"
+    }
+   }
+  },
+  {
+   "name": "1909-aggregate-folded-1919",
+   "identifier": "0x1919DFF2",
+   "payload": "0100020003000405",
+   "selection": {
+    "project": "QAAA",
+    "release": "0006",
+    "flavor": "pcs-extended19",
+    "bank": "ordinary",
+    "scope": "aggregate",
+    "endpoint": "coordinator",
+    "group": "0",
+    "slot": "1",
+    "destination": 223,
+    "source": 242
+   },
+   "expect": {
+    "limit_0": {
+     "status": "raw",
+     "raw": 1,
+     "value": "1"
+    },
+    "limit_2": {
+     "status": "raw",
+     "raw": 2,
+     "value": "2"
+    },
+    "derived": {
+     "status": "raw",
+     "raw": 3,
+     "value": "3"
+    },
+    "flag_6": {
+     "status": "raw",
+     "raw": 4,
+     "value": "4"
+    },
+    "flag_7": {
+     "status": "raw",
+     "raw": 5,
+     "value": "5"
+    }
+   }
+  },
+  {
+   "name": "1909-local-l2-maximum-words",
+   "identifier": "0x1909F202",
+   "payload": "ffffffffffffffff",
+   "selection": {
+    "project": "QAAA",
+    "release": "0006",
+    "flavor": "pcs-extended19",
+    "bank": "ordinary",
+    "scope": "local",
+    "endpoint": "coordinator",
+    "group": "0",
+    "slot": "1",
+    "destination": 242,
+    "source": 2
+   },
+   "expect": {
+    "limit_0": {
+     "status": "raw",
+     "raw": 65535,
+     "value": "65535"
+    },
+    "limit_2": {
+     "status": "raw",
+     "raw": 65535,
+     "value": "65535"
+    },
+    "derived": {
+     "status": "raw",
+     "raw": 65535,
+     "value": "65535"
+    },
+    "flag_6": {
+     "status": "raw",
+     "raw": 255,
+     "value": "255"
+    },
+    "flag_7": {
+     "status": "raw",
+     "raw": 255,
+     "value": "255"
+    }
+   }
+  },
+  {
+   "name": "1910-gateway-state",
+   "identifier": "0x1910FFF4",
+   "payload": "0201000000000003",
+   "selection": {
+    "project": "QCAA",
+    "release": "0001",
+    "flavor": "pcs-extended19",
+    "bank": "ordinary",
+    "scope": "local",
+    "endpoint": "gateway",
+    "group": "",
+    "slot": "",
+    "destination": 255,
+    "source": 244
+   },
+   "expect": {
+    "state": {
+     "status": "accepted",
+     "raw": 2,
+     "value": "2"
+    },
+    "flag": {
+     "status": "raw",
+     "raw": 1,
+     "value": "1"
+    },
+    "padding_2": {
+     "status": "raw",
+     "raw": 0,
+     "value": "0"
+    },
+    "padding_3": {
+     "status": "raw",
+     "raw": 0,
+     "value": "0"
+    },
+    "padding_4": {
+     "status": "raw",
+     "raw": 0,
+     "value": "0"
+    },
+    "padding_5": {
+     "status": "raw",
+     "raw": 0,
+     "value": "0"
+    },
+    "padding_6": {
+     "status": "raw",
+     "raw": 0,
+     "value": "0"
+    },
+    "downstream_address": {
+     "status": "accepted",
+     "raw": 3,
+     "value": "3"
+    }
+   }
+  },
+  {
+   "name": "1910-gateway-state-padding-nonzero",
+   "identifier": "0x1910FFF4",
+   "payload": "0201000100000003",
+   "selection": {
+    "project": "QCAA",
+    "release": "0001",
+    "flavor": "pcs-extended19",
+    "bank": "ordinary",
+    "scope": "local",
+    "endpoint": "gateway",
+    "group": "",
+    "slot": "",
+    "destination": 255,
+    "source": 244
+   },
+   "expect": {
+    "state": {
+     "status": "accepted",
+     "raw": 2,
+     "value": "2"
+    },
+    "flag": {
+     "status": "raw",
+     "raw": 1,
+     "value": "1"
+    },
+    "padding_2": {
+     "status": "raw",
+     "raw": 0,
+     "value": "0"
+    },
+    "padding_3": {
+     "status": "invalid",
+     "raw": 1,
+     "value": ""
+    },
+    "padding_4": {
+     "status": "raw",
+     "raw": 0,
+     "value": "0"
+    },
+    "padding_5": {
+     "status": "raw",
+     "raw": 0,
+     "value": "0"
+    },
+    "padding_6": {
+     "status": "raw",
+     "raw": 0,
+     "value": "0"
+    },
+    "downstream_address": {
+     "status": "accepted",
+     "raw": 3,
+     "value": "3"
+    }
+   }
+  },
+  {
+   "name": "1910-gateway-state-address-zero-invalid",
+   "identifier": "0x1910FFF4",
+   "payload": "0201000000000000",
+   "selection": {
+    "project": "QCAA",
+    "release": "0001",
+    "flavor": "pcs-extended19",
+    "bank": "ordinary",
+    "scope": "local",
+    "endpoint": "gateway",
+    "group": "",
+    "slot": "",
+    "destination": 255,
+    "source": 244
+   },
+   "expect": {
+    "state": {
+     "status": "accepted",
+     "raw": 2,
+     "value": "2"
+    },
+    "flag": {
+     "status": "raw",
+     "raw": 1,
+     "value": "1"
+    },
+    "padding_2": {
+     "status": "raw",
+     "raw": 0,
+     "value": "0"
+    },
+    "padding_3": {
+     "status": "raw",
+     "raw": 0,
+     "value": "0"
+    },
+    "padding_4": {
+     "status": "raw",
+     "raw": 0,
+     "value": "0"
+    },
+    "padding_5": {
+     "status": "raw",
+     "raw": 0,
+     "value": "0"
+    },
+    "padding_6": {
+     "status": "raw",
+     "raw": 0,
+     "value": "0"
+    },
+    "downstream_address": {
+     "status": "invalid",
+     "raw": 0,
+     "value": ""
+    }
+   }
+  },
+  {
+   "name": "1910-gateway-state-address-nine-invalid",
+   "identifier": "0x1910FFF4",
+   "payload": "0201000000000009",
+   "selection": {
+    "project": "QCAA",
+    "release": "0001",
+    "flavor": "pcs-extended19",
+    "bank": "ordinary",
+    "scope": "local",
+    "endpoint": "gateway",
+    "group": "",
+    "slot": "",
+    "destination": 255,
+    "source": 244
+   },
+   "expect": {
+    "state": {
+     "status": "accepted",
+     "raw": 2,
+     "value": "2"
+    },
+    "flag": {
+     "status": "raw",
+     "raw": 1,
+     "value": "1"
+    },
+    "padding_2": {
+     "status": "raw",
+     "raw": 0,
+     "value": "0"
+    },
+    "padding_3": {
+     "status": "raw",
+     "raw": 0,
+     "value": "0"
+    },
+    "padding_4": {
+     "status": "raw",
+     "raw": 0,
+     "value": "0"
+    },
+    "padding_5": {
+     "status": "raw",
+     "raw": 0,
+     "value": "0"
+    },
+    "padding_6": {
+     "status": "raw",
+     "raw": 0,
+     "value": "0"
+    },
+    "downstream_address": {
+     "status": "invalid",
+     "raw": 9,
+     "value": ""
+    }
+   }
+  },
+  {
+   "name": "1910-gateway-state-address-eight",
+   "identifier": "0x1910FFF4",
+   "payload": "0201000000000008",
+   "selection": {
+    "project": "QCAA",
+    "release": "0001",
+    "flavor": "pcs-extended19",
+    "bank": "ordinary",
+    "scope": "local",
+    "endpoint": "gateway",
+    "group": "",
+    "slot": "",
+    "destination": 255,
+    "source": 244
+   },
+   "expect": {
+    "state": {
+     "status": "accepted",
+     "raw": 2,
+     "value": "2"
+    },
+    "flag": {
+     "status": "raw",
+     "raw": 1,
+     "value": "1"
+    },
+    "padding_2": {
+     "status": "raw",
+     "raw": 0,
+     "value": "0"
+    },
+    "padding_3": {
+     "status": "raw",
+     "raw": 0,
+     "value": "0"
+    },
+    "padding_4": {
+     "status": "raw",
+     "raw": 0,
+     "value": "0"
+    },
+    "padding_5": {
+     "status": "raw",
+     "raw": 0,
+     "value": "0"
+    },
+    "padding_6": {
+     "status": "raw",
+     "raw": 0,
+     "value": "0"
+    },
+    "downstream_address": {
+     "status": "accepted",
+     "raw": 8,
+     "value": "8"
+    }
+   }
+  },
+  {
+   "name": "1910-gateway-state-other-selection-raw",
+   "identifier": "0x1910FFF4",
+   "payload": "0201000000000003",
+   "selection": {
+    "project": "QAAA",
+    "release": "0006",
+    "flavor": "pcs-extended19",
+    "bank": "ordinary",
+    "scope": "local",
+    "endpoint": "coordinator",
+    "group": "0",
+    "slot": "1",
+    "destination": 255,
+    "source": 244
+   },
+   "expect": {
+    "state": {
+     "status": "raw",
+     "raw": 2,
+     "value": "2"
+    },
+    "flag": {
+     "status": "raw",
+     "raw": 1,
+     "value": "1"
+    },
+    "padding_2": {
+     "status": "raw",
+     "raw": 0,
+     "value": "0"
+    },
+    "padding_3": {
+     "status": "raw",
+     "raw": 0,
+     "value": "0"
+    },
+    "padding_4": {
+     "status": "raw",
+     "raw": 0,
+     "value": "0"
+    },
+    "padding_5": {
+     "status": "raw",
+     "raw": 0,
+     "value": "0"
+    },
+    "padding_6": {
+     "status": "raw",
+     "raw": 0,
+     "value": "0"
+    },
+    "downstream_address": {
+     "status": "raw",
+     "raw": 3,
+     "value": "3"
+    }
+   }
+  }
+ ]
+}

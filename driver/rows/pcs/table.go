@@ -234,13 +234,24 @@ func frameDisposition(frame canbus.Frame) roweval.Reason {
 	return roweval.ReasonNoMatch
 }
 
+// Attribution is the selection context an observation was evaluated under: the
+// scope, bank, group and slot the decoder attributed its fields to. A group or
+// slot the selection does not carry is absent (HasGroup or HasSlot false, the
+// text empty); it is never reported as zero.
+type Attribution struct {
+	Scope, Bank       string
+	Group, Slot       string
+	HasGroup, HasSlot bool
+}
+
 // Result is the evaluation of one standard PCS observation: the evidence the
-// observation carries and the evaluation of every row of its identifier, keyed
-// by row identifier. Rows that do not apply under the selection give
-// roweval.ReasonNoMatch.
+// observation carries, the selection attribution of its fields and the
+// evaluation of every row of its identifier, keyed by row identifier. Rows that
+// do not apply under the selection give roweval.ReasonNoMatch.
 type Result struct {
-	Evidence canbusreg.Evidence
-	Rows     map[string]roweval.Evaluation
+	Evidence    canbusreg.Evidence
+	Attribution Attribution
+	Rows        map[string]roweval.Evaluation
 }
 
 // Evaluate evaluates the native rows of one standard PCS observation under the
@@ -249,7 +260,10 @@ type Result struct {
 // status as the reason and no rows, so an unresolved publisher, a direction or
 // context mismatch or a frame outside the table is never evaluated as a value.
 func Evaluate(s canbusreg.Selection, in canbusreg.PCSStandardPCSInput) (Result, roweval.Reason, error) {
-	res := Result{Evidence: in.Evidence}
+	res := Result{
+		Evidence:    in.Evidence,
+		Attribution: Attribution{Scope: in.Scope, Bank: in.Bank, Group: in.Group, Slot: in.Slot, HasGroup: in.Group != "", HasSlot: in.Slot != ""},
+	}
 	frame := in.Evidence.Frame
 	if reason := frameDisposition(frame); reason != "" {
 		return res, reason, nil
@@ -257,33 +271,49 @@ func Evaluate(s canbusreg.Selection, in canbusreg.PCSStandardPCSInput) (Result, 
 	if decoded := canbusreg.DecodePCSStandard(s, in); decoded.Status != "decoded" {
 		return res, roweval.Reason(decoded.Status), nil
 	}
-	rows, reason, err := evaluateRows(frame, Qualifiers(s, in))
+	rows, reason, err := evaluateRows(Table(), frame, Qualifiers(s, in))
 	res.Rows = rows
 	return res, reason, err
 }
 
-// evaluateRows evaluates every native row of the frame's identifier under the
-// qualifiers. It does not check the decoder admission; Evaluate does.
-func evaluateRows(frame canbus.Frame, q roweval.Qualifiers) (map[string]roweval.Evaluation, roweval.Reason, error) {
-	table := Table()
+// frameSelector is the selector the frame presents for one row: the identifier,
+// the format, the DLC and the raw DLC of the frame, with the field slice of the
+// row. A row whose declared identifier, format, DLC or raw DLC differs from the
+// frame therefore matches no observation of that frame.
+func frameSelector(frame canbus.Frame, slice signalSlice) Selector {
+	return Selector{
+		Identifier: frame.ID().Value(),
+		Extended:   frame.ID().Extended(),
+		DLC:        frame.DLC(),
+		RawDLC:     frame.RawDLC(),
+		Slice:      slice,
+	}
+}
+
+// evaluateRows evaluates every native row of the table whose identifier is the
+// frame's, under the qualifiers. The acquired selector is the frame's own
+// geometry, so a row declaring other geometry does not apply. It does not check
+// the decoder admission; Evaluate does.
+func evaluateRows(t roweval.Table[Selector], frame canbus.Frame, q roweval.Qualifiers) (map[string]roweval.Evaluation, roweval.Reason, error) {
+	raw := rawRowIDs()
 	out := make(map[string]roweval.Evaluation)
-	for _, row := range table.Native {
+	for _, row := range t.Native {
 		if row.At.Identifier != frame.ID().Value() {
 			continue
 		}
-		a := roweval.Acquired[Selector]{Selector: row.At, Payload: frame.Data(), Qualifiers: q, Descriptors: Descriptors()}
-		ev, err := roweval.Evaluate(table, a)
+		a := roweval.Acquired[Selector]{Selector: frameSelector(frame, row.At.Slice), Payload: frame.Data(), Qualifiers: q, Descriptors: Descriptors()}
+		ev, err := roweval.Evaluate(t, a)
 		if err != nil {
 			return nil, "", err
 		}
-		switch {
-		case ev.Native != nil:
+		if ev.Native != nil {
+			ev.Native.Disposition = disposition(ev.Native, raw[ev.Native.RowID])
 			out[ev.Native.RowID] = ev
-		case ev.Reason != roweval.ReasonNoMatch:
+		} else if ev.Reason != roweval.ReasonNoMatch {
 			out[row.ID] = ev
 		}
 	}
-	for _, row := range table.Native {
+	for _, row := range t.Native {
 		if row.At.Identifier != frame.ID().Value() {
 			continue
 		}
@@ -292,6 +322,41 @@ func evaluateRows(frame canbus.Frame, q roweval.Qualifiers) (map[string]roweval.
 		}
 	}
 	return out, "", nil
+}
+
+// Dispositions of a native value. An interpreted value is accepted; the raw
+// word of a field the decoder does not interpret, or of a field whose gate is
+// not met, is raw evidence. The numeric raw word is kept in both cases.
+const (
+	dispositionAccepted = "accepted"
+	dispositionRaw      = "raw"
+)
+
+// disposition states how the native value of one row was obtained. A withheld
+// gate is raw evidence; any other reason leaves the disposition empty, since
+// the reason already states the outcome. A row the decoder never interprets is
+// raw even when its value is present.
+func disposition(n *roweval.Native, rawRow bool) string {
+	switch {
+	case n.Reason == gateWithheld:
+		return dispositionRaw
+	case n.Reason != "":
+		return ""
+	case rawRow:
+		return dispositionRaw
+	}
+	return dispositionAccepted
+}
+
+// rawRowIDs returns the identifiers of the rows the decoder never interprets.
+func rawRowIDs() map[string]bool {
+	raw := make(map[string]bool)
+	for _, s := range standardSpecs() {
+		if s.raw {
+			raw[nativeRow(s).ID] = true
+		}
+	}
+	return raw
 }
 
 // nativeRow builds one native row of the standard table. The selector is the

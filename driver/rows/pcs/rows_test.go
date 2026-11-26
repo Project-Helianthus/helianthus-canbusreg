@@ -181,6 +181,25 @@ func checkEvidence(t *testing.T, name string, res Result, in canbusreg.PCSStanda
 	}
 }
 
+// checkAttribution compares the selection attribution the evaluator retains with
+// the group and slot of every decoder field: an absent coordinate is absent on
+// both sides, and a present one has the same text.
+func checkAttribution(t *testing.T, name string, res Result, r canbusreg.PCSStandardPCSResult) {
+	t.Helper()
+	a := res.Attribution
+	for field, df := range r.Fields {
+		if df.Scope != a.Scope || df.Bank != a.Bank {
+			t.Errorf("%s: %s scope/bank %q/%q, evaluator %q/%q", name, field, df.Scope, df.Bank, a.Scope, a.Bank)
+		}
+		if df.Group != a.Group || df.Slot != a.Slot {
+			t.Errorf("%s: %s group/slot %q/%q, evaluator %q/%q", name, field, df.Group, df.Slot, a.Group, a.Slot)
+		}
+		if (df.Group != "") != a.HasGroup || (df.Slot != "") != a.HasSlot {
+			t.Errorf("%s: %s presence of group and slot differs from the evaluator", name, field)
+		}
+	}
+}
+
 // checkCase compares every decoder field of a vector with the one row that
 // applies to it. A vector the decoder does not admit must be refused by the
 // evaluator with the decoder's status and no rows. It returns the identifiers
@@ -203,6 +222,7 @@ func checkCase(t *testing.T, c vectorCase) map[string]bool {
 		t.Fatalf("%s: decoder admits the observation, evaluator refuses it (%q)", c.Name, reason)
 	}
 	checkEvidence(t, c.Name, res, in, r)
+	checkAttribution(t, c.Name, res, r)
 	rows := make(map[string]roweval.NativeRow[Selector])
 	for _, row := range Table().Native {
 		rows[row.ID] = row
@@ -270,6 +290,9 @@ func checkField(t *testing.T, name, field string, df canbusreg.NativeField, row 
 		if nat.Reason != "" || nat.Value == nil || nat.Value.Quantity == nil {
 			t.Fatalf("%s: %s accepted by the decoder, row reason %q", name, field, nat.Reason)
 		}
+		if nat.Disposition != dispositionAccepted {
+			t.Errorf("%s: %s accepted by the decoder, row disposition %q", name, field, nat.Disposition)
+		}
 		if df.Unit != row.Unit {
 			t.Errorf("%s: %s unit %q, row %q", name, field, df.Unit, row.Unit)
 		}
@@ -277,6 +300,9 @@ func checkField(t *testing.T, name, field string, df canbusreg.NativeField, row 
 			t.Errorf("%s: %s row value differs from the decoder %d/%d", name, field, df.Numerator, df.Denominator)
 		}
 	case "raw":
+		if nat.Disposition != dispositionRaw {
+			t.Errorf("%s: %s raw in the decoder, row disposition %q", name, field, nat.Disposition)
+		}
 		if gated && nat.Reason != gateWithheld {
 			t.Errorf("%s: %s raw in the decoder, row reason %q", name, field, nat.Reason)
 		}
@@ -454,6 +480,14 @@ func TestStandardRowsSeparateBanksAndGroupAndSlotContext(t *testing.T) {
 	absent.Selection.Group, absent.Selection.Slot = "", ""
 	rb, eb, _ := evaluateCase(t, base)
 	ra, ea, _ := evaluateCase(t, absent)
+	gotB, gotA := attributionOf(t, base), attributionOf(t, absent)
+	if want := (Attribution{Scope: "local", Bank: "ordinary", Group: "0", Slot: "1", HasGroup: true, HasSlot: true}); gotB != want {
+		t.Errorf("selected group and slot: %+v, want %+v", gotB, want)
+	}
+	if want := (Attribution{Scope: "local", Bank: "ordinary"}); gotA != want {
+		t.Errorf("absent group and slot: %+v, want %+v", gotA, want)
+	}
+
 	if rb.Fields["voltage"].Group != "0" || rb.Fields["voltage"].Slot != "1" || ra.Fields["voltage"].Group != "" || ra.Fields["voltage"].Slot != "" {
 		t.Fatalf("decoder context: %q/%q and %q/%q", rb.Fields["voltage"].Group, rb.Fields["voltage"].Slot, ra.Fields["voltage"].Group, ra.Fields["voltage"].Slot)
 	}
@@ -479,7 +513,7 @@ func TestStandardRowsSeparateBanksAndGroupAndSlotContext(t *testing.T) {
 	s, in, frame := build(t, base)
 	q := Qualifiers(s, in)
 	q.Values[qBank] = "parallel"
-	evals, reason, err := evaluateRows(frame, q)
+	evals, reason, err := evaluateRows(Table(), frame, q)
 	if err != nil {
 		t.Fatalf("parallel-bank qualifier: %v", err)
 	}
@@ -534,5 +568,72 @@ func TestStandardMeasurementRowsKeepLegacyAndRelease11MeaningsApart(t *testing.T
 		if er.Rows[id].Reason == roweval.ReasonNoMatch || el.Rows[id].Reason != roweval.ReasonNoMatch {
 			t.Errorf("%s applies to the wrong contract", id)
 		}
+	}
+}
+
+// attributionOf evaluates one admitted vector and returns the attribution its
+// evaluation retains.
+func attributionOf(t *testing.T, c vectorCase) Attribution {
+	t.Helper()
+	_, res, _ := evaluateCase(t, c)
+	return res.Attribution
+}
+
+// TestStandardRowsDeclaredGeometryMustMatchFrame pins that the table's declared
+// identifier, format, DLC and raw DLC are compared with the observation. A row
+// whose declared geometry differs from the frame applies to no observation of
+// that frame, so a misdeclared table cannot pass the parity harness.
+func TestStandardRowsDeclaredGeometryMustMatchFrame(t *testing.T) {
+	c := caseNamed(t, "legacy-local-measured-313")
+	s, in, frame := build(t, c)
+	base := Table()
+	if evals, _, _ := evaluateRows(base, frame, Qualifiers(s, in)); len(evals) == 0 {
+		t.Fatal("the unmodified table applies no row to the frame")
+	}
+	mutations := map[string]func(*Selector){
+		"raw DLC 7":  func(a *Selector) { a.RawDLC = 7 },
+		"DLC 7":      func(a *Selector) { a.DLC = 7 },
+		"identifier": func(a *Selector) { a.Identifier = 0x312 },
+		"extended":   func(a *Selector) { a.Extended = true },
+	}
+	for name, mutate := range mutations {
+		table := roweval.Table[Selector]{Hooks: base.Hooks}
+		for _, row := range base.Native {
+			mutate(&row.At)
+			table.Native = append(table.Native, row)
+		}
+		evals, _, err := evaluateRows(table, frame, Qualifiers(s, in))
+		if err != nil {
+			t.Fatalf("%s: %v", name, err)
+		}
+		for id, ev := range evals {
+			if ev.Native != nil || ev.Reason != roweval.ReasonNoMatch {
+				t.Errorf("%s: %s applies to the frame (reason %q)", name, id, ev.Reason)
+			}
+		}
+	}
+}
+
+// TestStandardRawRowsAreRawDispositions pins that a field the decoder never
+// interprets keeps its raw word and is marked raw, while an accepted field is
+// marked accepted, so a consumer tells the two apart in the native result.
+func TestStandardRawRowsAreRawDispositions(t *testing.T) {
+	c := caseNamed(t, "summary-words-312")
+	_, res, _ := evaluateCase(t, c)
+	for _, id := range []string{rowPrefix + "312.reported_count", rowPrefix + "312.status_a"} {
+		nat := res.Rows[id].Native
+		if nat == nil || nat.Value == nil || nat.Reason != "" {
+			t.Fatalf("%s: no value", id)
+		}
+		if nat.Disposition != dispositionRaw {
+			t.Errorf("%s: disposition %q, want raw", id, nat.Disposition)
+		}
+	}
+	if nat := res.Rows[rowPrefix+"312.reported_count"].Native; nat.Raw != 3 {
+		t.Errorf("reported_count raw %d, want 3", nat.Raw)
+	}
+	_, res, _ = evaluateCase(t, caseNamed(t, "legacy-local-measured-313"))
+	if nat := res.Rows[rowPrefix+"313.legacy.voltage"].Native; nat == nil || nat.Disposition != dispositionAccepted {
+		t.Errorf("accepted voltage disposition %+v", nat)
 	}
 }

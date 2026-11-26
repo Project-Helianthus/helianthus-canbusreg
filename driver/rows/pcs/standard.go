@@ -13,6 +13,7 @@ type rowSpec struct {
 	divisor       int64
 	gate          string
 	percentDomain bool
+	raw           bool
 	when          map[string]string
 }
 
@@ -42,9 +43,10 @@ func when(extra ...string) map[string]string {
 	return m
 }
 
-// rawRow is a native row without a gate: its raw word is the native value.
+// rawRow is a native row without a gate that the decoder never interprets: its
+// raw word is the native value and its disposition is raw.
 func rawRow(frame uint32, field string, slice signalSlice) rowSpec {
-	return rowSpec{frame: frame, field: field, slice: slice, divisor: 1, when: when()}
+	return rowSpec{frame: frame, field: field, slice: slice, divisor: 1, raw: true, when: when()}
 }
 
 // standardSpecs returns the row specifications of frames 311 to 314, in frame order.

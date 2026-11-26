@@ -1,0 +1,18 @@
+{
+  "settings": [
+    {"name":"bit value out of range","unit":32,"start":0,"value":2,"deadline":"future"},
+    {"name":"destination outside indoor class","unit":8,"start":0,"value":1,"deadline":"future"},
+    {"name":"unknown setting coordinate","unit":32,"start":256,"value":1,"deadline":"future"},
+    {"name":"missing deadline","unit":32,"start":0,"value":1,"deadline":"missing"},
+    {"name":"elapsed deadline","unit":32,"start":0,"value":1,"deadline":"elapsed"}
+  ],
+  "properties": [
+    {"name":"byte value out of range","property":11,"unit":32,"value":256},
+    {"name":"unit outside wire field","property":11,"unit":128,"value":1},
+    {"name":"reserved command","property":0,"unit":32,"value":1},
+    {"name":"unsupported width","property":87,"unit":32,"value":1}
+  ],
+  "temperature": [
+    {"name":"wrong quantity unit","unit":"unit.pascal"}
+  ]
+}

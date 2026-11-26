@@ -112,6 +112,31 @@ func SendClock(name string, arg reg.GreeVRFTime, send func(reg.GreeVRFCommand) e
 	return send(f)
 }
 
+// SendSetting evaluates an addressed setting and sends it once before the
+// caller's deadline. It does not wait for a report; Execute observes readback.
+func SendSetting(call SettingCall, send func(reg.GreeVRFCommand) error) error {
+	if call.Deadline.IsZero() {
+		return fmt.Errorf("gree VRF setting requires an explicit deadline")
+	}
+	f, err := EncodeSetting(call.Setting)
+	if err != nil {
+		return err
+	}
+	if !time.Now().Before(call.Deadline) {
+		return context.DeadlineExceeded
+	}
+	return send(f)
+}
+
+// SendProperty evaluates a command-map row and hands one frame to the sender.
+func SendProperty(property uint8, seed uint32, unit uint8, value uint16, send func(reg.GreeVRFCommand) error) error {
+	f, err := EncodeProperty(property, seed, unit, value)
+	if err != nil {
+		return err
+	}
+	return send(f)
+}
+
 // EncodeProperty evaluates a command-map row for the supplied target.
 func EncodeProperty(property uint8, seed uint32, unit uint8, value uint16) (reg.GreeVRFCommand, error) {
 	f, ok := reg.EncodeGreeVRFCommand(seed, unit, property, 0)

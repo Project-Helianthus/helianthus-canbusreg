@@ -354,6 +354,42 @@ func diagDTCSpecs(fam diagDTCFamily, member canbusreg.Selection, offset int, fra
 	return specs
 }
 
+// DTCRowIDs lists every DTC row identifier the package declares: the
+// selected_word and numeric_index rows at each word offset of the 0x333, 0x52X
+// and LINK 1853 families.
+func DTCRowIDs() []string {
+	var ids []string
+	for _, c := range []struct {
+		id       uint32
+		extended bool
+	}{{0x333, false}, {0x520, false}, {0x1853F41A, true}} {
+		var ident canbus.Identifier
+		var err error
+		if c.extended {
+			ident, err = canbus.NewExtendedID(c.id)
+		} else {
+			ident, err = canbus.NewStandardID(c.id)
+		}
+		if err != nil {
+			continue
+		}
+		frame, err := canbus.NewFrame(ident, make([]byte, 8))
+		if err != nil {
+			continue
+		}
+		fam, ok := diagDTCFamilyOf(frame)
+		if !ok {
+			continue
+		}
+		for _, offset := range fam.offsets {
+			for _, spec := range diagDTCSpecs(fam, canbusreg.Selection{}, offset, frame) {
+				ids = append(ids, spec.id)
+			}
+		}
+	}
+	return ids
+}
+
 // EvaluateDTC evaluates the selected_word and numeric_index rows of one
 // diagnostic word at the caller's offset. A frame, member or offset the decoder
 // refuses gives the decoder's status and no rows. An offset that is not a word

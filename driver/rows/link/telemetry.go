@@ -34,7 +34,7 @@ type rowSpec struct {
 var sharedNames = map[string]bool{
 	"b0": true, "b1": true, "b2": true, "b3": true, "b4": true, "b5": true, "b6": true, "b7": true,
 	"word_0": true, "word_1": true, "spread": true, "maximum_index": true, "minimum_index": true,
-	"tail": true, "status": true, "reserved": true, "current": true, "mask": true, "counter": true,
+	"tail": true, "status": true, "reserved": true, "current": true, "mask": true, "counter": true, "maximum": true, "minimum": true, "mean": true,
 }
 
 func (r rowSpec) rowID() string {

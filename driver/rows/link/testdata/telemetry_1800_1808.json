@@ -811,7 +811,7 @@
      "disposition": "raw",
      "raw": "16"
     },
-    "growatt.bms.link.maximum": {
+    "growatt.bms.link.1806.maximum": {
      "value": "3300",
      "unit": "",
      "disposition": "raw",
@@ -823,7 +823,7 @@
      "disposition": "raw",
      "raw": "3"
     },
-    "growatt.bms.link.minimum": {
+    "growatt.bms.link.1806.minimum": {
      "value": "3200",
      "unit": "",
      "disposition": "raw",

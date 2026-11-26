@@ -390,3 +390,27 @@ func TestEvaluationRefusesWhatTheDecoderRefuses(t *testing.T) {
 		}
 	})
 }
+
+func TestNamesEmittedByAnotherLinkFamilyTakeTheFrameQualifier(t *testing.T) {
+	// maximum, minimum and mean are also emitted by the 1862 temperature
+	// summary decoder (DecodeLINKTemperatureSummary).
+	for _, field := range []string{"maximum", "minimum", "mean"} {
+		if !sharedNames[field] {
+			t.Errorf("field %s is emitted by more than one LINK frame family and needs the frame qualifier", field)
+		}
+	}
+	ids := map[string]bool{}
+	for _, row := range Table().Native {
+		ids[row.ID] = true
+	}
+	for _, id := range []string{"growatt.bms.link.1806.maximum", "growatt.bms.link.1806.minimum"} {
+		if !ids[id] {
+			t.Errorf("missing row %s", id)
+		}
+	}
+	for _, id := range []string{"growatt.bms.link.maximum", "growatt.bms.link.minimum"} {
+		if ids[id] {
+			t.Errorf("unqualified row %s must not exist", id)
+		}
+	}
+}

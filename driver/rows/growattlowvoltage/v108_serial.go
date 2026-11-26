@@ -72,8 +72,10 @@ func (e *SerialExchange) Fragments() []SerialFragment {
 func (e *SerialExchange) Completed() bool { return e != nil && e.started }
 
 // SerialBytes returns the serial bytes received so far: B2 to B7 of frame 0
-// and B1 to B7 of each later fragment, in arrival order. Their order by frame
-// number and the end of the serial are not stated by the document.
+// and B1 to B7 of each later fragment, in arrival order, at most MaxSerialBytes.
+// Bytes past the documented bound are not serial content and stay only in the
+// raw fragments. Their order by frame number and the end of the serial are not
+// stated by the document.
 func (e *SerialExchange) SerialBytes() []byte {
 	var out []byte
 	for i, f := range e.fragments {
@@ -82,6 +84,9 @@ func (e *SerialExchange) SerialBytes() []byte {
 		} else {
 			out = append(out, f.Raw[1:]...)
 		}
+	}
+	if len(out) > MaxSerialBytes {
+		out = out[:MaxSerialBytes]
 	}
 	return out
 }

@@ -139,6 +139,9 @@ func TestV108SerialResponseKeepsEveryFragmentStandardAndExtended(t *testing.T) {
 				t.Errorf("%s: fragment %d %x, want %x", c.Name, i, got[i].Raw, want)
 			}
 		}
+		if len(ex.SerialBytes()) > MaxSerialBytes {
+			t.Errorf("%s: %d serial bytes, past the bound", c.Name, len(ex.SerialBytes()))
+		}
 		if hex.EncodeToString(ex.SerialBytes()) != c.Serial {
 			t.Errorf("%s: serial bytes %x, want %s", c.Name, ex.SerialBytes(), c.Serial)
 		}
@@ -147,7 +150,7 @@ func TestV108SerialResponseKeepsEveryFragmentStandardAndExtended(t *testing.T) {
 	r := &recorder{}
 	q, _ := NewSerialQuerier(v108, r.send)
 	ex, _ := q.Query(3)
-	vs := loadSerialVectors(t).Response[2]
+	vs := loadSerialVectors(t).Response[3]
 	for _, s := range vs.Frames {
 		if err := ex.Offer(hexFrame(t, s)); err != nil {
 			t.Fatal(err)
@@ -244,7 +247,8 @@ func TestV108SerialCompletionOnlyForCorrespondingResponse(t *testing.T) {
 	}
 }
 
-func TestPCS212OutputIsUnchanged(t *testing.T) {
+// The PCS 212 output stays unchanged: no command row and the published gap text.
+func TestPCSStandardInputGapAndCommandRowsStayAsPublished(t *testing.T) {
 	var gap string
 	for _, g := range pcs.IncompleteInputs() {
 		if g.Identifier == 0x212 {

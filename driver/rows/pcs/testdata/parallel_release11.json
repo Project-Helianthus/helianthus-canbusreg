@@ -1,0 +1,965 @@
+{
+ "description": "Synthetic vectors of the release-11 parallel families. Expectations are written from the page's layouts: slot and word fields are little-endian except the diagnostic words, which are big-endian; the 610 current is (word - 10000) / 10 A; a local temperature code is the code minus 40 degrees Celsius; the dictionary word of index 5 is 0x1005 on the non-modern contract and 1005 decimal on the modern one. Values are decimal strings; an empty value is not checked. A refused case names the decoder status.",
+ "cases": [
+  {
+   "name": "family-510-local-release-11",
+   "identifier": "0x511",
+   "payload": "0234120701020300",
+   "selection": {
+    "project": "QAAA",
+    "release": "0011",
+    "scope": "local",
+    "endpoint": "coordinator",
+    "group": "1",
+    "slot": "2"
+   },
+   "expect": {
+    "slot": {
+     "status": "accepted",
+     "value": "2"
+    },
+    "minimum_cell": {
+     "status": "accepted",
+     "value": "4660"
+    },
+    "independent_b3": {
+     "status": "raw",
+     "value": "7"
+    },
+    "state_4": {
+     "status": "accepted",
+     "value": "1"
+    },
+    "state_5": {
+     "status": "accepted",
+     "value": "2"
+    },
+    "state_6": {
+     "status": "accepted",
+     "value": "3"
+    },
+    "state_7": {
+     "status": "accepted",
+     "value": "0"
+    }
+   }
+  },
+  {
+   "name": "family-510-local-state-7-nonzero-is-invalid",
+   "identifier": "0x511",
+   "payload": "0234120701020305",
+   "selection": {
+    "project": "QAAA",
+    "release": "0011",
+    "scope": "local",
+    "endpoint": "coordinator",
+    "group": "1",
+    "slot": "2"
+   },
+   "expect": {
+    "state_7": {
+     "status": "invalid",
+     "value": ""
+    }
+   }
+  },
+  {
+   "name": "family-510-aggregate-state-7-is-raw",
+   "identifier": "0x511",
+   "payload": "0234120701020305",
+   "selection": {
+    "project": "QAAA",
+    "release": "0011",
+    "scope": "aggregate",
+    "endpoint": "coordinator",
+    "group": "1",
+    "slot": "2"
+   },
+   "expect": {
+    "state_7": {
+     "status": "raw",
+     "value": "5"
+    }
+   }
+  },
+  {
+   "name": "family-510-modern-contract-state-7-accepted",
+   "identifier": "0x511",
+   "payload": "0234120701020305",
+   "selection": {
+    "project": "QAAa",
+    "release": "9011",
+    "scope": "local",
+    "endpoint": "coordinator",
+    "group": "1",
+    "slot": "2",
+    "choice": "release11"
+   },
+   "expect": {
+    "state_7": {
+     "status": "accepted",
+     "value": "5"
+    }
+   }
+  },
+  {
+   "name": "family-510-slot-mismatch-refused",
+   "identifier": "0x511",
+   "payload": "0234120701020300",
+   "selection": {
+    "project": "QAAA",
+    "release": "0011",
+    "scope": "local",
+    "endpoint": "coordinator",
+    "group": "1",
+    "slot": "3"
+   },
+   "refused": "invalid"
+  },
+  {
+   "name": "family-520-dictionary-index-5-and-empty-word",
+   "identifier": "0x521",
+   "payload": "0210050000000000",
+   "selection": {
+    "project": "QAAA",
+    "release": "0011",
+    "scope": "local",
+    "endpoint": "coordinator",
+    "group": "1",
+    "slot": "2"
+   },
+   "expect": {
+    "slot": {
+     "status": "accepted",
+     "value": "2"
+    },
+    "dtc_a": {
+     "status": "accepted",
+     "value": "4101"
+    },
+    "dtc_a_index": {
+     "status": "accepted",
+     "value": "5"
+    },
+    "dtc_b": {
+     "status": "empty",
+     "value": "0"
+    },
+    "zero_5": {
+     "status": "accepted",
+     "value": "0"
+    },
+    "zero_6": {
+     "status": "accepted",
+     "value": "0"
+    },
+    "zero_7": {
+     "status": "accepted",
+     "value": "0"
+    }
+   }
+  },
+  {
+   "name": "family-520-modern-dictionary-indices-5-and-131",
+   "identifier": "0x521",
+   "payload": "0203ED04A1000000",
+   "selection": {
+    "project": "QAAa",
+    "release": "9011",
+    "scope": "local",
+    "endpoint": "coordinator",
+    "group": "1",
+    "slot": "2",
+    "choice": "release11"
+   },
+   "expect": {
+    "dtc_a": {
+     "status": "accepted",
+     "value": "1005"
+    },
+    "dtc_a_index": {
+     "status": "accepted",
+     "value": "5"
+    },
+    "dtc_b": {
+     "status": "accepted",
+     "value": "1185"
+    },
+    "dtc_b_index": {
+     "status": "accepted",
+     "value": "131"
+    }
+   }
+  },
+  {
+   "name": "family-520-unknown-word-and-nonzero-padding",
+   "identifier": "0x521",
+   "payload": "0212340000010000",
+   "selection": {
+    "project": "QAAA",
+    "release": "0011",
+    "scope": "local",
+    "endpoint": "coordinator",
+    "group": "1",
+    "slot": "2"
+   },
+   "expect": {
+    "dtc_a": {
+     "status": "unknown",
+     "value": "4660"
+    },
+    "dtc_b": {
+     "status": "empty",
+     "value": "0"
+    },
+    "zero_5": {
+     "status": "invalid",
+     "value": ""
+    }
+   }
+  },
+  {
+   "name": "family-590-aggregate-summary",
+   "identifier": "0x590",
+   "payload": "0102033412785609",
+   "selection": {
+    "project": "QAAA",
+    "release": "0011",
+    "scope": "aggregate",
+    "endpoint": "coordinator",
+    "group": "0",
+    "slot": ""
+   },
+   "expect": {
+    "state_0": {
+     "status": "accepted",
+     "value": "1"
+    },
+    "state_1": {
+     "status": "accepted",
+     "value": "2"
+    },
+    "state_2": {
+     "status": "accepted",
+     "value": "3"
+    },
+    "aggregate_3": {
+     "status": "raw",
+     "value": "4660"
+    },
+    "aggregate_5": {
+     "status": "raw",
+     "value": "22136"
+    },
+    "input_b7": {
+     "status": "raw",
+     "value": "9"
+    }
+   }
+  },
+  {
+   "name": "family-590-local-summary-refused",
+   "identifier": "0x590",
+   "payload": "0102033412785609",
+   "selection": {
+    "project": "QAAA",
+    "release": "0011",
+    "scope": "local",
+    "endpoint": "coordinator",
+    "group": "0",
+    "slot": ""
+   },
+   "refused": "unsupported"
+  },
+  {
+   "name": "family-610-local-measurements",
+   "identifier": "0x611",
+   "payload": "F4811C25E0015703",
+   "selection": {
+    "project": "QAAA",
+    "release": "0011",
+    "scope": "local",
+    "endpoint": "coordinator",
+    "group": "1",
+    "slot": ""
+   },
+   "expect": {
+    "mux": {
+     "status": "accepted",
+     "value": "1"
+    },
+    "voltage": {
+     "status": "accepted",
+     "value": "50"
+    },
+    "current": {
+     "status": "accepted",
+     "value": "-50"
+    },
+    "port": {
+     "status": "accepted",
+     "value": "48"
+    },
+    "soc": {
+     "status": "accepted",
+     "value": "85.5"
+    }
+   }
+  },
+  {
+   "name": "family-610-aggregate-port-is-raw",
+   "identifier": "0x611",
+   "payload": "F4811C25E0015703",
+   "selection": {
+    "project": "QAAA",
+    "release": "0011",
+    "scope": "aggregate",
+    "endpoint": "coordinator",
+    "group": "1",
+    "slot": ""
+   },
+   "expect": {
+    "mux": {
+     "status": "accepted",
+     "value": "1"
+    },
+    "voltage": {
+     "status": "accepted",
+     "value": "50"
+    },
+    "current": {
+     "status": "accepted",
+     "value": "-50"
+    },
+    "port": {
+     "status": "raw",
+     "value": "480"
+    },
+    "soc": {
+     "status": "accepted",
+     "value": "85.5"
+    }
+   }
+  },
+  {
+   "name": "family-650-local-temperatures-and-soh",
+   "identifier": "0x651",
+   "payload": "03004104003C3E64",
+   "selection": {
+    "project": "QAAA",
+    "release": "0011",
+    "scope": "local",
+    "endpoint": "coordinator",
+    "group": "1",
+    "slot": ""
+   },
+   "context": {
+    "soh_tenths": 1000
+   },
+   "expect": {
+    "maximum_index": {
+     "status": "accepted",
+     "value": "3"
+    },
+    "zero_1": {
+     "status": "accepted",
+     "value": "0"
+    },
+    "temperature_maximum": {
+     "status": "accepted",
+     "value": "25"
+    },
+    "minimum_index": {
+     "status": "accepted",
+     "value": "4"
+    },
+    "zero_4": {
+     "status": "accepted",
+     "value": "0"
+    },
+    "temperature_minimum": {
+     "status": "accepted",
+     "value": "20"
+    },
+    "average_temperature": {
+     "status": "accepted",
+     "value": "22"
+    },
+    "soh": {
+     "status": "accepted",
+     "value": "100"
+    }
+   }
+  },
+  {
+   "name": "family-650-local-soh-conflict",
+   "identifier": "0x651",
+   "payload": "03004104003C3E63",
+   "selection": {
+    "project": "QAAA",
+    "release": "0011",
+    "scope": "local",
+    "endpoint": "coordinator",
+    "group": "1",
+    "slot": ""
+   },
+   "context": {
+    "soh_tenths": 1000
+   },
+   "expect": {
+    "soh": {
+     "status": "conflict",
+     "value": ""
+    }
+   }
+  },
+  {
+   "name": "family-650-local-soh-withheld-without-context",
+   "identifier": "0x651",
+   "payload": "03004104003C3E64",
+   "selection": {
+    "project": "QAAA",
+    "release": "0011",
+    "scope": "local",
+    "endpoint": "coordinator",
+    "group": "1",
+    "slot": ""
+   },
+   "expect": {
+    "soh": {
+     "status": "withheld",
+     "value": ""
+    },
+    "temperature_maximum": {
+     "status": "accepted",
+     "value": "25"
+    }
+   }
+  },
+  {
+   "name": "family-650-maximum-padding-invalidates-maximum",
+   "identifier": "0x651",
+   "payload": "03014104003C3E64",
+   "selection": {
+    "project": "QAAA",
+    "release": "0011",
+    "scope": "local",
+    "endpoint": "coordinator",
+    "group": "1",
+    "slot": ""
+   },
+   "context": {
+    "soh_tenths": 1000
+   },
+   "expect": {
+    "zero_1": {
+     "status": "invalid",
+     "value": ""
+    },
+    "maximum_index": {
+     "status": "invalid",
+     "value": ""
+    },
+    "temperature_maximum": {
+     "status": "invalid",
+     "value": ""
+    },
+    "temperature_minimum": {
+     "status": "accepted",
+     "value": "20"
+    }
+   }
+  },
+  {
+   "name": "family-650-minimum-padding-invalidates-minimum",
+   "identifier": "0x651",
+   "payload": "03004104013C3E64",
+   "selection": {
+    "project": "QAAA",
+    "release": "0011",
+    "scope": "local",
+    "endpoint": "coordinator",
+    "group": "1",
+    "slot": ""
+   },
+   "context": {
+    "soh_tenths": 1000
+   },
+   "expect": {
+    "zero_4": {
+     "status": "invalid",
+     "value": ""
+    },
+    "minimum_index": {
+     "status": "invalid",
+     "value": ""
+    },
+    "temperature_minimum": {
+     "status": "invalid",
+     "value": ""
+    },
+    "temperature_maximum": {
+     "status": "accepted",
+     "value": "25"
+    }
+   }
+  },
+  {
+   "name": "family-650-aggregate-codes-are-raw",
+   "identifier": "0x651",
+   "payload": "03004104003C3E64",
+   "selection": {
+    "project": "QAAA",
+    "release": "0011",
+    "scope": "aggregate",
+    "endpoint": "coordinator",
+    "group": "1",
+    "slot": ""
+   },
+   "expect": {
+    "temperature_maximum": {
+     "status": "raw",
+     "value": "65"
+    },
+    "temperature_minimum": {
+     "status": "raw",
+     "value": "60"
+    },
+    "average_temperature": {
+     "status": "raw",
+     "value": "62"
+    },
+    "soh": {
+     "status": "raw",
+     "value": "100"
+    }
+   }
+  },
+  {
+   "name": "family-680-local-reported-soc",
+   "identifier": "0x681",
+   "payload": "6400C80057030101",
+   "selection": {
+    "project": "QAAA",
+    "release": "0011",
+    "scope": "local",
+    "endpoint": "coordinator",
+    "group": "1",
+    "slot": ""
+   },
+   "context": {
+    "permission": 1,
+    "soc_tenths": 855,
+    "state": 6
+   },
+   "expect": {
+    "limit_a": {
+     "status": "raw",
+     "value": "100"
+    },
+    "limit_b": {
+     "status": "raw",
+     "value": "200"
+    },
+    "soc_report": {
+     "status": "accepted",
+     "value": "85.5"
+    },
+    "state_bit_2": {
+     "status": "accepted",
+     "value": "1"
+    },
+    "state_bit_1": {
+     "status": "accepted",
+     "value": "1"
+    }
+   }
+  },
+  {
+   "name": "family-680-local-substituted-soc",
+   "identifier": "0x681",
+   "payload": "6400C8000A000001",
+   "selection": {
+    "project": "QAAA",
+    "release": "0011",
+    "scope": "local",
+    "endpoint": "coordinator",
+    "group": "1",
+    "slot": ""
+   },
+   "context": {
+    "permission": 1,
+    "soc_tenths": 0,
+    "state": 2
+   },
+   "expect": {
+    "soc_report": {
+     "status": "accepted",
+     "value": "1"
+    },
+    "state_bit_2": {
+     "status": "accepted",
+     "value": "0"
+    },
+    "state_bit_1": {
+     "status": "accepted",
+     "value": "1"
+    }
+   }
+  },
+  {
+   "name": "family-680-local-inactive-report-conflict",
+   "identifier": "0x681",
+   "payload": "6400C80005000000",
+   "selection": {
+    "project": "QAAA",
+    "release": "0011",
+    "scope": "local",
+    "endpoint": "coordinator",
+    "group": "1",
+    "slot": ""
+   },
+   "context": {
+    "permission": 0,
+    "soc_tenths": 855,
+    "state": 0
+   },
+   "expect": {
+    "soc_report": {
+     "status": "conflict",
+     "value": ""
+    },
+    "state_bit_2": {
+     "status": "accepted",
+     "value": "0"
+    }
+   }
+  },
+  {
+   "name": "family-680-local-withheld-without-context",
+   "identifier": "0x681",
+   "payload": "6400C80057030101",
+   "selection": {
+    "project": "QAAA",
+    "release": "0011",
+    "scope": "local",
+    "endpoint": "coordinator",
+    "group": "1",
+    "slot": ""
+   },
+   "expect": {
+    "soc_report": {
+     "status": "withheld",
+     "value": ""
+    },
+    "state_bit_2": {
+     "status": "withheld",
+     "value": ""
+    },
+    "state_bit_1": {
+     "status": "withheld",
+     "value": ""
+    }
+   }
+  },
+  {
+   "name": "family-680-aggregate-words-are-raw",
+   "identifier": "0x681",
+   "payload": "6400C80057030101",
+   "selection": {
+    "project": "QAAA",
+    "release": "0011",
+    "scope": "aggregate",
+    "endpoint": "coordinator",
+    "group": "1",
+    "slot": ""
+   },
+   "expect": {
+    "soc_report": {
+     "status": "raw",
+     "value": "855"
+    },
+    "state_bit_2": {
+     "status": "raw",
+     "value": "1"
+    },
+    "state_bit_1": {
+     "status": "raw",
+     "value": "1"
+    }
+   }
+  },
+  {
+   "name": "family-6d0-local-cell-sum",
+   "identifier": "0x6D1",
+   "payload": "E40C000000000000",
+   "selection": {
+    "project": "QAAA",
+    "release": "0011",
+    "scope": "local",
+    "endpoint": "coordinator",
+    "group": "1",
+    "slot": ""
+   },
+   "context": {
+    "category_first": 0,
+    "category_second": 0,
+    "cell_sum_valid": 1,
+    "pack_code": 150,
+    "state": 0
+   },
+   "expect": {
+    "cell_sum": {
+     "status": "accepted",
+     "value": "330"
+    },
+    "pack_over_200": {
+     "status": "accepted",
+     "value": "0"
+    },
+    "state_nonzero": {
+     "status": "accepted",
+     "value": "0"
+    },
+    "zero_4": {
+     "status": "accepted",
+     "value": "0"
+    },
+    "zero_7": {
+     "status": "accepted",
+     "value": "0"
+    }
+   }
+  },
+  {
+   "name": "family-6d0-local-cell-sum-withheld-without-validity",
+   "identifier": "0x6D1",
+   "payload": "E40C000000000000",
+   "selection": {
+    "project": "QAAA",
+    "release": "0011",
+    "scope": "local",
+    "endpoint": "coordinator",
+    "group": "1",
+    "slot": ""
+   },
+   "context": {
+    "category_first": 0,
+    "category_second": 0,
+    "pack_code": 150,
+    "state": 0
+   },
+   "expect": {
+    "cell_sum": {
+     "status": "withheld",
+     "value": ""
+    }
+   }
+  },
+  {
+   "name": "family-6d0-local-sentinel-is-invalid",
+   "identifier": "0x6D1",
+   "payload": "FFFF000000000000",
+   "selection": {
+    "project": "QAAA",
+    "release": "0011",
+    "scope": "local",
+    "endpoint": "coordinator",
+    "group": "1",
+    "slot": ""
+   },
+   "context": {
+    "category_first": 0,
+    "category_second": 0,
+    "cell_sum_valid": 1,
+    "pack_code": 150,
+    "state": 0
+   },
+   "expect": {
+    "cell_sum": {
+     "status": "invalid",
+     "value": ""
+    }
+   }
+  },
+  {
+   "name": "family-6d0-local-category-conflict",
+   "identifier": "0x6D1",
+   "payload": "E40C000000000000",
+   "selection": {
+    "project": "QAAA",
+    "release": "0011",
+    "scope": "local",
+    "endpoint": "coordinator",
+    "group": "1",
+    "slot": ""
+   },
+   "context": {
+    "category_first": 2,
+    "category_second": 0,
+    "cell_sum_valid": 1,
+    "pack_code": 150,
+    "state": 0
+   },
+   "expect": {
+    "cell_sum": {
+     "status": "conflict",
+     "value": ""
+    }
+   }
+  },
+  {
+   "name": "family-6d0-local-category-sentinel-invalid",
+   "identifier": "0x6D1",
+   "payload": "FFFF000000000000",
+   "selection": {
+    "project": "QAAA",
+    "release": "0011",
+    "scope": "local",
+    "endpoint": "coordinator",
+    "group": "1",
+    "slot": ""
+   },
+   "context": {
+    "category_first": 0,
+    "category_second": 3,
+    "cell_sum_valid": 1,
+    "pack_code": 150,
+    "state": 0
+   },
+   "expect": {
+    "cell_sum": {
+     "status": "invalid",
+     "value": ""
+    }
+   }
+  },
+  {
+   "name": "family-6d0-local-cell-sum-withheld-without-categories",
+   "identifier": "0x6D1",
+   "payload": "E40C000000000000",
+   "selection": {
+    "project": "QAAA",
+    "release": "0011",
+    "scope": "local",
+    "endpoint": "coordinator",
+    "group": "1",
+    "slot": ""
+   },
+   "context": {
+    "cell_sum_valid": 1,
+    "pack_code": 150,
+    "state": 0
+   },
+   "expect": {
+    "cell_sum": {
+     "status": "withheld",
+     "value": ""
+    }
+   }
+  },
+  {
+   "name": "family-6d0-local-derived-flags-and-padding",
+   "identifier": "0x6D1",
+   "payload": "E40C010101000000",
+   "selection": {
+    "project": "QAAA",
+    "release": "0011",
+    "scope": "local",
+    "endpoint": "coordinator",
+    "group": "1",
+    "slot": ""
+   },
+   "context": {
+    "category_first": 0,
+    "category_second": 0,
+    "cell_sum_valid": 1,
+    "pack_code": 250,
+    "state": 3
+   },
+   "expect": {
+    "pack_over_200": {
+     "status": "accepted",
+     "value": "1"
+    },
+    "state_nonzero": {
+     "status": "accepted",
+     "value": "1"
+    },
+    "zero_4": {
+     "status": "invalid",
+     "value": ""
+    }
+   }
+  },
+  {
+   "name": "family-6d0-aggregate-words-are-raw",
+   "identifier": "0x6D1",
+   "payload": "E40C000000000000",
+   "selection": {
+    "project": "QAAA",
+    "release": "0011",
+    "scope": "aggregate",
+    "endpoint": "coordinator",
+    "group": "1",
+    "slot": ""
+   },
+   "expect": {
+    "cell_sum": {
+     "status": "raw",
+     "value": "3300"
+    },
+    "pack_over_200": {
+     "status": "raw",
+     "value": "0"
+    },
+    "state_nonzero": {
+     "status": "raw",
+     "value": "0"
+    }
+   }
+  },
+  {
+   "name": "family-37f-emits-no-field",
+   "identifier": "0x37F",
+   "payload": "0000000000000000",
+   "selection": {
+    "project": "QAAA",
+    "release": "0011",
+    "scope": "local",
+    "endpoint": "coordinator",
+    "group": "1",
+    "slot": ""
+   },
+   "refused": "raw"
+  },
+  {
+   "name": "family-3f7-emits-no-field",
+   "identifier": "0x3F7",
+   "payload": "0000000000000000",
+   "selection": {
+    "project": "QAAA",
+    "release": "0011",
+    "scope": "local",
+    "endpoint": "coordinator",
+    "group": "1",
+    "slot": ""
+   },
+   "refused": "raw"
+  },
+  {
+   "name": "family-6ff-is-not-decoded",
+   "identifier": "0x6FF",
+   "payload": "0000000000000000",
+   "selection": {
+    "project": "QAAA",
+    "release": "0011",
+    "scope": "local",
+    "endpoint": "coordinator",
+    "group": "1",
+    "slot": ""
+   },
+   "refused": "unsupported"
+  }
+ ]
+}

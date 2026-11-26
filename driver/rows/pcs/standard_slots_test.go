@@ -453,6 +453,38 @@ func TestSlotCurrentRowsDeclareNoSlotRequirement(t *testing.T) {
 	}
 }
 
+// TestSlotCurrentRowsDeclareSlotContextWithoutCoordinate pins that the 0x326
+// current rows declare their slot context in When, and that an observation
+// with no slot coordinate still yields its current with the coordinate absent.
+func TestSlotCurrentRowsDeclareSlotContextWithoutCoordinate(t *testing.T) {
+	rows := slotRowsByID()
+	for _, id := range []string{"growatt.bms.pcs.standard.326.current", "growatt.bms.pcs.parallel.326.current"} {
+		row, ok := rows[id]
+		if !ok {
+			t.Fatalf("no row %s", id)
+		}
+		if row.When.Equal[qSlotContext] != slotFrameContext {
+			t.Errorf("%s When does not declare the slot context: %v", id, row.When.Equal)
+		}
+	}
+	c := slotCase(t, "slot-326-ordinary-word-4000")
+	c.Selection.Slot = ""
+	s, in, _ := slotBuild(t, c)
+	if r := canbusreg.DecodePCSSlots(s, in); r.Status != "decoded" {
+		t.Fatalf("decoder refuses the observation without a coordinate: %s", r.Status)
+	}
+	res, reason, err := EvaluateSlots(s, in)
+	if err != nil || reason != "" {
+		t.Fatalf("evaluate refused without a coordinate: %v %v", reason, err)
+	}
+	if got := slotValue(t, res, "growatt.bms.pcs.standard.326.current"); got.Cmp(ratText(t, "0")) != 0 {
+		t.Errorf("current without a coordinate %s, want 0", got.RatString())
+	}
+	if res.Attribution.HasSlot || res.Attribution.Slot != "" {
+		t.Errorf("coordinate present without a coordinate: %+v", res.Attribution)
+	}
+}
+
 // TestSlotRowsRefuseUnpairedFlavorAndBank pins that a flavor and a bank that do
 // not pair never make a selection, and that the rows refuse a pairing the
 // selection would not give: no slot row applies to a mismatched qualifier set.

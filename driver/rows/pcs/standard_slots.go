@@ -39,6 +39,13 @@ const (
 	qIndexState = "dtc-index-state:"
 	qIndex      = "dtc-index:"
 
+	// qSlotContext declares that a row belongs to the slot frames. It is a
+	// fixed condition the selection always supplies, so it asserts the slot
+	// context of the row without requiring a slot coordinate: the coordinate
+	// stays attribution and an observation without one keeps its values.
+	qSlotContext     = "slot-context"
+	slotFrameContext = "slot-frame"
+
 	// qDTCRole separates the two roles of one 0x333 dictionary word: the word
 	// itself and its index companion. Both rows read the same selector, so the
 	// validator needs the roles to differ in their conditions.
@@ -113,7 +120,7 @@ func slotSpecs(b slotBank) []slotSpec {
 // the field disposition and, for a dictionary index, the index state.
 func slotNativeRow(b slotBank, r slotSpec) roweval.NativeRow[Selector] {
 	codec := "unsigned"
-	equal := map[string]string{qFlavor: b.flavor, qBank: b.bank}
+	equal := map[string]string{qFlavor: b.flavor, qBank: b.bank, qSlotContext: slotFrameContext}
 	if r.role != "" {
 		equal[qDTCRole] = r.role
 	}
@@ -335,6 +342,7 @@ func slotQualifiers(s canbusreg.Selection, in canbusreg.PCSSlotPCSInput) roweval
 	values := map[string]string{
 		qFlavor:            c.Flavor,
 		qBank:              c.Bank,
+		qSlotContext:       slotFrameContext,
 		gateSlot326:        boolText(slot && pad326),
 		gateMeasured326:    boolText(slot && pad326 && in.MeasurementValid),
 		gateSlot327:        boolText(slot && p[7] == 0),

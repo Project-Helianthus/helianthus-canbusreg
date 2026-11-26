@@ -516,31 +516,33 @@ func TestStandardRowsRefuseNeighbouringIdentifierWrongLengthAndExtendedFormat(t 
 	for _, id := range []uint32{0x310, 0x315, 0x321} {
 		identifier, _ := canbus.NewStandardID(id)
 		frame, _ := canbus.NewFrame(identifier, []byte{0x14, 0xbe, 0xff, 0xf6, 0xff, 0xf6, 0x64, 0xe4})
-		assertRefused(t, fmt.Sprintf("neighbour %#x", id), s, in, frame)
+		assertRefused(t, fmt.Sprintf("neighbour %#x", id), s, in, frame, "unsupported")
 	}
 	short, _ := canbus.NewStandardID(0x313)
 	frame, _ := canbus.NewFrame(short, []byte{0x14, 0xbe, 0xff, 0xf6, 0xff, 0xf6, 0x64})
-	assertRefused(t, "wrong length", s, in, frame)
+	assertRefused(t, "wrong length", s, in, frame, "invalid")
 	extended, _ := canbus.NewExtendedID(0x313)
 	frame, _ = canbus.NewFrame(extended, []byte{0x14, 0xbe, 0xff, 0xf6, 0xff, 0xf6, 0x64, 0xe4})
-	assertRefused(t, "extended format", s, in, frame)
+	assertRefused(t, "extended format", s, in, frame, "invalid")
 }
 
-// assertRefused checks that the decoder yields no field and that the evaluator
-// refuses the frame by the frame disposition: no rows, reason no_match.
-func assertRefused(t *testing.T, name string, s canbusreg.Selection, in canbusreg.PCSStandardPCSInput, frame canbus.Frame) {
+// assertRefused checks that the decoder refuses the frame with the given status
+// and yields no field, and that the evaluator gives that same status as its
+// reason with no rows, so a caller can tell a malformed frame from an
+// out-of-table identifier by the reason.
+func assertRefused(t *testing.T, name string, s canbusreg.Selection, in canbusreg.PCSStandardPCSInput, frame canbus.Frame, status string) {
 	t.Helper()
 	in.Evidence.Frame = frame
 	r := canbusreg.DecodePCSStandard(s, in)
-	if len(r.Fields) != 0 {
-		t.Errorf("%s: decoder emitted %d fields", name, len(r.Fields))
+	if r.Status != status || len(r.Fields) != 0 {
+		t.Errorf("%s: decoder status %q with %d fields, want %q and none", name, r.Status, len(r.Fields), status)
 	}
 	res, reason, err := Evaluate(s, in)
 	if err != nil {
 		t.Fatal(err)
 	}
-	if reason != roweval.ReasonNoMatch || res.Rows != nil {
-		t.Errorf("%s: evaluator admitted the frame (%q)", name, reason)
+	if reason != roweval.Reason(status) || res.Rows != nil {
+		t.Errorf("%s: evaluator reason %q with rows %v, want decoder status %q and none", name, reason, res.Rows != nil, status)
 	}
 }
 
@@ -639,6 +641,51 @@ func TestStandardMeasurementRowsKeepLegacyAndRelease11MeaningsApart(t *testing.T
 		if er.Rows[id].Reason == roweval.ReasonNoMatch || el.Rows[id].Reason != roweval.ReasonNoMatch {
 			t.Errorf("%s applies to the wrong contract", id)
 		}
+	}
+}
+
+// TestStandardTemperatureWithheldWithoutTemperatureValidity pins that an
+// unvalidated 0x313 temperature gives no typed value on either contract: the row
+// is withheld with its raw word kept, while the voltage, current, state of charge
+// and state of health of the same frame stay accepted with their values. The
+// gate is the decoder's temperature validity: removing it from the row makes the
+// temperature accepted and fails this test, and removing it from the decoder
+// fails the parity vectors that carry temperature_valid false.
+func TestStandardTemperatureWithheldWithoutTemperatureValidity(t *testing.T) {
+	cases := []struct {
+		vector, voltageRow, temperatureRow string
+		rawWord                            uint16
+	}{
+		{"temperature-unvalidated-313-withholds-temperature", rowPrefix + "313.legacy.voltage", rowPrefix + "313.legacy.temperature", 0xFFF6},
+		{"release-11-temperature-unvalidated-313-withholds-average", rowPrefix + "313.release11.voltage", rowPrefix + "313.release11.temperature", 0x00FA},
+	}
+	for _, tc := range cases {
+		t.Run(tc.vector, func(t *testing.T) {
+			_, res, _ := evaluateCase(t, caseNamed(t, tc.vector))
+			temp := res.Rows[tc.temperatureRow].Native
+			if temp == nil || temp.Value != nil || temp.Unit != "" || temp.Reason != gateWithheld || temp.Disposition != dispositionRaw {
+				t.Fatalf("%s: unvalidated temperature gives a typed value: %+v", tc.temperatureRow, temp)
+			}
+			if temp.Raw != uint64(tc.rawWord) {
+				t.Errorf("%s: raw %#x, want %#x", tc.temperatureRow, temp.Raw, tc.rawWord)
+			}
+			accepted := map[string]string{
+				tc.voltageRow:             "53.1",
+				rowPrefix + "313.current": "-1",
+				rowPrefix + "313.soc":     "100",
+				rowPrefix + "313.soh":     "100",
+			}
+			for id, want := range accepted {
+				nat := res.Rows[id].Native
+				if nat == nil || nat.Reason != "" || nat.Value == nil || nat.Value.Quantity == nil {
+					t.Errorf("%s: no typed value while only the temperature is unvalidated (reason %v)", id, res.Rows[id].Reason)
+					continue
+				}
+				if decimalRat(t, nat.Value.Quantity.Number).Cmp(ratText(t, want)) != 0 {
+					t.Errorf("%s: value %v, want %s", id, nat.Value.Quantity.Number, want)
+				}
+			}
+		})
 	}
 }
 

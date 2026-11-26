@@ -91,6 +91,36 @@
       }
     },
     {
+      "name": "temperature-unvalidated-313-withholds-temperature",
+      "identifier": "0x313",
+      "payload": "14beFFF6FFF664E4",
+      "selection": {"project": "QAAA", "release": "0006", "flavor": "pcs-standard", "bank": "ordinary", "scope": "local", "endpoint": "coordinator", "group": "0", "slot": "1"},
+      "input": {"measurement_valid": true, "temperature_valid": false, "count_valid": true, "count": 2},
+      "expect": {
+        "voltage": {"status": "accepted", "value": "53.1"},
+        "current": {"status": "accepted", "value": "-1"},
+        "temperature": {"status": "raw", "value": "-1"},
+        "soc": {"status": "accepted", "value": "100"},
+        "soh": {"status": "accepted", "value": "100"},
+        "soh_high_bit": {"status": "accepted", "value": "1"}
+      }
+    },
+    {
+      "name": "release-11-temperature-unvalidated-313-withholds-average",
+      "identifier": "0x313",
+      "payload": "14beFFF600FA64E4",
+      "selection": {"project": "QAAA", "release": "0011", "flavor": "pcs-standard", "bank": "ordinary", "scope": "local", "endpoint": "coordinator", "group": "0", "slot": "1"},
+      "input": {"measurement_valid": true, "temperature_valid": false, "count_valid": true, "count": 5},
+      "expect": {
+        "voltage": {"status": "accepted", "value": "53.1"},
+        "current": {"status": "accepted", "value": "-1"},
+        "temperature": {"status": "raw", "value": "25"},
+        "soc": {"status": "accepted", "value": "100"},
+        "soh": {"status": "accepted", "value": "100"},
+        "soh_high_bit": {"status": "accepted", "value": "1"}
+      }
+    },
+    {
       "name": "unmeasured-local-313-is-raw",
       "identifier": "0x313",
       "payload": "14beFFF6FFF664E4",

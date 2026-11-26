@@ -295,13 +295,15 @@ func Evaluate(s canbusreg.Selection, in canbusreg.PCSStandardPCSInput) (Result, 
 	frame := in.Evidence.Frame
 	// The decoder copies the supplied native record before any admission check,
 	// so a rejected observation keeps its diagnostic bytes; no rows are emitted.
+	// The decoder status is checked first, so a frame it refuses (extended,
+	// wrong length, neighbouring identifier) reports the decoder's own status.
 	decoded := canbusreg.DecodePCSStandard(s, in)
 	res.Diagnostics = decoded.Diagnostics
-	if reason := frameDisposition(frame); reason != "" {
-		return res, reason, nil
-	}
 	if decoded.Status != "decoded" {
 		return res, roweval.Reason(decoded.Status), nil
+	}
+	if reason := frameDisposition(frame); reason != "" {
+		return res, reason, nil
 	}
 	rows, reason, err := evaluateRows(Table(), frame, Qualifiers(s, in))
 	res.Rows = rows

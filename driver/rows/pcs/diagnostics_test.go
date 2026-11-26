@@ -433,6 +433,78 @@ func TestDiagnosticBankPairing(t *testing.T) {
 	}
 }
 
+// TestDiagnosticDTCRowIdentifiersCoverTwoOffsetsPerFamily checks the declared
+// DTC coverage: twelve row identifiers, the selected_word and numeric_index rows
+// at offsets 2 and 4 of 0x333, 1 and 3 of 0x52X and 0 and 2 of the LINK frame.
+func TestDiagnosticDTCRowIdentifiersCoverTwoOffsetsPerFamily(t *testing.T) {
+	want := map[string]bool{}
+	for _, p := range []struct {
+		prefix  string
+		offsets []int
+	}{
+		{"growatt.bms.pcs.standard.333", []int{2, 4}},
+		{"growatt.bms.pcs.parallel.52X", []int{1, 3}},
+		{"growatt.bms.link.1853", []int{0, 2}},
+	} {
+		for _, o := range p.offsets {
+			for _, k := range []string{"selected_word", "numeric_index"} {
+				want[fmt.Sprintf("%s.offset%d.%s", p.prefix, o, k)] = true
+			}
+		}
+	}
+	got := DTCRowIDs()
+	if len(got) != 12 || len(want) != 12 {
+		t.Fatalf("declared %d DTC row identifiers, want 12: %v", len(got), got)
+	}
+	for _, id := range got {
+		if !want[id] {
+			t.Errorf("unexpected DTC row identifier %s", id)
+		}
+		delete(want, id)
+	}
+	for id := range want {
+		t.Errorf("missing DTC row identifier %s", id)
+	}
+}
+
+// TestDiagnosticDTCRowsPairBankWithFlavor checks the pairing declared by the DTC
+// rows themselves: a row applies under its own flavor and bank and gives no_match
+// under the other bank or the other flavor.
+func TestDiagnosticDTCRowsPairBankWithFlavor(t *testing.T) {
+	for _, c := range []struct {
+		id, flavor, bank, otherFlavor, otherBank string
+	}{
+		{"0x333", "pcs-standard", "ordinary", "pcs-parallel", "parallel"},
+		{"0x520", "pcs-parallel", "parallel", "pcs-standard", "ordinary"},
+	} {
+		frame := diagFrame(t, c.id, false, "0000100900000000")
+		fam, ok := diagDTCFamilyOf(frame)
+		if !ok {
+			t.Fatalf("%s: family not admitted", c.id)
+		}
+		for _, spec := range diagDTCSpecs(fam, canbusreg.Selection{}, fam.offsets[0], frame) {
+			for _, q := range []struct {
+				flavor, bank string
+				applies      bool
+			}{
+				{c.flavor, c.bank, true},
+				{c.flavor, c.otherBank, false},
+				{c.otherFlavor, c.bank, false},
+				{c.otherFlavor, c.otherBank, false},
+			} {
+				ev, err := diagEvaluate(spec, frame, roweval.Qualifiers{Values: map[string]string{qFlavor: q.flavor, qBank: q.bank, qDTCDictionary: "present"}})
+				if err != nil {
+					t.Fatal(err)
+				}
+				noMatch := ev.Reason == roweval.ReasonNoMatch
+				if q.applies == noMatch {
+					t.Errorf("%s %s under %s/%s: no_match %v, applies %v", c.id, spec.id, q.flavor, q.bank, noMatch, q.applies)
+				}
+			}
+		}
+	}
+}
+
 // TestDiagnosticRowsRetainNativeRecordOnRefusal checks that the native record
 // supplied to the summary decoder is kept as diagnostic evidence when the
 // decoder refuses the observation, and that no row or condition is derived.

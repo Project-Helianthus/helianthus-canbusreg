@@ -7,10 +7,9 @@ import (
 )
 
 // Command identifiers of the host inputs the PCS page documents with a
-// complete payload layout. Each is a standard 11-bit data frame of DLC 8.
+// complete payload layout (211 and 6F0). Each is a standard 11-bit data frame of DLC 8.
 const (
 	commandClockFrame     uint32 = 0x211
-	commandParallelFrame  uint32 = 0x37F
 	commandDiscoveryFrame uint32 = 0x6F0
 
 	commandRowPrefix = "growatt.bms.pcs.command."
@@ -35,11 +34,6 @@ func Commands() []Command {
 			Layout:     "B0 unused; B1 year offset from 2000; B2 month; B3 day; B4 hour; B5 minute; B6 second; B7 unused; binary integers",
 		},
 		{
-			ID:         commandRowPrefix + "37F",
-			Identifier: commandParallelFrame,
-			Layout:     "B0 control flags; B1-B6 profile-specific; B7 parallel configuration",
-		},
-		{
 			ID:         commandRowPrefix + "6F0",
 			Identifier: commandDiscoveryFrame,
 			Layout:     "B0 phase/control; B1 coordination parameter; B2-B7 zero",
@@ -61,6 +55,10 @@ func IncompleteInputs() []IncompleteInput {
 		{
 			Identifier: 0x212,
 			Gap:        "the page defines no operation for this input in the profiles it covers: its payload has no defined serial or history query, and the page marks it unsupported for query purposes",
+		},
+		{
+			Identifier: 0x37F,
+			Gap:        "the page leaves B1-B6 profile-specific, defines no flag meaning for B0 or the configuration byte, says the input changes the active profile, role or transmit state, and defines no generic encoder for unknown flags",
 		},
 		{
 			Identifier: 0x301,
@@ -94,25 +92,6 @@ func EncodeClockInput(in ClockInput) (canbus.Frame, error) {
 		return canbus.Frame{}, fmt.Errorf("clock input second %d outside 0..59", in.Second)
 	}
 	return commandFrame(commandClockFrame, [8]byte{0, in.YearOffset, in.Month, in.Day, in.Hour, in.Minute, in.Second, 0})
-}
-
-// ParallelControlInput is the argument of the profile control input 0x37F.
-// The page names B0 as control flags and B7 as the parallel configuration and
-// leaves B1 to B6 profile-specific; each byte is sent as given and the page
-// defines no flag or profile meaning that this row interprets.
-type ParallelControlInput struct {
-	Flags         uint8
-	Profile       [6]uint8
-	Configuration uint8
-}
-
-// EncodeParallelControlInput encodes the input as the standard identifier
-// 0x37F: B0 the control flags, B1 to B6 the profile bytes, B7 the parallel
-// configuration.
-func EncodeParallelControlInput(in ParallelControlInput) (canbus.Frame, error) {
-	return commandFrame(commandParallelFrame, [8]byte{
-		in.Flags, in.Profile[0], in.Profile[1], in.Profile[2], in.Profile[3], in.Profile[4], in.Profile[5], in.Configuration,
-	})
 }
 
 // DiscoveryControlInput is the argument of the coordinator input 0x6F0:

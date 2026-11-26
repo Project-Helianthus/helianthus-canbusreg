@@ -25,16 +25,6 @@ type commandVectors struct {
 		Name    string           `json:"name"`
 		RawArgs map[string]uint8 `json:"args"`
 	} `json:"clock_refused"`
-	Parallel []struct {
-		Name string `json:"name"`
-		Args struct {
-			Flags         uint8    `json:"flags"`
-			Profile       [6]uint8 `json:"profile"`
-			Configuration uint8    `json:"configuration"`
-		} `json:"args"`
-		Identifier string `json:"identifier"`
-		Payload    string `json:"payload"`
-	} `json:"parallel"`
 	Discovery []struct {
 		Name       string           `json:"name"`
 		RawArgs    map[string]uint8 `json:"args"`
@@ -143,13 +133,6 @@ func TestClockInputRefusesArgumentsOutsideThePageRanges(t *testing.T) {
 
 func TestParallelInputsEncodeExactIdentifierAndBytes(t *testing.T) {
 	v := loadCommandVectors(t)
-	for _, c := range v.Parallel {
-		frame, err := EncodeParallelControlInput(ParallelControlInput{Flags: c.Args.Flags, Profile: c.Args.Profile, Configuration: c.Args.Configuration})
-		if err != nil {
-			t.Fatalf("37F %s: %v", c.Name, err)
-		}
-		requireFrame(t, "37F "+c.Name, frame, c.Identifier, c.Payload)
-	}
 	for _, c := range v.Discovery {
 		frame, err := EncodeDiscoveryControlInput(DiscoveryControlInput{Phase: c.RawArgs["phase"], Parameter: c.RawArgs["parameter"]})
 		if err != nil {
@@ -158,28 +141,6 @@ func TestParallelInputsEncodeExactIdentifierAndBytes(t *testing.T) {
 		requireFrame(t, "6F0 "+c.Name, frame, c.Identifier, c.Payload)
 	}
 
-	// Every byte of 37F is its own argument: each is set alone and must land
-	// in its own position with the others zero.
-	for index := 0; index < 8; index++ {
-		var in ParallelControlInput
-		switch {
-		case index == 0:
-			in.Flags = 9
-		case index == 7:
-			in.Configuration = 9
-		default:
-			in.Profile[index-1] = 9
-		}
-		frame, err := EncodeParallelControlInput(in)
-		if err != nil {
-			t.Fatal(err)
-		}
-		want := make([]byte, 8)
-		want[index] = 9
-		if !bytes.Equal(frame.Data(), want) {
-			t.Errorf("37F byte %d: data %x, want %x", index, frame.Data(), want)
-		}
-	}
 	// 6F0 carries B0 and B1 only; B2 to B7 stay zero whatever the arguments.
 	frame, err := EncodeDiscoveryControlInput(DiscoveryControlInput{Phase: 0xFF, Parameter: 0xFF})
 	if err != nil {
@@ -199,16 +160,16 @@ func TestIncompleteInputsHaveNoCommandRow(t *testing.T) {
 			t.Errorf("row %#x has an empty id or layout", r.Identifier)
 		}
 	}
-	for _, id := range []uint32{0x211, 0x37F, 0x6F0} {
+	for _, id := range []uint32{0x211, 0x6F0} {
 		if !have[id] {
 			t.Errorf("no command row for %#x", id)
 		}
 	}
-	if len(rows) != 3 {
-		t.Errorf("%d command rows, want 3", len(rows))
+	if len(rows) != 2 {
+		t.Errorf("%d command rows, want 2", len(rows))
 	}
-	// 3F7 and 6FF are receive rows; 301 and 212 are the incomplete inputs.
-	for _, id := range []uint32{0x301, 0x212, 0x3F7, 0x6FF} {
+	// 3F7 and 6FF are receive rows; 301, 212 and 37F are the incomplete inputs.
+	for _, id := range []uint32{0x301, 0x212, 0x37F, 0x3F7, 0x6FF} {
 		if have[id] {
 			t.Errorf("command row for %#x", id)
 		}
@@ -217,8 +178,8 @@ func TestIncompleteInputsHaveNoCommandRow(t *testing.T) {
 	for _, g := range IncompleteInputs() {
 		gaps[g.Identifier] = g.Gap
 	}
-	if len(gaps) != 2 || gaps[0x301] == "" || gaps[0x212] == "" {
-		t.Errorf("incomplete inputs %v, want exactly 301 and 212 with a gap", gaps)
+	if len(gaps) != 3 || gaps[0x301] == "" || gaps[0x212] == "" || gaps[0x37F] == "" {
+		t.Errorf("incomplete inputs %v, want exactly 301, 212 and 37F with a gap", gaps)
 	}
 }
 

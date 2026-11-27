@@ -460,3 +460,10 @@ func TestMonitorStagesTheBoundVoltageAndCurrent(t *testing.T) {
 		t.Fatalf("subject %s", subjectText(t, batch.FactUpserts[0]))
 	}
 }
+
+func TestFactoryDescriptorDeclaresItsKind(t *testing.T) {
+	kinds := NewFactory().Descriptor().Kinds
+	if len(kinds) != 1 || kinds[0] != Kind {
+		t.Fatalf("descriptor kinds %v, want [%s]", kinds, Kind)
+	}
+}

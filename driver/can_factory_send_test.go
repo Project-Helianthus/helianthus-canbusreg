@@ -688,6 +688,8 @@ func (b *methodBook) Method(_ semdriver.NodeRef, spec semdriver.MethodSpec, call
 	return nil
 }
 
+func (b *methodBook) Root() semdriver.NodeRef { return semdriver.NodeRef{} }
+
 func (b *methodBook) Node(semdriver.NodeSpec) (semdriver.NodeRef, error) {
 	return semdriver.NodeRef{}, nil
 }

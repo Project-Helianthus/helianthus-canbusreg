@@ -40,6 +40,10 @@ type memRegistry struct {
 	viewed  bool
 }
 
+func (m *memRegistry) Root() semdriver.NodeRef {
+	return semdriver.NodeRef{Bridge: "bridge", ID: "node/root"}
+}
+
 func (m *memRegistry) Node(spec semdriver.NodeSpec) (semdriver.NodeRef, error) {
 	ref := semdriver.NodeRef{Bridge: "bridge", ID: semreg.ResourceID("node/" + string(spec.Local))}
 	if err := ref.Validate(); err != nil {

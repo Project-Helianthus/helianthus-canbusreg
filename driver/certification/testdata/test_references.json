@@ -1,0 +1,42 @@
+{
+  "contract": "helianthus.semreg.certification-references/v1",
+  "entries": [
+    {
+      "source": "certification", "category": "reference",
+      "driver": "test-data-driver", "vendor": "Test Data Vendor", "flavor": "test-data-profile",
+      "model": "TEST-DATA-REFERENCE", "firmware": {"form": "release", "release": "2.0"},
+      "issuer": "Test Data Certification Body", "certificate_number": "TEST-DATA-CERT-A",
+      "issue_date": "2000-01-15",
+      "stated_value": {
+        "measurement_type": "active_current", "measured": true,
+        "ratio_maximum": {"coefficient": "3", "exponent10": -3},
+        "range_maximum": {"coefficient": "7", "exponent10": 1}
+      },
+      "url": "https://example.invalid/test-data/TEST-DATA-CERT-A", "retrieved_on": "2000-02-01"
+    },
+    {
+      "source": "certification", "category": "reference",
+      "driver": "test-data-driver", "vendor": "Test Data Vendor", "flavor": "test-data-profile",
+      "model": "TEST-DATA-STATEMENT", "firmware": {"form": "not_stated"},
+      "issuer": "Test Data Certification Body", "certificate_number": "TEST-DATA-CERT-B",
+      "issue_date": "2000-01-16",
+      "stated_value": {"measurement_type": "voltage", "statement": "test data statement"},
+      "url": "https://example.invalid/test-data/TEST-DATA-CERT-B", "retrieved_on": "2000-02-01"
+    },
+    {
+      "source": "certification", "category": "gap",
+      "driver": "test-data-driver", "vendor": "Test Data Vendor", "flavor": "test-data-profile",
+      "model": "TEST-DATA-GAP", "firmware": {"form": "not_stated"},
+      "issuer": "Test Data Certification Body",
+      "url": "https://example.invalid/test-data/search", "retrieved_on": "2000-02-01"
+    },
+    {
+      "source": "certification", "category": "unavailable",
+      "driver": "test-data-driver", "vendor": "Test Data Vendor", "flavor": "test-data-profile",
+      "model": "TEST-DATA-UNAVAILABLE", "firmware": {"form": "not_stated"},
+      "issuer": "Test Data Certification Body",
+      "url": "https://example.invalid/test-data/search", "retrieved_on": "2000-02-01",
+      "refusal": "Test data: automated access refused."
+    }
+  ]
+}

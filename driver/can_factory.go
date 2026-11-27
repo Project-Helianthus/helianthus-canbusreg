@@ -40,7 +40,9 @@ func NewFactory() *Factory {
 }
 
 // Descriptor returns the families the factory declares.
-func (f *Factory) Descriptor() semdriver.Descriptor { return semdriver.Descriptor{} }
+func (f *Factory) Descriptor() semdriver.Descriptor {
+	return semdriver.Descriptor{Kinds: []semdriver.DriverKind{Kind}}
+}
 
 // Plan plans one instance for one enabled configuration. It dials nothing.
 func (f *Factory) Plan(c semdriver.Config) ([]semdriver.InstancePlan, error) {

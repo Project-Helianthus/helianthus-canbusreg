@@ -46,8 +46,10 @@ func (p *recordingPublisher) snapshot() []semreg.PublicationBatch {
 }
 
 type recordingTx struct {
-	pub   *recordingPublisher
-	batch semreg.PublicationBatch
+	pub     *recordingPublisher
+	batch   semreg.PublicationBatch
+	samples []semdriver.Sample
+	links   []semdriver.LinkClaim
 }
 
 func (t *recordingTx) OperatorLinks([]semreg.NativeBinding) []semreg.IdentityLink { return nil }
@@ -56,7 +58,17 @@ func (t *recordingTx) AdmitManufacturerSerial(semdriver.ManufacturerSerialClaim)
 }
 func (t *recordingTx) DeclareSource(semdriver.Source) error             { return nil }
 func (t *recordingTx) DeclareSettingRoute(semdriver.SettingRoute) error { return nil }
-func (t *recordingTx) Abort(context.Context) error                      { return nil }
+func (t *recordingTx) StageSample(s semdriver.Sample) error {
+	t.samples = append(t.samples, s)
+	return nil
+}
+
+func (t *recordingTx) StageLink(l semdriver.LinkClaim) error {
+	t.links = append(t.links, l)
+	return nil
+}
+
+func (t *recordingTx) Abort(context.Context) error { return nil }
 
 func (t *recordingTx) Stage(batch semreg.PublicationBatch) error {
 	t.pub.mu.Lock()
@@ -86,6 +98,11 @@ func (s feedSession) SemanticInput() semdriver.SemanticInput       { return nil 
 func (s feedSession) ScopedOperations() semdriver.ScopedOperations { return nil }
 func (s feedSession) Calendar() semdriver.Calendar                 { return nil }
 func (s feedSession) Publisher() semdriver.Publisher               { return s.pub }
+func (s feedSession) Prepare(mutate func(*semreg.PublicationBatch)) (semreg.PublicationBatch, error) {
+	var batch semreg.PublicationBatch
+	mutate(&batch)
+	return batch, nil
+}
 func (s feedSession) RegisterExecutor(semdriver.SettingRoute, semdriver.Executor) (func(), error) {
 	return func() {}, nil
 }
@@ -441,5 +458,12 @@ func TestMonitorStagesTheBoundVoltageAndCurrent(t *testing.T) {
 	assertNoAccuracy(t, batch.FactUpserts)
 	if subjectText(t, batch.FactUpserts[0]) != "can/a/battery" {
 		t.Fatalf("subject %s", subjectText(t, batch.FactUpserts[0]))
+	}
+}
+
+func TestFactoryDescriptorDeclaresItsKind(t *testing.T) {
+	kinds := NewFactory().Descriptor().Kinds
+	if len(kinds) != 1 || kinds[0] != Kind {
+		t.Fatalf("descriptor kinds %v, want [%s]", kinds, Kind)
 	}
 }

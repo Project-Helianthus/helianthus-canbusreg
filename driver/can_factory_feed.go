@@ -6,17 +6,23 @@ import (
 	"fmt"
 	"sort"
 	"strconv"
+	"sync"
 
 	semreg "github.com/Project-Helianthus/helianthus-semreg/semreg/v1"
 	semdriver "github.com/Project-Helianthus/helianthus-semreg/semreg/v1/driver"
 	"github.com/Project-Helianthus/helianthus-semreg/semreg/v1/roweval"
 
 	canbusreg "github.com/Project-Helianthus/helianthus-canbusreg"
+	"github.com/Project-Helianthus/helianthus-canbusreg/driver/certification"
 	"github.com/Project-Helianthus/helianthus-canbusreg/driver/rows/bms"
+	references "github.com/Project-Helianthus/helianthus-canbusreg/driverdata/certification"
 )
 
 // packCoordinate is the row slot whose text is the pack subject. The rows name
 // this slot; a frame does not carry a separate pack anchor.
+// certificationVendor is the vendor of every profile this driver configures.
+const certificationVendor = "Growatt"
+
 const packCoordinate = "pack-resource"
 
 // The candidate contract requires a positive fresh window that retention
@@ -35,8 +41,8 @@ const (
 // publishReceived evaluates the configured profile's rows for one admitted
 // frame and stages the bound candidates. A nil session, a withdrawn instance,
 // a frame with no candidate and a publisher that refuses all stage nothing.
-// Malformed records never reach this path. Accuracy is not staged: no frame
-// carries one.
+// Malformed records never reach this path. No frame carries an accuracy; a certification
+// reference is staged only when the held identity matches an entry.
 func (i *instance) publishReceived(ctx context.Context, session semdriver.Session, evidence canbusreg.Evidence) {
 	if session == nil || session.Publisher() == nil || i.withdrawn() {
 		return
@@ -46,6 +52,39 @@ func (i *instance) publishReceived(ctx context.Context, session semdriver.Sessio
 		return
 	}
 	i.stage(ctx, session, evidence, facts)
+	i.certify(ctx, session, evidence, facts)
+}
+
+var (
+	certificationOnce sync.Once
+	certificationData *references.Registry
+)
+
+func certificationReferences() *references.Registry {
+	certificationOnce.Do(func() {
+		if registry, err := references.LoadEmbedded(); err == nil {
+			certificationData = registry
+		}
+	})
+	return certificationData
+}
+
+// certify stages the certification references that match the identity this
+// instance holds: its driver, the vendor and the flavor of its profile. No
+// profile decodes a model or a firmware release, so both are absent, no entry
+// matches and nothing is published for a live instance.
+func (i *instance) certify(ctx context.Context, session semdriver.Session, evidence canbusreg.Evidence, facts []semreg.FactCandidate) {
+	registry := certificationReferences()
+	native := session.Native()
+	if registry == nil || native == nil {
+		return
+	}
+	root := native.Root()
+	identity := certification.Identity{Driver: string(Kind), Vendor: certificationVendor, Flavor: string(i.config.Options.Profile)}
+	_ = certification.Publish(ctx, session.Publisher(), session.Prepare, registry, identity, certification.Context{
+		Template: i.template(evidence), Producer: root,
+		Subject: func(string) (semdriver.NodeRef, bool) { return root, true },
+	}, facts)
 }
 
 func (i *instance) withdrawn() bool {

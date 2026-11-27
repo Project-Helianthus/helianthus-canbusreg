@@ -1,0 +1,81 @@
+{
+  "contract": "helianthus.semreg.certification-references/v1",
+  "entries": [
+    {
+      "source": "certification",
+      "category": "reference",
+      "driver": "example-driver",
+      "vendor": "Example Vendor",
+      "flavor": "example-profile",
+      "model": "EX-1000",
+      "firmware": {"form": "release", "release": "1.4.0"},
+      "issuer": "Example Certification Body",
+      "certificate_number": "EX-CERT-0001",
+      "issue_date": "2000-01-15",
+      "stated_value": {
+        "measurement_type": "active_power",
+        "ratio_maximum": {"coefficient": "1", "exponent10": -2}
+      },
+      "url": "https://example.invalid/registry/EX-CERT-0001",
+      "retrieved_on": "2000-02-01"
+    },
+    {
+      "source": "certification",
+      "category": "reference",
+      "driver": "example-driver",
+      "vendor": "Example Vendor",
+      "flavor": "example-profile",
+      "model": "EX-1100",
+      "firmware": {"form": "range", "from": "2.0", "to": "2.5", "upper_bound_stated_by": "certificate"},
+      "issuer": "Example Certification Body",
+      "certificate_number": "EX-CERT-0002",
+      "issue_date": "2000-01-16",
+      "stated_value": {"measurement_type": "active_current", "measured": true},
+      "url": "https://example.invalid/registry/EX-CERT-0002",
+      "retrieved_on": "2000-02-01"
+    },
+    {
+      "source": "certification",
+      "category": "reference",
+      "driver": "example-driver",
+      "vendor": "Example Vendor",
+      "flavor": "example-profile",
+      "model": "EX-1200",
+      "firmware": {"form": "not_stated"},
+      "issuer": "Example Certification Body",
+      "certificate_number": "EX-CERT-0003",
+      "issue_date": "2000-01-17",
+      "stated_value": {
+        "measurement_type": "active_power",
+        "range_maximum": {"coefficient": "5", "exponent10": 3}
+      },
+      "url": "https://example.invalid/registry/EX-CERT-0003",
+      "retrieved_on": "2000-02-01"
+    },
+    {
+      "source": "certification",
+      "category": "gap",
+      "driver": "example-driver",
+      "vendor": "Example Vendor",
+      "flavor": "example-profile",
+      "model": "EX-2000",
+      "firmware": {"form": "not_stated"},
+      "issuer": "Example Certification Body",
+      "url": "https://example.invalid/registry/search",
+      "retrieved_on": "2000-02-01"
+    },
+    {
+      "source": "certification",
+      "category": "unavailable",
+      "driver": "example-driver",
+      "vendor": "Example Vendor",
+      "flavor": "example-profile",
+      "model": "EX-3000",
+      "firmware": {"form": "release", "release": "3.1"},
+      "issuer": "Example Certification Body",
+      "url": "https://example.invalid/registry/search",
+      "retrieved_on": "2000-02-01",
+      "refusal": "The registry answered that automated access is not permitted."
+    }
+  ]
+}

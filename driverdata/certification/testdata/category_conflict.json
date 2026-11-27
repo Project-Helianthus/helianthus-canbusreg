@@ -1,0 +1,32 @@
+{
+  "contract": "helianthus.semreg.certification-references/v1",
+  "entries": [
+    {
+      "source": "certification",
+      "category": "reference",
+      "driver": "example-driver",
+      "vendor": "Example Vendor",
+      "flavor": "example-profile",
+      "model": "EX-1000",
+      "firmware": {"form": "not_stated"},
+      "issuer": "Example Certification Body",
+      "certificate_number": "EX-CERT-0001",
+      "issue_date": "2000-01-15",
+      "stated_value": {"measurement_type": "active_power", "measured": true},
+      "url": "https://example.invalid/registry/EX-CERT-0001",
+      "retrieved_on": "2000-02-01"
+    },
+    {
+      "source": "certification",
+      "category": "gap",
+      "driver": "example-driver",
+      "vendor": "Example Vendor",
+      "flavor": "example-profile",
+      "model": "EX-1000",
+      "firmware": {"form": "not_stated"},
+      "issuer": "Example Certification Body",
+      "url": "https://example.invalid/registry/search",
+      "retrieved_on": "2000-02-01"
+    }
+  ]
+}

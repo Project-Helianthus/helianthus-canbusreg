@@ -101,6 +101,7 @@ type instance struct {
 	mu       sync.Mutex
 	started  bool
 	fenced   bool
+	session  semdriver.Session
 	cancel   context.CancelFunc
 	recv     receiver.Receiver
 	done     chan struct{}
@@ -145,8 +146,8 @@ func (i *instance) newDecoder(identity canbus.InterfaceIdentity) (decoder, error
 }
 
 // Start opens the configured interface through the CAN transport receiver and
-// feeds every received record to the instance's own decoder.
-func (i *instance) Start(ctx context.Context, _ semdriver.Session) error {
+// feeds every received record to the instance's own decoder and row publisher.
+func (i *instance) Start(ctx context.Context, session semdriver.Session) error {
 	i.mu.Lock()
 	defer i.mu.Unlock()
 	if i.started {
@@ -170,7 +171,7 @@ func (i *instance) Start(ctx context.Context, _ semdriver.Session) error {
 		return err
 	}
 	loopCtx, cancel := context.WithCancel(context.WithoutCancel(ctx))
-	i.started, i.cancel, i.recv, i.done = true, cancel, recv, make(chan struct{})
+	i.started, i.cancel, i.recv, i.done, i.session = true, cancel, recv, make(chan struct{}), session
 	go i.run(loopCtx, recv, decode, i.done)
 	return nil
 }
@@ -204,7 +205,9 @@ func (i *instance) run(ctx context.Context, recv receiver.Receiver, decode decod
 		if out, ok := decode(evidence); ok {
 			i.latest = out
 		}
+		session := i.session
 		i.mu.Unlock()
+		i.publishReceived(ctx, session, evidence)
 	}
 }
 

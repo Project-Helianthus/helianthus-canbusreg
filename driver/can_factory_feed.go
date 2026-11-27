@@ -224,7 +224,7 @@ func packSubject(instance semdriver.InstanceKey) string {
 }
 
 func (i *instance) stage(ctx context.Context, session semdriver.Session, evidence canbusreg.Evidence, facts []semreg.FactCandidate) {
-	batch, err := publicationBatch(i.key, evidence, facts)
+	batch, err := publicationBatch(i.key, i.config.Options.Profile, evidence, facts)
 	if err != nil {
 		return
 	}
@@ -239,21 +239,29 @@ func (i *instance) stage(ctx context.Context, session semdriver.Session, evidenc
 	_ = tx.Commit(ctx)
 }
 
-func publicationBatch(instance semdriver.InstanceKey, evidence canbusreg.Evidence, facts []semreg.FactCandidate) (semreg.PublicationBatch, error) {
+func publicationBatch(instance semdriver.InstanceKey, profile Profile, evidence canbusreg.Evidence, facts []semreg.FactCandidate) (semreg.PublicationBatch, error) {
 	key := string(instance)
 	sequence := semreg.Uint64(strconv.FormatUint(evidence.Sequence, 10))
 	point := transportPoint(evidence.Monotonic, key)
+	source := semreg.SourceID("source." + key)
+	epoch := semreg.SourceEpochID("epoch." + key)
+	asset := semreg.AssetID("asset." + key)
+	bindings := publicationBindings(key, asset, source, epoch, facts)
+	links, resources := publicationGraph(key, asset, bindings)
 	batch := semreg.PublicationBatch{
 		Contract: semreg.ContractKernelV1,
 		BatchID:  semreg.BatchID("batch." + key + "." + string(sequence)),
-		AssetID:  semreg.AssetID("asset." + key), SourceID: semreg.SourceID("source." + key),
-		SourceEpochID: semreg.SourceEpochID("epoch." + key), DriverGeneration: "1",
+		AssetID:  asset, SourceID: source,
+		SourceEpochID: epoch, DriverGeneration: "1",
 		Sequence: sequence, ExpectedSemanticRevision: "0", ObservedAt: point.wall,
-		SourceUpserts: []semreg.SourceDescriptor{}, SourceRetirements: []semreg.SourceEpochID{},
-		BindingUpserts: []semreg.NativeBinding{}, IdentityLinkUpserts: []semreg.IdentityLink{},
-		FactUpserts: facts, FactWithdrawals: []semreg.CandidateID{},
+		SourceUpserts:       []semreg.SourceDescriptor{publicationSource(key, profile, source, epoch, point.wall)},
+		SourceRetirements:   []semreg.SourceEpochID{},
+		BindingUpserts:      bindings,
+		IdentityLinkUpserts: links,
+		FactUpserts:         facts, FactWithdrawals: []semreg.CandidateID{},
 		ServiceUpserts: []semreg.ServiceInstance{}, ServiceWithdrawals: []semreg.ServiceInstanceID{},
 		CapabilityUpserts: []semreg.CapabilityInstance{}, CapabilityWithdrawals: []semreg.CapabilityInstanceID{},
+		ResourceUpserts:  resources,
 		GenerationFences: []semreg.GenerationFence{},
 	}
 	digest, err := batch.ComputedDigest()
@@ -262,4 +270,77 @@ func publicationBatch(instance semdriver.InstanceKey, evidence canbusreg.Evidenc
 	}
 	batch.BatchDigest = digest
 	return batch, nil
+}
+
+// publicationSource is the instance's native source. The descriptor is stable
+// across frames: a later batch repeats it, and an identical upsert is not a
+// metadata change. The host rejects a batch whose header source is neither
+// current nor in this list.
+func publicationSource(key string, profile Profile, source semreg.SourceID, epoch semreg.SourceEpochID, started semreg.TimePoint) semreg.SourceDescriptor {
+	return semreg.SourceDescriptor{
+		SourceID: source, SourceEpochID: epoch,
+		ProtocolID: "protocol.can", ProfileID: semreg.DefinitionID(profile), ProfileVersion: semreg.VersionLabel(feedPolicyVersion),
+		RegistryEvidence: frameEvidence([]byte("source." + key)),
+		StartedAt:        started, State: semreg.SourceCurrent, Revision: "1",
+	}
+}
+
+// publicationBindings names each binding the candidates already carry. The
+// native resource is the binding, not the frame, so a later frame does not
+// look like a different resource on the same binding.
+func publicationBindings(key string, asset semreg.AssetID, source semreg.SourceID, epoch semreg.SourceEpochID, facts []semreg.FactCandidate) []semreg.NativeBinding {
+	seen := map[semreg.NativeBindingID]struct{}{}
+	ids := make([]semreg.NativeBindingID, 0, 1)
+	for _, fact := range facts {
+		if fact.BindingID == nil {
+			continue
+		}
+		if _, ok := seen[*fact.BindingID]; ok {
+			continue
+		}
+		seen[*fact.BindingID] = struct{}{}
+		ids = append(ids, *fact.BindingID)
+	}
+	sort.Slice(ids, func(i, j int) bool { return ids[i] < ids[j] })
+	out := make([]semreg.NativeBinding, 0, len(ids))
+	for _, id := range ids {
+		out = append(out, semreg.NativeBinding{
+			BindingID: id, AssetID: asset, SourceID: source, SourceEpochID: epoch,
+			DriverGeneration: "1",
+			NativeResource:   frameEvidence([]byte("binding." + key + "." + string(id))),
+			State:            semreg.BindingCurrent, Revision: "1",
+		})
+	}
+	return out
+}
+
+// publicationGraph is the pack the candidates name. The dimension text is the
+// resource identifier, and each binding observes that pack. The record stays
+// the same on every frame, so a later batch repeats it.
+func publicationGraph(key string, asset semreg.AssetID, bindings []semreg.NativeBinding) ([]semreg.IdentityLink, []semreg.Resource) {
+	subject := packSubject(semdriver.InstanceKey(key))
+	id := semreg.ResourceID(subject)
+	slot := subject
+	evidence := frameEvidence([]byte("resource." + key))
+	resource := semreg.Resource{
+		ResourceID: id, Kind: "resource.battery_pack",
+		Anchor: semreg.ResourceAnchor{
+			Class: semreg.AnchorEquipment, Basis: semreg.AnchorOperatorSlot,
+			Slot: &slot, Evidence: []semreg.EvidenceRef{evidence},
+		},
+		State: semreg.ResourceCurrent,
+		Origin: semreg.OriginRef{
+			OriginID: semreg.OriginID("origin.operator." + key), Kind: semreg.OriginOperator,
+			Evidence: []semreg.EvidenceRef{evidence},
+		},
+		Revision: "1",
+	}
+	links := make([]semreg.IdentityLink, 0, len(bindings))
+	for _, binding := range bindings {
+		links = append(links, semreg.IdentityLink{
+			AssetID: asset, BindingID: binding.BindingID, State: semreg.LinkQualified,
+			Basis: []semreg.EvidenceRef{evidence}, Revision: "1", Resource: &id,
+		})
+	}
+	return links, []semreg.Resource{resource}
 }

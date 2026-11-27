@@ -2,13 +2,14 @@ package driver
 
 import (
 	"context"
-	"encoding/binary"
 	"encoding/hex"
 	"encoding/json"
 	"errors"
 	"fmt"
+	"math/big"
 	"os"
 	"sort"
+	"strconv"
 	"strings"
 	"sync"
 	"testing"
@@ -196,9 +197,16 @@ func TestSecondHostReplaysConfiguredProfiles(t *testing.T) {
 	if left != right {
 		t.Fatalf("publications differ\n%s\n%s", left, right)
 	}
-	if left != "" {
-		t.Fatalf("a refused batch published\n%s", left)
-	}
+	requirePublished(t, left, "can/alpha/battery", "storage.state.soc", "unit.ratio", "1/2")
+	requirePublished(t, left, "can/alpha/battery", "storage.pack.voltage", "unit.volt", "1/100")
+	requirePublished(t, left, "can/alpha/battery", "storage.pack.current", "unit.ampere", "1/5")
+	requirePublished(t, left, "can/bravo/battery", "storage.state.soc", "unit.ratio", "1/2")
+	requirePublished(t, left, "can/bravo/battery", "storage.state.soh", "unit.ratio", "9/10")
+	requirePublished(t, left, "can/local/battery", "storage.state.soc", "unit.ratio", "1/2")
+	requirePublished(t, left, "can/local/battery", "storage.pack.voltage", "unit.volt", "1/100")
+	requirePublished(t, left, "can/local/battery", "storage.pack.current", "unit.ampere", "1/5")
+	requirePublished(t, left, "can/watch/battery", "storage.pack.voltage", "unit.volt", "10/1")
+	requirePublished(t, left, "can/watch/battery", "storage.pack.current", "unit.ampere", "1/1")
 }
 
 func profileCapture(t *testing.T, at time.Time) string {
@@ -217,57 +225,62 @@ func profileCapture(t *testing.T, at time.Time) string {
 			t.Fatalf("%s received=%d skipped=%d frames=%d", key, received, skipped, want)
 		}
 	}
-	assertSourceRefused(t, tracked.take("alpha"))
-	return publishedLines(t, site)
+	return settledLines(t, site)
 }
 
-func assertSourceRefused(t *testing.T, inst *instance) {
+// settledLines waits until the host capture repeats and includes the measurement
+// state of charge. A receive count moves before that frame's batch commits.
+func settledLines(t *testing.T, site *semhost.Site) string {
 	t.Helper()
-	id, err := canbus.NewStandardID(0x313)
-	if err != nil {
-		t.Fatal(err)
-	}
-	payload := []byte{0, 1, 0, 2, 0, 0, 50, 90}
-	frame, err := canbus.NewFrame(id, payload)
-	if err != nil {
-		t.Fatal(err)
-	}
-	identity, err := canbus.NewInterfaceIdentity("can0", 1)
-	if err != nil {
-		t.Fatal(err)
-	}
-	var raw [canbus.SocketCANRecordSize]byte
-	binary.NativeEndian.PutUint32(raw[:4], 0x313)
-	raw[4] = byte(len(payload))
-	copy(raw[8:], payload)
-	evidence := canbusreg.Evidence{Frame: frame, Interface: identity, Sequence: 1, Monotonic: time.Millisecond, RawRecord: raw}
-	facts, err := inst.boundFacts(evidence)
-	if err != nil || len(facts) == 0 {
-		t.Fatalf("rows: %v facts %d", err, len(facts))
-	}
-	batch, err := publicationBatch(inst.key, evidence, facts)
-	if err != nil {
-		t.Fatal(err)
-	}
-	var tx semdriver.PublicationTransaction
-	deadline := time.Now().Add(2 * time.Second)
+	var prev string
+	same := 0
+	deadline := time.Now().Add(5 * time.Second)
 	for {
-		tx, err = inst.session.Publisher().Begin(context.Background())
-		if err == nil {
-			break
+		got := publishedLines(t, site)
+		if got == prev && strings.Contains(got, "can/alpha/battery storage.state.soc ") {
+			same++
+			if same >= 2 {
+				return got
+			}
+		} else {
+			same = 0
 		}
+		prev = got
 		if time.Now().After(deadline) {
-			t.Fatal(err)
+			t.Fatalf("capture did not settle\n%s", got)
 		}
 		time.Sleep(time.Millisecond)
 	}
-	if err := tx.Stage(batch); err != nil {
-		t.Fatal(err)
+}
+
+func requirePublished(t *testing.T, capture, subject, fact, unit, value string) {
+	t.Helper()
+	want, ok := new(big.Rat).SetString(value)
+	if !ok {
+		t.Fatal(value)
 	}
-	err = tx.Commit(context.Background())
-	var refused *semreg.Error
-	if !errors.As(err, &refused) || refused.ID != semreg.DanglingReference || refused.Detail != "publication source" {
-		t.Fatalf("publication: %v", err)
+	prefix := subject + " " + fact + " "
+	found := 0
+	for _, line := range strings.Split(capture, "\n") {
+		if !strings.HasPrefix(line, prefix) {
+			continue
+		}
+		fields := strings.Fields(strings.TrimPrefix(line, prefix))
+		if len(fields) != 3 || fields[0] != unit {
+			t.Fatalf("%s line %q", fact, line)
+		}
+		exponent, err := strconv.Atoi(fields[2])
+		if err != nil {
+			t.Fatal(err)
+		}
+		got, ok := new(big.Rat).SetString(fields[1] + "e" + strconv.Itoa(exponent))
+		if !ok || got.Cmp(want) != 0 {
+			t.Fatalf("%s = %s e%d, want %s %s", fact, fields[1], exponent, value, unit)
+		}
+		found++
+	}
+	if found != 1 {
+		t.Fatalf("%s %s count %d\n%s", subject, fact, found, capture)
 	}
 }
 

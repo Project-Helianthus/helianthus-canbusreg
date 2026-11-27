@@ -32,6 +32,15 @@ class ValidatorTest(unittest.TestCase):
     def test_valid_file_is_accepted(self):
         self.assertIsNone(V.check_document(document()))
 
+    def test_category_or_form_that_is_not_text_is_a_schema_failure(self):
+        for value in ([], {}, ["reference"]):
+            doc = document()
+            doc["entries"][0]["category"] = value
+            self.reject(doc, "invalid_value", 0, "category")
+            doc = document()
+            doc["entries"][0]["firmware"]["form"] = value
+            self.reject(doc, "firmware_invalid", 0, "firmware")
+
     def test_source_other_than_certification(self):
         doc = document()
         doc["entries"][0]["source"] = "device"

@@ -98,7 +98,7 @@ def check_source(entry):
 def check_category(entry):
     if "category" not in entry:
         return ("missing_member", "category")
-    if entry["category"] not in CATEGORY_MEMBERS:
+    if not isinstance(entry["category"], str) or entry["category"] not in CATEGORY_MEMBERS:
         return ("invalid_value", "category")
     return None
 
@@ -131,7 +131,7 @@ def check_values(entry):
 
 def check_firmware(entry):
     firmware = entry["firmware"]
-    if not isinstance(firmware, dict) or firmware.get("form") not in FIRMWARE_FORMS:
+    if not isinstance(firmware, dict) or not isinstance(firmware.get("form"), str) or firmware.get("form") not in FIRMWARE_FORMS:
         return ("firmware_invalid", "firmware")
     if firmware["form"] == "range" and firmware.get("upper_bound_stated_by") not in UPPER_BOUND_SOURCES:
         return ("firmware_upper_bound_unstated", "firmware")

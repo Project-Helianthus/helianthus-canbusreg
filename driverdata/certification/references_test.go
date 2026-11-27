@@ -125,6 +125,7 @@ func TestRejectionReasonsAreStable(t *testing.T) {
 		{"unavailable without refusal text", func(_ map[string]any, e []any) { entryAt(e, 4)["refusal"] = "" }, ReasonRefusalMissing, 4, "refusal"},
 		{"reference with refusal", func(_ map[string]any, e []any) { entryAt(e, 0)["refusal"] = "x" }, ReasonUnknownMember, 0, "refusal"},
 		{"unknown category", func(_ map[string]any, e []any) { entryAt(e, 0)["category"] = "default" }, ReasonInvalidValue, 0, "category"},
+		{"year zero date", func(_ map[string]any, e []any) { entryAt(e, 0)["issue_date"] = "0000-01-15" }, ReasonInvalidValue, 0, "issue_date"},
 		{"empty text", func(_ map[string]any, e []any) { entryAt(e, 1)["model"] = "" }, ReasonInvalidValue, 1, "model"},
 		{"impossible date", func(_ map[string]any, e []any) { entryAt(e, 0)["issue_date"] = "2001-02-30" }, ReasonInvalidValue, 0, "issue_date"},
 		{"plain http address", func(_ map[string]any, e []any) { entryAt(e, 0)["url"] = "http://example.invalid/x" }, ReasonInvalidValue, 0, "url"},
@@ -279,5 +280,27 @@ func TestEveryQueryFieldSelectsTheEntry(t *testing.T) {
 		if got := document.Lookup(query); len(got) != 0 {
 			t.Fatalf("%s: %v", name, got)
 		}
+	}
+}
+
+func TestReleaseComponentsBeyondSixtyFourBitsAreOrdered(t *testing.T) {
+	big := "18446744073709551616"
+	firmware := Firmware{Form: FormRange, From: "1.0", To: big + ".0", UpperBoundStatedBy: "certificate"}
+	for release, want := range map[string]string{"1.0": Covered, big: Covered, big + ".1": NotCovered, "18446744073709551617": NotCovered, "0.1": NotCovered} {
+		if got := Coverage(firmware, release); got != want {
+			t.Fatalf("release %s: %s, want %s", release, got, want)
+		}
+	}
+	if got := Coverage(Firmware{Form: FormRelease, Release: big}, "18446744073709551617"); got != Covered {
+		t.Fatal(got)
+	}
+	if got := Coverage(Firmware{Form: FormRelease, Release: big}, "1"); got != NotCovered {
+		t.Fatal(got)
+	}
+	data := mutated(t, func(_ map[string]any, e []any) {
+		entryAt(e, 0)["firmware"] = map[string]any{"form": "range", "from": "1.0", "to": big + ".0", "upper_bound_stated_by": "certificate"}
+	})
+	if _, err := Load(data); err != nil {
+		t.Fatal(err)
 	}
 }

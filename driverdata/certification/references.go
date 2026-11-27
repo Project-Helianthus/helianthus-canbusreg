@@ -46,7 +46,7 @@ const (
 )
 
 // SchemaFile is the name of the shared schema among the embedded files.
-const SchemaFile = "references-v1.schema.json"
+const SchemaFile = "references.schema.json"
 
 // Stable failure reasons.
 const (
@@ -346,6 +346,9 @@ func isDate(value any) bool {
 	if !ok || !datePattern.MatchString(text) {
 		return false
 	}
+	if strings.HasPrefix(text, "0000-") {
+		return false
+	}
 	_, err := time.Parse("2006-01-02", text)
 	return err == nil
 }
@@ -533,11 +536,11 @@ func buildEntry(raw map[string]any) Entry {
 	return entry
 }
 
-func releaseKey(release string) []int {
-	var key []int
+func releaseKey(release string) []*big.Int {
+	var key []*big.Int
 	for _, part := range strings.Split(release, ".") {
 		number, _ := new(big.Int).SetString(part, 10)
-		key = append(key, int(number.Int64()))
+		key = append(key, number)
 	}
 	return key
 }
@@ -545,18 +548,15 @@ func releaseKey(release string) []int {
 func compareReleases(left, right string) int {
 	a, b := releaseKey(left), releaseKey(right)
 	for index := 0; index < len(a) || index < len(b); index++ {
-		var x, y int
+		x, y := new(big.Int), new(big.Int)
 		if index < len(a) {
 			x = a[index]
 		}
 		if index < len(b) {
 			y = b[index]
 		}
-		if x != y {
-			if x > y {
-				return 1
-			}
-			return -1
+		if c := x.Cmp(y); c != 0 {
+			return c
 		}
 	}
 	return 0

@@ -10,6 +10,8 @@ import (
 	semreg "github.com/Project-Helianthus/helianthus-semreg/semreg/v1"
 	semdriver "github.com/Project-Helianthus/helianthus-semreg/semreg/v1/driver"
 
+	"github.com/Project-Helianthus/helianthus-semreg/semreg/v1/packs/storage"
+
 	references "github.com/Project-Helianthus/helianthus-canbusreg/driverdata/certification"
 )
 
@@ -33,7 +35,19 @@ func identity(model, release string) Identity {
 }
 
 func fact(id semreg.DefinitionID) semreg.FactCandidate {
-	return semreg.FactCandidate{Key: keyOf(packRef{id: "helianthus.pack.storage", version: "1.0.0", text: packText}, id)}
+	kind := ""
+	if strings.HasPrefix(string(id), accuracyPrefix) {
+		kind = activeCurrent
+	}
+	return semreg.FactCandidate{Key: keyOf(packRef{id: "helianthus.pack.storage", version: "1.1.0", text: packText}, id, kind)}
+}
+
+func byKey(result Result) map[string]Staged {
+	out := map[string]Staged{}
+	for _, s := range result.Staged {
+		out[keyText(s.Sample.Candidate.Key)] = s
+	}
+	return out
 }
 
 func context0() Context {
@@ -156,7 +170,7 @@ func TestOtherIdentityMembersYieldNoCandidate(t *testing.T) {
 
 func TestStatementOnlyValueIsNamedAndNotPublished(t *testing.T) {
 	result := match(t, identity("TEST-DATA-STATEMENT", ""), fact(packVoltage))
-	if len(result.Staged) != 0 || len(result.Unmapped) != 1 || result.Unmapped[0] != "voltage" {
+	if len(result.Staged) != 0 || len(result.Unmapped) != 1 || result.Unmapped[0] != "voltage.statement" {
 		t.Fatalf("%+v", result)
 	}
 }
@@ -216,6 +230,54 @@ func TestPublishSourceHoldsNoNumericAccuracyLiteral(t *testing.T) {
 		}
 		if literal.MatchString(strings.ReplaceAll(line, "sha256", "")) {
 			t.Fatalf("line %d holds a numeric literal: %s", number+1, line)
+		}
+	}
+}
+
+func TestStagedAccuracyKeysCarryMeasurementTypeAndStayDistinct(t *testing.T) {
+	result := match(t, identity("TEST-DATA-REFERENCE", "2.1"), fact(packCurrent))
+	for _, s := range result.Staged {
+		ds := s.Sample.Candidate.Key.Dimensions
+		if len(ds) != 2 || ds[0].ID != measurementType || ds[0].Value.Symbol == nil || ds[0].Value.Symbol.Token != activeCurrent || ds[1].ID != packDimension {
+			t.Fatalf("dimensions %+v", ds)
+		}
+	}
+	// the same members for another measurement type are different keys
+	pack := packRef{id: "helianthus.pack.storage", version: "1.1.0", text: packText}
+	if keyText(keyOf(pack, measuredFact, activeCurrent)) == keyText(keyOf(pack, measuredFact, activePower)) {
+		t.Fatal("measurement types share a key")
+	}
+}
+
+func TestVoltageReferenceStagesMeasuredAndRatioAndNamesRange(t *testing.T) {
+	result := match(t, identity("TEST-DATA-VOLTAGE", ""), fact(packVoltage))
+	got := byKey(result)
+	pack := packRef{id: "helianthus.pack.storage", version: "1.1.0", text: packText}
+	for _, id := range []semreg.DefinitionID{measuredFact, ratioMaximumFact} {
+		if _, ok := got[keyText(keyOf(pack, id, voltage))]; !ok {
+			t.Fatalf("%s not staged for voltage: %v", id, got)
+		}
+	}
+	if len(result.Staged) != 2 {
+		t.Fatalf("staged %d", len(result.Staged))
+	}
+	if len(result.Unmapped) != 1 || result.Unmapped[0] != "voltage.range_maximum" {
+		t.Fatalf("unmapped %v", result.Unmapped)
+	}
+}
+
+func TestStagedAccuracyKeysAreAcceptedByTheStoragePackValidator(t *testing.T) {
+	v := storage.New()
+	for _, model := range []string{"TEST-DATA-REFERENCE", "TEST-DATA-VOLTAGE"} {
+		result := match(t, identity(model, "2.1"), fact(packCurrent))
+		if len(result.Staged) == 0 {
+			t.Fatalf("%s staged nothing", model)
+		}
+		for _, s := range result.Staged {
+			c := s.Sample.Candidate
+			if err := v.ValidateFact(c.Key, c.Value); err != nil {
+				t.Fatalf("%s: %v", c.Key.FactID, err)
+			}
 		}
 	}
 }

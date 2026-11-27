@@ -31,6 +31,8 @@ const (
 	unitWatt         semreg.DefinitionID = "unit.watt"
 	activeCurrent                        = "active_current"
 	activePower                          = "active_power"
+	voltage                              = "voltage"
+	measurementType  semreg.DefinitionID = "storage.dimension.measurement_type"
 
 	// LowestPriority is the source priority of every certification source:
 	// the lowest the priority type holds, so any other source wins.
@@ -88,12 +90,18 @@ type packRef struct {
 	text    string
 }
 
-func keyOf(pack packRef, fact semreg.DefinitionID) semreg.FactKey {
+// keyOf builds the key of an accuracy fact: the measurement-type qualifier
+// the fact declares comes before the pack dimension (identifier order).
+func keyOf(pack packRef, fact semreg.DefinitionID, kind string) semreg.FactKey {
 	text := pack.text
-	return semreg.FactKey{
-		PackID: pack.id, PackVersion: pack.version, FactID: fact,
-		Dimensions: []semreg.Dimension{{ID: packDimension, Value: semreg.Value{Kind: semreg.ValueText, Text: &text}}},
+	dims := []semreg.Dimension{}
+	if kind != "" {
+		dims = append(dims, semreg.Dimension{ID: measurementType, Value: semreg.Value{
+			Kind: semreg.ValueSymbol, Symbol: &semreg.Symbol{Namespace: measurementType, Token: kind, Known: true},
+		}})
 	}
+	dims = append(dims, semreg.Dimension{ID: packDimension, Value: semreg.Value{Kind: semreg.ValueText, Text: &text}})
+	return semreg.FactKey{PackID: pack.id, PackVersion: pack.version, FactID: fact, Dimensions: dims}
 }
 
 func keyText(key semreg.FactKey) string {
@@ -102,6 +110,9 @@ func keyText(key semreg.FactKey) string {
 		text := ""
 		if d.Value.Text != nil {
 			text = *d.Value.Text
+		}
+		if d.Value.Symbol != nil {
+			text = d.Value.Symbol.Token
 		}
 		parts = append(parts, string(d.ID)+"="+text)
 	}
@@ -138,9 +149,12 @@ func packs(facts []semreg.FactCandidate) ([]packRef, map[string]bool) {
 
 type stated struct {
 	fact  semreg.DefinitionID
+	kind  string
 	value semreg.Value
 	entry references.Entry
 }
+
+func (s stated) id() string { return string(s.fact) + "|" + s.kind }
 
 func quantity(d *references.Decimal, unit semreg.DefinitionID) semreg.Value {
 	return semreg.Value{Kind: semreg.ValueQuantity, Quantity: &semreg.Quantity{
@@ -153,10 +167,10 @@ func members(entry references.Entry) ([]stated, []string) {
 	var out []stated
 	var unmapped []string
 	kind := value.MeasurementType
-	if kind != activeCurrent && kind != activePower {
+	if kind != activeCurrent && kind != activePower && kind != voltage {
 		return nil, []string{kind}
 	}
-	add := func(fact semreg.DefinitionID, v semreg.Value) { out = append(out, stated{fact, v, entry}) }
+	add := func(fact semreg.DefinitionID, v semreg.Value) { out = append(out, stated{fact, kind, v, entry}) }
 	if value.Measured != nil {
 		b := *value.Measured
 		add(measuredFact, semreg.Value{Kind: semreg.ValueBoolean, Boolean: &b})
@@ -175,7 +189,10 @@ func members(entry references.Entry) ([]stated, []string) {
 		{"measured_minimum", value.MeasuredMinimum}, {"measured_maximum", value.MeasuredMaximum},
 		{"range_minimum", value.RangeMinimum}, {"range_maximum", value.RangeMaximum},
 	} {
-		if m.value != nil {
+		if m.value != nil && kind == voltage {
+			// the catalog has no range or measured-bound fact for voltage
+			unmapped = append(unmapped, kind+"."+m.name)
+		} else if m.value != nil {
 			add(semreg.DefinitionID(accuracyPrefix+m.name+"_"+kind), quantity(m.value, unit))
 		}
 	}
@@ -218,8 +235,8 @@ func Match(data Lookuper, identity Identity, ctx Context, facts []semreg.FactCan
 		Driver: identity.Driver, Vendor: identity.Vendor, Flavor: identity.Flavor,
 		Model: identity.Model, Release: identity.Release,
 	})
-	byFact := map[semreg.DefinitionID][]stated{}
-	var order []semreg.DefinitionID
+	byFact := map[string][]stated{}
+	var order []string
 	unmapped := map[string]bool{}
 	for _, entry := range entries {
 		if entry.Category != references.CategoryReference || entry.StatedValue == nil {
@@ -230,10 +247,10 @@ func Match(data Lookuper, identity Identity, ctx Context, facts []semreg.FactCan
 			unmapped[name] = true
 		}
 		for _, s := range got {
-			if byFact[s.fact] == nil {
-				order = append(order, s.fact)
+			if byFact[s.id()] == nil {
+				order = append(order, s.id())
 			}
-			byFact[s.fact] = append(byFact[s.fact], s)
+			byFact[s.id()] = append(byFact[s.id()], s)
 		}
 	}
 	for name := range unmapped {
@@ -245,12 +262,12 @@ func Match(data Lookuper, identity Identity, ctx Context, facts []semreg.FactCan
 		if !ok {
 			continue
 		}
-		for _, fact := range order {
-			key := keyOf(pack, fact)
+		for _, id := range order {
+			all := byFact[id]
+			key := keyOf(pack, all[0].fact, all[0].kind)
 			if device[keyText(key)] {
 				continue
 			}
-			all := byFact[fact]
 			conflict := false
 			for _, other := range all[1:] {
 				conflict = conflict || !sameValue(all[0].value, other.value)

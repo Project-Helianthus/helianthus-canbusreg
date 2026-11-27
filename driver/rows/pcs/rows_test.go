@@ -880,3 +880,358 @@ func TestIntegerCodecUnsignedRoundTripsFullRange(t *testing.T) {
 		}
 	}
 }
+
+// observedDecoder is one decoder run over one vector: the field keys the decoder
+// emitted and the native rows the matching evaluator applied to the same bytes.
+type observedDecoder struct {
+	decoder string
+	vector  string
+	keys    []string
+	applied map[string]roweval.Evaluation
+}
+
+// appliedRows keeps the rows of an evaluation that applied to the observation.
+func appliedRows(rows map[string]roweval.Evaluation) map[string]roweval.Evaluation {
+	out := make(map[string]roweval.Evaluation)
+	for id, ev := range rows {
+		if ev.Native != nil && ev.Reason != roweval.ReasonNoMatch {
+			out[id] = ev
+		}
+	}
+	return out
+}
+
+func fieldKeys(r canbusreg.NativeResult) []string {
+	keys := make([]string, 0, len(r.Fields))
+	for k := range r.Fields {
+		keys = append(keys, k)
+	}
+	return keys
+}
+
+// diagVariants is the diagnostic vector file with, for each of its vectors, the
+// neighbouring cases the file does not spell out: the second word offset of the
+// frame family of every code-word vector, and the parallel summary frame 0x323
+// with every bit clear and every bit set.
+func diagVariants(t *testing.T) []diagVectorCase {
+	t.Helper()
+	out := diagLoadVectors(t)
+	secondOffset := map[string]int{"0x333": 4, "0x522": 3}
+	for _, c := range diagLoadVectors(t) {
+		switch c.Kind {
+		case "dtc":
+			v := c
+			v.Name += "-other-offset"
+			if o, ok := secondOffset[c.Identifier]; ok {
+				v.Offset = o
+			} else {
+				v.Offset = 2
+			}
+			out = append(out, v)
+		case "summary":
+			if c.Identifier == "0x312" && c.Selection.Flavor == "pcs-parallel" {
+				for _, payload := range []string{"0000000000000000", "ffffffffffffffff"} {
+					v := c
+					v.Name += "-323-" + payload[:2]
+					v.Identifier, v.Payload = "0x323", payload
+					out = append(out, v)
+				}
+			}
+		}
+	}
+	return out
+}
+
+// parallelFaultVariants is the parallel identity vector file with the fault frames
+// 0x503, 0x663 and 0x673 carrying every bit clear, every bit set and a mixed
+// pattern, the frames whose bit rows no vector of the file reaches.
+func parallelFaultVariants(t *testing.T) []parallelIdentityVectorCase {
+	t.Helper()
+	out := parallelLoadVectors(t)
+	for _, f := range []struct {
+		identifier string
+		project    [2]string
+	}{{"0x503", [2]string{"QAAB", "0004"}}, {"0x663", [2]string{"QAAB", "0002"}}, {"0x673", [2]string{"QAAB", "0002"}}} {
+		for _, payload := range []string{"0000000000000000", "ffffffffffffffff", "0180040820408010"} {
+			out = append(out, parallelIdentityVectorCase{Name: f.identifier + "-" + payload, Identifier: f.identifier, Payload: payload, Selection: sel(f.project)})
+		}
+	}
+	return out
+}
+
+// decoderCorpus runs each of the nine decoders and its evaluator over the vector
+// corpus of its frames. A vector the decoder refuses emits no key and is kept
+// out, as the decoder-versus-evaluator tests of each family check its refusal.
+func decoderCorpus(t *testing.T) []observedDecoder {
+	t.Helper()
+	var out []observedDecoder
+	add := func(decoder, vector string, keys []string, rows map[string]roweval.Evaluation) {
+		if len(keys) > 0 {
+			out = append(out, observedDecoder{decoder, vector, keys, appliedRows(rows)})
+		}
+	}
+	must := func(vector string, reason roweval.Reason, err error) {
+		if err != nil {
+			t.Fatalf("%s: %v", vector, err)
+		}
+		if reason != "" {
+			t.Fatalf("%s: evaluator refuses an observation the decoder admits (%q)", vector, reason)
+		}
+	}
+	standard := func(s canbusreg.Selection, in canbusreg.PCSStandardPCSInput, name string, eval func(canbusreg.Selection, canbusreg.PCSStandardPCSInput) (Result, roweval.Reason, error)) {
+		dec := canbusreg.DecodePCSStandard(s, in)
+		if dec.Status != "decoded" {
+			return
+		}
+		res, reason, err := eval(s, in)
+		must(name, reason, err)
+		add("DecodePCSStandard", name, fieldKeys(dec.NativeResult), res.Rows)
+	}
+	for _, c := range loadVectors(t) {
+		s, in, _ := build(t, c)
+		standard(s, in, c.Name, Evaluate)
+	}
+	for _, c := range loadExtremaCases(t) {
+		s, in, _ := buildExtrema(t, c)
+		standard(s, in, c.Name, EvaluateExtrema)
+	}
+	for _, c := range loadGaugeVectors(t) {
+		s, in, _ := buildGauge(t, c)
+		dec := canbusreg.DecodePCSGauge(s, in)
+		if dec.Status != "decoded" {
+			continue
+		}
+		res, reason, err := EvaluateGauge(s, in)
+		must(c.Name, reason, err)
+		add("DecodePCSGauge", c.Name, fieldKeys(dec), res.Rows)
+	}
+	for _, c := range loadIdentityVectors(t) {
+		s, in := buildIdentityCase(t, c)
+		dec := canbusreg.DecodePCSIdentity(s, in)
+		if dec.Status != "decoded" {
+			continue
+		}
+		res, reason, err := EvaluateIdentity(s, in)
+		must(c.Name, reason, err)
+		add("DecodePCSIdentity", c.Name, fieldKeys(dec), res.Rows)
+	}
+	for _, c := range loadSlotVectors(t) {
+		s, in, _ := slotBuild(t, c)
+		dec := canbusreg.DecodePCSSlots(s, in)
+		if dec.Status != "decoded" {
+			continue
+		}
+		res, reason, err := EvaluateSlots(s, in)
+		must(c.Name, reason, err)
+		add("DecodePCSSlots", c.Name, fieldKeys(dec), res.Rows)
+	}
+	for _, c := range diagVariants(t) {
+		s := diagSelection(t, c.Selection)
+		frame := diagFrame(t, c.Identifier, c.Extended, c.Payload)
+		switch c.Kind {
+		case "summary":
+			in := diagSummaryInput(s, frame, c.Selection.LocalSummaryQualified)
+			dec := canbusreg.DecodePCSSummaries(s, in)
+			keys := fieldKeys(dec.NativeResult)
+			for k := range dec.Bits {
+				keys = append(keys, k)
+			}
+			if len(keys) == 0 {
+				continue
+			}
+			res, reason, err := EvaluateSummaryBits(s, in)
+			must(c.Name, reason, err)
+			add("DecodePCSSummaries", c.Name, keys, res.Rows)
+		case "dtc":
+			in := diagLinkInput(s, frame)
+			dec := canbusreg.DecodeDTC(s, in, c.Offset)
+			if len(dec.Fields) == 0 {
+				continue
+			}
+			res, reason, err := EvaluateDTC(s, in, c.Offset)
+			must(c.Name, reason, err)
+			add("DecodeDTC", c.Name, fieldKeys(dec), res.Rows)
+		}
+	}
+	for _, c := range loadExtendedVectors(t) {
+		s, in, _ := buildExtended(t, c)
+		dec := canbusreg.DecodePCSExtended(s, in)
+		if len(dec.Fields) == 0 {
+			continue
+		}
+		res, reason, err := EvaluateExtended(s, in)
+		must(c.Name, reason, err)
+		add("DecodePCSExtended", c.Name, fieldKeys(dec), res.Rows)
+	}
+	for _, c := range loadFaultVectors(t) {
+		s, in, _ := buildFault(t, c)
+		dec := canbusreg.DecodePCSExtended(s, in)
+		if len(dec.Fields) == 0 {
+			continue
+		}
+		res, reason, err := EvaluateExtendedFaults(s, in)
+		must(c.Name, reason, err)
+		add("DecodePCSExtended", c.Name, fieldKeys(dec), res.Rows)
+	}
+	for _, c := range parallelFaultVariants(t) {
+		s := diagSelection(t, c.Selection)
+		in := diagLinkInput(s, diagFrame(t, c.Identifier, c.Extended, c.Payload))
+		dec := canbusreg.ParallelIdentityDecodeParallel(s, in)
+		if len(dec.Fields) == 0 {
+			continue
+		}
+		res, reason, err := EvaluateParallelIdentity(s, in)
+		must(c.Name, reason, err)
+		add("ParallelIdentityDecodeParallel", c.Name, fieldKeys(dec), res.Rows)
+	}
+	for _, c := range loadParallelVectors(t) {
+		s, in, x, _ := parallelBuild(t, c)
+		dec := canbusreg.ParallelReleaseDecodeParallel(s, in, x)
+		if len(dec.Fields) == 0 {
+			continue
+		}
+		res, reason, err := EvaluateParallelRelease(s, in, x)
+		must(c.Name, reason, err)
+		add("ParallelReleaseDecodeParallel", c.Name, fieldKeys(dec), res.Rows)
+	}
+	return out
+}
+
+// TestEveryDecoderFieldKeyHasARow pins that each of the nine decoders is
+// exercised by the corpus, and that every field key a decoder emits on a vector
+// is carried, for the same bytes, by a native row of the combined table.
+func TestEveryDecoderFieldKeyHasARow(t *testing.T) {
+	table := make(map[string]bool)
+	for _, r := range CombinedTable().Native {
+		table[r.ID] = true
+	}
+	seen := make(map[string]int)
+	for _, o := range decoderCorpus(t) {
+		seen[o.decoder]++
+		for _, key := range o.keys {
+			found := false
+			for id := range o.applied {
+				if fieldOf(id) == key && table[id] {
+					found = true
+				}
+			}
+			if !found {
+				t.Errorf("%s on %s: field %s has no applied native row", o.decoder, o.vector, key)
+			}
+		}
+	}
+	for _, d := range []string{"DecodePCSStandard", "DecodePCSGauge", "DecodePCSIdentity", "DecodePCSSlots", "DecodePCSSummaries", "DecodePCSExtended", "ParallelIdentityDecodeParallel", "ParallelReleaseDecodeParallel", "DecodeDTC"} {
+		if seen[d] == 0 {
+			t.Errorf("no vector exercises %s", d)
+		}
+	}
+}
+
+// TestEveryRowHasAVector pins that the row identifiers of the combined table are
+// unique and that every native row applies to the bytes of at least one vector.
+func TestEveryRowHasAVector(t *testing.T) {
+	ids := make(map[string]bool)
+	for _, r := range CombinedTable().Native {
+		if ids[r.ID] {
+			t.Errorf("duplicate native row %s", r.ID)
+		}
+		ids[r.ID] = true
+	}
+	applied := make(map[string]bool)
+	for _, o := range decoderCorpus(t) {
+		for id := range o.applied {
+			applied[id] = true
+		}
+	}
+	for id := range ids {
+		if !applied[id] {
+			t.Errorf("no vector applies to %s", id)
+		}
+	}
+}
+
+// pairedBank is the bank a PCS flavor pairs with.
+var pairedBank = map[string]string{"pcs-standard": "ordinary", "pcs-parallel": "parallel"}
+
+// TestBankDependentRowsCarryTheirBank pins that every row whose conditions name
+// a bank-paired PCS flavor (standard or parallel) or a bank names both, as a pair, and that a row of the parallel
+// flavor names the parallel bank.
+func TestBankDependentRowsCarryTheirBank(t *testing.T) {
+	banked := 0
+	for _, r := range CombinedTable().Native {
+		flavor, hasFlavor := r.When.Equal[qFlavor]
+		if _, paired := pairedBank[flavor]; !paired {
+			hasFlavor = false
+		}
+		bank, hasBank := r.When.Equal[qBank]
+		if strings.Contains(r.ID, ".parallel.") && !hasBank {
+			t.Errorf("%s: parallel row carries no bank", r.ID)
+		}
+		if !hasFlavor && !hasBank {
+			continue
+		}
+		banked++
+		if hasFlavor != hasBank {
+			t.Errorf("%s: flavor %q and bank %q are not stated together", r.ID, flavor, bank)
+			continue
+		}
+		if pairedBank[flavor] != bank {
+			t.Errorf("%s: flavor %q is paired with bank %q, the row states %q", r.ID, flavor, pairedBank[flavor], bank)
+		}
+	}
+	if banked == 0 {
+		t.Fatal("no row carries a bank")
+	}
+}
+
+// TestStandardLimitWordsPublishNoLimitBindingUnderAnySelection evaluates every
+// 0x311 row of the bound table on each 0x311 vector under each pairing of flavor
+// and bank, and checks no fact candidate is produced and no binding names a
+// 0x311 row or a limit fact.
+func TestStandardLimitWordsPublishNoLimitBindingUnderAnySelection(t *testing.T) {
+	for _, b := range Bindings() {
+		if strings.Contains(b.NativeID, ".311.") || strings.Contains(string(b.Read.Fact.ID), "storage.limit.") {
+			t.Errorf("%s is bound to %s", b.NativeID, b.Read.Fact.ID)
+		}
+	}
+	roles := packRoles(t, "pack.ordinary")
+	table := BoundTable()
+	evaluated := 0
+	for _, c := range loadVectors(t) {
+		if c.Identifier != "0x311" {
+			continue
+		}
+		for _, flavor := range []string{"pcs-standard", "pcs-parallel"} {
+			for _, bank := range []string{"ordinary", "parallel"} {
+				v := c
+				v.Selection.Flavor, v.Selection.Bank = flavor, bank
+				if _, err := func() (canbusreg.Selection, error) {
+					spec := canbusreg.SelectionSpec{Flavor: flavor, ProjectCode: v.Selection.Project, Release: v.Selection.Release, Direction: "bms-to-pcs", Scope: v.Selection.Scope, Bank: bank, Endpoint: v.Selection.Endpoint, Group: v.Selection.Group, Slot: v.Selection.Slot, Epoch: 1}
+					iface, err := canbus.NewInterfaceIdentity("synthetic", 1)
+					spec.Interface = iface
+					if err != nil {
+						return canbusreg.Selection{}, err
+					}
+					return canbusreg.NewSelection(spec)
+				}(); err != nil {
+					continue
+				}
+				s, in, frame := build(t, v)
+				o := observation{table: table, frame: frame, qualifiers: Qualifiers(s, in), identifier: frame.ID().Value()}
+				for _, row := range table.Native {
+					if !strings.Contains(row.ID, ".311.") {
+						continue
+					}
+					ev, _ := o.evaluate(t, row, roles)
+					evaluated++
+					if ev.Candidate != nil {
+						t.Errorf("%s under %s/%s on %s gives a candidate", row.ID, flavor, bank, c.Name)
+					}
+				}
+			}
+		}
+	}
+	if evaluated == 0 {
+		t.Fatal("no 0x311 row was evaluated")
+	}
+}

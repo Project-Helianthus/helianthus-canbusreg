@@ -107,6 +107,7 @@ type StatedValue struct {
 	MeasuredMaximum *Decimal
 	RangeMinimum    *Decimal
 	RangeMaximum    *Decimal
+	Statement       string
 }
 
 // Entry is one record of a document. CertificateNumber, IssueDate and
@@ -459,6 +460,11 @@ func checkStatedValue(entry map[string]any) *Finding {
 				return problem
 			}
 			values++
+		case name == "statement":
+			if !isText(value) {
+				return problem
+			}
+			values++
 		case contains(decimalMembers, name):
 			if !isDecimal(value) {
 				return problem
@@ -518,7 +524,7 @@ func buildEntry(raw map[string]any) Entry {
 		RetrievedOn: text(raw, "retrieved_on"), Refusal: text(raw, "refusal"),
 	}
 	if stated, ok := raw["stated_value"].(map[string]any); ok {
-		value := &StatedValue{MeasurementType: text(stated, "measurement_type")}
+		value := &StatedValue{MeasurementType: text(stated, "measurement_type"), Statement: text(stated, "statement")}
 		if measured, ok := stated["measured"].(bool); ok {
 			value.Measured = &measured
 		}

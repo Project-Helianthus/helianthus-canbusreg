@@ -76,6 +76,21 @@
       "url": "https://example.invalid/registry/search",
       "retrieved_on": "2000-02-01",
       "refusal": "The registry answered that automated access is not permitted."
+    },
+    {
+      "source": "certification",
+      "category": "reference",
+      "driver": "example-driver",
+      "vendor": "Example Vendor",
+      "flavor": "example-profile",
+      "model": "EX-1300",
+      "firmware": {"form": "not_stated"},
+      "issuer": "Example Certification Body",
+      "certificate_number": "EX-CERT-0004",
+      "issue_date": "2000-01-18",
+      "stated_value": {"measurement_type": "active_energy", "statement": "Class 1 as written in the example standard"},
+      "url": "https://example.invalid/registry/EX-CERT-0004",
+      "retrieved_on": "2000-02-01"
     }
   ]
 }

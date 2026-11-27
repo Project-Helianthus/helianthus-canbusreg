@@ -63,7 +63,7 @@ func TestValidFileLoadsAllThreeCategories(t *testing.T) {
 			t.Fatalf("source %q", entry.Source)
 		}
 	}
-	want := map[string]int{CategoryReference: 3, CategoryGap: 1, CategoryUnavailable: 1}
+	want := map[string]int{CategoryReference: 4, CategoryGap: 1, CategoryUnavailable: 1}
 	if !reflect.DeepEqual(counts, want) {
 		t.Fatalf("counts %v", counts)
 	}
@@ -74,6 +74,18 @@ func TestValidFileLoadsAllThreeCategories(t *testing.T) {
 	}
 	if document.Entries[3].StatedValue != nil || document.Entries[4].Refusal == "" {
 		t.Fatal("gap carries a value or unavailable lost its refusal")
+	}
+}
+
+func TestReferenceWithMeasurementTypeAndStatementLoadsAndLookupReturnsItUnchanged(t *testing.T) {
+	document := loadValid(t)
+	got := document.Lookup(Query{Driver: "example-driver", Vendor: "Example Vendor", Flavor: "example-profile", Model: "EX-1300", Release: "1.0"})
+	if len(got) != 1 || got[0].StatedValue == nil {
+		t.Fatalf("matches %+v", got)
+	}
+	want := StatedValue{MeasurementType: "active_energy", Statement: "Class 1 as written in the example standard"}
+	if !reflect.DeepEqual(*got[0].StatedValue, want) {
+		t.Fatalf("stated value %+v", *got[0].StatedValue)
 	}
 }
 
@@ -142,6 +154,12 @@ func TestRejectionReasonsAreStable(t *testing.T) {
 		{"stated value only names the type", func(_ map[string]any, e []any) {
 			entryAt(e, 0)["stated_value"] = map[string]any{"measurement_type": "active_power"}
 		}, ReasonStatedValueInvalid, 0, "stated_value"},
+		{"empty statement", func(_ map[string]any, e []any) {
+			entryAt(e, 5)["stated_value"] = map[string]any{"measurement_type": "active_energy", "statement": ""}
+		}, ReasonStatedValueInvalid, 5, "stated_value"},
+		{"statement that is not text", func(_ map[string]any, e []any) {
+			entryAt(e, 5)["stated_value"] = map[string]any{"measurement_type": "active_energy", "statement": 1}
+		}, ReasonStatedValueInvalid, 5, "stated_value"},
 		{"null stated member", func(_ map[string]any, e []any) {
 			entryAt(e, 0)["stated_value"] = map[string]any{"measurement_type": "active_power", "measured": nil}
 		}, ReasonStatedValueInvalid, 0, "stated_value"},

@@ -110,6 +110,14 @@ class ValidatorTest(unittest.TestCase):
             doc["entries"][0]["stated_value"] = stated
             self.reject(doc, "stated_value_invalid", 0, "stated_value")
 
+    def test_statement_only_stated_value_passes_and_empty_statement_fails(self):
+        doc = document()
+        doc["entries"][0]["stated_value"] = {"measurement_type": "active_energy", "statement": "Class 1 as written"}
+        self.assertIsNone(V.check_document(doc))
+        for statement in ("", 1, None):
+            doc["entries"][0]["stated_value"] = {"measurement_type": "active_energy", "statement": statement}
+            self.reject(doc, "stated_value_invalid", 0, "stated_value")
+
     def test_two_categories_for_one_identity_are_rejected(self):
         found = V.check_document(json.loads(CONFLICT.read_text(encoding="utf-8")))
         self.assertEqual(found["reason"], "category_conflict")

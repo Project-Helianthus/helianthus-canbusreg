@@ -81,7 +81,7 @@ func (i *instance) certify(ctx context.Context, session semdriver.Session, evide
 	}
 	root := native.Root()
 	identity := certification.Identity{Driver: string(Kind), Vendor: certificationVendor, Flavor: string(i.config.Options.Profile)}
-	_ = certification.Publish(ctx, session.Publisher(), registry, identity, certification.Context{
+	_ = certification.Publish(ctx, session.Publisher(), session.Prepare, registry, identity, certification.Context{
 		Template: i.template(evidence), Producer: root,
 		Subject: func(string) (semdriver.NodeRef, bool) { return root, true },
 	}, facts)

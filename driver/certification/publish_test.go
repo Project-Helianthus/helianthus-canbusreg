@@ -2,6 +2,7 @@ package certification
 
 import (
 	"context"
+	"errors"
 	"os"
 	"regexp"
 	"strings"
@@ -186,11 +187,25 @@ type tx struct {
 	sources []semdriver.Source
 	samples []semdriver.Sample
 	commit  int
+	batches []semreg.PublicationBatch
 }
 
 func (x *tx) DeclareSource(s semdriver.Source) error { x.sources = append(x.sources, s); return nil }
 func (x *tx) StageSample(s semdriver.Sample) error   { x.samples = append(x.samples, s); return nil }
-func (x *tx) Commit(context.Context) error           { x.commit++; return nil }
+func (x *tx) Commit(context.Context) error {
+	x.commit++
+	if len(x.batches) == 0 {
+		return errors.New("runtime: no batch is staged")
+	}
+	return nil
+}
+func (x *tx) Stage(b semreg.PublicationBatch) error { x.batches = append(x.batches, b); return nil }
+
+func prepare(mutate func(*semreg.PublicationBatch)) (semreg.PublicationBatch, error) {
+	var b semreg.PublicationBatch
+	mutate(&b)
+	return b, nil
+}
 
 type publisher struct {
 	semdriver.Publisher
@@ -205,15 +220,23 @@ func (p *publisher) Begin(context.Context) (semdriver.PublicationTransaction, er
 
 func TestPublishStagesSourcesAndSamplesInOneTransaction(t *testing.T) {
 	p := &publisher{tx: &tx{}}
-	err := Publish(context.Background(), p, loadTestData(t), identity("TEST-DATA-REFERENCE", "2.1"), context0(), []semreg.FactCandidate{fact(packCurrent)})
+	err := Publish(context.Background(), p, prepare, loadTestData(t), identity("TEST-DATA-REFERENCE", "2.1"), context0(), []semreg.FactCandidate{fact(packCurrent)})
 	if err != nil {
 		t.Fatal(err)
 	}
 	if len(p.tx.sources) != 3 || len(p.tx.samples) != 3 || p.tx.commit != 1 {
 		t.Fatalf("%d %d %d", len(p.tx.sources), len(p.tx.samples), p.tx.commit)
 	}
+	if len(p.tx.batches) != 1 || len(p.tx.batches[0].FactUpserts) != 3 {
+		t.Fatalf("batch must carry the three candidates: %+v", p.tx.batches)
+	}
+	for i, sample := range p.tx.samples {
+		if p.tx.batches[0].FactUpserts[i].CandidateID != sample.Candidate.CandidateID {
+			t.Fatalf("candidate %d is not in the batch", i)
+		}
+	}
 	q := &publisher{tx: &tx{}}
-	if err := Publish(context.Background(), q, loadTestData(t), identity("", ""), context0(), []semreg.FactCandidate{fact(packCurrent)}); err != nil || q.begun != 0 {
+	if err := Publish(context.Background(), q, prepare, loadTestData(t), identity("", ""), context0(), []semreg.FactCandidate{fact(packCurrent)}); err != nil || q.begun != 0 {
 		t.Fatalf("%v %d", err, q.begun)
 	}
 }

@@ -311,8 +311,25 @@ func build(ctx Context, subject semdriver.NodeRef, key semreg.FactKey, s stated)
 	return Staged{Source: source, Sample: sample}, nil
 }
 
-// Stage declares every source and stages its sample in the transaction.
-func Stage(tx semdriver.PublicationTransaction, result Result) error {
+// Prepare is the session's batch preparation: it fills the ownership stamp
+// after the mutation has set the batch contents.
+type Prepare func(mutate func(*semreg.PublicationBatch)) (semreg.PublicationBatch, error)
+
+// Stage declares every source, stages the batch that carries the candidates of
+// the samples, and stages the samples, so the publication the transaction
+// applies holds the candidates the samples are admitted against.
+func Stage(tx semdriver.PublicationTransaction, prepare Prepare, result Result) error {
+	facts := make([]semreg.FactCandidate, 0, len(result.Staged))
+	for _, staged := range result.Staged {
+		facts = append(facts, staged.Sample.Candidate)
+	}
+	batch, err := prepare(func(b *semreg.PublicationBatch) { b.FactUpserts = facts })
+	if err != nil {
+		return err
+	}
+	if err := tx.Stage(batch); err != nil {
+		return err
+	}
 	for _, staged := range result.Staged {
 		if err := tx.DeclareSource(staged.Source); err != nil {
 			return err
@@ -326,7 +343,7 @@ func Stage(tx semdriver.PublicationTransaction, result Result) error {
 
 // Publish matches and stages in one transaction of the publisher. A match
 // with nothing to stage opens no transaction.
-func Publish(ctx context.Context, publisher semdriver.Publisher, data Lookuper, identity Identity, c Context, facts []semreg.FactCandidate) error {
+func Publish(ctx context.Context, publisher semdriver.Publisher, prepare Prepare, data Lookuper, identity Identity, c Context, facts []semreg.FactCandidate) error {
 	result, err := Match(data, identity, c, facts)
 	if err != nil || len(result.Staged) == 0 {
 		return err
@@ -335,7 +352,7 @@ func Publish(ctx context.Context, publisher semdriver.Publisher, data Lookuper, 
 	if err != nil {
 		return err
 	}
-	if err := Stage(tx, result); err != nil {
+	if err := Stage(tx, prepare, result); err != nil {
 		_ = tx.Abort(ctx)
 		return err
 	}

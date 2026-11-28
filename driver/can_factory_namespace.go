@@ -182,7 +182,7 @@ func (b *nsBook) install(reg semdriver.NativeRegistry) error {
 	if err := b.bindDiagnostics(device); err != nil {
 		return err
 	}
-	if err := b.bindRows(device); err != nil {
+	if err := b.bindInstanceRows(device); err != nil {
 		return err
 	}
 	if err := b.bindRaw(device); err != nil {
@@ -191,8 +191,18 @@ func (b *nsBook) install(reg semdriver.NativeRegistry) error {
 	return b.bindStored(device)
 }
 func (i *instance) observeNamespace(e canbusreg.Evidence) {
+	v, ok := namespaceBooks.Load(i)
+	if !ok {
+		return
+	}
+	b := v.(*nsBook)
+	b.mu.Lock()
+	registered := b.reg != nil
+	b.mu.Unlock()
+	if !registered {
+		return
+	}
 	ev, reason, err := i.profileEvaluation(e)
-	b := bookFor(i)
 	b.mu.Lock()
 	defer b.mu.Unlock()
 	if err != nil {
@@ -201,7 +211,7 @@ func (i *instance) observeNamespace(e canbusreg.Evidence) {
 	}
 	decoded := reason == "" && len(ev) > 0
 	keep, status := rawAdmission(i.config.Options.Profile, e, decoded)
-	if keep {
+	if keep && !i.suppressRaw {
 		b.raw = append(b.raw, rawDocument(e, i.config.Options.Profile == ProfileCommon))
 	}
 	if decoded {
@@ -209,7 +219,7 @@ func (i *instance) observeNamespace(e canbusreg.Evidence) {
 			if one.Native == nil {
 				continue
 			}
-			b.rows[id] = rowFrom(one.Native, e.Monotonic)
+			b.rows[id] = keepKnown(b.rows[id], rowFrom(one.Native, e.Monotonic), one.Native.Reason != "")
 		}
 	}
 	b.status = status
@@ -367,7 +377,7 @@ func (i *instance) profileEvaluation(e canbusreg.Evidence) (map[string]roweval.E
 		table := bms.MonitorTable(frame.ID().Value())
 		return bms.EvaluateMonitorFrame(frame, i.acquired(e, table.Bindings))
 	default:
-		return nil, "", nil
+		return i.projectProfileEvaluation(e)
 	}
 }
 func rawAdmission(profile Profile, e canbusreg.Evidence, decoded bool) (bool, string) {
@@ -459,7 +469,7 @@ func commandIDs(profile Profile) []string {
 	case ProfileV108:
 		return []string{growattlowvoltage.ClockEventRowID, growattlowvoltage.SerialQueryRowID, growattlowvoltage.HistoryQueryRowID}
 	default:
-		return nil
+		return projectCommandIDs(profile)
 	}
 }
 func providerCommandIDs(provider string) []string {
@@ -636,8 +646,8 @@ func (b *nsBook) bindMethod(name string) error {
 		return nil
 	}
 	spec := semdriver.MethodSpec{Local: semdriver.MemberID(name), Schema: "canbusreg.command", Scope: "instance"}
-	if err := reg.Method(node, spec, func(_ context.Context, arg []byte) ([]byte, error) {
-		return b.invoke(name, arg)
+	if err := reg.Method(node, spec, func(ctx context.Context, arg []byte) ([]byte, error) {
+		return b.invoke(ctx, name, arg)
 	}); err != nil {
 		return err
 	}
@@ -986,13 +996,4 @@ func nonempty(value, fallback string) string {
 		return fallback
 	}
 	return value
-}
-func (b *nsBook) invoke(name string, arg []byte) ([]byte, error) {
-	if closed, _, _, _ := b.inst.namespaceState(); closed {
-		return nil, errNamespaceStopped
-	}
-	if namespaceInvoke == nil {
-		return nil, errNamespaceUnbound
-	}
-	return namespaceInvoke(b.inst.key, name, arg)
 }

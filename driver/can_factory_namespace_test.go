@@ -84,9 +84,13 @@ func (m *memRegistry) find(local string) heldMember {
 }
 
 func (m *memRegistry) call(local string, arg []byte) ([]byte, error) {
+	return m.callContext(context.Background(), local, arg)
+}
+
+func (m *memRegistry) callContext(ctx context.Context, local string, arg []byte) ([]byte, error) {
 	for i, spec := range m.methods {
 		if string(spec.Local) == local {
-			return m.invoke[i](context.Background(), arg)
+			return m.invoke[i](ctx, arg)
 		}
 	}
 	return nil, errors.New("method missing")
@@ -795,6 +799,29 @@ func TestNamespaceViewBindsRegisteredMembers(t *testing.T) {
 	}
 }
 
+func TestRunningProfileWithoutRegistryDropsRaw(t *testing.T) {
+	recv := newFakeReceiver(t, "can0", 1)
+	inst := startedInstance(t, factoryWith(recv, nil), config("v104-raw", `{"interface":"can0"}`, `{"profile":"growatt-bms-can-v104"}`))
+	for n := uint64(1); n <= 4; n++ {
+		recv.push(n, 0x313, false, 0, 0, 0, 0, 0, 0, 50, 0)
+	}
+	waitFor(t, "frames", func() bool {
+		got, _, _ := inst.counts()
+		return got == 4
+	})
+	v, ok := namespaceBooks.Load(inst)
+	if !ok {
+		return
+	}
+	b := v.(*nsBook)
+	b.mu.Lock()
+	n := len(b.raw)
+	b.mu.Unlock()
+	if n != 0 {
+		t.Fatalf("raw documents %d", n)
+	}
+}
+
 func typedPoint(class canbusreg.GreeVRFDeviceClass, unit uint8, row canbusreg.GreeVRFDictionaryRow, raw byte, at time.Duration, data []byte) typedPointNote {
 	if data == nil && raw != 0 {
 		data = []byte{raw}
@@ -805,6 +832,54 @@ func typedPoint(class canbusreg.GreeVRFDeviceClass, unit uint8, row canbusreg.Gr
 			Key: canbusreg.GreeVRFRegisterKey{Unit: unit, Type: row.Type}, Row: row, Present: true, Received: at,
 			Value: canbusreg.GreeVRFValue{Status: canbusreg.GreeVRFValueDecoded, Raw: data, Numerator: int64(raw), Denominator: 1},
 		},
+	}
+}
+
+func TestRunningRegistryDropsRawAtStop(t *testing.T) {
+	for _, options := range []string{
+		`{"profile":"growatt-bms-can-v104"}`,
+		commonOptions(""),
+	} {
+		recv := newFakeReceiver(t, "can0", 1)
+		f := factoryWith(recv, nil)
+		plans, err := f.Plan(config("raw-stop", `{"interface":"can0"}`, options))
+		if err != nil || len(plans) != 1 {
+			t.Fatalf("plan: %v %v", plans, err)
+		}
+		built, err := f.Construct(context.Background(), plans[0])
+		if err != nil {
+			t.Fatal(err)
+		}
+		inst := built.(*instance)
+		reg := &memRegistry{}
+		if err := inst.Start(context.Background(), nativeSession{feedSession: feedSession{}, reg: reg}); err != nil {
+			t.Fatal(err)
+		}
+		t.Cleanup(func() { inst.Stop(context.Background()) })
+		for n := uint64(1); n <= 6; n++ {
+			recv.push(n, 0x313, false, 0, 0, 0, 0, 0, 0, 50, 0)
+		}
+		waitFor(t, "frames", func() bool {
+			got, _, _ := inst.counts()
+			return got == 6
+		})
+		v, ok := namespaceBooks.Load(inst)
+		if !ok {
+			t.Fatal("registry book missing")
+		}
+		b := v.(*nsBook)
+		b.mu.Lock()
+		n := len(b.raw)
+		b.mu.Unlock()
+		if n != 0 {
+			t.Fatalf("raw documents %d", n)
+		}
+		if report := inst.Stop(context.Background()); !report.Confirmed && report.Err != nil {
+			t.Fatal(report.Err)
+		}
+		if _, ok := namespaceBooks.Load(inst); ok {
+			t.Fatal("registry book retained")
+		}
 	}
 }
 

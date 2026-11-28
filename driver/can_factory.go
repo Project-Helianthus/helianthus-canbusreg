@@ -8,12 +8,16 @@ import (
 	"errors"
 	"fmt"
 	"sync"
+	"time"
 
 	"github.com/Project-Helianthus/helianthus-canbus"
+	"github.com/Project-Helianthus/helianthus-canbus/periodic"
 	"github.com/Project-Helianthus/helianthus-canbus/receiver"
 	semdriver "github.com/Project-Helianthus/helianthus-semreg/semreg/v1/driver"
 
 	canbusreg "github.com/Project-Helianthus/helianthus-canbusreg"
+	"github.com/Project-Helianthus/helianthus-canbusreg/driver/rows/link"
+	"github.com/Project-Helianthus/helianthus-canbusreg/driver/rows/pcs"
 )
 
 // Kind is the driver kind of every instance this factory plans.
@@ -26,17 +30,26 @@ const (
 
 type openFunc func(string) (receiver.Receiver, error)
 
+// writeFunc opens the transport writer for one interface. The pinned receiver
+// has no Submit method, so a PCS or LINK command uses this writer.
+type writeFunc func(string) (periodic.Sender, error)
+
 // Factory is the SemReg driver factory of the CAN driver.
 type Factory struct {
 	mu      sync.Mutex
 	planned map[semdriver.InstanceKey]InstanceConfig
 	open    openFunc
+	write   writeFunc
 }
 
 // NewFactory returns the CAN driver factory. Instances open their interface
-// through receiver.Open.
+// through receiver.Open and, for a PCS or LINK profile, the transport writer.
 func NewFactory() *Factory {
-	return &Factory{planned: map[semdriver.InstanceKey]InstanceConfig{}, open: receiver.Open}
+	return &Factory{planned: map[semdriver.InstanceKey]InstanceConfig{}, open: receiver.Open, write: socketCANWriter}
+}
+
+func socketCANWriter(name string) (periodic.Sender, error) {
+	return periodic.OpenSocketCAN(name, func() time.Duration { return receiver.MonotonicAt(time.Now()) })
 }
 
 // Descriptor returns the families the factory declares.
@@ -90,7 +103,7 @@ func (f *Factory) Construct(_ context.Context, plan semdriver.InstancePlan) (sem
 	if !ok {
 		return nil, fmt.Errorf("instance %q was not planned by this factory", plan.Instance)
 	}
-	return &instance{key: plan.Instance, config: config, open: f.open}, nil
+	return &instance{key: plan.Instance, config: config, open: f.open, write: f.write}, nil
 }
 
 type decoder func(canbusreg.Evidence) (any, bool)
@@ -99,6 +112,7 @@ type instance struct {
 	key    semdriver.InstanceKey
 	config InstanceConfig
 	open   openFunc
+	write  writeFunc
 
 	mu       sync.Mutex
 	started  bool
@@ -111,7 +125,19 @@ type instance struct {
 	received uint64
 	skipped  uint64
 	err      error
+	// send is the path opened for a PCS or LINK receiver that can submit a
+	// frame. ownsSend is set only for that path, so Stop leaves a path the
+	// caller opened through OpenSend running. closeSend releases a writer
+	// this instance opened; a sender borrowed from the receiver stays with it.
+	send      *Path
+	ownsSend  bool
+	closeSend func() error
+	// suppressRaw drops raw retention while the receive loop is running. A
+	// direct observation before Start still keeps the history a reader holds.
+	suppressRaw bool
 }
+
+var errExtendedSelection = errors.New("extended command is not the configured selection")
 
 func (i *instance) newDecoder(identity canbus.InterfaceIdentity) (decoder, error) {
 	switch i.config.Options.Profile {
@@ -143,6 +169,8 @@ func (i *instance) newDecoder(identity canbus.InterfaceIdentity) (decoder, error
 			return nil, errors.New("invalid interface for the monitor profile")
 		}
 		return func(e canbusreg.Evidence) (any, bool) { return monitor.Apply(e) }, nil
+	case ProfilePCS, ProfileLINK:
+		return i.projectDecoder(identity)
 	}
 	return nil, fmt.Errorf("unsupported profile %q", i.config.Options.Profile)
 }
@@ -172,10 +200,82 @@ func (i *instance) Start(ctx context.Context, session semdriver.Session) error {
 		_ = recv.Close()
 		return err
 	}
+	path, owns, err := i.openProjectSend(identity, recv)
+	if err != nil {
+		_ = recv.Close()
+		return err
+	}
+	if err := i.registerSession(session); err != nil {
+		if owns {
+			path.Stop()
+		}
+		if i.closeSend != nil {
+			_ = i.closeSend()
+			i.closeSend = nil
+		}
+		_ = recv.Close()
+		return err
+	}
 	loopCtx, cancel := context.WithCancel(context.WithoutCancel(ctx))
 	i.started, i.cancel, i.recv, i.done, i.session = true, cancel, recv, make(chan struct{}), session
+	i.send, i.ownsSend, i.suppressRaw = path, owns, true
 	go i.run(loopCtx, recv, decode, i.done)
 	return nil
+}
+
+// openProjectSend opens a command path for a PCS or LINK instance. The pinned
+// receiver exposes no Submit method, so the default factory opens the
+// transport writer. A source that already submits keeps that sender. A
+// receive-only source with no writer leaves the command rows unbound.
+func (i *instance) openProjectSend(identity canbus.InterfaceIdentity, recv receiver.Receiver) (*Path, bool, error) {
+	profile := i.config.Options.Profile
+	if profile != ProfilePCS && profile != ProfileLINK {
+		return nil, false, nil
+	}
+	clock := Clock{Now: func() time.Duration { return receiver.MonotonicAt(time.Now()) }}
+	if sender, ok := recv.(periodic.Sender); ok {
+		path, err := NewPath(i.config, identity, sender, clock)
+		if err != nil {
+			return nil, false, err
+		}
+		return path, true, nil
+	}
+	if i.write == nil {
+		return nil, false, nil
+	}
+	sender, err := i.write(identity.Name())
+	if err != nil {
+		return nil, false, err
+	}
+	path, err := NewPath(i.config, identity, sender, clock)
+	if err != nil {
+		releaseWriter(sender)
+		return nil, false, err
+	}
+	if c, ok := sender.(interface{ Close() error }); ok {
+		i.closeSend = c.Close
+	}
+	return path, true, nil
+}
+
+func releaseWriter(sender periodic.Sender) {
+	if c, ok := sender.(interface{ Close() error }); ok {
+		_ = c.Close()
+	}
+}
+
+// registerSession installs the session namespace before the receive loop
+// starts. A nil session, and a session with no native registry, keep the
+// caller's own registration.
+func (i *instance) registerSession(session semdriver.Session) error {
+	if session == nil {
+		return nil
+	}
+	native := session.Native()
+	if native == nil {
+		return nil
+	}
+	return i.registerNamespace(native)
 }
 
 func (i *instance) run(ctx context.Context, recv receiver.Receiver, decode decoder, done chan struct{}) {
@@ -209,6 +309,7 @@ func (i *instance) run(ctx context.Context, recv receiver.Receiver, decode decod
 		}
 		session := i.session
 		i.mu.Unlock()
+		i.observeNamespace(evidence)
 		i.publishReceived(ctx, session, evidence)
 	}
 }
@@ -222,10 +323,20 @@ func (i *instance) FenceWithdrawal() {
 
 // Stop ends the receive loop, closes the interface and reports the close.
 func (i *instance) Stop(ctx context.Context) semdriver.CloseReport {
+	defer namespaceBooks.Delete(i)
 	i.mu.Lock()
-	cancel, recv, done := i.cancel, i.recv, i.done
-	i.cancel, i.recv = nil, nil
+	cancel, recv, done, path, owns, closeSend := i.cancel, i.recv, i.done, i.send, i.ownsSend, i.closeSend
+	i.cancel, i.recv, i.closeSend = nil, nil, nil
+	if owns {
+		i.send, i.ownsSend = nil, false
+	}
 	i.mu.Unlock()
+	if owns && path != nil {
+		path.Stop()
+	}
+	if closeSend != nil {
+		_ = closeSend()
+	}
 	if recv == nil {
 		return semdriver.CloseReport{Confirmed: true}
 	}
@@ -237,4 +348,87 @@ func (i *instance) Stop(ctx context.Context) semdriver.CloseReport {
 		return semdriver.CloseReport{Err: ctx.Err()}
 	}
 	return semdriver.CloseReport{Confirmed: closeErr == nil, Err: closeErr}
+}
+
+func (b *nsBook) invoke(ctx context.Context, name string, arg []byte) ([]byte, error) {
+	if closed, _, _, _ := b.inst.namespaceState(); closed {
+		return nil, errNamespaceStopped
+	}
+	b.inst.mu.Lock()
+	path := b.inst.send
+	b.inst.mu.Unlock()
+	if path != nil {
+		if out, err, handled := path.invokeNamed(ctx, name, arg); handled {
+			return out, err
+		}
+	}
+	if namespaceInvoke == nil {
+		return nil, errNamespaceUnbound
+	}
+	return namespaceInvoke(b.inst.key, name, arg)
+}
+
+// invokeNamed dispatches one native PCS or LINK command row. handled is false
+// when the name is not a command of this path, so another profile keeps the
+// caller seam.
+func (p *Path) invokeNamed(ctx context.Context, name string, raw []byte) ([]byte, error, bool) {
+	if p == nil {
+		return nil, nil, false
+	}
+	switch p.config.Options.Profile {
+	case ProfilePCS:
+		for _, row := range pcs.Commands() {
+			if row.ID != name {
+				continue
+			}
+			kind := kindPCSClock
+			if row.Identifier == 0x6F0 {
+				kind = kindPCSDiscovery
+			}
+			out, err := p.dispatch(ctx, kind, row.Identifier, raw)
+			return out, err, true
+		}
+		for _, row := range pcs.ExtendedCommands() {
+			if row.ID != name {
+				continue
+			}
+			if _, ok := p.extendedContract(); !ok {
+				return nil, errExtendedSelection, true
+			}
+			out, err := p.dispatch(ctx, kindPCSExtended, row.Identifier, raw)
+			return out, err, true
+		}
+	case ProfileLINK:
+		for _, row := range link.Commands() {
+			if row.ID != name {
+				continue
+			}
+			out, err := p.dispatch(ctx, kindLINKClock, row, raw)
+			return out, err, true
+		}
+	}
+	return nil, nil, false
+}
+
+// extendedContract is the legacy extended contract of a PCS selection whose
+// flavor is pcs-extended19. Any other selection admits no extended command.
+func (p *Path) extendedContract() (pcs.ExtendedContract, bool) {
+	if p == nil || p.config.Options.PCS == nil || p.config.Options.PCS.Flavor != "pcs-extended19" {
+		return "", false
+	}
+	return pcs.ContractLegacyExtended19, true
+}
+
+// keepKnown retains a field's last value and receipt when the new evaluation
+// is rejected. The failed observation's validity replaces the stored one.
+func keepKnown(prev, next nsRow, rejected bool) nsRow {
+	if !rejected || prev.value == nil {
+		return next
+	}
+	next.value = prev.value
+	next.received = prev.received
+	if next.unit == "" {
+		next.unit = prev.unit
+	}
+	return next
 }

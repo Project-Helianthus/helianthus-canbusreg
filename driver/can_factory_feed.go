@@ -113,7 +113,7 @@ func (i *instance) boundFacts(evidence canbusreg.Evidence) ([]semreg.FactCandida
 		table := bms.MonitorTable(frame.ID().Value())
 		evals, _, err = bms.EvaluateMonitorFrame(frame, i.acquired(evidence, table.Bindings))
 	default:
-		return nil, nil
+		evals, err = i.projectEvaluations(evidence)
 	}
 	if err != nil {
 		return nil, err
@@ -263,6 +263,7 @@ func packSubject(instance semdriver.InstanceKey) string {
 }
 
 func (i *instance) stage(ctx context.Context, session semdriver.Session, evidence canbusreg.Evidence, facts []semreg.FactCandidate) {
+	facts = qualifyProjectPacks(string(i.key), i.config.Options.Profile, facts)
 	batch, err := publicationBatch(i.key, i.config.Options.Profile, evidence, facts)
 	if err != nil {
 		return
@@ -286,7 +287,7 @@ func publicationBatch(instance semdriver.InstanceKey, profile Profile, evidence 
 	epoch := semreg.SourceEpochID("epoch." + key)
 	asset := semreg.AssetID("asset." + key)
 	bindings := publicationBindings(key, asset, source, epoch, facts)
-	links, resources := publicationGraph(key, asset, bindings)
+	links, resources := publicationGraph(key, asset, bindings, profile, facts)
 	batch := semreg.PublicationBatch{
 		Contract: semreg.ContractKernelV1,
 		BatchID:  semreg.BatchID("batch." + key + "." + string(sequence)),
@@ -353,16 +354,99 @@ func publicationBindings(key string, asset semreg.AssetID, source semreg.SourceI
 	return out
 }
 
-// publicationGraph is the pack the candidates name. The dimension text is the
-// resource identifier, and each binding observes that pack. The record stays
-// the same on every frame, so a later batch repeats it.
-func publicationGraph(key string, asset semreg.AssetID, bindings []semreg.NativeBinding) ([]semreg.IdentityLink, []semreg.Resource) {
+// publicationGraph is the pack the candidates name. A PCS or LINK fact
+// dimension is that pack's resource identifier and carries the instance key,
+// so two instances that share a label stay distinct in one cut. A LINK
+// instance uses one pack per module source. The other profiles name the
+// instance battery resource. Each binding observes the pack its facts name.
+// The record of one pack stays the same on every frame.
+func publicationGraph(key string, asset semreg.AssetID, bindings []semreg.NativeBinding, profile Profile, facts []semreg.FactCandidate) ([]semreg.IdentityLink, []semreg.Resource) {
+	if profile == ProfileLINK {
+		return linkGraph(key, asset, bindings, facts)
+	}
 	subject := packSubject(semdriver.InstanceKey(key))
-	id := semreg.ResourceID(subject)
+	if profile == ProfilePCS {
+		subject = projectPackID(key, "pack")
+		if packs := distinctPacks(facts); len(packs) > 0 {
+			subject = packs[0]
+		}
+	}
+	return onePackGraph(key, asset, bindings, subject)
+}
+
+// projectPackID is the PCS or LINK resource identifier of one pack label.
+func projectPackID(key, label string) string {
+	return "can/" + key + "/" + label
+}
+
+// qualifyProjectPacks copies PCS and LINK candidates with the pack dimension
+// set to the instance resource identifier. Other profiles are unchanged.
+func qualifyProjectPacks(key string, profile Profile, facts []semreg.FactCandidate) []semreg.FactCandidate {
+	if profile != ProfilePCS && profile != ProfileLINK {
+		return facts
+	}
+	out := append([]semreg.FactCandidate(nil), facts...)
+	for i := range out {
+		dims := append([]semreg.Dimension(nil), out[i].Key.Dimensions...)
+		for j := range dims {
+			if dims[j].ID != "storage.dimension.pack" || dims[j].Value.Text == nil {
+				continue
+			}
+			text := projectPackID(key, *dims[j].Value.Text)
+			dims[j].Value.Text = &text
+		}
+		out[i].Key.Dimensions = dims
+	}
+	return out
+}
+
+func onePackGraph(key string, asset semreg.AssetID, bindings []semreg.NativeBinding, subject string) ([]semreg.IdentityLink, []semreg.Resource) {
+	resource := packResource(key, subject)
+	id := resource.ResourceID
+	links := make([]semreg.IdentityLink, 0, len(bindings))
+	for _, binding := range bindings {
+		links = append(links, semreg.IdentityLink{
+			AssetID: asset, BindingID: binding.BindingID, State: semreg.LinkQualified,
+			Basis: resource.Anchor.Evidence, Revision: "1", Resource: &id,
+		})
+	}
+	return links, []semreg.Resource{resource}
+}
+
+func linkGraph(key string, asset semreg.AssetID, bindings []semreg.NativeBinding, facts []semreg.FactCandidate) ([]semreg.IdentityLink, []semreg.Resource) {
+	subjects := distinctPacks(facts)
+	if len(subjects) == 0 {
+		subjects = []string{projectPackID(key, "pack")}
+	}
+	resources := make([]semreg.Resource, 0, len(subjects))
+	index := map[string]semreg.ResourceID{}
+	for _, subject := range subjects {
+		resource := packResource(key, subject)
+		index[subject] = resource.ResourceID
+		resources = append(resources, resource)
+	}
+	ids := make([]semreg.ResourceID, len(bindings))
+	links := make([]semreg.IdentityLink, 0, len(bindings))
+	evidence := resources[0].Anchor.Evidence
+	for i, binding := range bindings {
+		subject := packOfBinding(facts, binding.BindingID)
+		if subject == "" {
+			subject = subjects[0]
+		}
+		ids[i] = index[subject]
+		links = append(links, semreg.IdentityLink{
+			AssetID: asset, BindingID: binding.BindingID, State: semreg.LinkQualified,
+			Basis: evidence, Revision: "1", Resource: &ids[i],
+		})
+	}
+	return links, resources
+}
+
+func packResource(key, subject string) semreg.Resource {
 	slot := subject
 	evidence := frameEvidence([]byte("resource." + key))
-	resource := semreg.Resource{
-		ResourceID: id, Kind: "resource.battery_pack",
+	return semreg.Resource{
+		ResourceID: semreg.ResourceID(subject), Kind: "resource.battery_pack",
 		Anchor: semreg.ResourceAnchor{
 			Class: semreg.AnchorEquipment, Basis: semreg.AnchorOperatorSlot,
 			Slot: &slot, Evidence: []semreg.EvidenceRef{evidence},
@@ -374,12 +458,42 @@ func publicationGraph(key string, asset semreg.AssetID, bindings []semreg.Native
 		},
 		Revision: "1",
 	}
-	links := make([]semreg.IdentityLink, 0, len(bindings))
-	for _, binding := range bindings {
-		links = append(links, semreg.IdentityLink{
-			AssetID: asset, BindingID: binding.BindingID, State: semreg.LinkQualified,
-			Basis: []semreg.EvidenceRef{evidence}, Revision: "1", Resource: &id,
-		})
+}
+
+func distinctPacks(facts []semreg.FactCandidate) []string {
+	seen := map[string]struct{}{}
+	out := make([]string, 0, 1)
+	for _, fact := range facts {
+		text := packDimensionText(fact)
+		if text == "" {
+			continue
+		}
+		if _, ok := seen[text]; ok {
+			continue
+		}
+		seen[text] = struct{}{}
+		out = append(out, text)
 	}
-	return links, []semreg.Resource{resource}
+	sort.Strings(out)
+	return out
+}
+
+func packOfBinding(facts []semreg.FactCandidate, id semreg.NativeBindingID) string {
+	for _, fact := range facts {
+		if fact.BindingID != nil && *fact.BindingID == id {
+			if text := packDimensionText(fact); text != "" {
+				return text
+			}
+		}
+	}
+	return ""
+}
+
+func packDimensionText(fact semreg.FactCandidate) string {
+	for _, dim := range fact.Key.Dimensions {
+		if dim.ID == "storage.dimension.pack" && dim.Value.Text != nil {
+			return *dim.Value.Text
+		}
+	}
+	return ""
 }

@@ -7,6 +7,7 @@ import (
 	"fmt"
 	"io"
 	"strings"
+	"time"
 
 	"github.com/Project-Helianthus/helianthus-canbus"
 	"github.com/Project-Helianthus/helianthus-canbus/receiver"
@@ -24,6 +25,8 @@ const (
 	ProfileV108    Profile = "growatt-bms-can-v108"
 	ProfileCommon  Profile = "growatt-bms-can-common"
 	ProfileMonitor Profile = "growatt-bms-can-monitor"
+	ProfilePCS     Profile = "growatt-bms-can-pcs"
+	ProfileLINK    Profile = "growatt-bms-can-link"
 )
 
 // V104Role is the configured transmit role of a V1.04 instance. The only
@@ -61,10 +64,17 @@ type CommonSelection struct {
 }
 
 // Options is the strict options operand of an instance.
+// CacheAge is the configured freshness window of a PCS or LINK instance.
+// PCS is that instance's one selection. Sources is a LINK instance's ordered
+// per-source selections, including the coordinator route when one is configured.
+// A value that is already a member of the typed selection is not repeated here.
 type Options struct {
-	Profile   Profile          `json:"profile"`
-	V104Role  V104Role         `json:"v104_role,omitempty"`
-	Selection *CommonSelection `json:"selection,omitempty"`
+	Profile   Profile               `json:"profile"`
+	V104Role  V104Role              `json:"v104_role,omitempty"`
+	Selection *CommonSelection      `json:"selection,omitempty"`
+	CacheAge  time.Duration         `json:"cache_age,omitempty"`
+	PCS       *PCSSelection         `json:"pcs,omitempty"`
+	Sources   []LINKSourceSelection `json:"sources,omitempty"`
 }
 
 // InstanceConfig is one validated configured instance.
@@ -132,7 +142,7 @@ func ParseConfig(transport, options json.RawMessage) (InstanceConfig, error) {
 		return InstanceConfig{}, fmt.Errorf("options: %w", err)
 	}
 	switch o.Profile {
-	case ProfileV104, ProfileV108, ProfileCommon, ProfileMonitor:
+	case ProfileV104, ProfileV108, ProfileCommon, ProfileMonitor, ProfilePCS, ProfileLINK:
 	default:
 		return InstanceConfig{}, fmt.Errorf("options: unsupported profile %q", o.Profile)
 	}
@@ -153,7 +163,7 @@ func ParseConfig(transport, options json.RawMessage) (InstanceConfig, error) {
 			return InstanceConfig{}, fmt.Errorf("options: %w", err)
 		}
 	}
-	return InstanceConfig{Interface: t.Interface, Options: o}, nil
+	return finishParse(t.Interface, o)
 }
 
 func (o Options) commonProjector(identity canbus.InterfaceIdentity, name string) (*canbusreg.GrowattLowVoltageBMSCommonProjector, error) {

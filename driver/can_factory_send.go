@@ -658,6 +658,9 @@ func (p *Path) add(reg semdriver.NativeRegistry, node semdriver.NodeRef, local s
 	})
 }
 func (p *Path) dispatch(ctx context.Context, kind string, row any, raw []byte) ([]byte, error) {
+	if err := ctx.Err(); err != nil {
+		return nil, err
+	}
 	var args commandArguments
 	if err := decodeStrict(raw, &args); err != nil {
 		return nil, err
@@ -757,6 +760,9 @@ func (p *Path) invokePCSDiscovery(args commandArguments) ([]byte, error) {
 	return resultOf(periodic.Submission{Accepted: true}, "")
 }
 func (p *Path) invokeExtended(id uint32, args commandArguments) ([]byte, error) {
+	if _, ok := p.extendedContract(); !ok {
+		return nil, errExtendedSelection
+	}
 	contract := pcs.ExtendedContract(args.Contract)
 	year, err := args.year8()
 	if err != nil {

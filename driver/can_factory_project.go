@@ -190,6 +190,31 @@ func (i *instance) evaluatePCS(e canbusreg.Evidence) (map[string]roweval.Evaluat
 		return nil, "", err
 	}
 	in := pcsInput(sel, e)
+	id := e.Frame.ID()
+	if id.Extended() {
+		return nil, "", nil
+	}
+	switch id.Value() {
+	case 0x311, 0x312, 0x313, 0x314:
+		return i.evaluatePCSBasic(sel, in, e)
+	case 0x315, 0x316, 0x317, 0x318:
+		res, reason, err := pcs.EvaluateGauge(sel, canbusreg.PCSIdentityPCSInput{PCSStandardPCSInput: in})
+		return res.Rows, reason, err
+	case 0x319, 0x322, 0x330:
+		res, reason, err := pcs.EvaluateExtrema(sel, in)
+		return res.Rows, reason, err
+	case 0x320, 0x321, 0x323, 0x324, 0x325:
+		res, reason, err := pcs.EvaluateIdentity(sel, canbusreg.PCSIdentityPCSInput{PCSStandardPCSInput: in})
+		return res.Rows, reason, err
+	case 0x326, 0x327, 0x333, 0x334:
+		res, reason, err := pcs.EvaluateSlots(sel, canbusreg.PCSSlotPCSInput{PCSIdentityPCSInput: canbusreg.PCSIdentityPCSInput{PCSStandardPCSInput: in}})
+		return res.Rows, reason, err
+	default:
+		return nil, "", nil
+	}
+}
+
+func (i *instance) evaluatePCSBasic(sel canbusreg.Selection, in canbusreg.PCSStandardPCSInput, e canbusreg.Evidence) (map[string]roweval.Evaluation, roweval.Reason, error) {
 	res, reason, err := pcs.Evaluate(sel, in)
 	if err != nil || reason != "" {
 		return res.Rows, reason, err
@@ -216,35 +241,56 @@ func (i *instance) evaluateLINK(e canbusreg.Evidence) (map[string]roweval.Evalua
 	in := linkContext(entry.Selection.SelectionSpecValue(), e)
 	res, reason, err := linkObservation(entry, in)
 	if err != nil || reason != "" {
-		return res.Rows, reason, err
+		return qualifySource(res.Rows, entry.Source), reason, err
 	}
 	if entry.Coordinator {
-		return res.Rows, "", nil
+		return qualifySource(res.Rows, entry.Source), "", nil
 	}
 	family := uint16(e.Frame.ID().Value() >> 16)
 	table := link.BoundTable()
+	q := link.Qualifiers(entry.Selection, in)
 	if family == 0x1862 || family == 0x180b {
 		table = link.BoundFineTable()
+		q = link.FineQualifiers(entry.Selection, in, canbusreg.SummaryGates{})
 	}
 	source := fmt.Sprintf("%02X", entry.Source)
-	extra, err := candidatesOf(table, e, link.Qualifiers(entry.Selection, in), link.Descriptors(), i.projectTemplate(e, policyOf(table.Bindings), source), projectRoles(i.key, source, table.Bindings), func(at link.Selector) bool {
+	extra, err := candidatesOf(table, e, q, link.Descriptors(), i.projectTemplate(e, policyOf(table.Bindings), source), projectRoles(i.key, source, table.Bindings), func(at link.Selector) bool {
 		return at.Family == family && at.Extended == e.Frame.ID().Extended() && at.DLC == e.Frame.DLC() && at.RawDLC == e.Frame.RawDLC()
 	})
 	if err != nil {
 		return nil, "", err
 	}
-	return mergeCandidates(res.Rows, extra), "", nil
+	return qualifySource(mergeCandidates(res.Rows, extra), entry.Source), "", nil
 }
 
 func linkObservation(entry LINKEntry, in canbusreg.LINKInput) (link.Result, roweval.Reason, error) {
 	if entry.Coordinator {
 		return link.EvaluateAggregate(entry.Selection, in)
 	}
-	family := uint16(in.Evidence.Frame.ID().Value() >> 16)
-	if family == 0x1862 || family == 0x180b {
+	switch uint16(in.Evidence.Frame.ID().Value() >> 16) {
+	case 0x1862, 0x180b:
 		return link.EvaluateFine(entry.Selection, in, canbusreg.SummaryGates{})
+	case 0x1809, 0x18fb:
+		return link.EvaluateIdentity(entry.Selection, in)
+	case 0x1850, 0x1851, 0x1852, 0x1853, 0x1861, 0x1869:
+		return link.EvaluateDiagnostics(entry.Selection, in)
+	default:
+		return link.Evaluate(entry.Selection, in)
 	}
-	return link.Evaluate(entry.Selection, in)
+}
+
+// qualifySource keeps each LINK module's native reading under its own source.
+// Fact candidate identifiers are already source-qualified and stay as they are.
+func qualifySource(rows map[string]roweval.Evaluation, source uint8) map[string]roweval.Evaluation {
+	if len(rows) == 0 {
+		return rows
+	}
+	suffix := fmt.Sprintf(".%02X", source)
+	out := make(map[string]roweval.Evaluation, len(rows))
+	for id, ev := range rows {
+		out[id+suffix] = ev
+	}
+	return out
 }
 
 func (i *instance) projectTemplate(e canbusreg.Evidence, policy semreg.PolicyID, source string) semreg.FactCandidate {
@@ -386,13 +432,18 @@ func projectNativeRows(o Options, id canbus.InterfaceIdentity) ([]namedRow, erro
 		if err != nil {
 			return nil, err
 		}
-		qs := make([]roweval.Qualifiers, 0, len(sels.Entries))
 		frame := quietFrame()
+		var rows []namedRow
 		for _, entry := range sels.Entries {
 			in := linkContext(entry.Selection.SelectionSpecValue(), canbusreg.Evidence{Frame: frame})
-			qs = append(qs, link.FineQualifiers(entry.Selection, in, canbusreg.SummaryGates{}))
+			q := link.FineQualifiers(entry.Selection, in, canbusreg.SummaryGates{})
+			suffix := fmt.Sprintf(".%02X", entry.Source)
+			for _, row := range admitRows(link.AllTable().Native, []roweval.Qualifiers{q}) {
+				row.id += suffix
+				rows = append(rows, row)
+			}
 		}
-		return admitRows(link.AllTable().Native, qs), nil
+		return rows, nil
 	default:
 		return nil, nil
 	}

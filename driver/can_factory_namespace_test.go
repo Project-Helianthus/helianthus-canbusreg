@@ -795,6 +795,29 @@ func TestNamespaceViewBindsRegisteredMembers(t *testing.T) {
 	}
 }
 
+func TestRunningProfileWithoutRegistryDropsRaw(t *testing.T) {
+	recv := newFakeReceiver(t, "can0", 1)
+	inst := startedInstance(t, factoryWith(recv, nil), config("v104-raw", `{"interface":"can0"}`, `{"profile":"growatt-bms-can-v104"}`))
+	for n := uint64(1); n <= 4; n++ {
+		recv.push(n, 0x313, false, 0, 0, 0, 0, 0, 0, 50, 0)
+	}
+	waitFor(t, "frames", func() bool {
+		got, _, _ := inst.counts()
+		return got == 4
+	})
+	v, ok := namespaceBooks.Load(inst)
+	if !ok {
+		return
+	}
+	b := v.(*nsBook)
+	b.mu.Lock()
+	n := len(b.raw)
+	b.mu.Unlock()
+	if n != 0 {
+		t.Fatalf("raw documents %d", n)
+	}
+}
+
 func typedPoint(class canbusreg.GreeVRFDeviceClass, unit uint8, row canbusreg.GreeVRFDictionaryRow, raw byte, at time.Duration, data []byte) typedPointNote {
 	if data == nil && raw != 0 {
 		data = []byte{raw}

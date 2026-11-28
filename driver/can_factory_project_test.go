@@ -5,16 +5,23 @@ import (
 	"encoding/hex"
 	"encoding/json"
 	"fmt"
+	"sort"
 	"strconv"
 	"strings"
 	"testing"
 	"time"
 
+	"sync"
+
 	"github.com/Project-Helianthus/helianthus-canbus"
+	"github.com/Project-Helianthus/helianthus-canbus/periodic"
 	"github.com/Project-Helianthus/helianthus-canbus/receiver"
+	semdriver "github.com/Project-Helianthus/helianthus-semreg/semreg/v1/driver"
+	"github.com/Project-Helianthus/helianthus-semreg/semreg/v1/roweval"
 
 	canbusreg "github.com/Project-Helianthus/helianthus-canbusreg"
 	"github.com/Project-Helianthus/helianthus-canbusreg/driver/replay"
+	"github.com/Project-Helianthus/helianthus-canbusreg/driver/rows/link"
 	"github.com/Project-Helianthus/helianthus-canbusreg/driver/rows/pcs"
 )
 
@@ -118,8 +125,8 @@ func TestLinkSourcesKeepTheirLayoutValues(t *testing.T) {
 	deadline := time.Now().Add(5 * time.Second)
 	var gotA, gotB readingBody
 	for {
-		gotA = readReading(t, reg, "growatt.bms.link.checkpoint_0")
-		gotB = readReading(t, reg, "growatt.bms.link.full_capacity")
+		gotA = readReading(t, reg, "growatt.bms.link.checkpoint_0.01")
+		gotB = readReading(t, reg, "growatt.bms.link.full_capacity.02")
 		if gotA.Value != nil && gotB.Value != nil && *gotA.Value == wantA && *gotB.Value == wantB && len(pub.snapshot()) == 0 {
 			break
 		}
@@ -135,15 +142,15 @@ func TestLinkSourcesKeepTheirLayoutValues(t *testing.T) {
 		}
 		time.Sleep(time.Millisecond)
 	}
-	if again := readReading(t, reg, "growatt.bms.link.checkpoint_0"); again.Value == nil || *again.Value != wantA {
+	if again := readReading(t, reg, "growatt.bms.link.checkpoint_0.01"); again.Value == nil || *again.Value != wantA {
 		t.Fatalf("unselected source changed checkpoint_0 to %v", again.Value)
 	}
 	cycles := linkField(t, sources[1], 1, 0x180BF402, payloadB, "fine_cycles")
 	state := linkField(t, sources[1], 1, 0x180BF402, payloadB, "algorithm_state")
-	if got := readReading(t, reg, "growatt.bms.link.fine_cycles"); got.Value == nil || *got.Value != cycles {
+	if got := readReading(t, reg, "growatt.bms.link.fine_cycles.02"); got.Value == nil || *got.Value != cycles {
 		t.Fatalf("fine_cycles %v, want %s", got.Value, cycles)
 	}
-	if got := readReading(t, reg, "growatt.bms.link.algorithm_state"); got.Value == nil || *got.Value != state {
+	if got := readReading(t, reg, "growatt.bms.link.algorithm_state.02"); got.Value == nil || *got.Value != state {
 		t.Fatalf("algorithm_state %v, want %s", got.Value, state)
 	}
 }
@@ -340,4 +347,328 @@ func pcsMemberIDs(t *testing.T, sel PCSSelection) map[string]bool {
 		}
 	}
 	return out
+}
+
+func standardPCS() PCSSelection {
+	return PCSSelection{
+		Flavor: "pcs-standard", ProjectCode: "QAAA", Release: "0006", Direction: "bms-to-pcs",
+		Scope: "local", Bank: "ordinary", Endpoint: "coordinator", Group: "0", Slot: "1", Epoch: 4,
+	}
+}
+
+func TestPCSNativeFamiliesReceiveValues(t *testing.T) {
+	sel := standardPCS()
+	raw, err := json.Marshal(Options{Profile: ProfilePCS, CacheAge: time.Second, PCS: &sel})
+	if err != nil {
+		t.Fatal(err)
+	}
+	extrema, identity, gauge := mustHex(t, "5A0D2F0D20030B01"), mustHex(t, "1122330102030400"), mustHex(t, "000A0014001E012C")
+	script := replay.Script{Name: "can0", Interface: "can0", Index: 1, Frames: []replay.Frame{
+		{ID: 0x319, Data: extrema, Monotonic: time.Millisecond},
+		{ID: 0x320, Data: identity, Monotonic: 2 * time.Millisecond},
+		{ID: 0x315, Data: gauge, Monotonic: 3 * time.Millisecond},
+	}}
+	inst, reg := runRecorded(t, "pcs-families", "can0", string(raw), script, &recordingPublisher{})
+	waitReceived(t, inst, 3)
+	assertNative(t, reg, "growatt.bms.pcs.standard.319.maximum_cell", pcsNative(t, sel, 0x319, extrema))
+	assertNative(t, reg, "growatt.bms.pcs.standard.320.hardware", pcsNative(t, sel, 0x320, identity))
+	assertNative(t, reg, "growatt.bms.pcs.standard.315.capacity", pcsNative(t, sel, 0x315, gauge))
+}
+
+func TestLinkFineCapacityPublishesCharge(t *testing.T) {
+	entry := moduleEntry(2, "02", "QAAA", "0006", "")
+	payload := mustHex(t, "e803190007095802")
+	raw, err := json.Marshal(Options{Profile: ProfileLINK, CacheAge: time.Second, Sources: []LINKSourceSelection{entry}})
+	if err != nil {
+		t.Fatal(err)
+	}
+	script := replay.Script{Name: "can0", Interface: "can0", Index: 1, Frames: []replay.Frame{
+		{ID: 0x180BF402, Extended: true, Data: payload, Monotonic: time.Millisecond},
+	}}
+	pub := &recordingPublisher{}
+	_, reg := runRecorded(t, "link-capacity", "can0", string(raw), script, pub)
+	batches := waitBatches(t, pub, 1)
+	if factByID(batches[0].FactUpserts, "storage.capacity.charge") == nil {
+		t.Fatal("storage.capacity.charge was not published")
+	}
+	assertNative(t, reg, "growatt.bms.link.full_capacity.02", linkFineNative(t, entry, 0x180BF402, payload, "growatt.bms.link.full_capacity"))
+}
+
+func TestLinkSerialFragmentFillsIdentityRows(t *testing.T) {
+	entry := moduleEntry(2, "02", "QAAA", "0006", "")
+	payload := mustHex(t, "0f31323334353637")
+	raw, err := json.Marshal(Options{Profile: ProfileLINK, CacheAge: time.Second, Sources: []LINKSourceSelection{entry}})
+	if err != nil {
+		t.Fatal(err)
+	}
+	script := replay.Script{Name: "can0", Interface: "can0", Index: 1, Frames: []replay.Frame{
+		{ID: 0x18FBF402, Extended: true, Data: payload, Monotonic: time.Millisecond},
+	}}
+	inst, reg := runRecorded(t, "link-serial", "can0", string(raw), script, &recordingPublisher{})
+	waitReceived(t, inst, 1)
+	assertNative(t, reg, "growatt.bms.link.serial_header.02", linkIdentityNative(t, entry, 0x18FBF402, payload, "growatt.bms.link.serial_header"))
+}
+
+func TestLinkDiagnosticFrameFillsRegisteredRow(t *testing.T) {
+	entry := moduleEntry(2, "02", "QAAA", "0006", "")
+	payload := []byte{1, 0, 0, 0, 0, 0, 0, 0}
+	raw, err := json.Marshal(Options{Profile: ProfileLINK, CacheAge: time.Second, Sources: []LINKSourceSelection{entry}})
+	if err != nil {
+		t.Fatal(err)
+	}
+	script := replay.Script{Name: "can0", Interface: "can0", Index: 1, Frames: []replay.Frame{
+		{ID: 0x1850F402, Extended: true, Data: payload, Monotonic: time.Millisecond},
+	}}
+	inst, reg := runRecorded(t, "link-diagnostic", "can0", string(raw), script, &recordingPublisher{})
+	waitReceived(t, inst, 1)
+	local, want := linkDiagnosticNative(t, entry, 0x1850F402, payload)
+	assertNative(t, reg, local+".02", want)
+}
+
+func TestLinkSourcesKeepSeparateRemainingCapacity(t *testing.T) {
+	left := moduleEntry(1, "01", "QAAA", "0006", "")
+	right := moduleEntry(2, "02", "QAAA", "0006", "")
+	payloadA := []byte{0, 0, 0, 0, 0, 0, 0x64, 0x00}
+	payloadB := []byte{0, 0, 0, 0, 0, 0, 0xC8, 0x00}
+	raw, err := json.Marshal(Options{Profile: ProfileLINK, CacheAge: time.Second, Sources: []LINKSourceSelection{left, right}})
+	if err != nil {
+		t.Fatal(err)
+	}
+	script := replay.Script{Name: "can0", Interface: "can0", Index: 1, Frames: []replay.Frame{
+		{ID: 0x180BF401, Extended: true, Data: payloadA, Monotonic: time.Millisecond},
+		{ID: 0x180BF402, Extended: true, Data: payloadB, Monotonic: 2 * time.Millisecond},
+	}}
+	inst, reg := runRecorded(t, "link-modules", "can0", string(raw), script, &recordingPublisher{})
+	waitReceived(t, inst, 2)
+	row := "growatt.bms.link.remaining_capacity"
+	wantA := linkFineNative(t, left, 0x180BF401, payloadA, row)
+	wantB := linkFineNative(t, right, 0x180BF402, payloadB, row)
+	if wantA == wantB {
+		t.Fatalf("fixture values collapsed to %s", wantA)
+	}
+	assertNative(t, reg, row+".01", wantA)
+	assertNative(t, reg, row+".02", wantB)
+}
+
+func TestStartRegistersProjectNamespaceAndCommand(t *testing.T) {
+	sel := standardPCS()
+	body, err := json.Marshal(Options{Profile: ProfilePCS, CacheAge: time.Second, PCS: &sel})
+	if err != nil {
+		t.Fatal(err)
+	}
+	rec := &recordingSource{}
+	factory, err := NewFactoryWithSource(func(name string) (receiver.Receiver, error) {
+		if name != "can0" {
+			return nil, fmt.Errorf("no recorded frames for %s", name)
+		}
+		src, err := replay.Open(replay.Script{Name: "can0", Interface: "can0", Index: 1})
+		if err != nil {
+			return nil, err
+		}
+		rec.Receiver = src
+		return rec, nil
+	})
+	if err != nil {
+		t.Fatal(err)
+	}
+	plans, err := factory.Plan(config("pcs-start", `{"interface":"can0"}`, string(body)))
+	if err != nil || len(plans) != 1 {
+		t.Fatalf("plan: %v %v", plans, err)
+	}
+	built, err := factory.Construct(context.Background(), plans[0])
+	if err != nil {
+		t.Fatal(err)
+	}
+	inst := built.(*instance)
+	reg := &memRegistry{}
+	if err := inst.Start(context.Background(), nativeSession{feedSession: feedSession{}, reg: reg}); err != nil {
+		t.Fatal(err)
+	}
+	t.Cleanup(func() { inst.Stop(context.Background()) })
+	soc := readReading(t, reg, "growatt.bms.pcs.standard.313.soc")
+	if soc.Validity != "absent" {
+		t.Fatalf("soc before a frame %+v", soc)
+	}
+	clock := pcs.Commands()[0].ID
+	if !reg.hasMethod(clock) {
+		t.Fatal("clock command was not registered")
+	}
+	buf, err := reg.call(clock, []byte(`{"year":26,"month":11,"day":26,"hour":13,"minute":45,"second":30}`))
+	if err != nil {
+		t.Fatal(err)
+	}
+	var result commandResult
+	if err := json.Unmarshal(buf, &result); err != nil || !result.Accepted {
+		t.Fatalf("command result %s %v", buf, err)
+	}
+	sent := rec.sent()
+	if len(sent) != 1 || sent[0].ID().Value() != 0x211 || sent[0].ID().Extended() {
+		t.Fatalf("sent %#v", sent)
+	}
+}
+
+type nativeSession struct {
+	feedSession
+	reg semdriver.NativeRegistry
+}
+
+func (s nativeSession) Native() semdriver.NativeRegistry { return s.reg }
+
+type recordingSource struct {
+	receiver.Receiver
+	mu  sync.Mutex
+	got []canbus.Frame
+}
+
+func (s *recordingSource) Submit(frame canbus.Frame) (periodic.Submission, error) {
+	s.mu.Lock()
+	s.got = append(s.got, frame)
+	s.mu.Unlock()
+	return periodic.Submission{Accepted: true, Monotonic: time.Millisecond}, nil
+}
+
+func (s *recordingSource) sent() []canbus.Frame {
+	s.mu.Lock()
+	defer s.mu.Unlock()
+	return append([]canbus.Frame(nil), s.got...)
+}
+
+func assertNative(t *testing.T, reg *memRegistry, local, want string) {
+	t.Helper()
+	deadline := time.Now().Add(5 * time.Second)
+	var got readingBody
+	for {
+		got = readReading(t, reg, local)
+		if got.Value != nil && *got.Value == want {
+			return
+		}
+		if time.Now().After(deadline) {
+			t.Fatalf("%s %+v, want %s", local, got, want)
+		}
+		time.Sleep(time.Millisecond)
+	}
+}
+
+func pcsNative(t *testing.T, sel PCSSelection, id uint32, payload []byte) string {
+	t.Helper()
+	identity, err := canbus.NewInterfaceIdentity("can0", 1)
+	if err != nil {
+		t.Fatal(err)
+	}
+	selection, err := NewPCSSelection(identity, sel)
+	if err != nil {
+		t.Fatal(err)
+	}
+	evidence := nsEvidence(t, "can0", 1, 1, time.Millisecond, id, false, payload)
+	in := pcsInput(selection, evidence)
+	var rows map[string]roweval.Evaluation
+	var reason roweval.Reason
+	switch id {
+	case 0x319:
+		res, r, err := pcs.EvaluateExtrema(selection, in)
+		if err != nil {
+			t.Fatal(err)
+		}
+		rows, reason = res.Rows, r
+	case 0x320:
+		res, r, err := pcs.EvaluateIdentity(selection, canbusreg.PCSIdentityPCSInput{PCSStandardPCSInput: in})
+		if err != nil {
+			t.Fatal(err)
+		}
+		rows, reason = res.Rows, r
+	case 0x315:
+		res, r, err := pcs.EvaluateGauge(selection, canbusreg.PCSIdentityPCSInput{PCSStandardPCSInput: in})
+		if err != nil {
+			t.Fatal(err)
+		}
+		rows, reason = res.Rows, r
+	default:
+		t.Fatalf("identifier %#x", id)
+	}
+	if reason != "" {
+		t.Fatalf("identifier %#x reason %s", id, reason)
+	}
+	var local string
+	switch id {
+	case 0x319:
+		local = "growatt.bms.pcs.standard.319.maximum_cell"
+	case 0x320:
+		local = "growatt.bms.pcs.standard.320.hardware"
+	case 0x315:
+		local = "growatt.bms.pcs.standard.315.capacity"
+	}
+	return nativeSpelling(t, rows, local)
+}
+
+func linkFineNative(t *testing.T, entry LINKSourceSelection, id uint32, payload []byte, row string) string {
+	t.Helper()
+	res, reason, err := link.EvaluateFine(linkSelection(t, entry), linkInput(t, entry, id, payload), canbusreg.SummaryGates{})
+	if err != nil || reason != "" {
+		t.Fatalf("fine %v %s", err, reason)
+	}
+	return nativeSpelling(t, res.Rows, row)
+}
+
+func linkIdentityNative(t *testing.T, entry LINKSourceSelection, id uint32, payload []byte, row string) string {
+	t.Helper()
+	res, reason, err := link.EvaluateIdentity(linkSelection(t, entry), linkInput(t, entry, id, payload))
+	if err != nil || reason != "" {
+		t.Fatalf("identity %v %s", err, reason)
+	}
+	return nativeSpelling(t, res.Rows, row)
+}
+
+func linkDiagnosticNative(t *testing.T, entry LINKSourceSelection, id uint32, payload []byte) (string, string) {
+	t.Helper()
+	res, reason, err := link.EvaluateDiagnostics(linkSelection(t, entry), linkInput(t, entry, id, payload))
+	if err != nil || reason != "" {
+		t.Fatalf("diagnostics %v %s", err, reason)
+	}
+	ids := make([]string, 0, len(res.Rows))
+	for local, ev := range res.Rows {
+		if ev.Native != nil && ev.Native.Value != nil {
+			ids = append(ids, local)
+		}
+	}
+	if len(ids) == 0 {
+		t.Fatal("diagnostics produced no value")
+	}
+	sort.Strings(ids)
+	return ids[0], nativeSpelling(t, res.Rows, ids[0])
+}
+
+func linkSelection(t *testing.T, entry LINKSourceSelection) canbusreg.Selection {
+	t.Helper()
+	identity, err := canbus.NewInterfaceIdentity("can0", 1)
+	if err != nil {
+		t.Fatal(err)
+	}
+	sels, err := NewLINKSelections(identity, []LINKSourceSelection{entry})
+	if err != nil {
+		t.Fatal(err)
+	}
+	got, ok := sels.Lookup(entry.Source)
+	if !ok {
+		t.Fatalf("source %d missing", entry.Source)
+	}
+	return got.Selection
+}
+
+func linkInput(t *testing.T, entry LINKSourceSelection, id uint32, payload []byte) canbusreg.LINKInput {
+	t.Helper()
+	selection := linkSelection(t, entry)
+	return linkContext(selection.SelectionSpecValue(), nsEvidence(t, "can0", 1, 1, time.Millisecond, id, true, payload))
+}
+
+func nativeSpelling(t *testing.T, rows map[string]roweval.Evaluation, local string) string {
+	t.Helper()
+	ev, ok := rows[local]
+	if !ok || ev.Native == nil {
+		t.Fatalf("%s missing in evaluator", local)
+	}
+	text, ok := nativeText(ev.Native.Value)
+	if !ok {
+		t.Fatalf("%s has no value", local)
+	}
+	return text
 }

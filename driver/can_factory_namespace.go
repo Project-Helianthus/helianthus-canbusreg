@@ -191,8 +191,18 @@ func (b *nsBook) install(reg semdriver.NativeRegistry) error {
 	return b.bindStored(device)
 }
 func (i *instance) observeNamespace(e canbusreg.Evidence) {
+	v, ok := namespaceBooks.Load(i)
+	if !ok {
+		return
+	}
+	b := v.(*nsBook)
+	b.mu.Lock()
+	registered := b.reg != nil
+	b.mu.Unlock()
+	if !registered {
+		return
+	}
 	ev, reason, err := i.profileEvaluation(e)
-	b := bookFor(i)
 	b.mu.Lock()
 	defer b.mu.Unlock()
 	if err != nil {
@@ -986,13 +996,4 @@ func nonempty(value, fallback string) string {
 		return fallback
 	}
 	return value
-}
-func (b *nsBook) invoke(name string, arg []byte) ([]byte, error) {
-	if closed, _, _, _ := b.inst.namespaceState(); closed {
-		return nil, errNamespaceStopped
-	}
-	if namespaceInvoke == nil {
-		return nil, errNamespaceUnbound
-	}
-	return namespaceInvoke(b.inst.key, name, arg)
 }

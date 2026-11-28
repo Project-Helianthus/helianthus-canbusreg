@@ -8,12 +8,16 @@ import (
 	"errors"
 	"fmt"
 	"sync"
+	"time"
 
 	"github.com/Project-Helianthus/helianthus-canbus"
+	"github.com/Project-Helianthus/helianthus-canbus/periodic"
 	"github.com/Project-Helianthus/helianthus-canbus/receiver"
 	semdriver "github.com/Project-Helianthus/helianthus-semreg/semreg/v1/driver"
 
 	canbusreg "github.com/Project-Helianthus/helianthus-canbusreg"
+	"github.com/Project-Helianthus/helianthus-canbusreg/driver/rows/link"
+	"github.com/Project-Helianthus/helianthus-canbusreg/driver/rows/pcs"
 )
 
 // Kind is the driver kind of every instance this factory plans.
@@ -111,6 +115,11 @@ type instance struct {
 	received uint64
 	skipped  uint64
 	err      error
+	// send is the path opened for a PCS or LINK receiver that can submit a
+	// frame. ownsSend is set only for that path, so Stop leaves a path the
+	// caller opened through OpenSend running.
+	send     *Path
+	ownsSend bool
 }
 
 func (i *instance) newDecoder(identity canbus.InterfaceIdentity) (decoder, error) {
@@ -174,10 +183,55 @@ func (i *instance) Start(ctx context.Context, session semdriver.Session) error {
 		_ = recv.Close()
 		return err
 	}
+	path, owns, err := i.openProjectSend(identity, recv)
+	if err != nil {
+		_ = recv.Close()
+		return err
+	}
+	if err := i.registerSession(session); err != nil {
+		if owns {
+			path.Stop()
+		}
+		_ = recv.Close()
+		return err
+	}
 	loopCtx, cancel := context.WithCancel(context.WithoutCancel(ctx))
 	i.started, i.cancel, i.recv, i.done, i.session = true, cancel, recv, make(chan struct{}), session
+	i.send, i.ownsSend = path, owns
 	go i.run(loopCtx, recv, decode, i.done)
 	return nil
+}
+
+// openProjectSend opens a command path when this PCS or LINK receiver can
+// submit a frame. A receive-only source leaves the command rows unbound.
+func (i *instance) openProjectSend(identity canbus.InterfaceIdentity, recv receiver.Receiver) (*Path, bool, error) {
+	profile := i.config.Options.Profile
+	if profile != ProfilePCS && profile != ProfileLINK {
+		return nil, false, nil
+	}
+	sender, ok := recv.(periodic.Sender)
+	if !ok {
+		return nil, false, nil
+	}
+	path, err := NewPath(i.config, identity, sender, Clock{Now: func() time.Duration { return receiver.MonotonicAt(time.Now()) }})
+	if err != nil {
+		return nil, false, err
+	}
+	return path, true, nil
+}
+
+// registerSession installs the session namespace before the receive loop
+// starts. A nil session, and a session with no native registry, keep the
+// caller's own registration.
+func (i *instance) registerSession(session semdriver.Session) error {
+	if session == nil {
+		return nil
+	}
+	native := session.Native()
+	if native == nil {
+		return nil
+	}
+	return i.registerNamespace(native)
 }
 
 func (i *instance) run(ctx context.Context, recv receiver.Receiver, decode decoder, done chan struct{}) {
@@ -211,8 +265,8 @@ func (i *instance) run(ctx context.Context, recv receiver.Receiver, decode decod
 		}
 		session := i.session
 		i.mu.Unlock()
-		i.publishReceived(ctx, session, evidence)
 		i.observeNamespace(evidence)
+		i.publishReceived(ctx, session, evidence)
 	}
 }
 
@@ -226,9 +280,15 @@ func (i *instance) FenceWithdrawal() {
 // Stop ends the receive loop, closes the interface and reports the close.
 func (i *instance) Stop(ctx context.Context) semdriver.CloseReport {
 	i.mu.Lock()
-	cancel, recv, done := i.cancel, i.recv, i.done
+	cancel, recv, done, path, owns := i.cancel, i.recv, i.done, i.send, i.ownsSend
 	i.cancel, i.recv = nil, nil
+	if owns {
+		i.send, i.ownsSend = nil, false
+	}
 	i.mu.Unlock()
+	if owns && path != nil {
+		path.Stop()
+	}
 	if recv == nil {
 		return semdriver.CloseReport{Confirmed: true}
 	}
@@ -240,4 +300,61 @@ func (i *instance) Stop(ctx context.Context) semdriver.CloseReport {
 		return semdriver.CloseReport{Err: ctx.Err()}
 	}
 	return semdriver.CloseReport{Confirmed: closeErr == nil, Err: closeErr}
+}
+
+func (b *nsBook) invoke(name string, arg []byte) ([]byte, error) {
+	if closed, _, _, _ := b.inst.namespaceState(); closed {
+		return nil, errNamespaceStopped
+	}
+	b.inst.mu.Lock()
+	path := b.inst.send
+	b.inst.mu.Unlock()
+	if path != nil {
+		if out, err, handled := path.invokeNamed(context.Background(), name, arg); handled {
+			return out, err
+		}
+	}
+	if namespaceInvoke == nil {
+		return nil, errNamespaceUnbound
+	}
+	return namespaceInvoke(b.inst.key, name, arg)
+}
+
+// invokeNamed dispatches one native PCS or LINK command row. handled is false
+// when the name is not a command of this path, so another profile keeps the
+// caller seam.
+func (p *Path) invokeNamed(ctx context.Context, name string, raw []byte) ([]byte, error, bool) {
+	if p == nil {
+		return nil, nil, false
+	}
+	switch p.config.Options.Profile {
+	case ProfilePCS:
+		for _, row := range pcs.Commands() {
+			if row.ID != name {
+				continue
+			}
+			kind := kindPCSClock
+			if row.Identifier == 0x6F0 {
+				kind = kindPCSDiscovery
+			}
+			out, err := p.dispatch(ctx, kind, row.Identifier, raw)
+			return out, err, true
+		}
+		for _, row := range pcs.ExtendedCommands() {
+			if row.ID != name {
+				continue
+			}
+			out, err := p.dispatch(ctx, kindPCSExtended, row.Identifier, raw)
+			return out, err, true
+		}
+	case ProfileLINK:
+		for _, row := range link.Commands() {
+			if row.ID != name {
+				continue
+			}
+			out, err := p.dispatch(ctx, kindLINKClock, row, raw)
+			return out, err, true
+		}
+	}
+	return nil, nil, false
 }

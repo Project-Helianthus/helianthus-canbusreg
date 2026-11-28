@@ -113,7 +113,7 @@ func (i *instance) boundFacts(evidence canbusreg.Evidence) ([]semreg.FactCandida
 		table := bms.MonitorTable(frame.ID().Value())
 		evals, _, err = bms.EvaluateMonitorFrame(frame, i.acquired(evidence, table.Bindings))
 	default:
-		return nil, nil
+		evals, err = i.projectEvaluations(evidence)
 	}
 	if err != nil {
 		return nil, err
@@ -286,7 +286,7 @@ func publicationBatch(instance semdriver.InstanceKey, profile Profile, evidence 
 	epoch := semreg.SourceEpochID("epoch." + key)
 	asset := semreg.AssetID("asset." + key)
 	bindings := publicationBindings(key, asset, source, epoch, facts)
-	links, resources := publicationGraph(key, asset, bindings)
+	links, resources := publicationGraph(key, asset, bindings, profile)
 	batch := semreg.PublicationBatch{
 		Contract: semreg.ContractKernelV1,
 		BatchID:  semreg.BatchID("batch." + key + "." + string(sequence)),
@@ -353,11 +353,17 @@ func publicationBindings(key string, asset semreg.AssetID, source semreg.SourceI
 	return out
 }
 
-// publicationGraph is the pack the candidates name. The dimension text is the
-// resource identifier, and each binding observes that pack. The record stays
-// the same on every frame, so a later batch repeats it.
-func publicationGraph(key string, asset semreg.AssetID, bindings []semreg.NativeBinding) ([]semreg.IdentityLink, []semreg.Resource) {
+// publicationGraph is the pack the candidates name. PCS and LINK rows bind the
+// pack dimension to the pack role, so their resource identifier is that role
+// text. Two such instances therefore carry the same resource identifier. The
+// other profiles name the instance battery resource. Each binding observes
+// that pack. The record stays the same on every frame, so a later batch
+// repeats it.
+func publicationGraph(key string, asset semreg.AssetID, bindings []semreg.NativeBinding, profile Profile) ([]semreg.IdentityLink, []semreg.Resource) {
 	subject := packSubject(semdriver.InstanceKey(key))
+	if profile == ProfilePCS || profile == ProfileLINK {
+		subject = "pack"
+	}
 	id := semreg.ResourceID(subject)
 	slot := subject
 	evidence := frameEvidence([]byte("resource." + key))

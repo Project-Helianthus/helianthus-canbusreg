@@ -182,7 +182,7 @@ func (b *nsBook) install(reg semdriver.NativeRegistry) error {
 	if err := b.bindDiagnostics(device); err != nil {
 		return err
 	}
-	if err := b.bindRows(device); err != nil {
+	if err := b.bindInstanceRows(device); err != nil {
 		return err
 	}
 	if err := b.bindRaw(device); err != nil {
@@ -367,7 +367,7 @@ func (i *instance) profileEvaluation(e canbusreg.Evidence) (map[string]roweval.E
 		table := bms.MonitorTable(frame.ID().Value())
 		return bms.EvaluateMonitorFrame(frame, i.acquired(e, table.Bindings))
 	default:
-		return nil, "", nil
+		return i.projectProfileEvaluation(e)
 	}
 }
 func rawAdmission(profile Profile, e canbusreg.Evidence, decoded bool) (bool, string) {
@@ -459,7 +459,7 @@ func commandIDs(profile Profile) []string {
 	case ProfileV108:
 		return []string{growattlowvoltage.ClockEventRowID, growattlowvoltage.SerialQueryRowID, growattlowvoltage.HistoryQueryRowID}
 	default:
-		return nil
+		return projectCommandIDs(profile)
 	}
 }
 func providerCommandIDs(provider string) []string {

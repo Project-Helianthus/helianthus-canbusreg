@@ -143,6 +143,8 @@ func (i *instance) newDecoder(identity canbus.InterfaceIdentity) (decoder, error
 			return nil, errors.New("invalid interface for the monitor profile")
 		}
 		return func(e canbusreg.Evidence) (any, bool) { return monitor.Apply(e) }, nil
+	case ProfilePCS, ProfileLINK:
+		return i.projectDecoder(identity)
 	}
 	return nil, fmt.Errorf("unsupported profile %q", i.config.Options.Profile)
 }
@@ -210,6 +212,7 @@ func (i *instance) run(ctx context.Context, recv receiver.Receiver, decode decod
 		session := i.session
 		i.mu.Unlock()
 		i.publishReceived(ctx, session, evidence)
+		i.observeNamespace(evidence)
 	}
 }
 

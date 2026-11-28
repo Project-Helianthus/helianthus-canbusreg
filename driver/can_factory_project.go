@@ -206,8 +206,7 @@ func (i *instance) evaluatePCS(e canbusreg.Evidence) (map[string]roweval.Evaluat
 		res, reason, err := pcs.EvaluateExtrema(sel, in)
 		return res.Rows, reason, err
 	case 0x320, 0x321, 0x323, 0x324, 0x325:
-		res, reason, err := pcs.EvaluateIdentity(sel, canbusreg.PCSIdentityPCSInput{PCSStandardPCSInput: in})
-		return res.Rows, reason, err
+		return i.evaluatePCSIdentity(sel, in, e)
 	case 0x326, 0x327, 0x333, 0x334:
 		res, reason, err := pcs.EvaluateSlots(sel, canbusreg.PCSSlotPCSInput{PCSIdentityPCSInput: canbusreg.PCSIdentityPCSInput{PCSStandardPCSInput: in}})
 		return res.Rows, reason, err
@@ -244,6 +243,23 @@ func (i *instance) evaluatePCSSummary(sel canbusreg.Selection, in canbusreg.PCSS
 		return rows, bitReason, err
 	}
 	return mergeCandidates(rows, bits.Rows), "", nil
+}
+
+// evaluatePCSIdentity keeps the identity rows. Frame 0x323 also carries the
+// summary bits. A bit rejection leaves those identity rows and an empty reason.
+func (i *instance) evaluatePCSIdentity(sel canbusreg.Selection, in canbusreg.PCSStandardPCSInput, e canbusreg.Evidence) (map[string]roweval.Evaluation, roweval.Reason, error) {
+	res, reason, err := pcs.EvaluateIdentity(sel, canbusreg.PCSIdentityPCSInput{PCSStandardPCSInput: in})
+	if err != nil || reason != "" || e.Frame.ID().Value() != 0x323 {
+		return res.Rows, reason, err
+	}
+	bits, bitReason, bitErr := pcs.EvaluateSummaryBits(sel, canbusreg.PCSSummaryPCSInput{PCSStandardPCSInput: in})
+	if bitErr != nil {
+		return nil, "", bitErr
+	}
+	if bitReason != "" {
+		return res.Rows, "", nil
+	}
+	return mergeCandidates(res.Rows, bits.Rows), "", nil
 }
 
 func (i *instance) evaluateLINK(e canbusreg.Evidence) (map[string]roweval.Evaluation, roweval.Reason, error) {

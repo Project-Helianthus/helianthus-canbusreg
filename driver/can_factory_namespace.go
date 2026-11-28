@@ -211,7 +211,7 @@ func (i *instance) observeNamespace(e canbusreg.Evidence) {
 	}
 	decoded := reason == "" && len(ev) > 0
 	keep, status := rawAdmission(i.config.Options.Profile, e, decoded)
-	if keep {
+	if keep && !i.suppressRaw {
 		b.raw = append(b.raw, rawDocument(e, i.config.Options.Profile == ProfileCommon))
 	}
 	if decoded {
@@ -219,7 +219,7 @@ func (i *instance) observeNamespace(e canbusreg.Evidence) {
 			if one.Native == nil {
 				continue
 			}
-			b.rows[id] = rowFrom(one.Native, e.Monotonic)
+			b.rows[id] = keepKnown(b.rows[id], rowFrom(one.Native, e.Monotonic), one.Native.Reason != "")
 		}
 	}
 	b.status = status

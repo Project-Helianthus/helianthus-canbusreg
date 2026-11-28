@@ -189,7 +189,7 @@ func TestPCSPublishesBoundElementsAndRows(t *testing.T) {
 		if fact.FreshnessPolicy.FreshForNS != "2500000000" || fact.FreshnessPolicy.RetainForNS != "2500000001" {
 			t.Fatalf("cache age window %+v", fact.FreshnessPolicy)
 		}
-		if text := subjectText(t, fact); text != "pack" {
+		if text := subjectText(t, fact); text != "can/pcs-bound/pack" {
 			t.Fatalf("dimension %s", text)
 		}
 	}
@@ -538,6 +538,104 @@ func TestPCSSummaryBitFillsRegisteredMember(t *testing.T) {
 	}
 }
 
+func TestIdentityFrameKeepsSummaryBit(t *testing.T) {
+	sel := standardPCS()
+	raw, err := json.Marshal(Options{Profile: ProfilePCS, CacheAge: time.Second, PCS: &sel})
+	if err != nil {
+		t.Fatal(err)
+	}
+	script := replay.Script{Name: "can0", Interface: "can0", Index: 1, Frames: []replay.Frame{
+		{ID: 0x323, Data: mustHex(t, "03000a0011223344"), Monotonic: time.Millisecond},
+	}}
+	inst, reg := runRecorded(t, "pcs-identity", "can0", string(raw), script, &recordingPublisher{})
+	waitReceived(t, inst, 1)
+	assertNative(t, reg, "growatt.bms.pcs.standard.323.B4/0", "1")
+	assertNative(t, reg, "growatt.bms.pcs.standard.323.count", "3")
+}
+
+func TestRejectedFieldKeepsLastReceipt(t *testing.T) {
+	sel := standardPCS()
+	raw, err := json.Marshal(Options{Profile: ProfilePCS, CacheAge: time.Second, PCS: &sel})
+	if err != nil {
+		t.Fatal(err)
+	}
+	script := replay.Script{Name: "can0", Interface: "can0", Index: 1, Frames: []replay.Frame{
+		{ID: 0x313, Data: mustHex(t, "14BEFFF6FFF65563"), Monotonic: time.Millisecond},
+		{ID: 0x313, Data: mustHex(t, "14BEFFF6FFF6FF63"), Monotonic: 2 * time.Millisecond},
+	}}
+	inst, reg := runRecorded(t, "pcs-keep", "can0", string(raw), script, &recordingPublisher{})
+	waitReceived(t, inst, 2)
+	firstAt := strconv.FormatInt(time.Millisecond.Nanoseconds(), 10)
+	secondAt := strconv.FormatInt((2 * time.Millisecond).Nanoseconds(), 10)
+	deadline := time.Now().Add(5 * time.Second)
+	var soc, current readingBody
+	for {
+		soc = readReading(t, reg, "growatt.bms.pcs.standard.313.soc")
+		current = readReading(t, reg, "growatt.bms.pcs.standard.313.current")
+		if soc.Value != nil && *soc.Value == "85" && soc.Unit == "percent" && soc.Validity == "invalid" && soc.ReceivedAt == firstAt && current.Validity == "good" && current.ReceivedAt == secondAt {
+			return
+		}
+		if time.Now().After(deadline) {
+			t.Fatalf("soc %+v current %+v", soc, current)
+		}
+		time.Sleep(time.Millisecond)
+	}
+}
+
+func TestStandardPCSExtendedCommandSubmitsNothing(t *testing.T) {
+	sel := standardPCS()
+	body, err := json.Marshal(Options{Profile: ProfilePCS, CacheAge: time.Second, PCS: &sel})
+	if err != nil {
+		t.Fatal(err)
+	}
+	rec := &recordingSource{}
+	factory, err := NewFactoryWithSource(func(name string) (receiver.Receiver, error) {
+		if name != "can0" {
+			return nil, fmt.Errorf("no recorded frames for %s", name)
+		}
+		src, err := replay.Open(replay.Script{Name: "can0", Interface: "can0", Index: 1})
+		if err != nil {
+			return nil, err
+		}
+		rec.Receiver = src
+		return rec, nil
+	})
+	if err != nil {
+		t.Fatal(err)
+	}
+	plans, err := factory.Plan(config("pcs-standard-send", `{"interface":"can0"}`, string(body)))
+	if err != nil || len(plans) != 1 {
+		t.Fatalf("plan: %v %v", plans, err)
+	}
+	built, err := factory.Construct(context.Background(), plans[0])
+	if err != nil {
+		t.Fatal(err)
+	}
+	inst := built.(*instance)
+	reg := &memRegistry{}
+	if err := inst.Start(context.Background(), nativeSession{feedSession: feedSession{}, reg: reg}); err != nil {
+		t.Fatal(err)
+	}
+	t.Cleanup(func() { inst.Stop(context.Background()) })
+	extended := pcs.ExtendedCommands()[0].ID
+	if !reg.hasMethod(extended) {
+		t.Fatal("extended command is not registered")
+	}
+	if _, err := reg.call(extended, []byte(`{"contract":"legacy-extended-19","year":26,"month":11,"day":26,"hour":13,"minute":45,"second":30}`)); err == nil {
+		t.Fatal("extended command accepted")
+	}
+	if len(rec.sent()) != 0 {
+		t.Fatalf("extended command submitted %#v", rec.sent())
+	}
+	if _, err := reg.call(pcs.Commands()[0].ID, []byte(`{"year":26,"month":11,"day":26,"hour":13,"minute":45,"second":30}`)); err != nil {
+		t.Fatal(err)
+	}
+	sent := rec.sent()
+	if len(sent) != 1 || sent[0].ID().Extended() || sent[0].ID().Value() != 0x211 {
+		t.Fatalf("clock submitted %#v", sent)
+	}
+}
+
 func TestLinkModulesPublishDistinctPackDimensions(t *testing.T) {
 	left := moduleEntry(1, "01", "QAAA", "0006", "")
 	right := moduleEntry(2, "02", "QAAA", "0006", "")
@@ -564,10 +662,10 @@ func TestLinkModulesPublishDistinctPackDimensions(t *testing.T) {
 			dims[subjectText(t, fact)] = struct{}{}
 		}
 	}
-	if _, ok := dims["pack.01"]; !ok || len(dims) != 2 {
+	if _, ok := dims["can/link-packs/pack.01"]; !ok || len(dims) != 2 {
 		t.Fatalf("pack dimensions %v", dims)
 	}
-	if _, ok := dims["pack.02"]; !ok {
+	if _, ok := dims["can/link-packs/pack.02"]; !ok {
 		t.Fatalf("pack dimensions %v", dims)
 	}
 }

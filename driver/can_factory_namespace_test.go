@@ -835,6 +835,54 @@ func typedPoint(class canbusreg.GreeVRFDeviceClass, unit uint8, row canbusreg.Gr
 	}
 }
 
+func TestRunningRegistryDropsRawAtStop(t *testing.T) {
+	for _, options := range []string{
+		`{"profile":"growatt-bms-can-v104"}`,
+		commonOptions(""),
+	} {
+		recv := newFakeReceiver(t, "can0", 1)
+		f := factoryWith(recv, nil)
+		plans, err := f.Plan(config("raw-stop", `{"interface":"can0"}`, options))
+		if err != nil || len(plans) != 1 {
+			t.Fatalf("plan: %v %v", plans, err)
+		}
+		built, err := f.Construct(context.Background(), plans[0])
+		if err != nil {
+			t.Fatal(err)
+		}
+		inst := built.(*instance)
+		reg := &memRegistry{}
+		if err := inst.Start(context.Background(), nativeSession{feedSession: feedSession{}, reg: reg}); err != nil {
+			t.Fatal(err)
+		}
+		t.Cleanup(func() { inst.Stop(context.Background()) })
+		for n := uint64(1); n <= 6; n++ {
+			recv.push(n, 0x313, false, 0, 0, 0, 0, 0, 0, 50, 0)
+		}
+		waitFor(t, "frames", func() bool {
+			got, _, _ := inst.counts()
+			return got == 6
+		})
+		v, ok := namespaceBooks.Load(inst)
+		if !ok {
+			t.Fatal("registry book missing")
+		}
+		b := v.(*nsBook)
+		b.mu.Lock()
+		n := len(b.raw)
+		b.mu.Unlock()
+		if n != 0 {
+			t.Fatalf("raw documents %d", n)
+		}
+		if report := inst.Stop(context.Background()); !report.Confirmed && report.Err != nil {
+			t.Fatal(report.Err)
+		}
+		if _, ok := namespaceBooks.Load(inst); ok {
+			t.Fatal("registry book retained")
+		}
+	}
+}
+
 func mustJSON(t *testing.T, v any) string {
 	t.Helper()
 	buf, err := json.Marshal(v)

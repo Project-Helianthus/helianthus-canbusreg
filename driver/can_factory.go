@@ -132,7 +132,12 @@ type instance struct {
 	send      *Path
 	ownsSend  bool
 	closeSend func() error
+	// suppressRaw drops raw retention while the receive loop is running. A
+	// direct observation before Start still keeps the history a reader holds.
+	suppressRaw bool
 }
+
+var errExtendedSelection = errors.New("extended command is not the configured selection")
 
 func (i *instance) newDecoder(identity canbus.InterfaceIdentity) (decoder, error) {
 	switch i.config.Options.Profile {
@@ -213,7 +218,7 @@ func (i *instance) Start(ctx context.Context, session semdriver.Session) error {
 	}
 	loopCtx, cancel := context.WithCancel(context.WithoutCancel(ctx))
 	i.started, i.cancel, i.recv, i.done, i.session = true, cancel, recv, make(chan struct{}), session
-	i.send, i.ownsSend = path, owns
+	i.send, i.ownsSend, i.suppressRaw = path, owns, true
 	go i.run(loopCtx, recv, decode, i.done)
 	return nil
 }
@@ -318,6 +323,7 @@ func (i *instance) FenceWithdrawal() {
 
 // Stop ends the receive loop, closes the interface and reports the close.
 func (i *instance) Stop(ctx context.Context) semdriver.CloseReport {
+	defer namespaceBooks.Delete(i)
 	i.mu.Lock()
 	cancel, recv, done, path, owns, closeSend := i.cancel, i.recv, i.done, i.send, i.ownsSend, i.closeSend
 	i.cancel, i.recv, i.closeSend = nil, nil, nil
@@ -386,6 +392,9 @@ func (p *Path) invokeNamed(ctx context.Context, name string, raw []byte) ([]byte
 			if row.ID != name {
 				continue
 			}
+			if _, ok := p.extendedContract(); !ok {
+				return nil, errExtendedSelection, true
+			}
 			out, err := p.dispatch(ctx, kindPCSExtended, row.Identifier, raw)
 			return out, err, true
 		}
@@ -399,4 +408,27 @@ func (p *Path) invokeNamed(ctx context.Context, name string, raw []byte) ([]byte
 		}
 	}
 	return nil, nil, false
+}
+
+// extendedContract is the legacy extended contract of a PCS selection whose
+// flavor is pcs-extended19. Any other selection admits no extended command.
+func (p *Path) extendedContract() (pcs.ExtendedContract, bool) {
+	if p == nil || p.config.Options.PCS == nil || p.config.Options.PCS.Flavor != "pcs-extended19" {
+		return "", false
+	}
+	return pcs.ContractLegacyExtended19, true
+}
+
+// keepKnown retains a field's last value and receipt when the new evaluation
+// is rejected. The failed observation's validity replaces the stored one.
+func keepKnown(prev, next nsRow, rejected bool) nsRow {
+	if !rejected || prev.value == nil {
+		return next
+	}
+	next.value = prev.value
+	next.received = prev.received
+	if next.unit == "" {
+		next.unit = prev.unit
+	}
+	return next
 }

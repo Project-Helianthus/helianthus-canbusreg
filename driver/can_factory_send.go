@@ -760,6 +760,9 @@ func (p *Path) invokePCSDiscovery(args commandArguments) ([]byte, error) {
 	return resultOf(periodic.Submission{Accepted: true}, "")
 }
 func (p *Path) invokeExtended(id uint32, args commandArguments) ([]byte, error) {
+	if _, ok := p.extendedContract(); !ok {
+		return nil, errExtendedSelection
+	}
 	contract := pcs.ExtendedContract(args.Contract)
 	year, err := args.year8()
 	if err != nil {

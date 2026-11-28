@@ -263,6 +263,7 @@ func packSubject(instance semdriver.InstanceKey) string {
 }
 
 func (i *instance) stage(ctx context.Context, session semdriver.Session, evidence canbusreg.Evidence, facts []semreg.FactCandidate) {
+	facts = qualifyProjectPacks(string(i.key), i.config.Options.Profile, facts)
 	batch, err := publicationBatch(i.key, i.config.Options.Profile, evidence, facts)
 	if err != nil {
 		return
@@ -353,21 +354,50 @@ func publicationBindings(key string, asset semreg.AssetID, source semreg.SourceI
 	return out
 }
 
-// publicationGraph is the pack the candidates name. A PCS instance uses the
-// pack role text. A LINK instance uses one pack per module source, so two
-// modules are not two observations of one pack. The other profiles name the
+// publicationGraph is the pack the candidates name. A PCS or LINK fact
+// dimension is that pack's resource identifier and carries the instance key,
+// so two instances that share a label stay distinct in one cut. A LINK
+// instance uses one pack per module source. The other profiles name the
 // instance battery resource. Each binding observes the pack its facts name.
-// The record of one pack stays the same on every frame, so a later batch
-// repeats it.
+// The record of one pack stays the same on every frame.
 func publicationGraph(key string, asset semreg.AssetID, bindings []semreg.NativeBinding, profile Profile, facts []semreg.FactCandidate) ([]semreg.IdentityLink, []semreg.Resource) {
 	if profile == ProfileLINK {
 		return linkGraph(key, asset, bindings, facts)
 	}
 	subject := packSubject(semdriver.InstanceKey(key))
 	if profile == ProfilePCS {
-		subject = "pack"
+		subject = projectPackID(key, "pack")
+		if packs := distinctPacks(facts); len(packs) > 0 {
+			subject = packs[0]
+		}
 	}
 	return onePackGraph(key, asset, bindings, subject)
+}
+
+// projectPackID is the PCS or LINK resource identifier of one pack label.
+func projectPackID(key, label string) string {
+	return "can/" + key + "/" + label
+}
+
+// qualifyProjectPacks copies PCS and LINK candidates with the pack dimension
+// set to the instance resource identifier. Other profiles are unchanged.
+func qualifyProjectPacks(key string, profile Profile, facts []semreg.FactCandidate) []semreg.FactCandidate {
+	if profile != ProfilePCS && profile != ProfileLINK {
+		return facts
+	}
+	out := append([]semreg.FactCandidate(nil), facts...)
+	for i := range out {
+		dims := append([]semreg.Dimension(nil), out[i].Key.Dimensions...)
+		for j := range dims {
+			if dims[j].ID != "storage.dimension.pack" || dims[j].Value.Text == nil {
+				continue
+			}
+			text := projectPackID(key, *dims[j].Value.Text)
+			dims[j].Value.Text = &text
+		}
+		out[i].Key.Dimensions = dims
+	}
+	return out
 }
 
 func onePackGraph(key string, asset semreg.AssetID, bindings []semreg.NativeBinding, subject string) ([]semreg.IdentityLink, []semreg.Resource) {
@@ -386,7 +416,7 @@ func onePackGraph(key string, asset semreg.AssetID, bindings []semreg.NativeBind
 func linkGraph(key string, asset semreg.AssetID, bindings []semreg.NativeBinding, facts []semreg.FactCandidate) ([]semreg.IdentityLink, []semreg.Resource) {
 	subjects := distinctPacks(facts)
 	if len(subjects) == 0 {
-		subjects = []string{"pack"}
+		subjects = []string{projectPackID(key, "pack")}
 	}
 	resources := make([]semreg.Resource, 0, len(subjects))
 	index := map[string]semreg.ResourceID{}

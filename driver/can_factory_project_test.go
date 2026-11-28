@@ -4,18 +4,21 @@ import (
 	"context"
 	"encoding/hex"
 	"encoding/json"
+	"errors"
 	"fmt"
+	"reflect"
+	"runtime"
 	"sort"
 	"strconv"
 	"strings"
+	"sync"
 	"testing"
 	"time"
-
-	"sync"
 
 	"github.com/Project-Helianthus/helianthus-canbus"
 	"github.com/Project-Helianthus/helianthus-canbus/periodic"
 	"github.com/Project-Helianthus/helianthus-canbus/receiver"
+	semreg "github.com/Project-Helianthus/helianthus-semreg/semreg/v1"
 	semdriver "github.com/Project-Helianthus/helianthus-semreg/semreg/v1/driver"
 	"github.com/Project-Helianthus/helianthus-semreg/semreg/v1/roweval"
 
@@ -179,6 +182,9 @@ func TestPCSPublishesBoundElementsAndRows(t *testing.T) {
 	assertQuantity(t, facts, "storage.state.soh", "unit.ratio", "0.99")
 	assertQuantity(t, facts, "storage.pack.current", "unit.ampere", "-1")
 	assertQuantity(t, facts, "storage.pack.voltage", "unit.volt", "53.1")
+	if n := countFacts(facts, "storage.pack.voltage"); n != 1 {
+		t.Fatalf("pack voltage candidates %d", n)
+	}
 	for _, fact := range facts {
 		if fact.FreshnessPolicy.FreshForNS != "2500000000" || fact.FreshnessPolicy.RetainForNS != "2500000001" {
 			t.Fatalf("cache age window %+v", fact.FreshnessPolicy)
@@ -505,6 +511,193 @@ func TestStartRegistersProjectNamespaceAndCommand(t *testing.T) {
 	if len(sent) != 1 || sent[0].ID().Value() != 0x211 || sent[0].ID().Extended() {
 		t.Fatalf("sent %#v", sent)
 	}
+}
+
+func TestPCSSummaryBitFillsRegisteredMember(t *testing.T) {
+	sel := standardPCS()
+	raw, err := json.Marshal(Options{Profile: ProfilePCS, CacheAge: time.Second, PCS: &sel})
+	if err != nil {
+		t.Fatal(err)
+	}
+	script := replay.Script{Name: "can0", Interface: "can0", Index: 1, Frames: []replay.Frame{
+		{ID: 0x312, Data: []byte{1, 0, 0, 0, 0, 0, 0, 0}, Monotonic: time.Millisecond},
+	}}
+	inst, reg := runRecorded(t, "pcs-summary", "can0", string(raw), script, &recordingPublisher{})
+	waitReceived(t, inst, 1)
+	deadline := time.Now().Add(5 * time.Second)
+	var got readingBody
+	for {
+		got = readReading(t, reg, "growatt.bms.pcs.standard.312.A/0")
+		if got.Value != nil && *got.Value == "1" {
+			return
+		}
+		if time.Now().After(deadline) {
+			t.Fatalf("summary bit %+v", got)
+		}
+		time.Sleep(time.Millisecond)
+	}
+}
+
+func TestLinkModulesPublishDistinctPackDimensions(t *testing.T) {
+	left := moduleEntry(1, "01", "QAAA", "0006", "")
+	right := moduleEntry(2, "02", "QAAA", "0006", "")
+	raw, err := json.Marshal(Options{Profile: ProfileLINK, CacheAge: time.Second, Sources: []LINKSourceSelection{left, right}})
+	if err != nil {
+		t.Fatal(err)
+	}
+	script := replay.Script{Name: "can0", Interface: "can0", Index: 1, Frames: []replay.Frame{
+		{ID: 0x1805F401, Extended: true, Data: mustHex(t, "6400000000000000"), Monotonic: time.Millisecond},
+		{ID: 0x1805F402, Extended: true, Data: mustHex(t, "1282ea9b10feffff"), Monotonic: 2 * time.Millisecond},
+	}}
+	pub := &recordingPublisher{}
+	runRecorded(t, "link-packs", "can0", string(raw), script, pub)
+	batches := waitBatches(t, pub, 2)
+	dims := map[string]struct{}{}
+	for _, batch := range batches {
+		if err := batch.Validate(); err != nil {
+			t.Fatal(err)
+		}
+		for _, fact := range batch.FactUpserts {
+			if fact.Key.FactID != "storage.pack.voltage" {
+				continue
+			}
+			dims[subjectText(t, fact)] = struct{}{}
+		}
+	}
+	if _, ok := dims["pack.01"]; !ok || len(dims) != 2 {
+		t.Fatalf("pack dimensions %v", dims)
+	}
+	if _, ok := dims["pack.02"]; !ok {
+		t.Fatalf("pack dimensions %v", dims)
+	}
+}
+
+func TestCanceledPCSClockSubmitsNothing(t *testing.T) {
+	sel := standardPCS()
+	body, err := json.Marshal(Options{Profile: ProfilePCS, CacheAge: time.Second, PCS: &sel})
+	if err != nil {
+		t.Fatal(err)
+	}
+	rec := &recordingSource{}
+	factory, err := NewFactoryWithSource(func(name string) (receiver.Receiver, error) {
+		if name != "can0" {
+			return nil, fmt.Errorf("no recorded frames for %s", name)
+		}
+		src, err := replay.Open(replay.Script{Name: "can0", Interface: "can0", Index: 1})
+		if err != nil {
+			return nil, err
+		}
+		rec.Receiver = src
+		return rec, nil
+	})
+	if err != nil {
+		t.Fatal(err)
+	}
+	plans, err := factory.Plan(config("pcs-cancel", `{"interface":"can0"}`, string(body)))
+	if err != nil || len(plans) != 1 {
+		t.Fatalf("plan: %v %v", plans, err)
+	}
+	built, err := factory.Construct(context.Background(), plans[0])
+	if err != nil {
+		t.Fatal(err)
+	}
+	inst := built.(*instance)
+	reg := &memRegistry{}
+	if err := inst.Start(context.Background(), nativeSession{feedSession: feedSession{}, reg: reg}); err != nil {
+		t.Fatal(err)
+	}
+	t.Cleanup(func() { inst.Stop(context.Background()) })
+	ctx, cancel := context.WithCancel(context.Background())
+	cancel()
+	clock := pcs.Commands()[0].ID
+	buf, err := reg.callContext(ctx, clock, []byte(`{"year":26,"month":11,"day":26,"hour":13,"minute":45,"second":30}`))
+	if err == nil {
+		t.Fatalf("canceled clock returned %s", buf)
+	}
+	if len(rec.sent()) != 0 {
+		t.Fatalf("canceled clock submitted %#v", rec.sent())
+	}
+}
+
+func TestDefaultFactoryUsesPinnedWriter(t *testing.T) {
+	recvType := reflect.TypeOf((*receiver.Receiver)(nil)).Elem()
+	if _, ok := recvType.MethodByName("Submit"); ok {
+		t.Fatal("pinned receiver interface declares Submit")
+	}
+	sendType := reflect.TypeOf((*periodic.Sender)(nil)).Elem()
+	if _, ok := sendType.MethodByName("Submit"); !ok {
+		t.Fatal("pinned sender interface has no Submit")
+	}
+	factory := NewFactory()
+	sender, err := factory.write("can0")
+	if sender != nil {
+		releaseWriter(sender)
+	}
+	if runtime.GOOS != "linux" {
+		if !errors.Is(err, canbus.ErrUnsupportedPlatform) {
+			t.Fatalf("default writer %v", err)
+		}
+	} else if err == nil && sender == nil {
+		t.Fatal("default writer returned nothing")
+	}
+	sent := &captureSender{}
+	factory.open = func(name string) (receiver.Receiver, error) {
+		return replay.Open(replay.Script{Name: name, Interface: name, Index: 1})
+	}
+	factory.write = func(string) (periodic.Sender, error) { return sent, nil }
+	sel := standardPCS()
+	body, err := json.Marshal(Options{Profile: ProfilePCS, CacheAge: time.Second, PCS: &sel})
+	if err != nil {
+		t.Fatal(err)
+	}
+	plans, err := factory.Plan(config("pcs-writer", `{"interface":"can0"}`, string(body)))
+	if err != nil || len(plans) != 1 {
+		t.Fatalf("plan: %v %v", plans, err)
+	}
+	built, err := factory.Construct(context.Background(), plans[0])
+	if err != nil {
+		t.Fatal(err)
+	}
+	inst := built.(*instance)
+	reg := &memRegistry{}
+	if err := inst.Start(context.Background(), nativeSession{feedSession: feedSession{}, reg: reg}); err != nil {
+		t.Fatal(err)
+	}
+	t.Cleanup(func() { inst.Stop(context.Background()) })
+	if _, ok := inst.recv.(periodic.Sender); ok {
+		t.Fatal("receive-only source implements Submit")
+	}
+	clock := pcs.Commands()[0].ID
+	if _, err := reg.call(clock, []byte(`{"year":26,"month":11,"day":26,"hour":13,"minute":45,"second":30}`)); err != nil {
+		t.Fatal(err)
+	}
+	sent.mu.Lock()
+	defer sent.mu.Unlock()
+	if len(sent.got) != 1 || sent.got[0].ID().Value() != 0x211 {
+		t.Fatalf("submitted %#v", sent.got)
+	}
+}
+
+type captureSender struct {
+	mu  sync.Mutex
+	got []canbus.Frame
+}
+
+func (s *captureSender) Submit(frame canbus.Frame) (periodic.Submission, error) {
+	s.mu.Lock()
+	s.got = append(s.got, frame)
+	s.mu.Unlock()
+	return periodic.Submission{Accepted: true, Monotonic: time.Millisecond}, nil
+}
+
+func countFacts(facts []semreg.FactCandidate, id string) int {
+	n := 0
+	for _, fact := range facts {
+		if string(fact.Key.FactID) == id {
+			n++
+		}
+	}
+	return n
 }
 
 type nativeSession struct {

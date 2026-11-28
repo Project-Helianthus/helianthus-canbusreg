@@ -92,12 +92,12 @@ func TestRecordedSourceHostsProjectFacts(t *testing.T) {
 	if err := site.WaitInitial(context.Background()); err != nil {
 		t.Fatal(err)
 	}
-	want := []struct{ fact, unit, value string }{
-		{"storage.state.soh", "unit.ratio", "99/100"},
-		{"storage.pack.voltage", "unit.volt", "531/10"},
-		{"storage.pack.current", "unit.ampere", "-1"},
-		{"storage.state.soc", "unit.ratio", "853/1000"},
-		{"storage.state.soc", "unit.ratio", "85/100"},
+	want := []struct{ dimension, fact, unit, value string }{
+		{"pack", "storage.state.soh", "unit.ratio", "99/100"},
+		{"pack", "storage.pack.voltage", "unit.volt", "531/10"},
+		{"pack", "storage.pack.current", "unit.ampere", "-1"},
+		{"pack.02", "storage.state.soc", "unit.ratio", "853/1000"},
+		{"pack", "storage.state.soc", "unit.ratio", "85/100"},
 	}
 	deadline := time.Now().Add(5 * time.Second)
 	var lines []string
@@ -115,8 +115,7 @@ func TestRecordedSourceHostsProjectFacts(t *testing.T) {
 }
 
 // hostAsset is the asset the host opens for one instance: the digest of the
-// driver kind and the instance key. Each capture names one asset, because both
-// profiles publish the resource identifier the rows bind to the pack role.
+// driver kind and the instance key. Each capture names one asset.
 func hostAsset(instance string) (semreg.AssetID, error) {
 	raw, err := json.Marshal([2]string{string(driver.Kind), instance})
 	if err != nil {
@@ -182,7 +181,7 @@ func factLines(cut semdriver.SemanticCut) []string {
 	return lines
 }
 
-func projectFactsPresent(t *testing.T, lines []string, want []struct{ fact, unit, value string }) bool {
+func projectFactsPresent(t *testing.T, lines []string, want []struct{ dimension, fact, unit, value string }) bool {
 	t.Helper()
 	for _, one := range want {
 		ratio, ok := new(big.Rat).SetString(one.value)
@@ -192,7 +191,7 @@ func projectFactsPresent(t *testing.T, lines []string, want []struct{ fact, unit
 		found := false
 		for _, line := range lines {
 			fields := strings.Fields(line)
-			if len(fields) != 5 || fields[0] != "pack" || fields[1] != one.fact || fields[2] != one.unit {
+			if len(fields) != 5 || fields[0] != one.dimension || fields[1] != one.fact || fields[2] != one.unit {
 				continue
 			}
 			exp, err := strconv.Atoi(fields[4])

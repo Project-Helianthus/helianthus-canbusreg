@@ -195,8 +195,10 @@ func (i *instance) evaluatePCS(e canbusreg.Evidence) (map[string]roweval.Evaluat
 		return nil, "", nil
 	}
 	switch id.Value() {
-	case 0x311, 0x312, 0x313, 0x314:
+	case 0x311, 0x313, 0x314:
 		return i.evaluatePCSBasic(sel, in, e)
+	case 0x312:
+		return i.evaluatePCSSummary(sel, in, e)
 	case 0x315, 0x316, 0x317, 0x318:
 		res, reason, err := pcs.EvaluateGauge(sel, canbusreg.PCSIdentityPCSInput{PCSStandardPCSInput: in})
 		return res.Rows, reason, err
@@ -227,6 +229,21 @@ func (i *instance) evaluatePCSBasic(sel canbusreg.Selection, in canbusreg.PCSSta
 		return nil, "", err
 	}
 	return mergeCandidates(res.Rows, extra), "", nil
+}
+
+// evaluatePCSSummary keeps the summary word and evaluates the summary bits.
+// The word rows come from the standard table. The bit members, including
+// growatt.bms.pcs.standard.312.A/0, come only from EvaluateSummaryBits.
+func (i *instance) evaluatePCSSummary(sel canbusreg.Selection, in canbusreg.PCSStandardPCSInput, e canbusreg.Evidence) (map[string]roweval.Evaluation, roweval.Reason, error) {
+	rows, reason, err := i.evaluatePCSBasic(sel, in, e)
+	if err != nil || reason != "" {
+		return rows, reason, err
+	}
+	bits, bitReason, err := pcs.EvaluateSummaryBits(sel, canbusreg.PCSSummaryPCSInput{PCSStandardPCSInput: in})
+	if err != nil || bitReason != "" {
+		return rows, bitReason, err
+	}
+	return mergeCandidates(rows, bits.Rows), "", nil
 }
 
 func (i *instance) evaluateLINK(e canbusreg.Evidence) (map[string]roweval.Evaluation, roweval.Reason, error) {
@@ -260,7 +277,9 @@ func (i *instance) evaluateLINK(e canbusreg.Evidence) (map[string]roweval.Evalua
 	if err != nil {
 		return nil, "", err
 	}
-	return qualifySource(mergeCandidates(res.Rows, extra), entry.Source), "", nil
+	rows := qualifySource(mergeCandidates(res.Rows, extra), entry.Source)
+	qualifyPackDimension(rows, source)
+	return rows, "", nil
 }
 
 func linkObservation(entry LINKEntry, in canbusreg.LINKInput) (link.Result, roweval.Reason, error) {
@@ -301,6 +320,9 @@ func (i *instance) projectTemplate(e canbusreg.Evidence, policy semreg.PolicyID,
 	tpl.FreshnessPolicy.RetainForNS = semreg.Uint64(strconv.FormatInt(age+1, 10))
 	if source != "" {
 		tpl.CandidateID = semreg.CandidateID(string(tpl.CandidateID) + "." + source)
+		binding := semreg.NativeBindingID("binding." + string(i.key) + "." + source)
+		tpl.BindingID = &binding
+		tpl.Origin.BindingID = &binding
 	}
 	return tpl
 }
@@ -343,11 +365,46 @@ func candidatesOf[S any](table roweval.Table[S], e canbusreg.Evidence, q roweval
 		if err != nil {
 			return nil, err
 		}
-		if ev.Candidate != nil {
+		// Rows that share a selector are evaluated once for that selector. Keeping
+		// the candidate under every iterated row publishes the same fact twice.
+		if ev.Candidate != nil && ev.Native != nil && ev.Native.RowID == row.ID {
 			out[row.ID] = ev
 		}
 	}
 	return out, nil
+}
+
+// qualifyPackDimension names each LINK module's pack by its source address.
+// The row binding stores the role name, so two modules would otherwise share
+// one pack fact key.
+func qualifyPackDimension(rows map[string]roweval.Evaluation, source string) {
+	if source == "" {
+		return
+	}
+	label := "pack." + source
+	for id, ev := range rows {
+		if ev.Candidate == nil {
+			continue
+		}
+		cand := *ev.Candidate
+		dims := make([]semreg.Dimension, len(cand.Key.Dimensions))
+		copy(dims, cand.Key.Dimensions)
+		wrote := false
+		for i := range dims {
+			if dims[i].ID != "storage.dimension.pack" || dims[i].Value.Text == nil {
+				continue
+			}
+			text := label
+			dims[i].Value.Text = &text
+			wrote = true
+		}
+		if !wrote {
+			continue
+		}
+		cand.Key.Dimensions = dims
+		ev.Candidate = &cand
+		rows[id] = ev
+	}
 }
 
 func mergeCandidates(rows, extra map[string]roweval.Evaluation) map[string]roweval.Evaluation {

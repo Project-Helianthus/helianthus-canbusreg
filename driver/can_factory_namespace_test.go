@@ -84,9 +84,13 @@ func (m *memRegistry) find(local string) heldMember {
 }
 
 func (m *memRegistry) call(local string, arg []byte) ([]byte, error) {
+	return m.callContext(context.Background(), local, arg)
+}
+
+func (m *memRegistry) callContext(ctx context.Context, local string, arg []byte) ([]byte, error) {
 	for i, spec := range m.methods {
 		if string(spec.Local) == local {
-			return m.invoke[i](context.Background(), arg)
+			return m.invoke[i](ctx, arg)
 		}
 	}
 	return nil, errors.New("method missing")

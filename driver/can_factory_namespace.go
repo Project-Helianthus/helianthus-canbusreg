@@ -646,8 +646,8 @@ func (b *nsBook) bindMethod(name string) error {
 		return nil
 	}
 	spec := semdriver.MethodSpec{Local: semdriver.MemberID(name), Schema: "canbusreg.command", Scope: "instance"}
-	if err := reg.Method(node, spec, func(_ context.Context, arg []byte) ([]byte, error) {
-		return b.invoke(name, arg)
+	if err := reg.Method(node, spec, func(ctx context.Context, arg []byte) ([]byte, error) {
+		return b.invoke(ctx, name, arg)
 	}); err != nil {
 		return err
 	}

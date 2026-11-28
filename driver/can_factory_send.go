@@ -658,6 +658,9 @@ func (p *Path) add(reg semdriver.NativeRegistry, node semdriver.NodeRef, local s
 	})
 }
 func (p *Path) dispatch(ctx context.Context, kind string, row any, raw []byte) ([]byte, error) {
+	if err := ctx.Err(); err != nil {
+		return nil, err
+	}
 	var args commandArguments
 	if err := decodeStrict(raw, &args); err != nil {
 		return nil, err
